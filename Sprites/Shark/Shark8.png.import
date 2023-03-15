@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dd5w8b6cnmfow"
-path="res://.godot/imported/Shark8.png-dbbf8a32e27629c09bd63f23b45c58c4.ctex"
+path="res://.godot/imported/Shark8.png-a9ceab8f6aac067ac1558f6dd7615b2a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Sprites/Shark Sprite/Shark8.png"
-dest_files=["res://.godot/imported/Shark8.png-dbbf8a32e27629c09bd63f23b45c58c4.ctex"]
+source_file="res://Sprites/Shark/Shark8.png"
+dest_files=["res://.godot/imported/Shark8.png-a9ceab8f6aac067ac1558f6dd7615b2a.ctex"]
 
 [params]
 

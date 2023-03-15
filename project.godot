@@ -11,19 +11,23 @@ config_version=5
 [application]
 
 config/name="avenger-sharks"
-run/main_scene="res://Player.tscn"
-config/features=PackedStringArray("4.0", "C#", "GL Compatibility")
+run/main_scene="res://main.tscn"
+config/features=PackedStringArray("4.0", "GL Compatibility")
 config/icon="res://icon.svg"
 
 [display]
 
-window/size/viewport_width=640
-window/size/viewport_height=480
-window/stretch/mode="canvas_items"
+window/size/viewport_width=1280
+window/size/viewport_height=720
+window/stretch/mode="viewport"
 
 [dotnet]
 
 project/assembly_name="avenger-sharks"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/AsepriteWizard/plugin.cfg")
 
 [input]
 

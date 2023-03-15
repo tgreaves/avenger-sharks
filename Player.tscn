@@ -1,41 +1,45 @@
-[gd_scene load_steps=11 format=3 uid="uid://bivsprvkoa0rv"]
+[gd_scene load_steps=12 format=3 uid="uid://bhx6neq7hsoq0"]
 
-[ext_resource type="Script" path="res://Player.cs" id="1_tamtf"]
-[ext_resource type="Texture2D" uid="uid://ikcchi1bmyrs" path="res://Sprites/Shark Sprite/Shark1.png" id="2_b45nd"]
-[ext_resource type="Texture2D" uid="uid://bdivog3ud6gr" path="res://Sprites/Shark Sprite/Shark2.png" id="3_ojqsj"]
-[ext_resource type="Texture2D" uid="uid://d05wftn5oy54p" path="res://Sprites/Shark Sprite/Shark3.png" id="4_os5op"]
-[ext_resource type="Texture2D" uid="uid://ch8i7pej31kfq" path="res://Sprites/Shark Sprite/Shark4.png" id="5_wdeep"]
-[ext_resource type="Texture2D" uid="uid://bopdr8ypwa6id" path="res://Sprites/Shark Sprite/Shark5.png" id="6_5tmip"]
-[ext_resource type="Texture2D" uid="uid://cqdniuump4djq" path="res://Sprites/Shark Sprite/Shark6.png" id="7_oji8k"]
-[ext_resource type="Texture2D" uid="uid://c4rfkd6arhtvm" path="res://Sprites/Shark Sprite/Shark7.png" id="8_2w31y"]
-[ext_resource type="Texture2D" uid="uid://dd5w8b6cnmfow" path="res://Sprites/Shark Sprite/Shark8.png" id="9_ewxng"]
+[ext_resource type="Script" path="res://Player.gd" id="1_pw3rq"]
+[ext_resource type="Texture2D" uid="uid://ikcchi1bmyrs" path="res://Sprites/Shark/Shark1.png" id="2_px875"]
+[ext_resource type="Texture2D" uid="uid://bdivog3ud6gr" path="res://Sprites/Shark/Shark2.png" id="3_gasau"]
+[ext_resource type="Texture2D" uid="uid://d05wftn5oy54p" path="res://Sprites/Shark/Shark3.png" id="4_5ma5o"]
+[ext_resource type="Texture2D" uid="uid://ch8i7pej31kfq" path="res://Sprites/Shark/Shark4.png" id="5_wrx7s"]
+[ext_resource type="Texture2D" uid="uid://bopdr8ypwa6id" path="res://Sprites/Shark/Shark5.png" id="6_716g1"]
+[ext_resource type="Texture2D" uid="uid://cqdniuump4djq" path="res://Sprites/Shark/Shark6.png" id="7_gn5l1"]
+[ext_resource type="Texture2D" uid="uid://c4rfkd6arhtvm" path="res://Sprites/Shark/Shark7.png" id="8_2abrt"]
+[ext_resource type="Texture2D" uid="uid://dd5w8b6cnmfow" path="res://Sprites/Shark/Shark8.png" id="9_6ph23"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_1hb8q"]
+radius = 49.0
+height = 126.0
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_wa15s"]
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("2_b45nd")
+"texture": ExtResource("2_px875")
 }, {
 "duration": 1.0,
-"texture": ExtResource("3_ojqsj")
+"texture": ExtResource("3_gasau")
 }, {
 "duration": 1.0,
-"texture": ExtResource("4_os5op")
+"texture": ExtResource("4_5ma5o")
 }, {
 "duration": 1.0,
-"texture": ExtResource("5_wdeep")
+"texture": ExtResource("5_wrx7s")
 }, {
 "duration": 1.0,
-"texture": ExtResource("6_5tmip")
+"texture": ExtResource("6_716g1")
 }, {
 "duration": 1.0,
-"texture": ExtResource("7_oji8k")
+"texture": ExtResource("7_gn5l1")
 }, {
 "duration": 1.0,
-"texture": ExtResource("8_2w31y")
+"texture": ExtResource("8_2abrt")
 }, {
 "duration": 1.0,
-"texture": ExtResource("9_ewxng")
+"texture": ExtResource("9_6ph23")
 }],
 "loop": true,
 "name": &"default",
@@ -43,14 +47,27 @@ animations = [{
 }]
 
 [node name="Player" type="CharacterBody2D"]
-script = ExtResource("1_tamtf")
+position = Vector2(312, 206)
+script = ExtResource("1_pw3rq")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(1.00003, -10)
+rotation = 1.5708
+scale = Vector2(0.8, 0.8)
+shape = SubResource("CapsuleShape2D_1hb8q")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 texture_filter = 1
-position = Vector2(312, 236)
 scale = Vector2(4, 4)
 sprite_frames = SubResource("SpriteFrames_wa15s")
-frame = 2
-frame_progress = 0.357715
+frame = 7
+frame_progress = 0.338889
+metadata/_aseprite_wizard_config_ = {
+"layer": "",
+"o_ex_p": "",
+"o_folder": "",
+"o_name": "",
+"only_visible": false,
+"op_exp": false,
+"source": "res://Shark.aseprite"
+}

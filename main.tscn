@@ -1,0 +1,11 @@
+[gd_scene load_steps=4 format=3 uid="uid://b6w8kxixmst07"]
+
+[ext_resource type="PackedScene" uid="uid://bhx6neq7hsoq0" path="res://Player.tscn" id="1_btyoi"]
+[ext_resource type="Script" path="res://main.gd" id="1_bwln5"]
+[ext_resource type="PackedScene" uid="uid://crtedtu6qn41u" path="res://Enemy.tscn" id="2_pqhfy"]
+
+[node name="Main" type="Node"]
+script = ExtResource("1_bwln5")
+enemy_scene = ExtResource("2_pqhfy")
+
+[node name="Player" parent="." instance=ExtResource("1_btyoi")]
