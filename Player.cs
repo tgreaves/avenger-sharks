@@ -18,6 +18,16 @@ public partial class Player : CharacterBody2D
 		MoveAndSlide();
 				
 		var animatedSprite2D = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
+		
+		if (Velocity.X > 0)
+		{
+			animatedSprite2D.FlipH = true;
+		}
+		else if (Velocity.X < 0)
+		{
+			animatedSprite2D.FlipH = false;
+		}
+		
 		//animatedSprite2D.FlipH = true;
 		animatedSprite2D.Play();
 	}

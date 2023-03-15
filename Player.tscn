@@ -49,8 +49,8 @@ script = ExtResource("1_tamtf")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 texture_filter = 1
-position = Vector2(250, 276)
-scale = Vector2(7.25, 5.5625)
+position = Vector2(312, 236)
+scale = Vector2(4, 4)
 sprite_frames = SubResource("SpriteFrames_wa15s")
 frame = 2
 frame_progress = 0.357715
