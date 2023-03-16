@@ -1,10 +1,13 @@
-[gd_scene load_steps=32 format=3 uid="uid://crtedtu6qn41u"]
+[gd_scene load_steps=47 format=3 uid="uid://crtedtu6qn41u"]
 
 [ext_resource type="Script" path="res://Enemy.gd" id="1_inywh"]
 [ext_resource type="Texture2D" uid="uid://ps2dg61ty76w" path="res://Sprites/knight-run-sheet.png" id="2_7pnuj"]
 [ext_resource type="Texture2D" uid="uid://c4xfdnq5c38c0" path="res://Sprites/knight-death-sheet.png" id="2_q1u0q"]
 [ext_resource type="Texture2D" uid="uid://cc8l7jmv24vle" path="res://Sprites/wizard-run-sheet.png" id="3_8f23o"]
+[ext_resource type="Texture2D" uid="uid://c6sytqupcgoul" path="res://Sprites/rogue-death-sheet.png" id="4_chvat"]
 [ext_resource type="Texture2D" uid="uid://b3oxns30ei64v" path="res://Sprites/wizard-death-sheet.png" id="4_mvkr8"]
+[ext_resource type="Texture2D" uid="uid://1wf8llk48bgj" path="res://Sprites/rogue-run-sheet.png" id="5_kkmra"]
+[ext_resource type="AudioStream" uid="uid://vioqdrtdy1x3" path="res://Sound/086398_game-die-81356.mp3" id="8_wxbp6"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_brpyb"]
 radius = 59.0
@@ -56,6 +59,54 @@ region = Rect2(256, 32, 64, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_7ra1g"]
 atlas = ExtResource("2_7pnuj")
+region = Rect2(320, 32, 64, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_vi3f0"]
+atlas = ExtResource("4_chvat")
+region = Rect2(0, 0, 64, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_kqoa1"]
+atlas = ExtResource("4_chvat")
+region = Rect2(64, 0, 64, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_cq0my"]
+atlas = ExtResource("4_chvat")
+region = Rect2(128, 0, 64, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_14bfk"]
+atlas = ExtResource("4_chvat")
+region = Rect2(192, 0, 64, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gw4wh"]
+atlas = ExtResource("4_chvat")
+region = Rect2(256, 0, 64, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_o4wor"]
+atlas = ExtResource("4_chvat")
+region = Rect2(320, 0, 64, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hfmxy"]
+atlas = ExtResource("5_kkmra")
+region = Rect2(0, 32, 64, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_te58b"]
+atlas = ExtResource("5_kkmra")
+region = Rect2(64, 32, 64, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_kgc88"]
+atlas = ExtResource("5_kkmra")
+region = Rect2(128, 32, 64, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_io6je"]
+atlas = ExtResource("5_kkmra")
+region = Rect2(192, 32, 64, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8ww42"]
+atlas = ExtResource("5_kkmra")
+region = Rect2(256, 32, 64, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_oy34x"]
+atlas = ExtResource("5_kkmra")
 region = Rect2(320, 32, 64, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_o1kss"]
@@ -156,6 +207,52 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
+"texture": SubResource("AtlasTexture_vi3f0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_kqoa1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_cq0my")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_14bfk")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_gw4wh")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_o4wor")
+}],
+"loop": false,
+"name": &"rogue-death",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hfmxy")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_te58b")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_kgc88")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_io6je")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8ww42")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_oy34x")
+}],
+"loop": true,
+"name": &"rogue-run",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
 "texture": SubResource("AtlasTexture_o1kss")
 }, {
 "duration": 1.0,
@@ -202,6 +299,8 @@ animations = [{
 }]
 
 [node name="Enemy" type="CharacterBody2D"]
+collision_layer = 2
+collision_mask = 3
 motion_mode = 1
 script = ExtResource("1_inywh")
 
@@ -213,9 +312,7 @@ shape = SubResource("CapsuleShape2D_brpyb")
 texture_filter = 1
 scale = Vector2(4, 4)
 sprite_frames = SubResource("SpriteFrames_4gmcv")
-animation = &"wizard-death"
-frame = 5
-frame_progress = 1.0
+animation = &"wizard-run"
 metadata/_aseprite_wizard_config_ = {
 "layer": "",
 "o_ex_p": "",
@@ -229,3 +326,6 @@ metadata/_aseprite_wizard_config_ = {
 [node name="StateTimer" type="Timer" parent="."]
 wait_time = 2.0
 one_shot = true
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("8_wxbp6")

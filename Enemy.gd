@@ -13,7 +13,7 @@ var enemy_type;
 
 func _ready():
 	#var mob_types = $AnimatedSprite2D.get_sprite_frames().get_animation_names()
-	var mob_types = ['knight','wizard']
+	var mob_types = ['knight','wizard','rogue']
 	enemy_type = mob_types[randi() % mob_types.size()]
 	$AnimatedSprite2D.animation = enemy_type + str('-run')
 	
@@ -36,7 +36,7 @@ func _physics_process(delta):
 			#print("WANDER!!");
 			if $StateTimer.time_left == 0:
 				state = WANDER;
-				$StateTimer.start(float(2));
+				$StateTimer.start(randf_range(1,5));
 				velocity = Vector2(randf_range(-64,64), randf_range(-64,64));
 		DYING:
 			if $StateTimer.time_left == 0:
@@ -59,5 +59,6 @@ func _death():
 	$CollisionShape2D.set_deferred("disabled", true)
 	velocity = Vector2(0,0);
 	$AnimatedSprite2D.animation = enemy_type + str('-death');
-	$StateTimer.start(3);
+	$AudioStreamPlayer.play();
+	$StateTimer.start(2);
 	state = DYING;
