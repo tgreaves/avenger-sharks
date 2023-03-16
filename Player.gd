@@ -2,7 +2,7 @@ extends CharacterBody2D
 
 @export var speed = 400
 
-signal hit;
+signal enemy_eaten;
 @onready var screen_size = get_viewport_rect().size
 
 func get_input():
@@ -21,18 +21,18 @@ func _physics_process(delta):
 		
 	$AnimatedSprite2D.play();
 	
-	print("Count is" + str(get_slide_collision_count()));
+	#print("Count is" + str(get_slide_collision_count()));
 	
 	for i in get_slide_collision_count():
 		var collision = get_slide_collision(i)
 		print("I collided with ", collision.get_collider().name)
 		
 		var collided_with = collision.get_collider();
-		collided_with.queue_free();
-	
+		#collided_with.queue_free();
+		emit_signal('enemy_eaten');
+		collided_with.get_node('.')._death();
+		
 	position.x = clamp(position.x, 0, screen_size.x)
 	position.y = clamp(position.y, 0, screen_size.y)
 	
-	print("x: " + str(position.x) + " y: " + str(position.y))
-	
-	#move_and_slide()
+

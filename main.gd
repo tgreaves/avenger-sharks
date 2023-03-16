@@ -1,16 +1,18 @@
 extends Node
 
 @export var enemy_scene: PackedScene
+var score = 0;
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	var i = 1;
 	
-	while (i < 6):
+	var i = 0;
+	
+	while (i < 50):
 		var mob = enemy_scene.instantiate();
-		#mob.get_node('Enemy').get_node('AnimatedSprite2D').x += i * 20;
+		#mob.get_node('.').set_position (Vector2(150*i,50*i));
+		mob.get_node('.').set_position (Vector2(randf_range(0,2000),randf_range(0,1000)));
 		
-		mob.get_node('.').set_position (Vector2(150*i,50*i));
 		#print(test);
 				
 		add_child(mob);
@@ -21,3 +23,6 @@ func _ready():
 func _process(delta):
 	pass
 
+func _on_player_enemy_eaten():
+	score = score + 1;
+	print("CHOMP! " + str(score))

@@ -9,3 +9,5 @@ script = ExtResource("1_bwln5")
 enemy_scene = ExtResource("2_pqhfy")
 
 [node name="Player" parent="." instance=ExtResource("1_btyoi")]
+
+[connection signal="enemy_eaten" from="Player" to="." method="_on_player_enemy_eaten"]
