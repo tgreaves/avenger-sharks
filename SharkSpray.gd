@@ -12,5 +12,9 @@ func _physics_process(delta):
 		var collision = get_slide_collision(i)
 		print("PLAYER ATTACK HIT: ", collision.get_collider().name)
 		
+		if collision.get_collider().name == 'Arena':
+			self.queue_free()
+			break;
+			
 		collision.get_collider().get_node('.')._death();
 		self.queue_free()

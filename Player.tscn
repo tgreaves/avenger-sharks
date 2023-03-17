@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://bhx6neq7hsoq0"]
+[gd_scene load_steps=40 format=3 uid="uid://bhx6neq7hsoq0"]
 
 [ext_resource type="Script" path="res://Player.gd" id="1_pw3rq"]
 [ext_resource type="Texture2D" uid="uid://ikcchi1bmyrs" path="res://Sprites/Shark/Shark1.png" id="2_px875"]
@@ -9,8 +9,34 @@
 [ext_resource type="Texture2D" uid="uid://cqdniuump4djq" path="res://Sprites/Shark/Shark6.png" id="7_gn5l1"]
 [ext_resource type="Texture2D" uid="uid://c4rfkd6arhtvm" path="res://Sprites/Shark/Shark7.png" id="8_2abrt"]
 [ext_resource type="Texture2D" uid="uid://dd5w8b6cnmfow" path="res://Sprites/Shark/Shark8.png" id="9_6ph23"]
+[ext_resource type="Texture2D" uid="uid://chfcb5gy11be1" path="res://Sprites/Explosions/Explosion4/0001.png" id="10_dfhe1"]
 [ext_resource type="AudioStream" uid="uid://3dfl0qmhv15n" path="res://Sound/laser5-47286.mp3" id="10_v8evc"]
 [ext_resource type="AudioStream" uid="uid://dtpbwgcaf00bn" path="res://Sound/Boss hit 1.wav" id="11_g4ac8"]
+[ext_resource type="Texture2D" uid="uid://cn2mgyrc20w6q" path="res://Sprites/Explosions/Explosion4/0002.png" id="11_r7t7p"]
+[ext_resource type="Texture2D" uid="uid://brkgoddfwhykd" path="res://Sprites/Explosions/Explosion4/0003.png" id="12_lkm55"]
+[ext_resource type="Texture2D" uid="uid://c1lb354tbg0em" path="res://Sprites/Explosions/Explosion4/0004.png" id="13_4ueo8"]
+[ext_resource type="Texture2D" uid="uid://ct5iv3gvncrtt" path="res://Sprites/Explosions/Explosion4/0005.png" id="14_58qq8"]
+[ext_resource type="Texture2D" uid="uid://o01v1180a6dx" path="res://Sprites/Explosions/Explosion4/0006.png" id="15_op4r7"]
+[ext_resource type="Texture2D" uid="uid://6j2n7qawidh0" path="res://Sprites/Explosions/Explosion4/0007.png" id="16_nc7xf"]
+[ext_resource type="Texture2D" uid="uid://4qalnv6u70nu" path="res://Sprites/Explosions/Explosion4/0008.png" id="17_ntu2t"]
+[ext_resource type="Texture2D" uid="uid://brficao338eob" path="res://Sprites/Explosions/Explosion4/0009.png" id="18_f61ot"]
+[ext_resource type="Texture2D" uid="uid://c6obxtjhbnpns" path="res://Sprites/Explosions/Explosion4/0010.png" id="19_fyp2c"]
+[ext_resource type="Texture2D" uid="uid://bqf6dr0wktgue" path="res://Sprites/Explosions/Explosion4/0011.png" id="20_4o5n8"]
+[ext_resource type="Texture2D" uid="uid://b5gn7tir7hfyu" path="res://Sprites/Explosions/Explosion4/0012.png" id="21_gn52o"]
+[ext_resource type="Texture2D" uid="uid://dw7vcfrywwj10" path="res://Sprites/Explosions/Explosion4/0013.png" id="22_f45dj"]
+[ext_resource type="Texture2D" uid="uid://nm6226pcmnar" path="res://Sprites/Explosions/Explosion4/0014.png" id="23_8ke02"]
+[ext_resource type="Texture2D" uid="uid://c551rdutx4vj4" path="res://Sprites/Explosions/Explosion4/0015.png" id="24_e32dn"]
+[ext_resource type="Texture2D" uid="uid://csj6hldjnb48t" path="res://Sprites/Explosions/Explosion4/0016.png" id="25_cywux"]
+[ext_resource type="Texture2D" uid="uid://ddjd6bgr28vg6" path="res://Sprites/Explosions/Explosion4/0017.png" id="26_abuyv"]
+[ext_resource type="Texture2D" uid="uid://dxehstb4vkcqg" path="res://Sprites/Explosions/Explosion4/0018.png" id="27_ujuh7"]
+[ext_resource type="Texture2D" uid="uid://n0kty8k0cfpe" path="res://Sprites/Explosions/Explosion4/0019.png" id="28_mrbjv"]
+[ext_resource type="Texture2D" uid="uid://cnwa8yeckdfeo" path="res://Sprites/Explosions/Explosion4/0020.png" id="29_lfea7"]
+[ext_resource type="Texture2D" uid="uid://bum3yf0l8g1w5" path="res://Sprites/Explosions/Explosion4/0021.png" id="30_1wwox"]
+[ext_resource type="Texture2D" uid="uid://cde33wv60rmgk" path="res://Sprites/Explosions/Explosion4/0022.png" id="31_btk50"]
+[ext_resource type="Texture2D" uid="uid://c30jydja0ymoh" path="res://Sprites/Explosions/Explosion4/0023.png" id="32_tejem"]
+[ext_resource type="Texture2D" uid="uid://trexhcxje46i" path="res://Sprites/Explosions/Explosion4/0024.png" id="33_h0vnm"]
+[ext_resource type="Texture2D" uid="uid://c2kkxkkidhkwc" path="res://Sprites/Explosions/Explosion4/0025.png" id="34_k76uo"]
+[ext_resource type="AudioStream" uid="uid://c5leefn8upwfs" path="res://Sound/hq-explosion-6288.mp3" id="37_g7u1l"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_1hb8q"]
 radius = 49.0
@@ -46,12 +72,92 @@ animations = [{
 "loop": true,
 "name": &"default",
 "speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("10_dfhe1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_r7t7p")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_lkm55")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_4ueo8")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_58qq8")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_op4r7")
+}, {
+"duration": 1.0,
+"texture": ExtResource("16_nc7xf")
+}, {
+"duration": 1.0,
+"texture": ExtResource("17_ntu2t")
+}, {
+"duration": 1.0,
+"texture": ExtResource("18_f61ot")
+}, {
+"duration": 1.0,
+"texture": ExtResource("19_fyp2c")
+}, {
+"duration": 1.0,
+"texture": ExtResource("20_4o5n8")
+}, {
+"duration": 1.0,
+"texture": ExtResource("21_gn52o")
+}, {
+"duration": 1.0,
+"texture": ExtResource("22_f45dj")
+}, {
+"duration": 1.0,
+"texture": ExtResource("23_8ke02")
+}, {
+"duration": 1.0,
+"texture": ExtResource("24_e32dn")
+}, {
+"duration": 1.0,
+"texture": ExtResource("25_cywux")
+}, {
+"duration": 1.0,
+"texture": ExtResource("26_abuyv")
+}, {
+"duration": 1.0,
+"texture": ExtResource("27_ujuh7")
+}, {
+"duration": 1.0,
+"texture": ExtResource("28_mrbjv")
+}, {
+"duration": 1.0,
+"texture": ExtResource("29_lfea7")
+}, {
+"duration": 1.0,
+"texture": ExtResource("30_1wwox")
+}, {
+"duration": 1.0,
+"texture": ExtResource("31_btk50")
+}, {
+"duration": 1.0,
+"texture": ExtResource("32_tejem")
+}, {
+"duration": 1.0,
+"texture": ExtResource("33_h0vnm")
+}, {
+"duration": 1.0,
+"texture": ExtResource("34_k76uo")
+}],
+"loop": false,
+"name": &"explosion",
+"speed": 25.0
 }]
 
 [node name="Player" type="CharacterBody2D"]
 z_index = 1
 position = Vector2(313, 206)
-collision_mask = 4
+collision_mask = 20
 motion_mode = 1
 script = ExtResource("1_pw3rq")
 
@@ -65,8 +171,6 @@ shape = SubResource("CapsuleShape2D_1hb8q")
 texture_filter = 1
 scale = Vector2(4, 4)
 sprite_frames = SubResource("SpriteFrames_wa15s")
-frame = 7
-frame_progress = 0.338889
 metadata/_aseprite_wizard_config_ = {
 "layer": "",
 "o_ex_p": "",
@@ -82,3 +186,10 @@ stream = ExtResource("10_v8evc")
 
 [node name="AudioStreamPlayerHit" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("11_g4ac8")
+
+[node name="AudioStreamPlayerExplosion" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("37_g7u1l")
+
+[node name="PlayerExplosionTimer" type="Timer" parent="."]
+wait_time = 2.0
+one_shot = true

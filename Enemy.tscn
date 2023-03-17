@@ -300,6 +300,7 @@ animations = [{
 
 [node name="Enemy" type="CharacterBody2D"]
 collision_layer = 4
+collision_mask = 17
 motion_mode = 1
 script = ExtResource("1_inywh")
 

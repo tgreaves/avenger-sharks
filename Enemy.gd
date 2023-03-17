@@ -21,18 +21,16 @@ func _ready():
 	
 	$AnimatedSprite2D.play()
 	$StateTimer.start();
-	$AttackTimer.start(randf_range(90,100));
+	$AttackTimer.start(randf_range(1,5));
 	velocity = Vector2(randf_range(-64,64), randf_range(-64,64));
 	move_and_slide();
 
 func _physics_process(delta):
-	#print("Time" + str($StateTimer.time_left));
 	match state:
 		IDLE:
 			velocity = Vector2(0,0);
 			
 			if $StateTimer.time_left == 0:
-				#print("Timer out");
 				state = WANDER;
 				$StateTimer.start(float(2));			
 		WANDER:
@@ -57,7 +55,8 @@ func _physics_process(delta):
 	position.x = clamp(position.x, 0, screen_size.x)
 	position.y = clamp(position.y, 0, screen_size.y)
 	
-	if $AttackTimer.time_left == 0:
+	if $AttackTimer.time_left == 0 && state != DYING:
+		
 		# Always attack for now.
 		var enemy_attack = EnemyAttackScene.instantiate();
 		get_parent().add_child(enemy_attack);
@@ -67,15 +66,16 @@ func _physics_process(delta):
 		enemy_attack.global_position = position;
 		enemy_attack.velocity = target_direction * enemy_attack.enemy_attack_speed;
 
-		$AttackTimer.start(randf_range(90,100));
+		$AttackTimer.start(randf_range(1,20));
 	
 func _death():
-	print("Dead.")
-	$CollisionShape2D.set_deferred("disabled", true)
-	velocity = Vector2(0,0);
-	$AnimatedSprite2D.animation = enemy_type + str('-death');
-	$AudioStreamPlayer.play();
-	$StateTimer.start(2);
-	state = DYING;
+	if state != DYING:
+		$CollisionShape2D.set_deferred("disabled", true)
+		velocity = Vector2(0,0);
+		$AnimatedSprite2D.animation = enemy_type + str('-death');
+		$AudioStreamPlayer.play();
+		$StateTimer.start(2);
+		#$AttackTimer.stop();
+		state = DYING;
 	
-	get_parent()._on_enemy_update_score();
+		get_parent()._on_enemy_update_score();

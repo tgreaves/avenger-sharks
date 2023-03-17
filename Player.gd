@@ -2,13 +2,28 @@ extends CharacterBody2D
 
 const SharkSprayScene = preload("res://SharkSpray.tscn");
 
+enum {
+	ALIVE,
+	EXPLODING,
+	EXPLODED
+}
+
 @export var speed = 400
-@export var player_energy = 100
+@export var player_energy = 3
+@export var shark_status = ALIVE
 
 signal update_energy;
+signal player_died;
 @onready var screen_size = get_viewport_rect().size
 
+func _ready():
+	shark_status = ALIVE;
+
 func get_input():
+	
+	if shark_status != ALIVE:
+		return;
+	
 	var input_direction = Input.get_vector("left", "right", "up", "down")
 	velocity = input_direction * speed
 	
@@ -30,33 +45,53 @@ func get_input():
 func _physics_process(delta):
 	get_input()
 	move_and_slide()
-		
-	if velocity.x > 0:
-		$AnimatedSprite2D.set_flip_h(true);
 	
-	if velocity.x < 0:
-		$AnimatedSprite2D.set_flip_h(false);
-		
-	$AnimatedSprite2D.play();
+	#print("Player physics process...." + str(shark_status));
 	
-	#print("Count is" + str(get_slide_collision_count()));
-	
-	for i in get_slide_collision_count():
-		var collision = get_slide_collision(i)
-		print("PLAYER collided with ", collision.get_collider().name + " // " + collision.get_collider().get_class())
-		
-		var collided_with = collision.get_collider();
-		
-		collided_with.get_node('.')._death();
-		_player_hit();
-		
-	position.x = clamp(position.x, 0, screen_size.x)
-	position.y = clamp(position.y, 0, screen_size.y)
+	match shark_status:
+		ALIVE:
+			if velocity.x > 0:
+				$AnimatedSprite2D.set_flip_h(true);
+			
+			if velocity.x < 0:
+				$AnimatedSprite2D.set_flip_h(false);
+				
+			$AnimatedSprite2D.play();
+			
+			#print("Count is" + str(get_slide_collision_count()));
+			
+			for i in get_slide_collision_count():
+				var collision = get_slide_collision(i)
+				print("PLAYER collided with ", collision.get_collider().name + " // " + collision.get_collider().get_class())
+				
+				var collided_with = collision.get_collider();
+				
+				if collision.get_collider().name == 'Arena':
+					break;
+					
+				collided_with.get_node('.')._death();
+				_player_hit();
+				
+			position.x = clamp(position.x, 0, screen_size.x)
+			position.y = clamp(position.y, 0, screen_size.y)
+		EXPLODING:
+			if $PlayerExplosionTimer.time_left == 0:
+				emit_signal('player_died');
+				print("Death signal");
+				shark_status = EXPLODED;
 
 func _player_hit():
 	$AudioStreamPlayerHit.play();
 	player_energy = player_energy - 1;
 	emit_signal('update_energy');
+	
+	if player_energy <= 0:
+		$CollisionShape2D.set_deferred("disabled", true)
+		velocity = Vector2(0,0);
+		$AnimatedSprite2D.animation = 'explosion';
+		$AudioStreamPlayerExplosion.play();
+		shark_status=EXPLODING;
+		$PlayerExplosionTimer.start();
 	
 	
 

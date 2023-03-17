@@ -12,5 +12,9 @@
    * Water spray sprite: Cethiel - https://opengameart.org/content/water-magic-effect
 * Sound:
    * Shark spray: mparsons99 - https://pixabay.com/
-   * Death sound: https://pixabay.com/sound-effects/086398-game-die-81356/
+   * Enemy Death sound: https://pixabay.com/sound-effects/086398-game-die-81356/
    * Player hit: JDWasabi - https://jdwasabi.itch.io/8-bit-16-bit-sound-effects-pack
+   * Player explosion: Quaker540 - https://pixabay.com/sound-effects/hq-explosion-6288/
+* Font:
+   * Press Start 2P: CodeMan38 - https://fonts.google.com/specimen/Press+Start+2P
+	

@@ -42,7 +42,7 @@ animations = [{
 [node name="SharkSpray" type="CharacterBody2D"]
 scale = Vector2(0.5, 0.5)
 collision_layer = 2
-collision_mask = 4
+collision_mask = 20
 script = ExtResource("1_a544k")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

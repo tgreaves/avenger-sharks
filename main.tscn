@@ -1,16 +1,28 @@
-[gd_scene load_steps=5 format=3 uid="uid://b6w8kxixmst07"]
+[gd_scene load_steps=6 format=3 uid="uid://b6w8kxixmst07"]
 
 [ext_resource type="PackedScene" uid="uid://bhx6neq7hsoq0" path="res://Player.tscn" id="1_btyoi"]
 [ext_resource type="Script" path="res://main.gd" id="1_bwln5"]
 [ext_resource type="PackedScene" uid="uid://crtedtu6qn41u" path="res://Enemy.tscn" id="2_pqhfy"]
+[ext_resource type="PackedScene" uid="uid://ds5km1djhril" path="res://Arena.tscn" id="3_g5obo"]
 [ext_resource type="PackedScene" uid="uid://bcqacic7yj4ds" path="res://HUD.tscn" id="4_83kn1"]
 
 [node name="Main" type="Node"]
 script = ExtResource("1_bwln5")
 enemy_scene = ExtResource("2_pqhfy")
 
-[node name="Player" parent="." instance=ExtResource("1_btyoi")]
+[node name="Arena" parent="." instance=ExtResource("3_g5obo")]
 
 [node name="HUD" parent="." instance=ExtResource("4_83kn1")]
 
+[node name="Player" parent="." instance=ExtResource("1_btyoi")]
+
+[node name="WaveIntroTimer" type="Timer" parent="."]
+wait_time = 3.0
+one_shot = true
+
+[node name="GameOverTimer" type="Timer" parent="."]
+wait_time = 3.0
+one_shot = true
+
+[connection signal="player_died" from="Player" to="." method="_on_player_player_died"]
 [connection signal="update_energy" from="Player" to="." method="_on_player_update_energy"]
