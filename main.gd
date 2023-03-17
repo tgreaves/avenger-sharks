@@ -53,6 +53,8 @@ func start_game():
 	$Player.get_node("AnimatedSprite2D").animation = 'default';
 	$Player.visible = true;
 	
+	$ItemSpawnTimer.start(randf_range(1,2));
+	
 	_on_player_update_energy();
 	_on_enemy_update_score_display();
 	
@@ -77,6 +79,12 @@ func return_to_main_screen():
 	
 	_ready();
 	
+func spawn_item():
+	print("SPAWNING ITEM!");
+	
+	$Arena.set_cell(1, Vector2i(randi_range(1,20),randi_range(1,20)),0,Vector2i(9,8));
+	$ItemSpawnTimer.start(randf_range(10,20));
+	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	if game_status == WAVE_START:
@@ -86,6 +94,9 @@ func _process(delta):
 	if game_status == GAME_RUNNING:
 		if get_tree().get_nodes_in_group("enemyGroup").size() == 0:
 			wave_end();
+			
+		if $ItemSpawnTimer.time_left == 0:
+			spawn_item();
 			
 	if game_status == GAME_OVER:
 		if $GameOverTimer.time_left == 0:

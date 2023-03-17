@@ -69,6 +69,7 @@ shark_fire_mouse={
 2d_physics/layer_3="enemy"
 2d_physics/layer_4="enemy_attack"
 2d_physics/layer_5="walls"
+2d_physics/layer_6="items"
 
 [rendering]
 

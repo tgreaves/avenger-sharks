@@ -67,6 +67,15 @@ func _physics_process(delta):
 				var collided_with = collision.get_collider();
 				
 				if collision.get_collider().name == 'Arena':
+					print("RID: " + str(collision.get_collider_rid()));
+					var rid_coords = collided_with.get_coords_for_body_rid( collision.get_collider_rid());
+					print("Coords: " + str(collided_with.get_coords_for_body_rid( collision.get_collider_rid())));
+					print ("ATLAS Trans: " + str(collided_with.get_cell_atlas_coords(1, rid_coords)));
+					
+					collided_with.set_cell(		1, 
+												collided_with.get_coords_for_body_rid( collision.get_collider_rid()),
+												-1);
+					
 					break;
 					
 				collided_with.get_node('.')._death();
