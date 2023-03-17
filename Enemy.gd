@@ -1,5 +1,7 @@
 extends CharacterBody2D
 
+const EnemyAttackScene = preload("res://EnemyAttack.tscn");
+
 enum {
 	IDLE,
 	WANDER,
@@ -19,6 +21,7 @@ func _ready():
 	
 	$AnimatedSprite2D.play()
 	$StateTimer.start();
+	$AttackTimer.start(randf_range(90,100));
 	velocity = Vector2(randf_range(-64,64), randf_range(-64,64));
 	move_and_slide();
 
@@ -54,6 +57,18 @@ func _physics_process(delta):
 	position.x = clamp(position.x, 0, screen_size.x)
 	position.y = clamp(position.y, 0, screen_size.y)
 	
+	if $AttackTimer.time_left == 0:
+		# Always attack for now.
+		var enemy_attack = EnemyAttackScene.instantiate();
+		get_parent().add_child(enemy_attack);
+		
+		var target_direction = (get_parent().get_node("Player").global_position - global_position).normalized();
+		
+		enemy_attack.global_position = position;
+		enemy_attack.velocity = target_direction * enemy_attack.enemy_attack_speed;
+
+		$AttackTimer.start(randf_range(90,100));
+	
 func _death():
 	print("Dead.")
 	$CollisionShape2D.set_deferred("disabled", true)
@@ -62,3 +77,5 @@ func _death():
 	$AudioStreamPlayer.play();
 	$StateTimer.start(2);
 	state = DYING;
+	
+	get_parent()._on_enemy_update_score();

@@ -1,0 +1,35 @@
+[gd_scene load_steps=2 format=3 uid="uid://bcqacic7yj4ds"]
+
+[sub_resource type="SystemFont" id="SystemFont_oahei"]
+subpixel_positioning = 0
+
+[node name="HUD" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Energy" type="Label" parent="CanvasLayer"]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -230.0
+offset_bottom = 91.0
+grow_horizontal = 0
+size_flags_horizontal = 8
+theme_override_fonts/font = SubResource("SystemFont_oahei")
+theme_override_font_sizes/font_size = 64
+text = "Energy:"
+
+[node name="Score" type="Label" parent="CanvasLayer"]
+offset_top = -2.0
+offset_right = 230.0
+offset_bottom = 89.0
+size_flags_horizontal = 8
+theme_override_fonts/font = SubResource("SystemFont_oahei")
+theme_override_font_sizes/font_size = 64
+text = "Score:	"

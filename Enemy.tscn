@@ -299,8 +299,7 @@ animations = [{
 }]
 
 [node name="Enemy" type="CharacterBody2D"]
-collision_layer = 2
-collision_mask = 3
+collision_layer = 4
 motion_mode = 1
 script = ExtResource("1_inywh")
 
@@ -324,6 +323,10 @@ metadata/_aseprite_wizard_config_ = {
 }
 
 [node name="StateTimer" type="Timer" parent="."]
+wait_time = 2.0
+one_shot = true
+
+[node name="AttackTimer" type="Timer" parent="."]
 wait_time = 2.0
 one_shot = true
 

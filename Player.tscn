@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://bhx6neq7hsoq0"]
+[gd_scene load_steps=14 format=3 uid="uid://bhx6neq7hsoq0"]
 
 [ext_resource type="Script" path="res://Player.gd" id="1_pw3rq"]
 [ext_resource type="Texture2D" uid="uid://ikcchi1bmyrs" path="res://Sprites/Shark/Shark1.png" id="2_px875"]
@@ -10,6 +10,7 @@
 [ext_resource type="Texture2D" uid="uid://c4rfkd6arhtvm" path="res://Sprites/Shark/Shark7.png" id="8_2abrt"]
 [ext_resource type="Texture2D" uid="uid://dd5w8b6cnmfow" path="res://Sprites/Shark/Shark8.png" id="9_6ph23"]
 [ext_resource type="AudioStream" uid="uid://3dfl0qmhv15n" path="res://Sound/laser5-47286.mp3" id="10_v8evc"]
+[ext_resource type="AudioStream" uid="uid://dtpbwgcaf00bn" path="res://Sound/Boss hit 1.wav" id="11_g4ac8"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_1hb8q"]
 radius = 49.0
@@ -50,7 +51,7 @@ animations = [{
 [node name="Player" type="CharacterBody2D"]
 z_index = 1
 position = Vector2(313, 206)
-collision_mask = 2
+collision_mask = 4
 motion_mode = 1
 script = ExtResource("1_pw3rq")
 
@@ -76,5 +77,8 @@ metadata/_aseprite_wizard_config_ = {
 "source": "res://Shark.aseprite"
 }
 
-[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+[node name="AudioStreamPlayerSpray" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("10_v8evc")
+
+[node name="AudioStreamPlayerHit" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("11_g4ac8")

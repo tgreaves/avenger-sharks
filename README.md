@@ -13,3 +13,4 @@
 * Sound:
    * Shark spray: mparsons99 - https://pixabay.com/
    * Death sound: https://pixabay.com/sound-effects/086398-game-die-81356/
+   * Player hit: JDWasabi - https://jdwasabi.itch.io/8-bit-16-bit-sound-effects-pack
