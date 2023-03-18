@@ -22,7 +22,8 @@ grow_horizontal = 0
 size_flags_horizontal = 8
 theme_override_fonts/font = ExtResource("1_4l55f")
 theme_override_font_sizes/font_size = 64
-text = "Energy:"
+text = "ENERGY"
+horizontal_alignment = 2
 
 [node name="Score" type="Label" parent="CanvasLayer"]
 offset_top = -2.0
@@ -31,7 +32,7 @@ offset_bottom = 89.0
 size_flags_horizontal = 8
 theme_override_fonts/font = ExtResource("1_4l55f")
 theme_override_font_sizes/font_size = 64
-text = "Score:	"
+text = "SCORE"
 
 [node name="Label" type="Label" parent="CanvasLayer"]
 anchors_preset = 8
@@ -48,3 +49,18 @@ grow_vertical = 2
 theme_override_fonts/font = ExtResource("1_4l55f")
 theme_override_font_sizes/font_size = 64
 text = "AVENGER SHARKS!"
+
+[node name="HighScore" type="Label" parent="CanvasLayer"]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -192.0
+offset_right = 192.0
+offset_bottom = 91.0
+grow_horizontal = 2
+size_flags_horizontal = 8
+theme_override_fonts/font = ExtResource("1_4l55f")
+theme_override_font_sizes/font_size = 64
+text = "HIGH SCORE
+0"
+horizontal_alignment = 1

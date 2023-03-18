@@ -2,14 +2,15 @@ extends CharacterBody2D
 
 const SharkSprayScene = preload("res://SharkSpray.tscn");
 
+
 enum {
 	ALIVE,
 	EXPLODING,
 	EXPLODED
 }
 
-@export var speed = 400
-@export var player_energy = 3
+@export var speed = constants.PLAYER_SPEED;
+@export var player_energy = constants.PLAYER_START_GAME_ENERGY;
 @export var shark_status = ALIVE
 
 signal update_energy;
@@ -72,6 +73,12 @@ func _physics_process(delta):
 					print("Coords: " + str(collided_with.get_coords_for_body_rid( collision.get_collider_rid())));
 					print ("ATLAS Trans: " + str(collided_with.get_cell_atlas_coords(1, rid_coords)));
 					
+					if ( collided_with.get_cell_atlas_coords(1, rid_coords) == Vector2i(9,8)):
+						player_energy = player_energy + constants.HEALTH_POTION_BONUS;
+						if player_energy > constants.PLAYER_START_GAME_ENERGY:
+							player_energy = constants.PLAYER_START_GAME_ENERGY;
+						emit_signal('update_energy')
+					
 					collided_with.set_cell(		1, 
 												collided_with.get_coords_for_body_rid( collision.get_collider_rid()),
 												-1);
@@ -91,7 +98,7 @@ func _physics_process(delta):
 
 func _player_hit():
 	$AudioStreamPlayerHit.play();
-	player_energy = player_energy - 1;
+	player_energy = player_energy - constants.PLAYER_HIT_BY_ENEMY_DAMAGE;
 	emit_signal('update_energy');
 	
 	if player_energy <= 0:

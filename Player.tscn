@@ -156,7 +156,7 @@ animations = [{
 
 [node name="Player" type="CharacterBody2D"]
 z_index = 1
-position = Vector2(313, 206)
+position = Vector2(500, 500)
 collision_mask = 52
 motion_mode = 1
 script = ExtResource("1_pw3rq")
