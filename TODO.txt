@@ -11,3 +11,9 @@
 *DONE*
 
 * Ability to exit game (ESCAPE key?)
+
+
+Patch:
+******
+
+* Controller support (Twin stick shooter style).

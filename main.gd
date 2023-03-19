@@ -94,6 +94,9 @@ func return_to_main_screen():
 	for enemy_attack in get_tree().get_nodes_in_group('enemyAttack'):
 		enemy_attack.queue_free()
 	
+	for enemy_trap in get_tree().get_nodes_in_group('enemyTrap'):
+		enemy_trap.queue_free()
+	
 	_ready();
 	
 func spawn_item():	

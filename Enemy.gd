@@ -23,10 +23,8 @@ func _ready():
 	$StateTimer.start();
 	
 	set_modulate(Color(0,0,0,0));
-	
-	move_and_slide();
 
-func _physics_process(_delta):
+func _physics_process(delta):
 	set_modulate(lerp(get_modulate(), Color(1,1,1,1), 0.02));
 	
 	match state:
@@ -57,7 +55,7 @@ func _physics_process(_delta):
 			if $StateTimer.time_left == 0:
 				self.queue_free();
 			
-	move_and_slide();	
+	var collision = move_and_collide(velocity * delta);	
 	
 	if velocity.x > 0:
 		$AnimatedSprite2D.set_flip_h(false);
@@ -97,8 +95,9 @@ func _physics_process(_delta):
 			
 			$TrapTimer.start(randf_range(constants.ENEMY_TRAP_MINIMUM_SECONDS,constants.ENEMY_TRAP_MAXIMUM_SECONDS));
 		
-			
-
+	if collision:
+		print ("Enemy collision");
+		velocity = velocity.bounce(collision.get_normal());
 	
 func _death():
 	if state != DYING:

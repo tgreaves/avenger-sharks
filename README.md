@@ -9,7 +9,8 @@
 * Artwork:
    * Shark sprite: Sergeant_Slash - https://sergeant-slash.itch.io/32x32-animated-shark-sprite
    * Enemy sprites: Anokolisa's Pixel Crawler pack - https://anokolisa.itch.io/dungeon-crawler-pixel-art-asset-pack
-   * Water spray sprite: Cethiel - https://opengameart.org/content/water-magic-effect
+   * Water spray sprites: Cethiel - https://opengameart.org/content/water-magic-effect
+   * Trap sprite: Stealthix - https://stealthix.itch.io/animated-traps
 * Sound:
    * Shark spray: mparsons99 - https://pixabay.com/
    * Enemy Death sound: https://pixabay.com/sound-effects/086398-game-die-81356/

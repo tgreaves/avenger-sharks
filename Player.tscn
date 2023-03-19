@@ -197,3 +197,6 @@ one_shot = true
 [node name="PowerUpTimer" type="Timer" parent="."]
 wait_time = 5.0
 one_shot = true
+
+[node name="FireRateTimer" type="Timer" parent="."]
+one_shot = true

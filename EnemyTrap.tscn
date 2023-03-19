@@ -1,7 +1,13 @@
-[gd_scene load_steps=9 format=3 uid="uid://c1n880m7gbwf3"]
+[gd_scene load_steps=16 format=3 uid="uid://c1n880m7gbwf3"]
 
 [ext_resource type="Script" path="res://EnemyTrap.gd" id="1_73l6s"]
 [ext_resource type="Texture2D" uid="uid://cu4wy1d8botty" path="res://Sprites/Bear_Trap.png" id="2_mink7"]
+[ext_resource type="AudioStream" uid="uid://vioqdrtdy1x3" path="res://Sound/086398_game-die-81356.mp3" id="3_knkoh"]
+[ext_resource type="Texture2D" uid="uid://dpnh82bexsu7d" path="res://Sprites/Explosions/WaterExplosion/Water__05.png" id="3_xgwes"]
+[ext_resource type="Texture2D" uid="uid://djcxss8vcxcyv" path="res://Sprites/Explosions/WaterExplosion/Water__04.png" id="4_u25nb"]
+[ext_resource type="Texture2D" uid="uid://5onixek6sj6r" path="res://Sprites/Explosions/WaterExplosion/Water__03.png" id="5_n8dh0"]
+[ext_resource type="Texture2D" uid="uid://bh58c8y72t27l" path="res://Sprites/Explosions/WaterExplosion/Water__02.png" id="6_wf1it"]
+[ext_resource type="Texture2D" uid="uid://b132nn5mor6d3" path="res://Sprites/Explosions/WaterExplosion/Water__01.png" id="7_rcgy3"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_lwg83"]
 radius = 1.5
@@ -42,6 +48,29 @@ animations = [{
 "speed": 5.0
 }]
 
+[sub_resource type="SpriteFrames" id="SpriteFrames_1vjyt"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_xgwes")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_u25nb")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_n8dh0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_wf1it")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_rcgy3")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
 [node name="EnemyTrap" type="CharacterBody2D"]
 scale = Vector2(35, 35)
 collision_layer = 4
@@ -55,4 +84,17 @@ shape = SubResource("CircleShape2D_lwg83")
 texture_filter = 1
 scale = Vector2(0.15, 0.15)
 sprite_frames = SubResource("SpriteFrames_vvs7x")
-frame_progress = 0.932889
+frame_progress = 0.850303
+
+[node name="AnimatedSprite2DDeath" type="AnimatedSprite2D" parent="."]
+texture_filter = 1
+scale = Vector2(0.05, 0.05)
+sprite_frames = SubResource("SpriteFrames_1vjyt")
+frame_progress = 0.903318
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("3_knkoh")
+
+[node name="StateTimer" type="Timer" parent="."]
+wait_time = 2.0
+one_shot = true

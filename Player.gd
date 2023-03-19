@@ -2,7 +2,6 @@ extends CharacterBody2D
 
 const SharkSprayScene = preload("res://SharkSpray.tscn");
 
-
 enum {
 	ALIVE,
 	EXPLODING,
@@ -20,6 +19,7 @@ signal player_died;
 
 func _ready():
 	shark_status = ALIVE;
+	$FireRateTimer.start(constants.PLAYER_FIRE_DELAY);
 
 func get_input():
 	
@@ -29,20 +29,39 @@ func get_input():
 	var input_direction = Input.get_vector("left", "right", "up", "down")
 	velocity = input_direction * speed
 	
-	if input_direction && Input.is_action_just_pressed('shark_fire'):
-		var shark_spray = SharkSprayScene.instantiate();
-		get_parent().add_child(shark_spray);
-		shark_spray.global_position = position;
-		shark_spray.velocity = input_direction * shark_spray.spray_speed;
-		$AudioStreamPlayerSpray.play()
-		
-	if Input.is_action_just_pressed('shark_fire_mouse'):
-		var shark_spray = SharkSprayScene.instantiate();
-		get_parent().add_child(shark_spray);
-		var target_direction = (get_global_mouse_position() - global_position).normalized()
-		shark_spray.global_position = position;
-		shark_spray.velocity = target_direction * shark_spray.spray_speed;
-		$AudioStreamPlayerSpray.play()
+	if $FireRateTimer.time_left == 0:
+		if input_direction && Input.is_action_pressed('shark_fire'):
+			var shark_spray = SharkSprayScene.instantiate();
+			get_parent().add_child(shark_spray);
+			shark_spray.global_position = position;
+			shark_spray.velocity = input_direction * shark_spray.spray_speed;
+			$AudioStreamPlayerSpray.play()
+			$FireRateTimer.start(constants.PLAYER_FIRE_DELAY);
+			
+		if Input.is_action_pressed('shark_fire_mouse'):
+			var shark_spray = SharkSprayScene.instantiate();
+			get_parent().add_child(shark_spray);
+			var target_direction = (get_global_mouse_position() - global_position).normalized()
+			shark_spray.global_position = position;
+			shark_spray.velocity = target_direction * shark_spray.spray_speed;
+			$AudioStreamPlayerSpray.play()
+			$FireRateTimer.start(constants.PLAYER_FIRE_DELAY);
+			
+		var shoot_direction = Input.get_vector("shoot_left", "shoot_right", "shoot_up", "shoot_down");
+			
+		if shoot_direction:
+			var shark_spray = SharkSprayScene.instantiate();
+			get_parent().add_child(shark_spray);
+			shark_spray.global_position = position;
+			
+			var shoot_input = Vector2.ZERO;
+			shoot_input.x = Input.get_action_strength("shoot_right") - Input.get_action_strength("shoot_left");
+			shoot_input.y = Input.get_action_strength("shoot_down") - Input.get_action_strength("shoot_up");
+			shoot_direction = shoot_direction.normalized();
+			
+			shark_spray.velocity = shoot_direction * shark_spray.spray_speed;
+			$AudioStreamPlayerSpray.play()
+			$FireRateTimer.start(constants.PLAYER_FIRE_DELAY);
 	
 func _physics_process(_delta):
 	get_input()
