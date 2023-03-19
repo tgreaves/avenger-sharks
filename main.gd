@@ -5,6 +5,7 @@ extends Node
 var score = 0;
 var wave_number = 1;
 var high_score = 0;
+var enemies_left_this_wave = 0;
 
 enum {
 	INTRO_SCREEN,
@@ -13,6 +14,11 @@ enum {
 	GAME_RUNNING,
 	GAME_OVER
 }
+
+var ITEMS = {
+	"health": Vector2i(9,8),
+	"big_spray": Vector2i(7,9)
+};
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -24,6 +30,7 @@ func _ready():
 	$HUD.get_node("CanvasLayer/Score").visible = true;
 	$HUD.get_node("CanvasLayer/Label").visible = true;
 	$HUD.get_node("CanvasLayer/Label").text = "AVENGER SHARKS!";
+	$HUD.get_node("CanvasLayer/EnemiesLeft").visible = false;
 	
 	$Player.set_process(false);
 	$Player.set_physics_process(false);
@@ -54,23 +61,24 @@ func start_game():
 	$HUD.get_node("CanvasLayer/Energy").visible = true;
 	$HUD.get_node("CanvasLayer/Score").visible = true;
 	$HUD.get_node("CanvasLayer/Label").visible = false;
+	$HUD.get_node("CanvasLayer/EnemiesLeft").visible = true;
 	$Player.set_process(true);
 	$Player.set_physics_process(true);
 	$Player.get_node("AnimatedSprite2D").animation = 'default';
 	$Player.visible = true;
 	
-	$ItemSpawnTimer.start(randf_range(1,2));
+	$ItemSpawnTimer.start(randf_range(constants.ITEM_SPAWN_MINIMUM_SECONDS,constants.ITEM_SPAWN_MAXIMUM_SECONDS));
+	$EnemySpawnTimer.start(randf_range(3,8));
 	
 	_on_player_update_energy();
 	_on_enemy_update_score_display();
 	
 	while (i < wave_number * 5):
-		var mob = enemy_scene.instantiate();
-		mob.get_node('.').set_position (Vector2(randf_range(200,2000),randf_range(300,1000)));
-		mob.add_to_group('enemyGroup');
-				
-		add_child(mob);
+		spawn_enemy();
 		i=i+1;
+		
+	enemies_left_this_wave = (wave_number * 5) + 2
+	update_enemies_left_display();
 
 func game_over():
 	game_status = GAME_OVER;
@@ -88,46 +96,68 @@ func return_to_main_screen():
 	
 	_ready();
 	
-func spawn_item():
-	print("SPAWNING ITEM!");
-	
-	$Arena.set_cell(1, Vector2i(randi_range(3,20),randi_range(3,20)),0,Vector2i(9,8));
-	$ItemSpawnTimer.start(randf_range(10,20));
-	
+func spawn_item():	
+	var spawned_item = ITEMS[ ITEMS.keys()[ randi() % ITEMS.size() ] ];
+
+	$Arena.set_cell(1, Vector2i(randi_range(3,20),randi_range(3,20)),0,spawned_item);
+	$ItemSpawnTimer.start(randf_range(constants.ITEM_SPAWN_MINIMUM_SECONDS,constants.ITEM_SPAWN_MAXIMUM_SECONDS));
+
+func spawn_enemy():
+	print("Spawning enemy...")
+	var mob = enemy_scene.instantiate();
+	mob.get_node('.').set_position (Vector2(randf_range(200,2000),randf_range(300,1000)));
+	mob.add_to_group('enemyGroup');	
+	add_child(mob);
+
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
+func _process(_delta):
 	if game_status == WAVE_START:
 		if $WaveIntroTimer.time_left == 0:
 			start_game();
 			
 	if game_status == GAME_RUNNING:
-		if get_tree().get_nodes_in_group("enemyGroup").size() == 0:
+		if enemies_left_this_wave == 0:
 			wave_end();
 			
 		if $ItemSpawnTimer.time_left == 0:
 			spawn_item();
 			
+		if $EnemySpawnTimer.time_left == 0:
+			if enemies_left_this_wave > get_tree().get_nodes_in_group("enemyGroup").size():
+				spawn_enemy();
+				$EnemySpawnTimer.start(randf_range(3,8));
+			
 	if game_status == GAME_OVER:
 		if $GameOverTimer.time_left == 0:
 			return_to_main_screen();
 		
-func _input(ev):
+func _input(_ev):
 	if Input.is_action_just_pressed('shark_fire'):
 		if game_status == INTRO_SCREEN:
 			wave_start();
+			
+	if Input.is_action_just_pressed("quit"):
+			get_tree().quit();
 		
 func _on_player_update_energy():
 	$HUD.get_node('CanvasLayer').get_node('Energy').text = "ENERGY\n" + str($Player.player_energy);
 	
 func _on_enemy_update_score():
+	enemies_left_this_wave = enemies_left_this_wave - 1;
 	score = score + constants.KILL_ENEMY_SCORE;
 	if score > high_score:
 		high_score = score;
 	_on_enemy_update_score_display();
+	update_enemies_left_display();
+	print ("Enemies left this wave: " + str(enemies_left_this_wave));
 
 func _on_enemy_update_score_display():
 	$HUD.get_node('CanvasLayer').get_node('Score').text = "SCORE\n" + str(score);
 	$HUD.get_node('CanvasLayer').get_node('HighScore').text = "HIGH SCORE\n" + str(high_score);
+
+func update_enemies_left_display():
+	$HUD.get_node('CanvasLayer').get_node('EnemiesLeft').text = "ENEMIES\n" + str(enemies_left_this_wave);
+	
 
 func _on_player_player_died():
 	game_over();

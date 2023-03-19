@@ -1,0 +1,13 @@
+* AI variations - chase, wander etc
+** Vary based on sprite graphic for consistency?
+* Differing enemy speeds and accuracy (on spawn?) - link to Wave?
+* Rescue friends
+* Controller support (2 x sticks?)
+* Ability to shoot enemies when spawning in (but not collide)
+
+
+
+
+*DONE*
+
+* Ability to exit game (ESCAPE key?)

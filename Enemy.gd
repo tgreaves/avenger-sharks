@@ -1,6 +1,7 @@
 extends CharacterBody2D
 
 const EnemyAttackScene = preload("res://EnemyAttack.tscn");
+const EnemyTrapScene = preload("res://EnemyTrap.tscn");
 
 enum {
 	SPAWNING,
@@ -25,7 +26,7 @@ func _ready():
 	
 	move_and_slide();
 
-func _physics_process(delta):
+func _physics_process(_delta):
 	set_modulate(lerp(get_modulate(), Color(1,1,1,1), 0.02));
 	
 	match state:
@@ -36,14 +37,22 @@ func _physics_process(delta):
 				state = WANDER;
 				$AnimatedSprite2D.play();
 				$CollisionShape2D.disabled = false;
-				$AttackTimer.start(randf_range(1,5));
+				$AttackTimer.start(randf_range(constants.ENEMY_ATTACK_MINIMUM_SECONDS,constants.ENEMY_ATTACK_MAXIMUM_SECONDS));
+				$TrapTimer.start(randf_range(constants.ENEMY_TRAP_MINIMUM_SECONDS,constants.ENEMY_TRAP_MAXIMUM_SECONDS));
 				#$StateTimer.start(float(2));			
 		WANDER:
 			#print("WANDER!!");
 			if $StateTimer.time_left == 0:
 				state = WANDER;
-				$StateTimer.start(randf_range(1,5));
-				velocity = Vector2(randf_range(-64,64), randf_range(-64,64));
+				
+				if enemy_type == 'knight':
+					# Knights - chase the player.
+					var target_direction = (get_parent().get_node("Player").global_position - global_position).normalized();
+					velocity = target_direction * constants.ENEMY_SPEED;
+					$StateTimer.start(randf_range(1,1.5));
+				else:
+					$StateTimer.start(randf_range(1,5));
+					velocity = Vector2(randf_range(-1,1), randf_range(-1,1)) * constants.ENEMY_SPEED;
 		DYING:
 			if $StateTimer.time_left == 0:
 				self.queue_free();
@@ -62,20 +71,34 @@ func _physics_process(delta):
 	
 	if $AttackTimer.time_left == 0 && state == WANDER:
 		
-		# Always attack for now.
-		var enemy_attack = EnemyAttackScene.instantiate();
-		get_parent().add_child(enemy_attack);
-		enemy_attack.add_to_group('enemyAttack');
-		
-		var target_direction = (get_parent().get_node("Player").global_position - global_position).normalized();
-		
-		# We don't want enemies to always be a perfect shot.
-		target_direction = target_direction.rotated( deg_to_rad(randf_range(0,constants.ENEMY_ATTACK_ARC_DEGREES)));
-		
-		enemy_attack.global_position = position;
-		enemy_attack.velocity = target_direction * enemy_attack.enemy_attack_speed;
+		if enemy_type == 'wizard':
+			var enemy_attack = EnemyAttackScene.instantiate();
+			get_parent().add_child(enemy_attack);
+			enemy_attack.add_to_group('enemyAttack');
+			
+			var target_direction = (get_parent().get_node("Player").global_position - global_position).normalized();
+			
+			# We don't want enemies to always be a perfect shot.
+			target_direction = target_direction.rotated( deg_to_rad(randf_range(0,constants.ENEMY_ATTACK_ARC_DEGREES)));
+			
+			enemy_attack.global_position = position;
 
-		$AttackTimer.start(randf_range(1,20));
+			enemy_attack.velocity = target_direction * enemy_attack.enemy_attack_speed;
+			
+			$AttackTimer.start(randf_range(constants.ENEMY_ATTACK_MINIMUM_SECONDS,constants.ENEMY_ATTACK_MAXIMUM_SECONDS));
+			
+	if $TrapTimer.time_left == 0 && state == WANDER:
+		if enemy_type == 'rogue':
+			print ("ROGUE ATTACK");
+			var enemy_trap = EnemyTrapScene.instantiate();
+			get_parent().add_child(enemy_trap);
+			enemy_trap.add_to_group('enemyTrap');
+			enemy_trap.global_position = position;
+			
+			$TrapTimer.start(randf_range(constants.ENEMY_TRAP_MINIMUM_SECONDS,constants.ENEMY_TRAP_MAXIMUM_SECONDS));
+		
+			
+
 	
 func _death():
 	if state != DYING:

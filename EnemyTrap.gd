@@ -20,4 +20,14 @@ func _physics_process(_delta):
 		$CollisionShape2D.disabled = true;
 		self.queue_free();
 		break;
+		
+func _death():
+		$CollisionShape2D.set_deferred("disabled", true)
+		#$AudioStreamPlayer.play();
+		#$StateTimer.start(2);
+		#$AttackTimer.stop();
+		#state = DYING;
+	
+		#get_parent()._on_enemy_update_score();
+		self.queue_free();
 

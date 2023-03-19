@@ -12,6 +12,7 @@ enum {
 @export var speed = constants.PLAYER_SPEED;
 @export var player_energy = constants.PLAYER_START_GAME_ENERGY;
 @export var shark_status = ALIVE
+@export var big_spray = 0;
 
 signal update_energy;
 signal player_died;
@@ -43,11 +44,14 @@ func get_input():
 		shark_spray.velocity = target_direction * shark_spray.spray_speed;
 		$AudioStreamPlayerSpray.play()
 	
-func _physics_process(delta):
+func _physics_process(_delta):
 	get_input()
 	move_and_slide()
 	
-	#print("Player physics process...." + str(shark_status));
+	if $PowerUpTimer.time_left == 0:
+		if big_spray:
+			big_spray=0;
+			
 	
 	match shark_status:
 		ALIVE:
@@ -58,8 +62,6 @@ func _physics_process(delta):
 				$AnimatedSprite2D.set_flip_h(false);
 				
 			$AnimatedSprite2D.play();
-			
-			#print("Count is" + str(get_slide_collision_count()));
 			
 			for i in get_slide_collision_count():
 				var collision = get_slide_collision(i)
@@ -73,11 +75,17 @@ func _physics_process(delta):
 					print("Coords: " + str(collided_with.get_coords_for_body_rid( collision.get_collider_rid())));
 					print ("ATLAS Trans: " + str(collided_with.get_cell_atlas_coords(1, rid_coords)));
 					
-					if ( collided_with.get_cell_atlas_coords(1, rid_coords) == Vector2i(9,8)):
-						player_energy = player_energy + constants.HEALTH_POTION_BONUS;
-						if player_energy > constants.PLAYER_START_GAME_ENERGY:
-							player_energy = constants.PLAYER_START_GAME_ENERGY;
-						emit_signal('update_energy')
+					match collided_with.get_cell_atlas_coords(1, rid_coords):
+						Vector2i(9,8):
+							print ("HEATH");
+							player_energy = player_energy + constants.HEALTH_POTION_BONUS;
+							if player_energy > constants.PLAYER_START_GAME_ENERGY:
+								player_energy = constants.PLAYER_START_GAME_ENERGY;
+								emit_signal('update_energy')
+						Vector2i(7,9):
+							print ("POWERUP");
+							big_spray=1;
+							$PowerUpTimer.start(constants.POWER_UP_ACTIVE_DURATION);
 					
 					collided_with.set_cell(		1, 
 												collided_with.get_coords_for_body_rid( collision.get_collider_rid()),

@@ -193,3 +193,7 @@ stream = ExtResource("37_g7u1l")
 [node name="PlayerExplosionTimer" type="Timer" parent="."]
 wait_time = 2.0
 one_shot = true
+
+[node name="PowerUpTimer" type="Timer" parent="."]
+wait_time = 5.0
+one_shot = true

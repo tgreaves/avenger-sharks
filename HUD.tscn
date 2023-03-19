@@ -64,3 +64,21 @@ theme_override_font_sizes/font_size = 64
 text = "HIGH SCORE
 0"
 horizontal_alignment = 1
+
+[node name="EnemiesLeft" type="Label" parent="CanvasLayer"]
+anchors_preset = -1
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -2244.0
+offset_top = -1442.0
+offset_right = -1604.0
+offset_bottom = -1308.0
+grow_horizontal = 0
+grow_vertical = 0
+size_flags_horizontal = 8
+theme_override_fonts/font = ExtResource("1_4l55f")
+theme_override_font_sizes/font_size = 64
+text = "ENEMIES"
+horizontal_alignment = 1

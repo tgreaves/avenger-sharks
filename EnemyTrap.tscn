@@ -1,0 +1,58 @@
+[gd_scene load_steps=9 format=3 uid="uid://c1n880m7gbwf3"]
+
+[ext_resource type="Script" path="res://EnemyTrap.gd" id="1_73l6s"]
+[ext_resource type="Texture2D" uid="uid://cu4wy1d8botty" path="res://Sprites/Bear_Trap.png" id="2_mink7"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_lwg83"]
+radius = 1.5
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_xyxhp"]
+atlas = ExtResource("2_mink7")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_mlrbo"]
+atlas = ExtResource("2_mink7")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_p1vge"]
+atlas = ExtResource("2_mink7")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bj2lt"]
+atlas = ExtResource("2_mink7")
+region = Rect2(96, 0, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_vvs7x"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_xyxhp")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_mlrbo")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_p1vge")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_bj2lt")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[node name="EnemyTrap" type="CharacterBody2D"]
+scale = Vector2(35, 35)
+collision_layer = 4
+collision_mask = 17
+script = ExtResource("1_73l6s")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_lwg83")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+texture_filter = 1
+scale = Vector2(0.15, 0.15)
+sprite_frames = SubResource("SpriteFrames_vvs7x")
+frame_progress = 0.932889

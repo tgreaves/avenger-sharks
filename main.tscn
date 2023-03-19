@@ -28,5 +28,8 @@ one_shot = true
 wait_time = 2.0
 one_shot = true
 
+[node name="EnemySpawnTimer" type="Timer" parent="."]
+one_shot = true
+
 [connection signal="player_died" from="Player" to="." method="_on_player_player_died"]
 [connection signal="update_energy" from="Player" to="." method="_on_player_update_energy"]

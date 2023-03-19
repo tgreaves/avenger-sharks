@@ -4,8 +4,12 @@ extends CharacterBody2D
 
 func _ready():
 	$AnimatedSprite2D.play();
-
-func _physics_process(delta):
+	if get_parent().get_node('Player').big_spray:
+		print("Big please")
+		set_global_scale(Vector2(1.5,1.5))
+		
+		
+func _physics_process(_delta):
 	move_and_slide()
 	
 	for i in get_slide_collision_count():
