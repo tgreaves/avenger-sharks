@@ -1,6 +1,7 @@
 extends Node
 
 @export var enemy_scene: PackedScene
+@export var fish_scene: PackedScene;
 @export var game_status = INTRO_SCREEN;
 var score = 0;
 var wave_number = 1;
@@ -26,6 +27,9 @@ func _ready():
 	score=0;
 	wave_number=1;
 	
+	if $AudioStreamPlayerMusic.playing == false:
+		$AudioStreamPlayerMusic.play();
+		
 	$HUD.get_node("CanvasLayer/Energy").visible = true;
 	$HUD.get_node("CanvasLayer/Score").visible = true;
 	$HUD.get_node("CanvasLayer/Label").visible = true;
@@ -52,6 +56,13 @@ func wave_start():
 func wave_end():
 	game_status = WAVE_END;
 	# Stub for congratulations message, jingle etc.
+	
+	for enemy_trap in get_tree().get_nodes_in_group('enemyTrap'):
+		enemy_trap.queue_free()
+	
+	for fish in get_tree().get_nodes_in_group('fishGroup'):
+		fish.queue_free()
+		
 	wave_number=wave_number+1;
 	wave_start();
 
@@ -80,6 +91,12 @@ func start_game():
 	enemies_left_this_wave = (wave_number * 5) + 2
 	update_enemies_left_display();
 
+	i=0;
+
+	while (i < 3):
+		spawn_fish();
+		i=i+1;
+
 func game_over():
 	game_status = GAME_OVER;
 	$HUD.get_node("CanvasLayer/Label").visible = true;
@@ -96,6 +113,9 @@ func return_to_main_screen():
 	
 	for enemy_trap in get_tree().get_nodes_in_group('enemyTrap'):
 		enemy_trap.queue_free()
+		
+	for fish in get_tree().get_nodes_in_group('fishGroup'):
+		fish.queue_free()
 	
 	_ready();
 	
@@ -108,8 +128,15 @@ func spawn_item():
 func spawn_enemy():
 	print("Spawning enemy...")
 	var mob = enemy_scene.instantiate();
-	mob.get_node('.').set_position (Vector2(randf_range(200,2000),randf_range(300,1000)));
+	mob.get_node('.').set_position (Vector2(randf_range(120,2500),randf_range(300,1250)));
 	mob.add_to_group('enemyGroup');	
+	add_child(mob);
+	
+func spawn_fish():
+	print("Spawning fish")
+	var mob = fish_scene.instantiate();
+	mob.get_node('.').set_position (Vector2(randf_range(120,2500),randf_range(300,1250)));
+	mob.add_to_group('fishGroup');	
 	add_child(mob);
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -165,3 +192,8 @@ func update_enemies_left_display():
 func _on_player_player_died():
 	game_over();
 
+func _on_player_player_got_fish():
+	score = score + constants.GET_FISH_SCORE;
+	if score > high_score:
+		high_score = score;
+	_on_enemy_update_score_display();

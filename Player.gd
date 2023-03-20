@@ -15,10 +15,12 @@ enum {
 
 signal update_energy;
 signal player_died;
+signal player_got_fish;
 @onready var screen_size = get_viewport_rect().size
 
 func _ready():
 	shark_status = ALIVE;
+	$AnimatedSprite2DDamaged.visible = false;
 	$FireRateTimer.start(constants.PLAYER_FIRE_DELAY);
 
 func get_input():
@@ -100,11 +102,14 @@ func _physics_process(_delta):
 							player_energy = player_energy + constants.HEALTH_POTION_BONUS;
 							if player_energy > constants.PLAYER_START_GAME_ENERGY:
 								player_energy = constants.PLAYER_START_GAME_ENERGY;
-								emit_signal('update_energy')
+							$AudioStreamHealth.play();
+							emit_signal('update_energy')
+							
 						Vector2i(7,9):
 							print ("POWERUP");
 							big_spray=1;
 							$PowerUpTimer.start(constants.POWER_UP_ACTIVE_DURATION);
+							$AudioStreamPowerUp.play()
 					
 					collided_with.set_cell(		1, 
 												collided_with.get_coords_for_body_rid( collision.get_collider_rid()),
@@ -112,6 +117,12 @@ func _physics_process(_delta):
 					
 					break;
 					
+				if collision.get_collider().name.contains('Fish'):
+					collided_with.get_node('.')._death();
+					emit_signal('player_got_fish');
+					break
+				
+				# Default - Enemy	
 				collided_with.get_node('.')._death();
 				_player_hit();
 				
@@ -135,6 +146,8 @@ func _player_hit():
 		$AudioStreamPlayerExplosion.play();
 		shark_status=EXPLODING;
 		$PlayerExplosionTimer.start();
-	
+	else:
+		$AnimatedSprite2DDamaged.visible = true;
+		$AnimatedSprite2DDamaged.play();
 	
 

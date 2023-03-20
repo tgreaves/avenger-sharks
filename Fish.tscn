@@ -1,0 +1,81 @@
+[gd_scene load_steps=13 format=3 uid="uid://djqnnk36jvtk5"]
+
+[ext_resource type="Script" path="res://Fish.gd" id="1_ofnsv"]
+[ext_resource type="Texture2D" uid="uid://b88fnpcija5k4" path="res://Sprites/Fish/fishTile_078.png" id="2_5kwnx"]
+[ext_resource type="Texture2D" uid="uid://bgejrk4eagajd" path="res://Sprites/Fish/fishTile_079.png" id="3_8jvrj"]
+[ext_resource type="Texture2D" uid="uid://urvdlkovutbj" path="res://Sprites/Fish/fishTile_080.png" id="4_6j46p"]
+[ext_resource type="AudioStream" uid="uid://dl3w6ch8pux8d" path="res://Sound/yay-6120.mp3" id="4_40sxa"]
+[ext_resource type="Texture2D" uid="uid://b56mcpbeethqt" path="res://Sprites/Fish/fishTile_081.png" id="5_o41bs"]
+[ext_resource type="Texture2D" uid="uid://ci7uwd4jc535p" path="res://Sprites/Fish/fishTile_072.png" id="6_306mf"]
+[ext_resource type="Texture2D" uid="uid://da28yqnor5ik3" path="res://Sprites/Fish/fishTile_073.png" id="7_v4ds3"]
+[ext_resource type="Texture2D" uid="uid://cuw0h7qmf5hr3" path="res://Sprites/Fish/fishTile_076.png" id="8_35k0e"]
+[ext_resource type="Texture2D" uid="uid://cn8ronelkj2v5" path="res://Sprites/Fish/fishTile_077.png" id="9_ii0ta"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_qergj"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_5kwnx")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_8jvrj")
+}],
+"loop": true,
+"name": &"fish_1",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_6j46p")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_o41bs")
+}],
+"loop": true,
+"name": &"fish_2",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("6_306mf")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_v4ds3")
+}],
+"loop": true,
+"name": &"fish_3",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("8_35k0e")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_ii0ta")
+}],
+"loop": true,
+"name": &"fish_4",
+"speed": 5.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_4b2pv"]
+radius = 28.45
+
+[node name="Fish" type="CharacterBody2D"]
+collision_layer = 64
+script = ExtResource("1_ofnsv")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_qergj")
+animation = &"fish_1"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_4b2pv")
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("4_40sxa")
+volume_db = 6.558
+
+[node name="StateTimer" type="Timer" parent="."]
+wait_time = 2.0
+one_shot = true
