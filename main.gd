@@ -79,7 +79,8 @@ func start_game():
 	$Player.visible = true;
 	
 	$ItemSpawnTimer.start(randf_range(constants.ITEM_SPAWN_MINIMUM_SECONDS,constants.ITEM_SPAWN_MAXIMUM_SECONDS));
-	$EnemySpawnTimer.start(randf_range(3,8));
+	$EnemySpawnTimer.start(randf_range(constants.ENEMY_SPAWN_MINIMUM_SECONDS,
+												constants.ENEMY_SPAWN_MAXIMUM_SECONDS));
 	
 	_on_player_update_energy();
 	_on_enemy_update_score_display();
@@ -155,7 +156,8 @@ func _process(_delta):
 		if $EnemySpawnTimer.time_left == 0:
 			if enemies_left_this_wave > get_tree().get_nodes_in_group("enemyGroup").size():
 				spawn_enemy();
-				$EnemySpawnTimer.start(randf_range(3,8));
+				$EnemySpawnTimer.start(randf_range(constants.ENEMY_SPAWN_MINIMUM_SECONDS,
+												constants.ENEMY_SPAWN_MAXIMUM_SECONDS));
 			
 	if game_status == GAME_OVER:
 		if $GameOverTimer.time_left == 0:

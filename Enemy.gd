@@ -47,10 +47,12 @@ func _physics_process(delta):
 					# Knights - chase the player.
 					var target_direction = (get_parent().get_node("Player").global_position - global_position).normalized();
 					velocity = target_direction * constants.ENEMY_SPEED;
-					$StateTimer.start(randf_range(1,1.5));
+					$StateTimer.start(randf_range(constants.ENEMY_KNIGHT_CHASE_REORIENT_MINIMUM_SECONDS,
+												constants.ENEMY_KNIGHT_CHASE_REORIENT_MAXIMUM_SECONDS));
 				else:
-					$StateTimer.start(randf_range(1,5));
-					velocity = Vector2(randf_range(-1,1), randf_range(-1,1)) * constants.ENEMY_SPEED;
+					$StateTimer.start(randf_range(constants.ENEMY_DEFAULT_CHANGE_DIRECTION_MINIMUM_SECONDS,
+													constants.ENEMY_DEFAULT_CHANGE_DIRECTION_MAXIMUM_SECONDS));
+					velocity = Vector2(randf_range(-1,1), randf_range(-1,1)).normalized() * constants.ENEMY_SPEED;
 		DYING:
 			if $StateTimer.time_left == 0:
 				self.queue_free();

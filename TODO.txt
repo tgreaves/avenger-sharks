@@ -1,19 +1,10 @@
-* AI variations - chase, wander etc
-** Vary based on sprite graphic for consistency?
-* Differing enemy speeds and accuracy (on spawn?) - link to Wave?
-* Rescue friends
-* Controller support (2 x sticks?)
 * Ability to shoot enemies when spawning in (but not collide)
-
-
-
-
-*DONE*
-
-* Ability to exit game (ESCAPE key?)
-
+* Replace power-ups with sprites, and implement more....
+* Speed?
+* Bouncing shots?
+* Some form of intro
+* Menu system, credits etc
 
 Patch:
-******
-
-* Controller support (Twin stick shooter style).
+	
+* Game balancing inc. moving more parameters to constants.
