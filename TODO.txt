@@ -1,3 +1,7 @@
+* Necromancers...
+** Score difference
+** Check hit boxes as should be 5 hits only... might need to remove collision from SharkSpray on a hit.
+** Spawning mechanics - x per Wave ?
 * Ability to shoot enemies when spawning in (but not collide)
 * Replace power-ups with sprites, and implement more....
 * Speed?

@@ -1,15 +1,19 @@
-[gd_scene load_steps=13 format=3 uid="uid://djqnnk36jvtk5"]
+[gd_scene load_steps=18 format=3 uid="uid://djqnnk36jvtk5"]
 
 [ext_resource type="Script" path="res://Fish.gd" id="1_ofnsv"]
 [ext_resource type="Texture2D" uid="uid://b88fnpcija5k4" path="res://Sprites/Fish/fishTile_078.png" id="2_5kwnx"]
 [ext_resource type="Texture2D" uid="uid://bgejrk4eagajd" path="res://Sprites/Fish/fishTile_079.png" id="3_8jvrj"]
 [ext_resource type="Texture2D" uid="uid://urvdlkovutbj" path="res://Sprites/Fish/fishTile_080.png" id="4_6j46p"]
-[ext_resource type="AudioStream" uid="uid://dl3w6ch8pux8d" path="res://Sound/yay-6120.mp3" id="4_40sxa"]
 [ext_resource type="Texture2D" uid="uid://b56mcpbeethqt" path="res://Sprites/Fish/fishTile_081.png" id="5_o41bs"]
 [ext_resource type="Texture2D" uid="uid://ci7uwd4jc535p" path="res://Sprites/Fish/fishTile_072.png" id="6_306mf"]
 [ext_resource type="Texture2D" uid="uid://da28yqnor5ik3" path="res://Sprites/Fish/fishTile_073.png" id="7_v4ds3"]
 [ext_resource type="Texture2D" uid="uid://cuw0h7qmf5hr3" path="res://Sprites/Fish/fishTile_076.png" id="8_35k0e"]
 [ext_resource type="Texture2D" uid="uid://cn8ronelkj2v5" path="res://Sprites/Fish/fishTile_077.png" id="9_ii0ta"]
+[ext_resource type="Texture2D" uid="uid://dy3rebfbsvpl0" path="res://Sprites/Blood/bloodfx001_05.png" id="10_d5ci1"]
+[ext_resource type="Texture2D" uid="uid://7tscp15rfq17" path="res://Sprites/Blood/bloodfx001_04.png" id="11_iiqql"]
+[ext_resource type="Texture2D" uid="uid://d3tdosv5031k" path="res://Sprites/Blood/bloodfx001_03.png" id="12_axito"]
+[ext_resource type="Texture2D" uid="uid://cynsah81npsn3" path="res://Sprites/Blood/bloodfx001_02.png" id="13_lkcb6"]
+[ext_resource type="Texture2D" uid="uid://be1l4stvjmcog" path="res://Sprites/Blood/bloodfx001_01.png" id="14_pnhbi"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_qergj"]
 animations = [{
@@ -61,6 +65,32 @@ animations = [{
 [sub_resource type="CircleShape2D" id="CircleShape2D_4b2pv"]
 radius = 28.45
 
+[sub_resource type="SpriteFrames" id="SpriteFrames_kd5xg"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("10_d5ci1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_iiqql")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_axito")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_lkcb6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_pnhbi")
+}, {
+"duration": 1.0,
+"texture": null
+}],
+"loop": false,
+"name": &"default",
+"speed": 10.0
+}]
+
 [node name="Fish" type="CharacterBody2D"]
 collision_layer = 64
 script = ExtResource("1_ofnsv")
@@ -72,10 +102,13 @@ animation = &"fish_1"
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_4b2pv")
 
-[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("4_40sxa")
-volume_db = 6.558
-
 [node name="StateTimer" type="Timer" parent="."]
 wait_time = 2.0
 one_shot = true
+
+[node name="AnimatedSprite2DDamaged" type="AnimatedSprite2D" parent="."]
+position = Vector2(2.08165e-12, -15)
+scale = Vector2(3, 3)
+sprite_frames = SubResource("SpriteFrames_kd5xg")
+frame = 5
+frame_progress = 1.0

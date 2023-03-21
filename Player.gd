@@ -118,7 +118,8 @@ func _physics_process(_delta):
 					break;
 					
 				if collision.get_collider().name.contains('Fish'):
-					collided_with.get_node('.')._death();
+					collided_with.get_node('.')._death(0);
+					$AudioStreamPlayerGotFish.play();
 					emit_signal('player_got_fish');
 					break
 				

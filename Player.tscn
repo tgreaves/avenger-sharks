@@ -1,4 +1,4 @@
-[gd_scene load_steps=48 format=3 uid="uid://bhx6neq7hsoq0"]
+[gd_scene load_steps=49 format=3 uid="uid://bhx6neq7hsoq0"]
 
 [ext_resource type="Script" path="res://Player.gd" id="1_pw3rq"]
 [ext_resource type="Texture2D" uid="uid://ikcchi1bmyrs" path="res://Sprites/Shark/Shark1.png" id="2_px875"]
@@ -39,6 +39,7 @@
 [ext_resource type="AudioStream" uid="uid://c5leefn8upwfs" path="res://Sound/hq-explosion-6288.mp3" id="37_g7u1l"]
 [ext_resource type="AudioStream" uid="uid://vq6a2soq7m0i" path="res://Sound/glug-glug-glug-39140.mp3" id="38_86qdg"]
 [ext_resource type="AudioStream" uid="uid://di185cyn4vxdo" path="res://Sound/powering_up_funny_sci-fi_dry-102263.mp3" id="39_sydp1"]
+[ext_resource type="AudioStream" uid="uid://dl3w6ch8pux8d" path="res://Sound/yay-6120.mp3" id="45_fj125"]
 [ext_resource type="Texture2D" uid="uid://be1l4stvjmcog" path="res://Sprites/Blood/bloodfx001_01.png" id="71_f4bva"]
 [ext_resource type="Texture2D" uid="uid://cynsah81npsn3" path="res://Sprites/Blood/bloodfx001_02.png" id="72_657n3"]
 [ext_resource type="Texture2D" uid="uid://d3tdosv5031k" path="res://Sprites/Blood/bloodfx001_03.png" id="73_olu8i"]
@@ -218,6 +219,8 @@ metadata/_aseprite_wizard_config_ = {
 position = Vector2(2.08165e-12, -15)
 scale = Vector2(3, 3)
 sprite_frames = SubResource("SpriteFrames_bvem5")
+frame = 5
+frame_progress = 1.0
 
 [node name="AudioStreamPlayerSpray" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("10_v8evc")
@@ -245,3 +248,7 @@ stream = ExtResource("38_86qdg")
 
 [node name="AudioStreamPowerUp" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("39_sydp1")
+
+[node name="AudioStreamPlayerGotFish" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("45_fj125")
+volume_db = 6.558

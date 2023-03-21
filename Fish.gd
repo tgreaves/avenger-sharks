@@ -18,7 +18,7 @@ func _ready():
 	
 	$AnimatedSprite2D.play(animation_name)
 
-func _physics_process(delta):
+func _physics_process(_delta):
 	match state:
 		ACTIVE:
 			move_and_slide()
@@ -27,10 +27,13 @@ func _physics_process(delta):
 			if $StateTimer.time_left == 0:
 				queue_free();
 
-func _death():
+func _death(blood):
 	$CollisionShape2D.set_deferred("disabled", true)
-	$AudioStreamPlayer.play();
 	$AnimatedSprite2D.hide();
+	remove_from_group('fishGroup');
+	
+	if blood:
+		$AnimatedSprite2DDamaged.play();
 	
 	state = 'DESPAWNING';
 	$StateTimer.start(2);
