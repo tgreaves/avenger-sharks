@@ -9,6 +9,7 @@
 * Artwork:
    * Arena tiling: Pixel_Poem - https://pixel-poem.itch.io/dungeon-assetpuck
    * Shark sprite: Sergeant_Slash - https://sergeant-slash.itch.io/32x32-animated-shark-sprite
+   * Dino sprite: Arks - https://arks.itch.io/dino-characters
    * Enemy sprites: Anokolisa's Pixel Crawler pack - https://anokolisa.itch.io/dungeon-crawler-pixel-art-asset-pack
    * Necromancer sprite: CreativeKind - https://creativekind.itch.io/necromancer-free
    * Water spray sprites: Cethiel - https://opengameart.org/content/water-magic-effect
@@ -25,6 +26,7 @@
    * Fish splat: pixabay - https://pixabay.com/sound-effects/090035-splatwav-91604/
    * Glug! : iwanPlays - https://pixabay.com/sound-effects/glug-glug-glug-39140/
    * Power up: cabled mess - https://pixabay.com/sound-effects/powering-up-funny-sci-fi-dry-102263/
+   * Dinosaur growl: Universfield - https://pixabay.com/sound-effects/monster-growl-140377/
 * Font:
    * Press Start 2P: CodeMan38 - https://fonts.google.com/specimen/Press+Start+2P
 	

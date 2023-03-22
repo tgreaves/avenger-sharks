@@ -12,6 +12,12 @@
   * Rapid fire
 * Cheat mode
 
+# Bugs
+
+* Necromancers sometimes flicker after death / level transitions.
+* Energy can go to negative values.
+* Big spray doesn't work when player close to a wall.
+
 # Flow
 
 * Some form of intro
@@ -22,8 +28,5 @@
 
 # Patch notes
 
-* Spawning adjustments (inc multiple enemies spawning simultaneously during a wave)
-* Player speed increased.
-* Pause functionality
-* More controller mappings (Start button, exit game with 'Y')
+* Dinosaur support - RAWR!
 

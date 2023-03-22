@@ -2,6 +2,7 @@ extends Node
 
 @export var enemy_scene: PackedScene
 @export var fish_scene: PackedScene;
+@export var dinosaur_scene: PackedScene;
 @export var game_status = INTRO_SCREEN;
 var score = 0;
 var wave_number = 1;
@@ -19,7 +20,8 @@ enum {
 
 var ITEMS = {
 	"health": Vector2i(9,8),
-	"big_spray": Vector2i(7,9)
+	"big_spray": Vector2i(7,9),
+	"dinosaur": Vector2i(99,99)
 };
 
 # Called when the node enters the scene tree for the first time.
@@ -63,6 +65,9 @@ func wave_end():
 	
 	for fish in get_tree().get_nodes_in_group('fishGroup'):
 		fish.queue_free()
+		
+	for dinosaur in get_tree().get_nodes_in_group('dinosaurGroup'):
+		dinosaur.queue_free()	
 		
 	wave_number=wave_number+1;
 	wave_start();
@@ -124,7 +129,15 @@ func return_to_main_screen():
 func spawn_item():	
 	var spawned_item = ITEMS[ ITEMS.keys()[ randi() % ITEMS.size() ] ];
 
-	$Arena.set_cell(1, Vector2i(randi_range(3,20),randi_range(3,20)),0,spawned_item);
+	if spawned_item == Vector2i(99,99):
+		print ("Dinosaur spawn time!");
+		var dinosaur = dinosaur_scene.instantiate();
+		dinosaur.get_node('.').set_position (Vector2(randf_range(120,2500),randf_range(300,1250)));
+		dinosaur.add_to_group('dinosaurGroup');
+		add_child(dinosaur)
+	else:
+		$Arena.set_cell(1, Vector2i(randi_range(3,20),randi_range(3,20)),0,spawned_item);
+	
 	$ItemSpawnTimer.start(randf_range(constants.ITEM_SPAWN_MINIMUM_SECONDS,constants.ITEM_SPAWN_MAXIMUM_SECONDS));
 
 func spawn_enemy():

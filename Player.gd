@@ -123,6 +123,10 @@ func _physics_process(_delta):
 					emit_signal('player_got_fish');
 					break
 				
+				if collision.get_collider().name.contains('Dinosaur'):
+					collided_with.get_node('.')._go_on_a_rampage();
+					break
+				
 				# Default - Enemy	
 				collided_with.get_node('.')._death();
 				_player_hit();
