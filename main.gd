@@ -13,6 +13,7 @@ enum {
 	WAVE_START,
 	WAVE_END,
 	GAME_RUNNING,
+	GAME_PAUSED,
 	GAME_OVER
 }
 
@@ -85,16 +86,16 @@ func start_game():
 	_on_player_update_energy();
 	_on_enemy_update_score_display();
 	
-	while (i < wave_number * 5):
+	while (i < wave_number * constants.ENEMY_MULTIPLIER_AT_WAVE_START):
 		spawn_enemy();
 		i=i+1;
 		
-	enemies_left_this_wave = (wave_number * 5) + 2
+	enemies_left_this_wave = (wave_number * constants.ENEMY_MULTIPLIER_AT_WAVE_START) + (wave_number * constants.ENEMY_MULTIPLIER_DURING_WAVE);
 	update_enemies_left_display();
 
 	i=0;
 
-	while (i < 3):
+	while (i < constants.FISH_TO_SPAWN):
 		spawn_fish();
 		i=i+1;
 
@@ -127,14 +128,12 @@ func spawn_item():
 	$ItemSpawnTimer.start(randf_range(constants.ITEM_SPAWN_MINIMUM_SECONDS,constants.ITEM_SPAWN_MAXIMUM_SECONDS));
 
 func spawn_enemy():
-	print("Spawning enemy...")
 	var mob = enemy_scene.instantiate();
 	mob.get_node('.').set_position (Vector2(randf_range(120,2500),randf_range(300,1250)));
 	mob.add_to_group('enemyGroup');	
 	add_child(mob);
 	
 func spawn_fish():
-	print("Spawning fish")
 	var mob = fish_scene.instantiate();
 	mob.get_node('.').set_position (Vector2(randf_range(120,2500),randf_range(300,1250)));
 	mob.add_to_group('fishGroup');	
@@ -155,7 +154,21 @@ func _process(_delta):
 			
 		if $EnemySpawnTimer.time_left == 0:
 			if enemies_left_this_wave > get_tree().get_nodes_in_group("enemyGroup").size():
-				spawn_enemy();
+				
+				var enemies_to_spawn = randi_range(1, constants.ENEMY_SPAWN_MAX_BATCH_SIZE);
+				if enemies_to_spawn > enemies_left_this_wave - get_tree().get_nodes_in_group("enemyGroup").size():
+					enemies_to_spawn = enemies_left_this_wave - get_tree().get_nodes_in_group("enemyGroup").size()
+				
+				print ("Enemies left this wave: " + str(enemies_left_this_wave))	
+				print ("Enemies on screen: " + str(get_tree().get_nodes_in_group("enemyGroup").size()))
+				print ("Enemies to spawn: " + str(enemies_to_spawn))
+					
+				var i = 0;
+				
+				while i < enemies_to_spawn:
+					spawn_enemy()
+					i=i+1
+				
 				$EnemySpawnTimer.start(randf_range(constants.ENEMY_SPAWN_MINIMUM_SECONDS,
 												constants.ENEMY_SPAWN_MAXIMUM_SECONDS));
 			
@@ -164,13 +177,29 @@ func _process(_delta):
 			return_to_main_screen();
 		
 func _input(_ev):
-	if Input.is_action_just_pressed('shark_fire'):
+	# Game start.
+	if  Input.is_action_just_pressed('shark_fire') or Input.is_action_just_pressed('start'):	
 		if game_status == INTRO_SCREEN:
 			wave_start();
 			
+	# Insta-quit.		
 	if Input.is_action_just_pressed("quit"):
 			get_tree().quit();
+					
+	if Input.is_action_just_pressed('start'):
+		match game_status:
+			GAME_RUNNING:
+				print ("PAUSING")
+				game_status = GAME_PAUSED;
+				$Pause.show();
+				get_tree().paused = true;
+			GAME_PAUSED:
+				print ("UNPAUSING")
+				game_status = GAME_RUNNING;
+				$Pause.hide();
+				get_tree().paused = false;
 		
+
 func _on_player_update_energy():
 	$HUD.get_node('CanvasLayer').get_node('Energy').text = "ENERGY\n" + str($Player.player_energy);
 	
@@ -181,7 +210,6 @@ func _on_enemy_update_score():
 		high_score = score;
 	_on_enemy_update_score_display();
 	update_enemies_left_display();
-	print ("Enemies left this wave: " + str(enemies_left_this_wave));
 
 func _on_enemy_update_score_display():
 	$HUD.get_node('CanvasLayer').get_node('Score').text = "SCORE\n" + str(score);

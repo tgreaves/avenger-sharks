@@ -14,11 +14,11 @@ func _physics_process(_delta):
 	
 	for i in get_slide_collision_count():
 		var collision = get_slide_collision(i)
-		print("PLAYER ATTACK HIT: ", collision.get_collider().name)
 		
 		if collision.get_collider().name == 'Arena':
 			self.queue_free()
 			break;
 			
 		collision.get_collider().get_node('.')._death();
+		$CollisionShape2D.disabled = true;
 		self.queue_free()

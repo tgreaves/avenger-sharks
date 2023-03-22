@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://b6w8kxixmst07"]
+[gd_scene load_steps=9 format=3 uid="uid://b6w8kxixmst07"]
 
 [ext_resource type="PackedScene" uid="uid://bhx6neq7hsoq0" path="res://Player.tscn" id="1_btyoi"]
 [ext_resource type="Script" path="res://main.gd" id="1_bwln5"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://djqnnk36jvtk5" path="res://Fish.tscn" id="3_5ekcx"]
 [ext_resource type="PackedScene" uid="uid://ds5km1djhril" path="res://Arena.tscn" id="3_g5obo"]
 [ext_resource type="PackedScene" uid="uid://bcqacic7yj4ds" path="res://HUD.tscn" id="4_83kn1"]
+[ext_resource type="PackedScene" uid="uid://1jtglon274ct" path="res://Pause.tscn" id="6_tsvpc"]
 [ext_resource type="AudioStream" uid="uid://b65dtuu73n480" path="res://Sound/80s Synthpop Experiment - Steven O'Brien (Must Credit, CC-BY, www.steven-obrien.net).mp3" id="7_qtiqc"]
 
 [node name="Main" type="Node"]
@@ -16,6 +17,10 @@ fish_scene = ExtResource("3_5ekcx")
 [node name="Arena" parent="." instance=ExtResource("3_g5obo")]
 
 [node name="HUD" parent="." instance=ExtResource("4_83kn1")]
+
+[node name="Pause" parent="." instance=ExtResource("6_tsvpc")]
+process_mode = 2
+visible = false
 
 [node name="Player" parent="." instance=ExtResource("1_btyoi")]
 

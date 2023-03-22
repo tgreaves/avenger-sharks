@@ -14,6 +14,8 @@ config/name="avenger-sharks"
 run/main_scene="res://main.tscn"
 config/features=PackedStringArray("4.0", "GL Compatibility")
 boot_splash/show_image=false
+boot_splash/image="res://Images/avenger-shark-title.png"
+boot_splash/fullsize=false
 config/icon="res://icon.svg"
 
 [autoload]
@@ -24,6 +26,7 @@ constants="*res://constants.gd"
 
 window/size/viewport_width=2560
 window/size/viewport_height=1440
+window/size/mode=3
 window/dpi/allow_hidpi=false
 window/stretch/mode="viewport"
 
@@ -75,6 +78,7 @@ shark_fire_mouse={
 quit={
 "deadzone": 0.5,
 "events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":4194305,"key_label":0,"unicode":0,"echo":false,"script":null)
+, Object(InputEventJoypadButton,"resource_local_to_scene":false,"resource_name":"","device":-1,"button_index":3,"pressure":0.0,"pressed":true,"script":null)
 ]
 }
 shoot_left={
@@ -95,6 +99,11 @@ shoot_up={
 shoot_down={
 "deadzone": 0.5,
 "events": [Object(InputEventJoypadMotion,"resource_local_to_scene":false,"resource_name":"","device":-1,"axis":3,"axis_value":1.0,"script":null)
+]
+}
+start={
+"deadzone": 0.5,
+"events": [Object(InputEventJoypadButton,"resource_local_to_scene":false,"resource_name":"","device":-1,"button_index":6,"pressure":0.0,"pressed":true,"script":null)
 ]
 }
 

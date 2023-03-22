@@ -142,7 +142,6 @@ func _physics_process(delta):
 			
 	if $TrapTimer.time_left == 0 && state == WANDER:
 		if enemy_type == 'rogue':
-			print ("ROGUE ATTACK");
 			var enemy_trap = EnemyTrapScene.instantiate();
 			get_parent().add_child(enemy_trap);
 			enemy_trap.add_to_group('enemyTrap');
@@ -150,9 +149,7 @@ func _physics_process(delta):
 			
 			$TrapTimer.start(randf_range(constants.ENEMY_TRAP_MINIMUM_SECONDS,constants.ENEMY_TRAP_MAXIMUM_SECONDS));
 		
-	if collision:
-		print ("Enemy collision");
-		
+	if collision:		
 		if enemy_type == 'necromancer' && collision.get_collider().name.contains('Fish'):
 			var collided_with = collision.get_collider();
 			collided_with.get_node('.')._death(1);
