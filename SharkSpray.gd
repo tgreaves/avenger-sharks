@@ -1,7 +1,5 @@
 extends CharacterBody2D
 
-@export var spray_speed = 800
-
 func _ready():
     $AnimatedSprite2D.play();
     if get_parent().get_node('Player').big_spray:

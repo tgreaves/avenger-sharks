@@ -190,10 +190,17 @@ animations = [{
 
 [node name="Player" type="CharacterBody2D"]
 z_index = 1
-position = Vector2(500, 500)
+position = Vector2(1253, 666)
 collision_mask = 116
 motion_mode = 1
 script = ExtResource("1_pw3rq")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+limit_left = 0
+limit_top = 0
+limit_right = 5120
+limit_bottom = 2700
+editor_draw_limits = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(1.00003, -10)

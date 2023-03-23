@@ -134,23 +134,23 @@ func spawn_item():
 
     if spawned_item == Vector2i(99,99):
         var dinosaur = dinosaur_scene.instantiate();
-        dinosaur.get_node('.').set_position (Vector2(randf_range(120,2500),randf_range(300,1250)));
+        dinosaur.get_node('.').set_position (Vector2(randf_range(constants.ARENA_SPAWN_MIN_X,constants.ARENA_SPAWN_MAX_X),randf_range(constants.ARENA_SPAWN_MIN_Y,constants.ARENA_SPAWN_MAX_Y)));
         dinosaur.add_to_group('dinosaurGroup');
         add_child(dinosaur)
     else:
-        $Arena.set_cell(1, Vector2i(randi_range(3,20),randi_range(3,20)),0,spawned_item);
+        $Arena.set_cell(1, Vector2i(randi_range(3,40),randi_range(3,40)),0,spawned_item);
     
     $ItemSpawnTimer.start(randf_range(constants.ITEM_SPAWN_MINIMUM_SECONDS,constants.ITEM_SPAWN_MAXIMUM_SECONDS));
 
 func spawn_enemy():
     var mob = enemy_scene.instantiate();
-    mob.get_node('.').set_position (Vector2(randf_range(120,2500),randf_range(300,1250)));
+    mob.get_node('.').set_position (Vector2(randf_range(constants.ARENA_SPAWN_MIN_X,constants.ARENA_SPAWN_MAX_X),randf_range(constants.ARENA_SPAWN_MIN_Y,constants.ARENA_SPAWN_MAX_Y)));
     mob.add_to_group('enemyGroup');	
     add_child(mob);
     
 func spawn_fish():
     var mob = fish_scene.instantiate();
-    mob.get_node('.').set_position (Vector2(randf_range(120,2500),randf_range(300,1250)));
+    mob.get_node('.').set_position (Vector2(randf_range(constants.ARENA_SPAWN_MIN_X,constants.ARENA_SPAWN_MAX_X),randf_range(constants.ARENA_SPAWN_MIN_Y,constants.ARENA_SPAWN_MAX_Y)));
     mob.add_to_group('fishGroup');	
     add_child(mob);
 

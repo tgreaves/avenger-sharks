@@ -36,7 +36,7 @@ func get_input():
             var shark_spray = SharkSprayScene.instantiate();
             get_parent().add_child(shark_spray);
             shark_spray.global_position = position;
-            shark_spray.velocity = input_direction * shark_spray.spray_speed;
+            shark_spray.velocity = input_direction * constants.PLAYER_FIRE_SPEED;
             $AudioStreamPlayerSpray.play()
             $FireRateTimer.start(constants.PLAYER_FIRE_DELAY);
             
@@ -45,7 +45,7 @@ func get_input():
             get_parent().add_child(shark_spray);
             var target_direction = (get_global_mouse_position() - global_position).normalized()
             shark_spray.global_position = position;
-            shark_spray.velocity = target_direction * shark_spray.spray_speed;
+            shark_spray.velocity = target_direction * constants.PLAYER_FIRE_SPEED
             $AudioStreamPlayerSpray.play()
             $FireRateTimer.start(constants.PLAYER_FIRE_DELAY);
             
@@ -61,7 +61,7 @@ func get_input():
             shoot_input.y = Input.get_action_strength("shoot_down") - Input.get_action_strength("shoot_up");
             shoot_direction = shoot_direction.normalized();
             
-            shark_spray.velocity = shoot_direction * shark_spray.spray_speed;
+            shark_spray.velocity = shoot_direction * constants.PLAYER_FIRE_SPEED;
             $AudioStreamPlayerSpray.play()
             $FireRateTimer.start(constants.PLAYER_FIRE_DELAY);
     
@@ -105,15 +105,19 @@ func _physics_process(_delta):
                             $AudioStreamHealth.play();
                             emit_signal('update_energy')
                             
+                            collided_with.set_cell(		1, 
+                                            collided_with.get_coords_for_body_rid( collision.get_collider_rid()),
+                                                       -1);
+                            
                         Vector2i(7,9):
                             print ("POWERUP");
                             big_spray=1;
                             $PowerUpTimer.start(constants.POWER_UP_ACTIVE_DURATION);
                             $AudioStreamPowerUp.play()
                     
-                    collided_with.set_cell(		1, 
-                                                collided_with.get_coords_for_body_rid( collision.get_collider_rid()),
-                                                -1);
+                            collided_with.set_cell(		1, 
+                                                       collided_with.get_coords_for_body_rid( collision.get_collider_rid()),
+                                                       -1);
                     
                     break;
                     
@@ -131,8 +135,8 @@ func _physics_process(_delta):
                 collided_with.get_node('.')._death();
                 _player_hit();
                 
-            position.x = clamp(position.x, 0, screen_size.x)
-            position.y = clamp(position.y, 0, screen_size.y)
+            #position.x = clamp(position.x, 0, screen_size.x)
+            #position.y = clamp(position.y, 0, screen_size.y)
         EXPLODING:
             if $PlayerExplosionTimer.time_left == 0:
                 emit_signal('player_died');
