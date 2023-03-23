@@ -175,7 +175,7 @@ func _death():
             else:
                 enemy_killed_score = constants.KILL_ENEMY_SCORE;
         
-            get_parent()._on_enemy_update_score(enemy_killed_score);
+            get_parent()._on_enemy_update_score(enemy_killed_score,global_position);
         else:
             $AnimatedSprite2D.animation = enemy_type + str('-hit');
             await($AnimatedSprite2D.animation_finished);

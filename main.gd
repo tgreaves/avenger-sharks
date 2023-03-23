@@ -12,9 +12,11 @@ var enemies_left_this_wave = 0;
 enum {
     INTRO_SCREEN,
     WAVE_START,
-    WAVE_END,
     GAME_RUNNING,
     GAME_PAUSED,
+    GETTING_KEY,
+    WAVE_END,
+    PREPARE_FOR_NEXT_WAVE,
     GAME_OVER
 }
 
@@ -24,6 +26,8 @@ var ITEMS = {
     "dinosaur": Vector2i(99,99)
 };
 
+signal player_hunt_key;
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
     game_status = INTRO_SCREEN;
@@ -32,7 +36,8 @@ func _ready():
     
     if $AudioStreamPlayerMusic.playing == false:
         $AudioStreamPlayerMusic.play();
-        
+     
+    $ArenaBlank.visible = false;   
     $HUD.get_node("CanvasLayer/Energy").visible = true;
     $HUD.get_node("CanvasLayer/Score").visible = true;
     $HUD.get_node("CanvasLayer/Label").visible = true;
@@ -57,20 +62,45 @@ func wave_start():
     $WaveIntroTimer.start();
 
 func wave_end():
-    game_status = WAVE_END;
-    # Stub for congratulations message, jingle etc.
+    game_status = GETTING_KEY;
+    
+    $HUD.get_node("CanvasLayer/Label").text = "WAVE COMPLETE!"
+    $HUD.get_node("CanvasLayer/Label").visible = true;
     
     for enemy_trap in get_tree().get_nodes_in_group('enemyTrap'):
         enemy_trap.queue_free()
     
+    # Auto send player to get the key.
+    emit_signal('player_hunt_key', $Key.global_position);
+    
     for fish in get_tree().get_nodes_in_group('fishGroup'):
         fish.queue_free()
         
+    #wave_number=wave_number+1;
+    #wave_start();
+    
+func wave_end_cleanup():
     for dinosaur in get_tree().get_nodes_in_group('dinosaurGroup'):
         dinosaur.queue_free()	
         
+    $ArenaBlank.visible = true;
+    $Arena.visible = false;
+    $Player.visible = false;
+    $Player.set_process(false);
+    $Player.set_physics_process(false);
+    $Key.visible = false;
+    
+    game_status = PREPARE_FOR_NEXT_WAVE;
+    $WaveEndTimer.start();
+
+func wave_end_prepare_for_next_wave():
     wave_number=wave_number+1;
-    wave_start();
+    $Arena.visible = true;
+    $ArenaBlank.visible = false;
+    $Player._ready();
+    #$Player.visible = true;
+    $Key/CollisionShape2D.disabled = true;
+    wave_start()
 
 func start_game():
     game_status = GAME_RUNNING;
@@ -160,6 +190,10 @@ func _process(_delta):
         if $WaveIntroTimer.time_left == 0:
             start_game();
             
+    if game_status == PREPARE_FOR_NEXT_WAVE:
+        if $WaveEndTimer.time_left == 0:
+            wave_end_prepare_for_next_wave();   
+    
     if game_status == GAME_RUNNING:
         if enemies_left_this_wave == 0:
             wave_end();
@@ -218,11 +252,19 @@ func _input(_ev):
 func _on_player_update_energy():
     $HUD.get_node('CanvasLayer').get_node('Energy').text = "ENERGY\n" + str($Player.player_energy);
     
-func _on_enemy_update_score(score_to_add):
+func _on_enemy_update_score(score_to_add,enemy_global_position):
     enemies_left_this_wave = enemies_left_this_wave - 1;
     score = score + score_to_add;
     if score > high_score:
         high_score = score;
+    
+    if enemies_left_this_wave == 0:
+        # If last wave enemy is dead, spawn the key.
+        $Key.global_position = enemy_global_position
+        $Key.show();
+        $Key/CollisionShape2D.disabled = false;
+        $Key/AnimatedSprite2D.play();
+            
     _on_enemy_update_score_display();
     update_enemies_left_display();
 
@@ -242,3 +284,7 @@ func _on_player_player_got_fish():
     if score > high_score:
         high_score = score;
     _on_enemy_update_score_display();
+
+func _on_player_player_found_exit():
+    wave_end_cleanup();
+    

@@ -4,6 +4,9 @@ const SharkSprayScene = preload("res://SharkSpray.tscn");
 
 enum {
     ALIVE,
+    HUNTING_KEY,
+    HUNTING_EXIT,
+    FOUND_EXIT,
     EXPLODING,
     EXPLODED
 }
@@ -16,10 +19,22 @@ enum {
 signal update_energy;
 signal player_died;
 signal player_got_fish;
+signal player_got_key;
+signal player_found_exit_stop_key_movement;
+signal player_found_exit;
 @onready var screen_size = get_viewport_rect().size
+
+var key_global_position;
+var initial_player_position;
 
 func _ready():
     shark_status = ALIVE;
+    
+    if initial_player_position:
+        global_position = initial_player_position
+    else:
+        initial_player_position = global_position
+
     $AnimatedSprite2DDamaged.visible = false;
     $FireRateTimer.start(constants.PLAYER_FIRE_DELAY);
 
@@ -27,7 +42,7 @@ func get_input():
     
     if shark_status != ALIVE:
         return;
-    
+        
     var input_direction = Input.get_vector("left", "right", "up", "down")
     velocity = input_direction * speed
     
@@ -73,7 +88,6 @@ func _physics_process(_delta):
         if big_spray:
             big_spray=0;
             
-    
     match shark_status:
         ALIVE:
             if velocity.x > 0:
@@ -142,7 +156,45 @@ func _physics_process(_delta):
                 emit_signal('player_died');
                 print("Death signal");
                 shark_status = EXPLODED;
-
+        HUNTING_KEY:
+            if velocity.x > 0:
+                $AnimatedSprite2D.set_flip_h(true);
+            
+            if velocity.x < 0:
+                $AnimatedSprite2D.set_flip_h(false);
+              
+            for i in get_slide_collision_count():
+                var collision = get_slide_collision(i)
+                print("PLAYER collided with ", collision.get_collider().name + " // " + collision.get_collider().get_class())
+                
+                var collided_with = collision.get_collider();
+                
+                if collision.get_collider().name == 'Key':  
+                    print("KEY FOUND");
+                    shark_status = HUNTING_EXIT;
+                    var target_direction = (get_parent().get_node('Arena').get_node('ExitLocation').global_position - global_position).normalized();
+                    velocity = target_direction * constants.PLAYER_SPEED_ESCAPING;
+                    emit_signal('player_got_key')
+        HUNTING_EXIT:
+            if velocity.x > 0:
+                $AnimatedSprite2D.set_flip_h(true);
+            
+            if velocity.x < 0:
+                $AnimatedSprite2D.set_flip_h(false);
+              
+            for i in get_slide_collision_count():
+                var collision = get_slide_collision(i)
+                print("PLAYER collided with ", collision.get_collider().name + " // " + collision.get_collider().get_class())
+                
+                var collided_with = collision.get_collider();
+                
+                if collision.get_collider().name == 'Arena':  
+                    print("EXIT FOUND");
+                    shark_status = FOUND_EXIT;
+                    velocity = Vector2i(0,0)
+                    emit_signal('player_found_exit');          
+                    emit_signal('player_found_exit_stop_key_movement')
+                
 func _player_hit():
     $AudioStreamPlayerHit.play();
     player_energy = player_energy - constants.PLAYER_HIT_BY_ENEMY_DAMAGE;
@@ -161,3 +213,8 @@ func _player_hit():
     
     emit_signal('update_energy');
 
+func _on_main_player_hunt_key(passed_key_global_position):
+    shark_status = HUNTING_KEY
+    key_global_position = passed_key_global_position;
+    var target_direction = (key_global_position - global_position).normalized();
+    velocity = target_direction * constants.PLAYER_SPEED_ESCAPING;

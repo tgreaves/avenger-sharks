@@ -199,7 +199,7 @@ script = ExtResource("1_pw3rq")
 limit_left = 0
 limit_top = 0
 limit_right = 5120
-limit_bottom = 2700
+limit_bottom = 2720
 editor_draw_limits = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

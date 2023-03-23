@@ -10,18 +10,21 @@
   * Rapid fire
 * Cheat mode
 * Scenery / Obstacles in room (Tileset has boxes)
-* Make map size larger than Viewport, and have camera follow player (central)
-  * https://www.youtube.com/watch?v=rQ6ijsXz3Vo
 
-* Move into different room after wave end
-* WAVE CLEAR --> Open door --> Move to door (autopilot) and exit --> Spawn next room/wave
+* Room movement: Show entry into next room?
+  * Remove door when going through it, replace upon entry / room set-up
 * Opens up possibilities of some rooms being special, e.g. just full of fish?
 * Every x waves is a special room?
+
+* When only x enemy left, give hint arrows // change their behaviour to hunt for all types.
+* Keep count of fish rescued - use as currency in shop between x levels?
 
 # Bugs
 
 * Necromancers sometimes flicker after death / level transitions.
 * Big spray doesn't work when player close to a wall.
+* Movement to exit sometimes hits a different wall then transitions.
+* Player can take damage when being autosteered.
 
 # Flow
 
@@ -30,10 +33,5 @@
 
 # Patch notes
 
-* Gameplay: Necromancers spawn less often.
-* Gameplay: Necromancers score more points.
-* Audio: Increase volume of dinosaur RAWR.
-* Bug fix: Despawn dinosaurs on game end.
-* Bug fix: Player energy can't go to negative values any more.
 
 
