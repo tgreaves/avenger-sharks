@@ -4,10 +4,13 @@ extends Node
 @export var fish_scene: PackedScene;
 @export var dinosaur_scene: PackedScene;
 @export var game_status = INTRO_SCREEN;
+@export var cheat_mode = 0
+
 var score = 0;
 var wave_number = 1;
 var high_score = 0;
 var enemies_left_this_wave = 0;
+var fish_collected = 0;
 
 enum {
     INTRO_SCREEN,
@@ -27,12 +30,14 @@ var ITEMS = {
 };
 
 signal player_hunt_key;
+signal player_move_to_starting_position;
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
     game_status = INTRO_SCREEN;
     score=0;
-    wave_number=1;
+    fish_collected=0;
+    wave_number=0;
     
     if $AudioStreamPlayerMusic.playing == false:
         $AudioStreamPlayerMusic.play();
@@ -43,6 +48,7 @@ func _ready():
     $HUD.get_node("CanvasLayer/Label").visible = true;
     $HUD.get_node("CanvasLayer/Label").text = "AVENGER SHARKS!";
     $HUD.get_node("CanvasLayer/EnemiesLeft").visible = false;
+    $HUD.get_node("CanvasLayer/Fish").visible = false;
     
     $Player.set_process(false);
     $Player.set_physics_process(false);
@@ -75,9 +81,6 @@ func wave_end():
     
     for fish in get_tree().get_nodes_in_group('fishGroup'):
         fish.queue_free()
-        
-    #wave_number=wave_number+1;
-    #wave_start();
     
 func wave_end_cleanup():
     for dinosaur in get_tree().get_nodes_in_group('dinosaurGroup'):
@@ -90,16 +93,54 @@ func wave_end_cleanup():
     $Player.set_physics_process(false);
     $Key.visible = false;
     
+    for enemy_attack in get_tree().get_nodes_in_group('enemyAttack'):
+        enemy_attack.queue_free()
+    
+    for dinosaur_attack in get_tree().get_nodes_in_group('dinosaurAttack'):
+        dinosaur_attack.queue_free()
+    
     game_status = PREPARE_FOR_NEXT_WAVE;
     $WaveEndTimer.start();
 
 func wave_end_prepare_for_next_wave():
     wave_number=wave_number+1;
+    
+    # Close top door.
+    $Arena.set_cell(
+        1,
+        Vector2(31,2),
+        0,
+        Vector2i(6,6))
+    
+    $Arena.set_cell(
+        1,
+        Vector2(32,2),
+        0,
+        Vector2i(7,6))
+        
+    # Open bottom door.
+    $Arena.set_cell(
+        1,
+        Vector2(31,33),
+        -1,
+        Vector2i(6,6))
+    
+    $Arena.set_cell(
+        1,
+        Vector2(32,33),
+        -1,
+        Vector2i(7,6))
+    
     $Arena.visible = true;
     $ArenaBlank.visible = false;
     $Player._ready();
-    #$Player.visible = true;
+    $Player.visible = true
+    $Player.position = Vector2(2550, 2500);
+    $Player.get_node("AnimatedSprite2D").animation = 'default';
+    emit_signal("player_move_to_starting_position");
+
     $Key/CollisionShape2D.disabled = true;
+    
     wave_start()
 
 func start_game():
@@ -109,9 +150,10 @@ func start_game():
     $HUD.get_node("CanvasLayer/Score").visible = true;
     $HUD.get_node("CanvasLayer/Label").visible = false;
     $HUD.get_node("CanvasLayer/EnemiesLeft").visible = true;
+    $HUD.get_node("CanvasLayer/Fish").visible = true;
     $Player.set_process(true);
     $Player.set_physics_process(true);
-    $Player.get_node("AnimatedSprite2D").animation = 'default';
+    
     $Player.visible = true;
     
     $ItemSpawnTimer.start(randf_range(constants.ITEM_SPAWN_MINIMUM_SECONDS,constants.ITEM_SPAWN_MAXIMUM_SECONDS));
@@ -120,6 +162,7 @@ func start_game():
     
     _on_player_update_energy();
     _on_enemy_update_score_display();
+    update_fish_display();
     
     while (i < wave_number * constants.ENEMY_MULTIPLIER_AT_WAVE_START):
         spawn_enemy();
@@ -229,7 +272,16 @@ func _input(_ev):
     # Game start.
     if  Input.is_action_just_pressed('shark_fire') or Input.is_action_just_pressed('start'):	
         if game_status == INTRO_SCREEN:
-            wave_start();
+            #wave_start();
+            wave_end_prepare_for_next_wave()
+    
+    if Input.is_action_just_pressed('cheat'):
+        if game_status == INTRO_SCREEN:
+            cheat_mode = 1;
+            $HUD.get_node("CanvasLayer/Label").text = "CHEAT SHARKS!";
+            $Player.player_energy = constants.PLAYER_START_GAME_ENERGY_CHEATING;
+    
+            _on_player_update_energy();
             
     # Insta-quit.		
     if Input.is_action_just_pressed("quit"):
@@ -275,7 +327,9 @@ func _on_enemy_update_score_display():
 func update_enemies_left_display():
     $HUD.get_node('CanvasLayer').get_node('EnemiesLeft').text = "ENEMIES\n" + str(enemies_left_this_wave);
     
-
+func update_fish_display():
+    $HUD.get_node('CanvasLayer').get_node('Fish').text = "FISH\n" + str(fish_collected);
+    
 func _on_player_player_died():
     game_over();
 
@@ -283,7 +337,11 @@ func _on_player_player_got_fish():
     score = score + constants.GET_FISH_SCORE;
     if score > high_score:
         high_score = score;
+        
+    fish_collected = fish_collected + 1;
+       
     _on_enemy_update_score_display();
+    update_fish_display();
 
 func _on_player_player_found_exit():
     wave_end_cleanup();

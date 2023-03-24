@@ -15,6 +15,10 @@ func _physics_process(_delta):
             self.queue_free()
             break;
         
+        if collision.get_collider().name == 'ExitDoor':
+            break;
+        
+        print (collision.get_collider().name);
         collision.get_collider().get_node('.')._player_hit();
         
         $CollisionShape2D.disabled = true;

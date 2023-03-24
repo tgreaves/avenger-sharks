@@ -27,4 +27,5 @@ func _on_player_player_got_key():
     
 func _on_player_player_found_exit_stop_key_movement():
    state = IDLE;
+   visible = false;
     
