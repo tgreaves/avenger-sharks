@@ -559,7 +559,6 @@ collision_layer = 16
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="ExitLocation"]
 position = Vector2(-0.399976, 0.4)
-scale = Vector2(1, 1)
 shape = SubResource("RectangleShape2D_gufkr")
 
 [node name="ExitDoor" type="CharacterBody2D" parent="."]
@@ -569,7 +568,6 @@ collision_layer = 16
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="ExitDoor"]
 position = Vector2(0.400085, 1.4)
-scale = Vector2(1, 1)
 shape = SubResource("RectangleShape2D_gufkr")
 disabled = true
 
@@ -580,6 +578,5 @@ collision_layer = 16
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="PlayerStartLocation"]
 position = Vector2(1.20001, -25)
-scale = Vector2(1, 1)
 shape = SubResource("RectangleShape2D_gufkr")
 disabled = true

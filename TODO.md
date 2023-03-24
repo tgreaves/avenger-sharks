@@ -23,6 +23,8 @@
 
 # Bugs
 
+* Potions can block path to starting point -- need to despawn all items at level set-up.
+(Set all layer to 0, should be straigthtforward)
 * Necromancers sometimes flicker after death / level transitions.
 * Big spray doesn't work when player close to a wall.
 
@@ -33,10 +35,6 @@
 
 # Patch notes
 
-* Gameplay: Count the fish that are collected (Future currency!)
-* Gameplay: Increased player speed, spray speed and spray rate
-* Gameplay: Grace period added after player is hit to make things a bit fairer.
-* Gameplay: Cheat mode added to help with testing - energy set to 99999(Controller: LB button for now)
-* Flow: Exit and re-entry of room fleshed out (Auto-pilot)
-* Bug fix: Movement to exit correctly paths to door in all cases.
+* Bug fix: Health potions work correctly in cheat mode.
+
 

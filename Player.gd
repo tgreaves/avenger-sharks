@@ -116,8 +116,13 @@ func _physics_process(_delta):
                         Vector2i(9,8):
                             print ("HEATH");
                             player_energy = player_energy + constants.HEALTH_POTION_BONUS;
-                            if player_energy > constants.PLAYER_START_GAME_ENERGY:
-                                player_energy = constants.PLAYER_START_GAME_ENERGY;
+                            if get_parent().cheat_mode:
+                                if player_energy > constants.PLAYER_START_GAME_ENERGY_CHEATING:
+                                    player_energy = constants.PLAYER_START_GAME_ENERGY_CHEATING
+                            else:
+                                if player_energy > constants.PLAYER_START_GAME_ENERGY:
+                                    player_energy = constants.PLAYER_START_GAME_ENERGY;
+                                    
                             $AudioStreamHealth.play();
                             emit_signal('update_energy')
                             
