@@ -1,31 +1,31 @@
-[gd_scene load_steps=16 format=3 uid="uid://c1n880m7gbwf3"]
+[gd_scene load_steps=16 format=3 uid="uid://dl3gcb38nvw46"]
 
-[ext_resource type="Script" path="res://EnemyTrap.gd" id="1_73l6s"]
-[ext_resource type="Texture2D" uid="uid://cu4wy1d8botty" path="res://Sprites/Bear_Trap.png" id="2_mink7"]
-[ext_resource type="AudioStream" uid="uid://vioqdrtdy1x3" path="res://Sound/086398_game-die-81356.mp3" id="3_knkoh"]
-[ext_resource type="Texture2D" uid="uid://dpnh82bexsu7d" path="res://Sprites/Explosions/WaterExplosion/Water__05.png" id="3_xgwes"]
-[ext_resource type="Texture2D" uid="uid://djcxss8vcxcyv" path="res://Sprites/Explosions/WaterExplosion/Water__04.png" id="4_u25nb"]
-[ext_resource type="Texture2D" uid="uid://5onixek6sj6r" path="res://Sprites/Explosions/WaterExplosion/Water__03.png" id="5_n8dh0"]
-[ext_resource type="Texture2D" uid="uid://bh58c8y72t27l" path="res://Sprites/Explosions/WaterExplosion/Water__02.png" id="6_wf1it"]
-[ext_resource type="Texture2D" uid="uid://b132nn5mor6d3" path="res://Sprites/Explosions/WaterExplosion/Water__01.png" id="7_rcgy3"]
+[ext_resource type="Script" path="res://Scripts/EnemyTrap.gd" id="1_7c2qk"]
+[ext_resource type="Texture2D" uid="uid://cu4wy1d8botty" path="res://Sprites/Bear_Trap.png" id="2_y8xv8"]
+[ext_resource type="Texture2D" uid="uid://dpnh82bexsu7d" path="res://Sprites/Explosions/WaterExplosion/Water__05.png" id="3_eo0xu"]
+[ext_resource type="Texture2D" uid="uid://djcxss8vcxcyv" path="res://Sprites/Explosions/WaterExplosion/Water__04.png" id="4_hqxq0"]
+[ext_resource type="Texture2D" uid="uid://5onixek6sj6r" path="res://Sprites/Explosions/WaterExplosion/Water__03.png" id="5_mj3g4"]
+[ext_resource type="Texture2D" uid="uid://bh58c8y72t27l" path="res://Sprites/Explosions/WaterExplosion/Water__02.png" id="6_fa5vj"]
+[ext_resource type="Texture2D" uid="uid://b132nn5mor6d3" path="res://Sprites/Explosions/WaterExplosion/Water__01.png" id="7_8vtdi"]
+[ext_resource type="AudioStream" uid="uid://vioqdrtdy1x3" path="res://Sound/086398_game-die-81356.mp3" id="8_sb0g0"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_lwg83"]
 radius = 1.5
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_xyxhp"]
-atlas = ExtResource("2_mink7")
+atlas = ExtResource("2_y8xv8")
 region = Rect2(0, 0, 32, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_mlrbo"]
-atlas = ExtResource("2_mink7")
+atlas = ExtResource("2_y8xv8")
 region = Rect2(32, 0, 32, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_p1vge"]
-atlas = ExtResource("2_mink7")
+atlas = ExtResource("2_y8xv8")
 region = Rect2(64, 0, 32, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_bj2lt"]
-atlas = ExtResource("2_mink7")
+atlas = ExtResource("2_y8xv8")
 region = Rect2(96, 0, 32, 32)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_vvs7x"]
@@ -52,19 +52,19 @@ animations = [{
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("3_xgwes")
+"texture": ExtResource("3_eo0xu")
 }, {
 "duration": 1.0,
-"texture": ExtResource("4_u25nb")
+"texture": ExtResource("4_hqxq0")
 }, {
 "duration": 1.0,
-"texture": ExtResource("5_n8dh0")
+"texture": ExtResource("5_mj3g4")
 }, {
 "duration": 1.0,
-"texture": ExtResource("6_wf1it")
+"texture": ExtResource("6_fa5vj")
 }, {
 "duration": 1.0,
-"texture": ExtResource("7_rcgy3")
+"texture": ExtResource("7_8vtdi")
 }],
 "loop": true,
 "name": &"default",
@@ -75,7 +75,7 @@ animations = [{
 scale = Vector2(35, 35)
 collision_layer = 4
 collision_mask = 17
-script = ExtResource("1_73l6s")
+script = ExtResource("1_7c2qk")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_lwg83")
@@ -92,7 +92,7 @@ scale = Vector2(0.05, 0.05)
 sprite_frames = SubResource("SpriteFrames_1vjyt")
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("3_knkoh")
+stream = ExtResource("8_sb0g0")
 
 [node name="StateTimer" type="Timer" parent="."]
 wait_time = 2.0

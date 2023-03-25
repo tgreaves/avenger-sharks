@@ -1,6 +1,6 @@
-[gd_scene load_steps=49 format=3 uid="uid://bhx6neq7hsoq0"]
+[gd_scene load_steps=49 format=3 uid="uid://5yp4e43ckdrj"]
 
-[ext_resource type="Script" path="res://Player.gd" id="1_pw3rq"]
+[ext_resource type="Script" path="res://Scripts/Player.gd" id="1_m4brx"]
 [ext_resource type="Texture2D" uid="uid://ikcchi1bmyrs" path="res://Sprites/Shark/Shark1.png" id="2_px875"]
 [ext_resource type="Texture2D" uid="uid://bdivog3ud6gr" path="res://Sprites/Shark/Shark2.png" id="3_gasau"]
 [ext_resource type="Texture2D" uid="uid://d05wftn5oy54p" path="res://Sprites/Shark/Shark3.png" id="4_5ma5o"]
@@ -193,7 +193,7 @@ z_index = 1
 position = Vector2(1253, 666)
 collision_mask = 116
 motion_mode = 1
-script = ExtResource("1_pw3rq")
+script = ExtResource("1_m4brx")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 limit_left = 0

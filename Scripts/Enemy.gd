@@ -1,7 +1,7 @@
 extends CharacterBody2D
 
-const EnemyAttackScene = preload("res://EnemyAttack.tscn");
-const EnemyTrapScene = preload("res://EnemyTrap.tscn");
+const EnemyAttackScene = preload("res://Scenes/EnemyAttack.tscn");
+const EnemyTrapScene = preload("res://Scenes/EnemyTrap.tscn");
 
 enum {
     SPAWNING,

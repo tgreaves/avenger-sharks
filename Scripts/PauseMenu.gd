@@ -8,7 +8,7 @@ func _ready():
     $CanvasLayer/PauseMenuContainer/UnpauseGame.grab_focus()
     
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
+func _process(_delta):
     pass
 
 #func input(_ev):

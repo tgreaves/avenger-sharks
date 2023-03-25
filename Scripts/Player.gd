@@ -1,6 +1,6 @@
 extends CharacterBody2D
 
-const SharkSprayScene = preload("res://SharkSpray.tscn");
+const SharkSprayScene = preload("res://Scenes/SharkSpray.tscn");
 
 enum {
     ALIVE,

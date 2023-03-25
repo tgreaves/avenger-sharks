@@ -1,7 +1,7 @@
-[gd_scene load_steps=3 format=3 uid="uid://1jtglon274ct"]
+[gd_scene load_steps=3 format=3 uid="uid://djx0ns71ofwsx"]
 
-[ext_resource type="Script" path="res://Pause.gd" id="1_v5wnv"]
-[ext_resource type="FontFile" uid="uid://dclfn1fjcq5i7" path="res://Fonts/PressStart2P-Regular.ttf" id="1_ykjau"]
+[ext_resource type="Script" path="res://Scripts/Pause.gd" id="1_q6iqm"]
+[ext_resource type="FontFile" uid="uid://dclfn1fjcq5i7" path="res://Fonts/PressStart2P-Regular.ttf" id="2_wtf61"]
 
 [node name="Pause" type="Control"]
 layout_mode = 3
@@ -10,7 +10,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_v5wnv")
+script = ExtResource("1_q6iqm")
 
 [node name="Label" type="Label" parent="."]
 layout_mode = 1
@@ -25,6 +25,6 @@ offset_right = 192.0
 offset_bottom = 33.5
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_fonts/font = ExtResource("1_ykjau")
+theme_override_fonts/font = ExtResource("2_wtf61")
 theme_override_font_sizes/font_size = 64
 text = "PAUSED"

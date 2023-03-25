@@ -1,6 +1,6 @@
 extends CharacterBody2D
 
-const DinosaurAttackScene = preload("res://DinosaurAttack.tscn");
+const DinosaurAttackScene = preload("res://Scenes/DinosaurAttack.tscn");
 var state = IDLE;
 
 enum {

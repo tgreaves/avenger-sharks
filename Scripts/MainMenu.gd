@@ -9,7 +9,7 @@ func _ready():
     $CanvasLayer/VersionLabel.text = "Version " + constants.GAME_VERSION
     
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
+func _process(_delta):
     pass
 
 func _on_start_game_pressed():

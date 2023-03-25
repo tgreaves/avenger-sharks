@@ -1,7 +1,7 @@
-[gd_scene load_steps=17 format=3 uid="uid://dj3iq7ccyipva"]
+[gd_scene load_steps=17 format=3 uid="uid://70bo017e2fwf"]
 
+[ext_resource type="Script" path="res://Scripts/Dinosaur.gd" id="1_b5leg"]
 [ext_resource type="Texture2D" uid="uid://cidfg3jimn4je" path="res://Sprites/DinoSprites - vita.png" id="1_kt61w"]
-[ext_resource type="Script" path="res://Dinosaur.gd" id="1_u063v"]
 [ext_resource type="AudioStream" uid="uid://3dfl0qmhv15n" path="res://Sound/laser5-47286.mp3" id="3_5e8tr"]
 [ext_resource type="AudioStream" uid="uid://uasmo2ylqfag" path="res://Sound/monster-growl-140377.mp3" id="4_8dyv5"]
 
@@ -96,7 +96,7 @@ height = 19.0
 texture_filter = 1
 scale = Vector2(6, 6)
 collision_layer = 32
-script = ExtResource("1_u063v")
+script = ExtResource("1_b5leg")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_4mgyk")

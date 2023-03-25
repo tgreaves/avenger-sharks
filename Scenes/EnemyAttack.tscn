@@ -1,0 +1,49 @@
+[gd_scene load_steps=9 format=3 uid="uid://0fiq0n7khi4q"]
+
+[ext_resource type="Script" path="res://Scripts/EnemyAttack.gd" id="1_bat7h"]
+[ext_resource type="Texture2D" uid="uid://bcecqvxy2vhr7" path="res://Sprites/EnemyAttack/FB500-1.png" id="2_jwdju"]
+[ext_resource type="Texture2D" uid="uid://doik552n5vuq1" path="res://Sprites/EnemyAttack/FB500-2.png" id="3_2flv5"]
+[ext_resource type="Texture2D" uid="uid://dxyxtrpwer2x7" path="res://Sprites/EnemyAttack/FB500-3.png" id="4_koych"]
+[ext_resource type="Texture2D" uid="uid://c04fcose35e45" path="res://Sprites/EnemyAttack/FB500-4.png" id="5_6mf5t"]
+[ext_resource type="Texture2D" uid="uid://bk1rlhhhmsmm1" path="res://Sprites/EnemyAttack/FB500-5.png" id="6_6hioo"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_lwg83"]
+radius = 30.0
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_btn6d"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_jwdju")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_2flv5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_koych")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_6mf5t")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_6hioo")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[node name="EnemyAttack" type="CharacterBody2D"]
+z_index = 1
+scale = Vector2(0.5, 0.5)
+collision_layer = 8
+collision_mask = 17
+script = ExtResource("1_bat7h")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_lwg83")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+scale = Vector2(0.15, 0.15)
+sprite_frames = SubResource("SpriteFrames_btn6d")
+frame_progress = 0.685948

@@ -1,6 +1,6 @@
-[gd_scene load_steps=18 format=3 uid="uid://djqnnk36jvtk5"]
+[gd_scene load_steps=18 format=3 uid="uid://18lymhdawjy7"]
 
-[ext_resource type="Script" path="res://Fish.gd" id="1_ofnsv"]
+[ext_resource type="Script" path="res://Scripts/Fish.gd" id="1_5o38p"]
 [ext_resource type="Texture2D" uid="uid://b88fnpcija5k4" path="res://Sprites/Fish/fishTile_078.png" id="2_5kwnx"]
 [ext_resource type="Texture2D" uid="uid://bgejrk4eagajd" path="res://Sprites/Fish/fishTile_079.png" id="3_8jvrj"]
 [ext_resource type="Texture2D" uid="uid://urvdlkovutbj" path="res://Sprites/Fish/fishTile_080.png" id="4_6j46p"]
@@ -93,7 +93,7 @@ animations = [{
 
 [node name="Fish" type="CharacterBody2D"]
 collision_layer = 64
-script = ExtResource("1_ofnsv")
+script = ExtResource("1_5o38p")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_qergj")

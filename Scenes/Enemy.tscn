@@ -1,6 +1,6 @@
-[gd_scene load_steps=72 format=3 uid="uid://crtedtu6qn41u"]
+[gd_scene load_steps=72 format=3 uid="uid://bkmx1mvtb8dxr"]
 
-[ext_resource type="Script" path="res://Enemy.gd" id="1_inywh"]
+[ext_resource type="Script" path="res://Scripts/Enemy.gd" id="1_6udno"]
 [ext_resource type="Texture2D" uid="uid://ps2dg61ty76w" path="res://Sprites/knight-run-sheet.png" id="2_7pnuj"]
 [ext_resource type="Texture2D" uid="uid://c4xfdnq5c38c0" path="res://Sprites/knight-death-sheet.png" id="2_q1u0q"]
 [ext_resource type="Texture2D" uid="uid://cc8l7jmv24vle" path="res://Sprites/wizard-run-sheet.png" id="3_8f23o"]
@@ -481,7 +481,7 @@ z_index = 1
 collision_layer = 4
 collision_mask = 81
 motion_mode = 1
-script = ExtResource("1_inywh")
+script = ExtResource("1_6udno")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(2, -1)

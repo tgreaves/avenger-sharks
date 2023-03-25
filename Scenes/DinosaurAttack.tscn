@@ -1,0 +1,53 @@
+[gd_scene load_steps=9 format=3 uid="uid://ch08b0kbbu3je"]
+
+[ext_resource type="Script" path="res://Scripts/DinosaurAttack.gd" id="1_w8br7"]
+[ext_resource type="Texture2D" uid="uid://ig2s00164uhd" path="res://Sprites/SharkSpray/Water__01.png" id="2_1wwod"]
+[ext_resource type="Texture2D" uid="uid://cdu83ucyr77of" path="res://Sprites/SharkSpray/Water__02.png" id="3_2sf1m"]
+[ext_resource type="Texture2D" uid="uid://beqfs5j7nfpc3" path="res://Sprites/SharkSpray/Water__03.png" id="4_1nwek"]
+[ext_resource type="Texture2D" uid="uid://brtia1eocoama" path="res://Sprites/SharkSpray/Water__04.png" id="5_kxy63"]
+[ext_resource type="Texture2D" uid="uid://da60t2goyisif" path="res://Sprites/SharkSpray/Water__05.png" id="6_x5k5a"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_lwg83"]
+radius = 40.0
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_3lkrx"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_1wwod")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_2sf1m")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_1nwek")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_kxy63")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_x5k5a")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_kxy63")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_1nwek")
+}],
+"loop": true,
+"name": &"default",
+"speed": 10.0
+}]
+
+[node name="DinosaurAttack" type="CharacterBody2D"]
+scale = Vector2(0.5, 0.5)
+collision_layer = 2
+collision_mask = 20
+script = ExtResource("1_w8br7")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_lwg83")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_3lkrx")
+frame_progress = 0.0241135
