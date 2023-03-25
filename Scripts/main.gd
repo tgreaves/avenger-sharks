@@ -3,6 +3,7 @@ extends Node
 @export var enemy_scene: PackedScene
 @export var fish_scene: PackedScene;
 @export var dinosaur_scene: PackedScene;
+@export var credits_scene: PackedScene;
 @export var game_status = INTRO_SCREEN;
 @export var cheat_mode = 0
 
@@ -15,6 +16,7 @@ var spawned_items_this_wave = []
 
 enum {
     INTRO_SCREEN,
+    CREDITS,
     WAVE_START,
     GAME_RUNNING,
     GAME_PAUSED,
@@ -310,6 +312,14 @@ func _input(_ev):
                 $PauseMenu.set_process_input(true)
                 $PauseMenu._ready()
                 get_tree().paused = true;
+                
+    if Input.is_action_just_released('shark_fire') or Input.is_action_just_released('shark_fire_mouse'):
+        match game_status:
+            CREDITS:
+                game_status = INTRO_SCREEN
+                $Credits.queue_free()
+                $MainMenu.get_node("CanvasLayer").visible = true
+                
         
 func _on_player_update_energy():
     #$HUD.get_node('CanvasLayer').get_node('Energy').text = "ENERGY\n" + str($Player.player_energy);
@@ -377,3 +387,10 @@ func _on_pause_menu_abandon_game_pressed():
     $PauseMenu.set_process_input(false);
     get_tree().paused = false;
     return_to_main_screen();
+
+func _on_main_menu_credits_pressed():
+    game_status = CREDITS;
+    $MainMenu.get_node("CanvasLayer").visible = false
+    var credits = credits_scene.instantiate();
+    credits.visible = true
+    add_child(credits)
