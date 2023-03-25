@@ -8,25 +8,24 @@
   * Speed?
   * Bouncing shots?
   * Rapid fire
-* Cheat mode
+  * Exploding shots
 * Scenery / Obstacles in room (Tileset has boxes)
 
-* Room movement: Show entry into next room?
-  * Remove door when going through it, replace upon entry / room set-up
-  * Can use reload_scene() or similar here.
 * Opens up possibilities of some rooms being special, e.g. just full of fish?
 * Every x waves is a special room?
 
 * When only x enemy left, give hint arrows // change their behaviour to hunt for all types.
 * Keep count of fish rescued - use as currency in shop between x levels?
 * Bonus points for collecting all fish at end of wave?
+* Animation of fish being released back into the sea?
+
+* Replace health numerical representation with a health bar? // Progress bar 
 
 # Bugs
 
-* Potions can block path to starting point -- need to despawn all items at level set-up.
-(Set all layer to 0, should be straigthtforward)
 * Necromancers sometimes flicker after death / level transitions.
 * Big spray doesn't work when player close to a wall.
+* Items not correctly despawning on game end.
 
 # Flow
 
@@ -35,6 +34,11 @@
 
 # Patch notes
 
-* Bug fix: Health potions work correctly in cheat mode.
+* Interface: Initial menu system (Main and Pause).
+* Interface: Energy now represented as a ProgressBar.
+* Interface: Added version number.
+* Bug fix: Fixed crash due to SharkSpray conflict with ExitLocation.
+* Bug fix: Potions could block level exit route.  They now despawn on wave end.
+* Bug fix: Stop items spawning out of bounds.
 
 

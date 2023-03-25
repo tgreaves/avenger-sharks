@@ -11,6 +11,7 @@ var wave_number = 1;
 var high_score = 0;
 var enemies_left_this_wave = 0;
 var fish_collected = 0;
+var spawned_items_this_wave = []
 
 enum {
     INTRO_SCREEN,
@@ -41,12 +42,17 @@ func _ready():
     
     if $AudioStreamPlayerMusic.playing == false:
         $AudioStreamPlayerMusic.play();
-     
+ 
     $ArenaBlank.visible = false;   
+    $MainMenu.get_node('CanvasLayer').visible = true;
+    $MainMenu.set_process_input(true);
+    $MainMenu._ready();
+    $PauseMenu.get_node('CanvasLayer').visible = false;
+    $PauseMenu.set_process_input(false);
     $HUD.get_node("CanvasLayer/Energy").visible = true;
     $HUD.get_node("CanvasLayer/Score").visible = true;
     $HUD.get_node("CanvasLayer/Label").visible = true;
-    $HUD.get_node("CanvasLayer/Label").text = "AVENGER SHARKS!";
+    $HUD.get_node("CanvasLayer/Label").text = "";
     $HUD.get_node("CanvasLayer/EnemiesLeft").visible = false;
     $HUD.get_node("CanvasLayer/Fish").visible = false;
     
@@ -57,6 +63,7 @@ func _ready():
     $Player._ready();
     
     $Player.player_energy = constants.PLAYER_START_GAME_ENERGY;
+    $HUD.get_node("CanvasLayer/EnergyProgressBar").max_value = constants.PLAYER_START_GAME_ENERGY
     
     _on_player_update_energy();
     _on_enemy_update_score_display();
@@ -75,6 +82,8 @@ func wave_end():
     
     for enemy_trap in get_tree().get_nodes_in_group('enemyTrap'):
         enemy_trap.queue_free()
+    
+    despawn_all_items()
     
     # Auto send player to get the key.
     emit_signal('player_hunt_key', $Key.global_position);
@@ -131,6 +140,9 @@ func wave_end_prepare_for_next_wave():
         -1,
         Vector2i(7,6))
     
+    print("Trying to hide menu...")
+    $MainMenu.get_node('CanvasLayer').visible = false
+    $MainMenu.set_process_input(false)
     $Arena.visible = true;
     $ArenaBlank.visible = false;
     $Player._ready();
@@ -199,6 +211,8 @@ func return_to_main_screen():
         
     for dinosaur in get_tree().get_nodes_in_group('dinosaurGroup'):
         dinosaur.queue_free()
+        
+    despawn_all_items()
     
     _ready();
     
@@ -211,9 +225,18 @@ func spawn_item():
         dinosaur.add_to_group('dinosaurGroup');
         add_child(dinosaur)
     else:
-        $Arena.set_cell(1, Vector2i(randi_range(3,40),randi_range(3,40)),0,spawned_item);
+        var item_x = randi_range(3,40)
+        var item_y = randi_range(3,39)
+        spawned_items_this_wave.append(Vector2i(item_x,item_y))
+        $Arena.set_cell(1, Vector2i(item_x, item_y),0,spawned_item);
     
     $ItemSpawnTimer.start(randf_range(constants.ITEM_SPAWN_MINIMUM_SECONDS,constants.ITEM_SPAWN_MAXIMUM_SECONDS));
+
+func despawn_all_items():
+    # FIXME: This does not seem to be working.
+    for single_item in spawned_items_this_wave:
+        print ("DESPAWNING " + str(single_item))
+        $Arena.set_cell(1, single_item,-1, Vector2i(-1, -1));
 
 func spawn_enemy():
     var mob = enemy_scene.instantiate();
@@ -269,40 +292,28 @@ func _process(_delta):
             return_to_main_screen();
         
 func _input(_ev):
-    # Game start.
-    if  Input.is_action_just_pressed('shark_fire') or Input.is_action_just_pressed('start'):	
-        if game_status == INTRO_SCREEN:
-            #wave_start();
-            wave_end_prepare_for_next_wave()
-    
     if Input.is_action_just_pressed('cheat'):
         if game_status == INTRO_SCREEN:
             cheat_mode = 1;
-            $HUD.get_node("CanvasLayer/Label").text = "CHEAT SHARKS!";
+            $MainMenu/CanvasLayer/MainMenuContainer/TitleLabel.text = "CHEAT SHARKS!\n\nBy Tristan Greaves";
             $Player.player_energy = constants.PLAYER_START_GAME_ENERGY_CHEATING;
+            $HUD.get_node("CanvasLayer/EnergyProgressBar").max_value = constants.PLAYER_START_GAME_ENERGY
     
             _on_player_update_energy();
             
-    # Insta-quit.		
-    if Input.is_action_just_pressed("quit"):
-            get_tree().quit();
-                    
-    if Input.is_action_just_pressed('start'):
+    if Input.is_action_just_pressed('start') or Input.is_action_just_pressed('quit'):
         match game_status:
             GAME_RUNNING:
                 print ("PAUSING")
                 game_status = GAME_PAUSED;
-                $Pause.show();
+                $PauseMenu.get_node('CanvasLayer').visible = true
+                $PauseMenu.set_process_input(true)
+                $PauseMenu._ready()
                 get_tree().paused = true;
-            GAME_PAUSED:
-                print ("UNPAUSING")
-                game_status = GAME_RUNNING;
-                $Pause.hide();
-                get_tree().paused = false;
         
-
 func _on_player_update_energy():
-    $HUD.get_node('CanvasLayer').get_node('Energy').text = "ENERGY\n" + str($Player.player_energy);
+    #$HUD.get_node('CanvasLayer').get_node('Energy').text = "ENERGY\n" + str($Player.player_energy);
+    $HUD.get_node('CanvasLayer').get_node('EnergyProgressBar').value = $Player.player_energy
     
 func _on_enemy_update_score(score_to_add,enemy_global_position):
     enemies_left_this_wave = enemies_left_this_wave - 1;
@@ -339,10 +350,30 @@ func _on_player_player_got_fish():
         high_score = score;
         
     fish_collected = fish_collected + 1;
-       
     _on_enemy_update_score_display();
     update_fish_display();
 
 func _on_player_player_found_exit():
     wave_end_cleanup();
     
+func _on_main_menu_start_game_pressed():
+    print ("Signal to start OK")
+    wave_end_prepare_for_next_wave()
+
+func _on_main_menu_exit_game_pressed():
+    get_tree().quit();
+
+
+func _on_pause_menu_unpause_game_pressed():
+    print("UNPAUSING")
+    game_status = GAME_RUNNING;
+    $PauseMenu.get_node('CanvasLayer').visible = false;
+    $PauseMenu.set_process_input(false);
+    get_tree().paused = false;
+    
+
+func _on_pause_menu_abandon_game_pressed():
+    $PauseMenu.get_node('CanvasLayer').visible = false;
+    $PauseMenu.set_process_input(false);
+    get_tree().paused = false;
+    return_to_main_screen();

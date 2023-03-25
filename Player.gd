@@ -174,8 +174,6 @@ func _physics_process(_delta):
                 var collision = get_slide_collision(i)
                 print("PLAYER collided with ", collision.get_collider().name + " // " + collision.get_collider().get_class())
                 
-                var collided_with = collision.get_collider();
-                
                 if collision.get_collider().name == 'Key':  
                     print("KEY FOUND");
                     shark_status = HUNTING_EXIT;
@@ -193,8 +191,6 @@ func _physics_process(_delta):
             for i in get_slide_collision_count():
                 var collision = get_slide_collision(i)
                 #print("PLAYER collided with ", collision.get_collider().name + " // " + collision.get_collider().get_class())
-                
-                var collided_with = collision.get_collider();
                 
                 # TODO: Wait for player to explicitly hit ExitDoor as a first step.
                 # Then clear door tiles
@@ -235,8 +231,6 @@ func _physics_process(_delta):
                 for i in get_slide_collision_count():
                     var collision = get_slide_collision(i)
                     print("PLAYER collided with ", collision.get_collider().name + " // " + collision.get_collider().get_class())
-                    
-                    var collided_with = collision.get_collider();
                 
                     if collision.get_collider().name == 'ExitLocation':  
                         emit_signal('player_found_exit');  
@@ -258,8 +252,6 @@ func _physics_process(_delta):
                 for i in get_slide_collision_count():
                     var collision = get_slide_collision(i)
                     print("PLAYER collided with ", collision.get_collider().name + " // " + collision.get_collider().get_class())
-                    
-                    var collided_with = collision.get_collider();
                      
                     if collision.get_collider().name == 'PlayerStartLocation':  
                         shark_status = ALIVE

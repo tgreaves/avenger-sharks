@@ -1,0 +1,94 @@
+[gd_scene load_steps=7 format=3 uid="uid://b04icgc1tlxch"]
+
+[ext_resource type="Script" path="res://MainMenu.gd" id="1_bxskw"]
+[ext_resource type="FontFile" uid="uid://dclfn1fjcq5i7" path="res://Fonts/PressStart2P-Regular.ttf" id="1_jvmua"]
+
+[sub_resource type="InputEventAction" id="InputEventAction_0y2kl"]
+action = &"start"
+
+[sub_resource type="Shortcut" id="Shortcut_l265b"]
+events = [SubResource("InputEventAction_0y2kl")]
+
+[sub_resource type="InputEventAction" id="InputEventAction_13xus"]
+action = &"quit"
+
+[sub_resource type="Shortcut" id="Shortcut_ed26y"]
+events = [SubResource("InputEventAction_13xus")]
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_bxskw")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="VersionLabel" type="Label" parent="CanvasLayer"]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -1152.0
+offset_top = -201.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_fonts/font = ExtResource("1_jvmua")
+theme_override_font_sizes/font_size = 32
+text = "Version xxx"
+horizontal_alignment = 2
+vertical_alignment = 2
+
+[node name="MainMenuContainer" type="VBoxContainer" parent="CanvasLayer"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -576.0
+offset_top = -220.0
+offset_right = 576.0
+offset_bottom = 293.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 3
+alignment = 1
+
+[node name="TitleLabel" type="Label" parent="CanvasLayer/MainMenuContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("1_jvmua")
+theme_override_font_sizes/font_size = 64
+text = "AVENGER SHARKS!
+
+By Tristan Greaves
+"
+horizontal_alignment = 1
+
+[node name="BlankLabel" type="Label" parent="CanvasLayer/MainMenuContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("1_jvmua")
+theme_override_font_sizes/font_size = 64
+horizontal_alignment = 1
+
+[node name="StartGame" type="Button" parent="CanvasLayer/MainMenuContainer"]
+layout_mode = 2
+size_flags_vertical = 6
+theme_override_fonts/font = ExtResource("1_jvmua")
+theme_override_font_sizes/font_size = 64
+shortcut = SubResource("Shortcut_l265b")
+text = "START GAME
+"
+
+[node name="ExitGame" type="Button" parent="CanvasLayer/MainMenuContainer"]
+layout_mode = 2
+size_flags_vertical = 6
+theme_override_fonts/font = ExtResource("1_jvmua")
+theme_override_font_sizes/font_size = 64
+shortcut = SubResource("Shortcut_ed26y")
+text = "EXIT"
+
+[connection signal="pressed" from="CanvasLayer/MainMenuContainer/StartGame" to="." method="_on_start_game_pressed"]
+[connection signal="pressed" from="CanvasLayer/MainMenuContainer/ExitGame" to="." method="_on_exit_game_pressed"]

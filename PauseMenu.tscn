@@ -1,0 +1,66 @@
+[gd_scene load_steps=5 format=3 uid="uid://btse845y1mron"]
+
+[ext_resource type="Script" path="res://PauseMenu.gd" id="1_3r7mf"]
+[ext_resource type="FontFile" uid="uid://dclfn1fjcq5i7" path="res://Fonts/PressStart2P-Regular.ttf" id="2_qm1nk"]
+
+[sub_resource type="Shortcut" id="Shortcut_oo15p"]
+
+[sub_resource type="Shortcut" id="Shortcut_s5al1"]
+
+[node name="PauseMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_3r7mf")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="PauseMenuContainer" type="VBoxContainer" parent="CanvasLayer"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -320.0
+offset_top = -161.0
+offset_right = 320.0
+offset_bottom = 189.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 3
+alignment = 1
+
+[node name="TitleLabel" type="Label" parent="CanvasLayer/PauseMenuContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_qm1nk")
+theme_override_font_sizes/font_size = 64
+text = "PAUSED"
+horizontal_alignment = 1
+
+[node name="BlankLabel" type="Label" parent="CanvasLayer/PauseMenuContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_qm1nk")
+theme_override_font_sizes/font_size = 64
+horizontal_alignment = 1
+
+[node name="UnpauseGame" type="Button" parent="CanvasLayer/PauseMenuContainer"]
+layout_mode = 2
+size_flags_vertical = 6
+theme_override_fonts/font = ExtResource("2_qm1nk")
+theme_override_font_sizes/font_size = 64
+shortcut = SubResource("Shortcut_oo15p")
+text = "UNPAUSE GAME"
+
+[node name="AbandonGame" type="Button" parent="CanvasLayer/PauseMenuContainer"]
+layout_mode = 2
+size_flags_vertical = 6
+theme_override_fonts/font = ExtResource("2_qm1nk")
+theme_override_font_sizes/font_size = 64
+shortcut = SubResource("Shortcut_s5al1")
+text = "ABANDON GAME"
+
+[connection signal="pressed" from="CanvasLayer/PauseMenuContainer/UnpauseGame" to="." method="_on_unpause_game_pressed"]
+[connection signal="pressed" from="CanvasLayer/PauseMenuContainer/AbandonGame" to="." method="_on_abandon_game_pressed"]

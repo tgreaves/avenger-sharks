@@ -1,6 +1,12 @@
-[gd_scene load_steps=2 format=3 uid="uid://bcqacic7yj4ds"]
+[gd_scene load_steps=4 format=3 uid="uid://bcqacic7yj4ds"]
 
 [ext_resource type="FontFile" uid="uid://dclfn1fjcq5i7" path="res://Fonts/PressStart2P-Regular.ttf" id="1_4l55f"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tpm7p"]
+bg_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_i2m3c"]
+bg_color = Color(0.329412, 0.698039, 0.25098, 1)
 
 [node name="HUD" type="Control"]
 layout_mode = 3
@@ -24,6 +30,16 @@ theme_override_fonts/font = ExtResource("1_4l55f")
 theme_override_font_sizes/font_size = 64
 text = "ENERGY"
 horizontal_alignment = 2
+
+[node name="EnergyProgressBar" type="ProgressBar" parent="CanvasLayer"]
+offset_left = 2168.0
+offset_top = 62.0
+offset_right = 2558.0
+offset_bottom = 134.0
+theme_override_styles/background = SubResource("StyleBoxFlat_tpm7p")
+theme_override_styles/fill = SubResource("StyleBoxFlat_i2m3c")
+value = 50.0
+show_percentage = false
 
 [node name="Fish" type="Label" parent="CanvasLayer"]
 anchors_preset = 1
@@ -63,7 +79,6 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_fonts/font = ExtResource("1_4l55f")
 theme_override_font_sizes/font_size = 64
-text = "AVENGER SHARKS!"
 horizontal_alignment = 1
 
 [node name="HighScore" type="Label" parent="CanvasLayer"]

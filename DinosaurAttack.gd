@@ -18,6 +18,9 @@ func _physics_process(_delta):
         if collision.get_collider().name == 'ExitDoor':
             break    
             
+        if collision.get_collider().name == 'ExitLocation':
+            break      
+        
         if collision.get_collider().name == 'PlayerStartLocation':
             break 
             

@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://b6w8kxixmst07"]
+[gd_scene load_steps=13 format=3 uid="uid://b6w8kxixmst07"]
 
 [ext_resource type="PackedScene" uid="uid://bhx6neq7hsoq0" path="res://Player.tscn" id="1_btyoi"]
 [ext_resource type="Script" path="res://main.gd" id="1_bwln5"]
@@ -8,9 +8,10 @@
 [ext_resource type="PackedScene" uid="uid://bcqacic7yj4ds" path="res://HUD.tscn" id="4_83kn1"]
 [ext_resource type="PackedScene" uid="uid://dj3iq7ccyipva" path="res://Dinosaur.tscn" id="4_yhonq"]
 [ext_resource type="PackedScene" uid="uid://b4aalf68jjkjh" path="res://ArenaBlank.tscn" id="6_5775a"]
-[ext_resource type="PackedScene" uid="uid://1jtglon274ct" path="res://Pause.tscn" id="6_tsvpc"]
 [ext_resource type="AudioStream" uid="uid://b65dtuu73n480" path="res://Sound/80s Synthpop Experiment - Steven O'Brien (Must Credit, CC-BY, www.steven-obrien.net).mp3" id="7_qtiqc"]
+[ext_resource type="PackedScene" uid="uid://b04icgc1tlxch" path="res://MainMenu.tscn" id="8_vvm30"]
 [ext_resource type="PackedScene" uid="uid://crj1xt37dwwku" path="res://Key.tscn" id="9_jr8yu"]
+[ext_resource type="PackedScene" uid="uid://btse845y1mron" path="res://PauseMenu.tscn" id="9_u0n71"]
 
 [node name="Main" type="Node"]
 script = ExtResource("1_bwln5")
@@ -31,8 +32,14 @@ offset_top = -14.0
 offset_right = 38.0
 offset_bottom = -14.0
 
-[node name="Pause" parent="." instance=ExtResource("6_tsvpc")]
-process_mode = 2
+[node name="MainMenu" parent="." instance=ExtResource("8_vvm30")]
+offset_left = -1018.0
+offset_top = 93.0
+offset_right = -1018.0
+offset_bottom = 93.0
+
+[node name="PauseMenu" parent="." instance=ExtResource("9_u0n71")]
+process_mode = 3
 visible = false
 
 [node name="Player" parent="." instance=ExtResource("1_btyoi")]
@@ -64,6 +71,10 @@ stream = ExtResource("7_qtiqc")
 
 [connection signal="player_hunt_key" from="." to="Player" method="_on_main_player_hunt_key"]
 [connection signal="player_move_to_starting_position" from="." to="Player" method="_on_main_player_move_to_starting_position"]
+[connection signal="exit_game_pressed" from="MainMenu" to="." method="_on_main_menu_exit_game_pressed"]
+[connection signal="start_game_pressed" from="MainMenu" to="." method="_on_main_menu_start_game_pressed"]
+[connection signal="abandon_game_pressed" from="PauseMenu" to="." method="_on_pause_menu_abandon_game_pressed"]
+[connection signal="unpause_game_pressed" from="PauseMenu" to="." method="_on_pause_menu_unpause_game_pressed"]
 [connection signal="player_died" from="Player" to="." method="_on_player_player_died"]
 [connection signal="player_found_exit" from="Player" to="." method="_on_player_player_found_exit"]
 [connection signal="player_found_exit_stop_key_movement" from="Player" to="Key" method="_on_player_player_found_exit_stop_key_movement"]
