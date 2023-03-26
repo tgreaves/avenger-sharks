@@ -108,6 +108,9 @@ func wave_end_cleanup():
     for enemy_attack in get_tree().get_nodes_in_group('enemyAttack'):
         enemy_attack.queue_free()
     
+    for dinosaur in get_tree().get_nodes_in_group('dinosaurGroup'):
+        dinosaur.queue_free()
+    
     for dinosaur_attack in get_tree().get_nodes_in_group('dinosaurAttack'):
         dinosaur_attack.queue_free()
     
@@ -220,6 +223,7 @@ func return_to_main_screen():
     _ready();
     
 func spawn_item():	
+    
     var spawned_item = ITEMS[ ITEMS.keys()[ randi() % ITEMS.size() ] ];
 
     if spawned_item == Vector2i(99,99):
@@ -228,11 +232,15 @@ func spawn_item():
         dinosaur.add_to_group('dinosaurGroup');
         add_child(dinosaur)
     else:
-        var item_x = randi_range(3,40)
-        var item_y = randi_range(3,39)
-        spawned_items_this_wave.append(Vector2i(item_x,item_y))
-        $Arena.set_cell(1, Vector2i(item_x, item_y),0,spawned_item);
-    
+        #var item_x = randi_range(3,40)
+        #var item_y = randi_range(3,39)
+        #spawned_items_this_wave.append(Vector2i(item_x,item_y))
+        #$Arena.set_cell(1, Vector2i(item_x, item_y),0,spawned_item);
+        var item = item_scene.instantiate()
+        item.get_node('.').set_position (Vector2(randf_range(constants.ARENA_SPAWN_MIN_X,constants.ARENA_SPAWN_MAX_X),randf_range(constants.ARENA_SPAWN_MIN_Y,constants.ARENA_SPAWN_MAX_Y)));
+        item.add_to_group('itemGroup')
+        add_child(item)
+        
     $ItemSpawnTimer.start(randf_range(constants.ITEM_SPAWN_MINIMUM_SECONDS,constants.ITEM_SPAWN_MAXIMUM_SECONDS));
 
 func despawn_all_items():
@@ -240,6 +248,9 @@ func despawn_all_items():
     for single_item in spawned_items_this_wave:
         print ("DESPAWNING " + str(single_item))
         $Arena.set_cell(1, single_item,-1, Vector2i(-1, -1));
+        
+    for item in get_tree().get_nodes_in_group('itemGroup'):
+        item.queue_free()
 
 func spawn_enemy():
     var mob = enemy_scene.instantiate();

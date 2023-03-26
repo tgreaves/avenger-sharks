@@ -32,6 +32,9 @@ func _physics_process(_delta):
         DYING:
             if $StateTimer.time_left == 0:
                 self.queue_free();
+                
+            if $FlashHitTimer.time_left == 0:
+                set_modulate(Color(1,1,1,1));
         
 func _death():
         $CollisionShape2D.set_deferred("disabled", true)
@@ -43,7 +46,7 @@ func _death():
         
         $StateTimer.start(0.75);
         state = DYING;
-    
-        #get_parent()._on_enemy_update_score();
-        #self.queue_free();
+        
+        set_modulate(Color(10,10,10,10));
+        $FlashHitTimer.start()
 

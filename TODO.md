@@ -9,6 +9,8 @@
   * Bouncing shots?
   * Rapid fire
   * Exploding shots
+  * Piercing shots
+  * Mega Shark Mode?!
 * Scenery / Obstacles in room (Tileset has boxes)
 
 * Opens up possibilities of some rooms being special, e.g. just full of fish?
@@ -18,8 +20,6 @@
 * Keep count of fish rescued - use as currency in shop between x levels?
 * Bonus points for collecting all fish at end of wave?
 * Animation of fish being released back into the sea?
-
-* Replace health numerical representation with a health bar? // Progress bar 
 
 # Bugs
 
@@ -38,7 +38,7 @@
 
 # Patch notes
 
-* Misc: Credits now loaded from res://CREDITS
-* Misc: Removed obsolete Pause.tscn
-* Misc: Added new sprites for Health and Chests (Not yet implemented)
+* Enemies now flash on hit (Thanks Joe Pietroni for the suggestion!)
+* New sprites used for items (Health, chest).
+* Internal: Removed obsolete Pause.tscn and Pause.gd.
 

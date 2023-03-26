@@ -152,12 +152,36 @@ func _physics_process(_delta):
                     collided_with.get_node('.')._go_on_a_rampage();
                     break
                 
+                if collision.get_collider().name.contains('Item'):
+                    match collided_with.get_node('.').item_type:
+                        "health":
+                            player_energy = player_energy + constants.HEALTH_POTION_BONUS;
+                            if get_parent().cheat_mode:
+                                if player_energy > constants.PLAYER_START_GAME_ENERGY_CHEATING:
+                                    player_energy = constants.PLAYER_START_GAME_ENERGY_CHEATING
+                            else:
+                                if player_energy > constants.PLAYER_START_GAME_ENERGY:
+                                    player_energy = constants.PLAYER_START_GAME_ENERGY;
+                                    
+                            $AudioStreamHealth.play();
+                            emit_signal('update_energy')
+                            collided_with.get_node('.').despawn()
+                            
+                        "chest":
+                            print ("Chest - NYI")
+                            # Default to powerup spray for now....
+                            big_spray=1;
+                            $PowerUpTimer.start(constants.POWER_UP_ACTIVE_DURATION);
+                            $AudioStreamPowerUp.play()
+                     
+                    collided_with.get_node('.').despawn()
+                
+                    break
+                
                 # Default - Enemy	
                 collided_with.get_node('.')._death();
                 _player_hit();
                 
-            #position.x = clamp(position.x, 0, screen_size.x)
-            #position.y = clamp(position.y, 0, screen_size.y)
         EXPLODING:
             if $PlayerExplosionTimer.time_left == 0:
                 emit_signal('player_died');

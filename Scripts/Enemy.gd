@@ -37,6 +37,9 @@ func _ready():
 func _physics_process(delta):
     set_modulate(lerp(get_modulate(), Color(1,1,1,1), 0.02));
     
+    if $FlashHitTimer.time_left == 0:
+        set_modulate(Color(1,1,1,1));
+    
     match state:
         SPAWNING:
             velocity = Vector2(0,0);
@@ -102,10 +105,6 @@ func _physics_process(delta):
     if velocity.x < 0:
         $AnimatedSprite2D.set_flip_h(true);	
             
-            
-    #position.x = clamp(position.x, 0, screen_size.x)
-    #position.y = clamp(position.y, 0, screen_size.y)
-    
     if $AttackTimer.time_left == 0 && state == WANDER:
         
         if enemy_type == 'wizard':
@@ -160,6 +159,9 @@ func _physics_process(delta):
 func _death():
     if state != DYING:
         enemy_health = enemy_health - 1;
+        
+        set_modulate(Color(10,10,10,10));
+        $FlashHitTimer.start()
         
         if enemy_health <=0 :
             $CollisionShape2D.set_deferred("disabled", true)

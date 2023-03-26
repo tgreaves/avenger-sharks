@@ -516,6 +516,10 @@ one_shot = true
 wait_time = 2.0
 one_shot = true
 
+[node name="FlashHitTimer" type="Timer" parent="."]
+wait_time = 0.05
+one_shot = true
+
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("8_wxbp6")
 
