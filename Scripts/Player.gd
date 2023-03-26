@@ -105,42 +105,9 @@ func _physics_process(_delta):
                 print("PLAYER collided with ", collision.get_collider().name + " // " + collision.get_collider().get_class())
                 
                 var collided_with = collision.get_collider();
-                
+                   
                 if collision.get_collider().name == 'Arena':
-                    print("RID: " + str(collision.get_collider_rid()));
-                    var rid_coords = collided_with.get_coords_for_body_rid( collision.get_collider_rid());
-                    print("Coords: " + str(collided_with.get_coords_for_body_rid( collision.get_collider_rid())));
-                    print ("ATLAS Trans: " + str(collided_with.get_cell_atlas_coords(1, rid_coords)));
-                    
-                    match collided_with.get_cell_atlas_coords(1, rid_coords):
-                        Vector2i(9,8):
-                            print ("HEATH");
-                            player_energy = player_energy + constants.HEALTH_POTION_BONUS;
-                            if get_parent().cheat_mode:
-                                if player_energy > constants.PLAYER_START_GAME_ENERGY_CHEATING:
-                                    player_energy = constants.PLAYER_START_GAME_ENERGY_CHEATING
-                            else:
-                                if player_energy > constants.PLAYER_START_GAME_ENERGY:
-                                    player_energy = constants.PLAYER_START_GAME_ENERGY;
-                                    
-                            $AudioStreamHealth.play();
-                            emit_signal('update_energy')
-                            
-                            collided_with.set_cell(		1, 
-                                            collided_with.get_coords_for_body_rid( collision.get_collider_rid()),
-                                                       -1);
-                            
-                        Vector2i(7,9):
-                            print ("POWERUP");
-                            big_spray=1;
-                            $PowerUpTimer.start(constants.POWER_UP_ACTIVE_DURATION);
-                            $AudioStreamPowerUp.play()
-                    
-                            collided_with.set_cell(		1, 
-                                                       collided_with.get_coords_for_body_rid( collision.get_collider_rid()),
-                                                       -1);
-                    
-                    break;
+                    break  
                     
                 if collision.get_collider().name.contains('Fish'):
                     collided_with.get_node('.')._death(0);
@@ -164,6 +131,7 @@ func _physics_process(_delta):
                                     player_energy = constants.PLAYER_START_GAME_ENERGY;
                                     
                             $AudioStreamHealth.play();
+                            powerup_label_animation('HEALTH!')
                             emit_signal('update_energy')
                             collided_with.get_node('.').despawn()
                             
@@ -173,7 +141,9 @@ func _physics_process(_delta):
                             big_spray=1;
                             $PowerUpTimer.start(constants.POWER_UP_ACTIVE_DURATION);
                             $AudioStreamPowerUp.play()
-                     
+                            
+                            powerup_label_animation('BIG SPRAY!')
+                    
                     collided_with.get_node('.').despawn()
                 
                     break
@@ -214,17 +184,11 @@ func _physics_process(_delta):
               
             for i in get_slide_collision_count():
                 var collision = get_slide_collision(i)
-                #print("PLAYER collided with ", collision.get_collider().name + " // " + collision.get_collider().get_class())
-                
-                # TODO: Wait for player to explicitly hit ExitDoor as a first step.
-                # Then clear door tiles
-                # Then head further outside of the room before final signal?
                 
                 if collision.get_collider().name == 'ExitDoor':  
                     print("EXIT FOUND at " + str(global_position));
                     shark_status = FOUND_EXIT;
                     velocity = Vector2i(0,0)
-                   # $AudioStreamPlayerDoorOpen.play()
                     
                     # Open door.
                     get_parent().get_node('Arena').set_cell(
@@ -323,3 +287,16 @@ func _on_main_player_move_to_starting_position():
     
     $DoorCloseTimer.start()
 
+func powerup_label_animation(powerup_name):
+    var new_label = $PowerUpLabel.duplicate()
+    add_child(new_label)
+    
+    new_label.set_modulate(Color(1,1,1,1));
+    new_label.text = powerup_name
+    new_label.visible = true
+    
+    var tween = get_tree().create_tween()
+    tween.set_parallel()
+    tween.tween_property(new_label, "modulate", Color(0,0,0,0), 2)
+    tween.tween_property(new_label, "position", Vector2(-116,-150), 2)
+    tween.tween_callback(new_label.queue_free).set_delay(3)

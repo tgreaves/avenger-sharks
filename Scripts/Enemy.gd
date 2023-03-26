@@ -37,9 +37,6 @@ func _ready():
 func _physics_process(delta):
     set_modulate(lerp(get_modulate(), Color(1,1,1,1), 0.02));
     
-    if $FlashHitTimer.time_left == 0:
-        set_modulate(Color(1,1,1,1));
-    
     match state:
         SPAWNING:
             velocity = Vector2(0,0);
@@ -54,9 +51,13 @@ func _physics_process(delta):
                 else:
                     $AttackTimer.start(randf_range(constants.ENEMY_ATTACK_MINIMUM_SECONDS,constants.ENEMY_ATTACK_MAXIMUM_SECONDS));
                 $TrapTimer.start(randf_range(constants.ENEMY_TRAP_MINIMUM_SECONDS,constants.ENEMY_TRAP_MAXIMUM_SECONDS));
-                #$StateTimer.start(float(2));			
+
         WANDER:
             #print("WANDER!!");
+            
+            if $FlashHitTimer.time_left == 0:
+                set_modulate(Color(1,1,1,1));
+            
             if $StateTimer.time_left == 0:
                 state = WANDER;
                 
@@ -94,6 +95,9 @@ func _physics_process(delta):
                                                     constants.ENEMY_DEFAULT_CHANGE_DIRECTION_MAXIMUM_SECONDS));
                         velocity = Vector2(randf_range(-1,1), randf_range(-1,1)).normalized() * enemy_speed;
         DYING:
+            if $FlashHitTimer.time_left == 0:
+                set_modulate(Color(1,1,1,1));
+                
             if $StateTimer.time_left == 0:
                 self.queue_free();
             

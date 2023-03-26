@@ -38,7 +38,7 @@
 
 # Patch notes
 
-* Enemies now flash on hit (Thanks Joe Pietroni for the suggestion!)
-* New sprites used for items (Health, chest).
-* Internal: Removed obsolete Pause.tscn and Pause.gd.
+* UX: Power up label flashes up and animates above player sprite.
+* Bug fix: Player animation not starting until first wave start.
+* Bug fix: Fixed enemies not fading in correctly at wave start.
 

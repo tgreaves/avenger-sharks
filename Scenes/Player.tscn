@@ -1,4 +1,4 @@
-[gd_scene load_steps=49 format=3 uid="uid://5yp4e43ckdrj"]
+[gd_scene load_steps=50 format=3 uid="uid://5yp4e43ckdrj"]
 
 [ext_resource type="Script" path="res://Scripts/Player.gd" id="1_m4brx"]
 [ext_resource type="Texture2D" uid="uid://ikcchi1bmyrs" path="res://Sprites/Shark/Shark1.png" id="2_px875"]
@@ -39,6 +39,7 @@
 [ext_resource type="AudioStream" uid="uid://c5leefn8upwfs" path="res://Sound/hq-explosion-6288.mp3" id="37_g7u1l"]
 [ext_resource type="AudioStream" uid="uid://vq6a2soq7m0i" path="res://Sound/glug-glug-glug-39140.mp3" id="38_86qdg"]
 [ext_resource type="AudioStream" uid="uid://di185cyn4vxdo" path="res://Sound/powering_up_funny_sci-fi_dry-102263.mp3" id="39_sydp1"]
+[ext_resource type="FontFile" uid="uid://dclfn1fjcq5i7" path="res://Fonts/PressStart2P-Regular.ttf" id="40_8elap"]
 [ext_resource type="AudioStream" uid="uid://dl3w6ch8pux8d" path="res://Sound/yay-6120.mp3" id="45_fj125"]
 [ext_resource type="Texture2D" uid="uid://be1l4stvjmcog" path="res://Sprites/Blood/bloodfx001_01.png" id="71_f4bva"]
 [ext_resource type="Texture2D" uid="uid://cynsah81npsn3" path="res://Sprites/Blood/bloodfx001_02.png" id="72_657n3"]
@@ -228,6 +229,17 @@ scale = Vector2(3, 3)
 sprite_frames = SubResource("SpriteFrames_bvem5")
 frame = 5
 frame_progress = 1.0
+
+[node name="PowerUpLabel" type="Label" parent="."]
+visible = false
+offset_left = -116.0
+offset_top = -62.0
+offset_right = 124.0
+offset_bottom = -39.0
+theme_override_fonts/font = ExtResource("40_8elap")
+theme_override_font_sizes/font_size = 24
+text = "POWER-UP"
+horizontal_alignment = 1
 
 [node name="AudioStreamPlayerSpray" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("10_v8evc")

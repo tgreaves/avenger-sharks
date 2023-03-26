@@ -155,6 +155,7 @@ func wave_end_prepare_for_next_wave():
     $Player.visible = true
     $Player.position = Vector2(2550, 2500);
     $Player.get_node("AnimatedSprite2D").animation = 'default';
+    $Player.get_node("AnimatedSprite2D").play()
     emit_signal("player_move_to_starting_position");
 
     $Key/CollisionShape2D.disabled = true;
