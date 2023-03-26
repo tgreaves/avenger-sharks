@@ -4,6 +4,7 @@ extends Node
 @export var fish_scene: PackedScene;
 @export var dinosaur_scene: PackedScene;
 @export var credits_scene: PackedScene;
+@export var item_scene: PackedScene;
 @export var game_status = INTRO_SCREEN;
 @export var cheat_mode = 0
 

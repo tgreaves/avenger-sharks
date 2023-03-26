@@ -25,20 +25,20 @@
 
 * Necromancers sometimes flicker after death / level transitions.
 * Big spray doesn't work when player close to a wall.
-* Items not correctly despawning on game end.
 
 # Flow
 
 * Some form of intro
-* Menu system, credits etc
+
+* IMMEDIATE
+
+* Bring in replacement potion sprite
+* Bring in treasure chest (Generic powerup sprite) - spawn text above e.g. BIG SPRAY!
+* Remove Item tile support.
 
 # Patch notes
 
-* Interface: Initial menu system (Main and Pause).
-* Interface: Energy now represented as a ProgressBar.
-* Interface: Added version number.
-* Bug fix: Fixed crash due to SharkSpray conflict with ExitLocation.
-* Bug fix: Potions could block level exit route.  They now despawn on wave end.
-* Bug fix: Stop items spawning out of bounds.
-
+* Misc: Credits now loaded from res://CREDITS
+* Misc: Removed obsolete Pause.tscn
+* Misc: Added new sprites for Health and Chests (Not yet implemented)
 

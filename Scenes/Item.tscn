@@ -1,0 +1,85 @@
+[gd_scene load_steps=15 format=3 uid="uid://dlgd7e81sruh"]
+
+[ext_resource type="Texture2D" uid="uid://bictya3rvolq1" path="res://Sprites/Chest/chest_1.png" id="1_pgdwj"]
+[ext_resource type="Texture2D" uid="uid://caredgs16ro2q" path="res://Sprites/Chest/chest_2.png" id="2_jw3wu"]
+[ext_resource type="Texture2D" uid="uid://cjyoge37ke585" path="res://Sprites/Chest/chest_3.png" id="3_4a2n8"]
+[ext_resource type="Texture2D" uid="uid://dejhfr7q1l4f6" path="res://Sprites/Chest/chest_4.png" id="4_6ukub"]
+[ext_resource type="Texture2D" uid="uid://b52e2gauatrqj" path="res://Sprites/Chest/chest_open_1.png" id="5_mulgo"]
+[ext_resource type="Texture2D" uid="uid://dlcdrhb5fekei" path="res://Sprites/Chest/chest_open_2.png" id="6_hj6ni"]
+[ext_resource type="Texture2D" uid="uid://c6f8behmf1fk7" path="res://Sprites/Chest/chest_open_3.png" id="7_uhlhx"]
+[ext_resource type="Texture2D" uid="uid://cf340gghpc3sn" path="res://Sprites/Chest/chest_open_4.png" id="8_dkavf"]
+[ext_resource type="Texture2D" uid="uid://vcto1a44v0rs" path="res://Sprites/HealthPotion/flasks_4_1.png" id="9_vuciu"]
+[ext_resource type="Texture2D" uid="uid://pu8rn5h5q3dl" path="res://Sprites/HealthPotion/flasks_4_2.png" id="10_hg6cm"]
+[ext_resource type="Texture2D" uid="uid://xoyly2ub44lv" path="res://Sprites/HealthPotion/flasks_4_3.png" id="11_drj8x"]
+[ext_resource type="Texture2D" uid="uid://b4r7ob81t42ni" path="res://Sprites/HealthPotion/flasks_4_4.png" id="12_h77gr"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_b47ak"]
+radius = 24.35
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_4771i"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_pgdwj")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_jw3wu")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_4a2n8")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_6ukub")
+}],
+"loop": true,
+"name": &"chest-idle",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("5_mulgo")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_hj6ni")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_uhlhx")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_dkavf")
+}],
+"loop": false,
+"name": &"chest-open",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("9_vuciu")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_hg6cm")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_drj8x")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_h77gr")
+}],
+"loop": true,
+"name": &"health-idle",
+"speed": 5.0
+}]
+
+[node name="Item" type="StaticBody2D"]
+collision_layer = 32
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_b47ak")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+texture_filter = 1
+scale = Vector2(4, 4)
+sprite_frames = SubResource("SpriteFrames_4771i")
+animation = &"chest-open"
+frame = 3
+frame_progress = 1.0
