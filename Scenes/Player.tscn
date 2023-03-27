@@ -241,25 +241,20 @@ theme_override_font_sizes/font_size = 24
 text = "POWER-UP"
 horizontal_alignment = 1
 
-[node name="AudioStreamPlayerSpray" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("10_v8evc")
-
-[node name="AudioStreamPlayerHit" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("11_g4ac8")
-volume_db = 2.811
-
-[node name="AudioStreamPlayerExplosion" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("37_g7u1l")
-
 [node name="PlayerExplosionTimer" type="Timer" parent="."]
 wait_time = 2.0
 one_shot = true
 
-[node name="PowerUpTimer" type="Timer" parent="."]
+[node name="BigSprayTimer" type="Timer" parent="."]
+wait_time = 5.0
+one_shot = true
+
+[node name="FastSprayTimer" type="Timer" parent="."]
 wait_time = 5.0
 one_shot = true
 
 [node name="FireRateTimer" type="Timer" parent="."]
+wait_time = 5.0
 one_shot = true
 
 [node name="DoorOpenTimer" type="Timer" parent="."]
@@ -274,6 +269,16 @@ one_shot = true
 wait_time = 0.5
 one_shot = true
 autostart = true
+
+[node name="AudioStreamPlayerSpray" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("10_v8evc")
+
+[node name="AudioStreamPlayerHit" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("11_g4ac8")
+volume_db = 2.811
+
+[node name="AudioStreamPlayerExplosion" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("37_g7u1l")
 
 [node name="AudioStreamHealth" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("38_86qdg")

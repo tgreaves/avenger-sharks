@@ -1,6 +1,7 @@
 extends CharacterBody2D
 
-const SharkSprayScene = preload("res://Scenes/SharkSpray.tscn");
+const SharkSprayScene = preload("res://Scenes/SharkSpray.tscn")
+const MiniSharkScene = preload("res://Scenes/MiniShark.tscn")
 
 enum {
     ALIVE,
@@ -28,6 +29,7 @@ signal player_found_exit;
 
 var key_global_position;
 var initial_player_position;
+var fast_spray = false
 
 func _ready():
     shark_status = ALIVE;
@@ -38,7 +40,7 @@ func _ready():
         initial_player_position = global_position
 
     $AnimatedSprite2DDamaged.visible = false;
-    $FireRateTimer.start(constants.PLAYER_FIRE_DELAY);
+    set_fire_rate_delay_timer();
 
 func get_input():
     
@@ -54,8 +56,11 @@ func get_input():
             get_parent().add_child(shark_spray);
             shark_spray.global_position = position;
             shark_spray.velocity = input_direction * constants.PLAYER_FIRE_SPEED;
+            
+            mini_shark_fire(input_direction)
+            
             $AudioStreamPlayerSpray.play()
-            $FireRateTimer.start(constants.PLAYER_FIRE_DELAY);
+            set_fire_rate_delay_timer()
             
         if Input.is_action_pressed('shark_fire_mouse'):
             var shark_spray = SharkSprayScene.instantiate();
@@ -63,8 +68,11 @@ func get_input():
             var target_direction = (get_global_mouse_position() - global_position).normalized()
             shark_spray.global_position = position;
             shark_spray.velocity = target_direction * constants.PLAYER_FIRE_SPEED
+            
+            mini_shark_fire(target_direction)
+            
             $AudioStreamPlayerSpray.play()
-            $FireRateTimer.start(constants.PLAYER_FIRE_DELAY);
+            set_fire_rate_delay_timer()
             
         var shoot_direction = Input.get_vector("shoot_left", "shoot_right", "shoot_up", "shoot_down");
             
@@ -79,17 +87,24 @@ func get_input():
             shoot_direction = shoot_direction.normalized();
             
             shark_spray.velocity = shoot_direction * constants.PLAYER_FIRE_SPEED;
+            
+            mini_shark_fire(shoot_direction)
+            
             $AudioStreamPlayerSpray.play()
-            $FireRateTimer.start(constants.PLAYER_FIRE_DELAY);
+            set_fire_rate_delay_timer()
     
 func _physics_process(_delta):
     get_input()
     move_and_slide()
     
-    if $PowerUpTimer.time_left == 0:
+    if $BigSprayTimer.time_left == 0:
         if big_spray:
             big_spray=0;
-            
+       
+    if $FastSprayTimer.time_left == 0:
+        if fast_spray:
+            fast_spray=false
+         
     match shark_status:
         ALIVE:
             if velocity.x > 0:
@@ -136,13 +151,33 @@ func _physics_process(_delta):
                             collided_with.get_node('.').despawn()
                             
                         "chest":
-                            print ("Chest - NYI")
-                            # Default to powerup spray for now....
-                            big_spray=1;
-                            $PowerUpTimer.start(constants.POWER_UP_ACTIVE_DURATION);
-                            $AudioStreamPowerUp.play()
+                            var powerup_selection = randi_range(1,3)
                             
-                            powerup_label_animation('BIG SPRAY!')
+                            match powerup_selection:
+                                1:
+                                    big_spray=1;
+                                    $BigSprayTimer.start(constants.POWER_UP_ACTIVE_DURATION);
+                                    powerup_label_animation('BIG SPRAY!')
+                                2:
+                                    fast_spray=true
+                                    $FastSprayTimer.start(constants.POWER_UP_ACTIVE_DURATION);
+                                    powerup_label_animation('FAST SPRAY!')
+                                3:
+                                    if get_tree().get_nodes_in_group('miniSharkGroup').size() < 8:
+                                            
+                                        var new_mini_shark = MiniSharkScene.instantiate()
+                                        add_child(new_mini_shark)
+                                        new_mini_shark.add_to_group('miniSharkGroup')
+                                    
+                                        # Reset circular position of the mini sharks when we spawn a new one, to ensure
+                                        # everything stays evenly spaced.
+                                        recalculate_mini_shark_spacing()
+                                     
+                                    powerup_label_animation('MINI SHARK!')
+                                    
+                            $AudioStreamPowerUp.play()
+                        
+                            
                     
                     collided_with.get_node('.').despawn()
                 
@@ -300,3 +335,23 @@ func powerup_label_animation(powerup_name):
     tween.tween_property(new_label, "modulate", Color(0,0,0,0), 2)
     tween.tween_property(new_label, "position", Vector2(-116,-150), 2)
     tween.tween_callback(new_label.queue_free).set_delay(3)
+    
+func set_fire_rate_delay_timer():
+    if fast_spray:
+        $FireRateTimer.start(constants.PLAYER_FIRE_DELAY / 2)
+    else:
+        $FireRateTimer.start(constants.PLAYER_FIRE_DELAY)
+        
+func mini_shark_fire(shark_fire_direction):
+    for mini_shark in get_tree().get_nodes_in_group("miniSharkGroup"):
+        var mini_shark_spray = SharkSprayScene.instantiate()
+        get_parent().add_child(mini_shark_spray)
+        mini_shark_spray.global_position = mini_shark.global_position
+        mini_shark_spray.velocity = shark_fire_direction * constants.PLAYER_FIRE_SPEED;
+        
+func recalculate_mini_shark_spacing():
+    var number_of_mini_sharks = get_tree().get_nodes_in_group('miniSharkGroup').size()
+    var shark_count = 0;
+    for single_shark in get_tree().get_nodes_in_group('miniSharkGroup'):
+        single_shark.set_circle_position(shark_count, number_of_mini_sharks)
+        shark_count = shark_count + 1

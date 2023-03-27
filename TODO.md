@@ -7,10 +7,10 @@
 * Replace power-ups with sprites (NOTE: Tilemap has animations too), and implement more....
   * Speed?
   * Bouncing shots?
-  * Rapid fire
   * Exploding shots
   * Piercing shots
   * Mega Shark Mode?!
+  * 'Mini Shark' that rotates around the player
 * Scenery / Obstacles in room (Tileset has boxes)
 
 * Opens up possibilities of some rooms being special, e.g. just full of fish?
@@ -32,13 +32,11 @@
 
 * IMMEDIATE
 
-* Bring in replacement potion sprite
-* Bring in treasure chest (Generic powerup sprite) - spawn text above e.g. BIG SPRAY!
-* Remove Item tile support.
-
 # Patch notes
 
-* UX: Power up label flashes up and animates above player sprite.
-* Bug fix: Player animation not starting until first wave start.
-* Bug fix: Fixed enemies not fading in correctly at wave start.
+* Gameplay: New power-up: Increased fire rate.
+* Gameplay: Reduced player fire rate.
+* Bug fix: Despawn dinosaurs at wave end to prevent exit pathing block.
+* Bug fix: Fish not invoking queue_free() after collection.
+* Internal: Moved Item.gd to correct path.
 

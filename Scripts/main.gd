@@ -29,7 +29,7 @@ enum {
 
 var ITEMS = {
     "health": Vector2i(9,8),
-    "big_spray": Vector2i(7,9),
+    "chest": Vector2i(7,9),
     "dinosaur": Vector2i(99,99)
 };
 
@@ -41,7 +41,7 @@ func _ready():
     game_status = INTRO_SCREEN;
     score=0;
     fish_collected=0;
-    wave_number=0;
+    wave_number= constants.START_WAVE - 1
     
     if $AudioStreamPlayerMusic.playing == false:
         $AudioStreamPlayerMusic.play();
@@ -93,10 +93,11 @@ func wave_end():
     
     for fish in get_tree().get_nodes_in_group('fishGroup'):
         fish.queue_free()
+        
+    for dinosaur in get_tree().get_nodes_in_group('dinosaurGroup'):
+        dinosaur.queue_free()
     
 func wave_end_cleanup():
-    for dinosaur in get_tree().get_nodes_in_group('dinosaurGroup'):
-        dinosaur.queue_free()	
         
     $ArenaBlank.visible = true;
     $Arena.visible = false;
@@ -108,12 +109,9 @@ func wave_end_cleanup():
     for enemy_attack in get_tree().get_nodes_in_group('enemyAttack'):
         enemy_attack.queue_free()
     
-    for dinosaur in get_tree().get_nodes_in_group('dinosaurGroup'):
-        dinosaur.queue_free()
-    
     for dinosaur_attack in get_tree().get_nodes_in_group('dinosaurAttack'):
         dinosaur_attack.queue_free()
-    
+        
     game_status = PREPARE_FOR_NEXT_WAVE;
     $WaveEndTimer.start();
 
@@ -233,10 +231,6 @@ func spawn_item():
         dinosaur.add_to_group('dinosaurGroup');
         add_child(dinosaur)
     else:
-        #var item_x = randi_range(3,40)
-        #var item_y = randi_range(3,39)
-        #spawned_items_this_wave.append(Vector2i(item_x,item_y))
-        #$Arena.set_cell(1, Vector2i(item_x, item_y),0,spawned_item);
         var item = item_scene.instantiate()
         item.get_node('.').set_position (Vector2(randf_range(constants.ARENA_SPAWN_MIN_X,constants.ARENA_SPAWN_MAX_X),randf_range(constants.ARENA_SPAWN_MIN_Y,constants.ARENA_SPAWN_MAX_Y)));
         item.add_to_group('itemGroup')
@@ -245,11 +239,6 @@ func spawn_item():
     $ItemSpawnTimer.start(randf_range(constants.ITEM_SPAWN_MINIMUM_SECONDS,constants.ITEM_SPAWN_MAXIMUM_SECONDS));
 
 func despawn_all_items():
-    # FIXME: This does not seem to be working.
-    for single_item in spawned_items_this_wave:
-        print ("DESPAWNING " + str(single_item))
-        $Arena.set_cell(1, single_item,-1, Vector2i(-1, -1));
-        
     for item in get_tree().get_nodes_in_group('itemGroup'):
         item.queue_free()
 
@@ -265,7 +254,6 @@ func spawn_fish():
     mob.add_to_group('fishGroup');	
     add_child(mob);
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
     if game_status == WAVE_START:
         if $WaveIntroTimer.time_left == 0:
@@ -288,11 +276,7 @@ func _process(_delta):
                 var enemies_to_spawn = randi_range(1, constants.ENEMY_SPAWN_MAX_BATCH_SIZE);
                 if enemies_to_spawn > enemies_left_this_wave - get_tree().get_nodes_in_group("enemyGroup").size():
                     enemies_to_spawn = enemies_left_this_wave - get_tree().get_nodes_in_group("enemyGroup").size()
-                
-                print ("Enemies left this wave: " + str(enemies_left_this_wave))	
-                print ("Enemies on screen: " + str(get_tree().get_nodes_in_group("enemyGroup").size()))
-                print ("Enemies to spawn: " + str(enemies_to_spawn))
-                    
+                      
                 var i = 0;
                 
                 while i < enemies_to_spawn:
@@ -335,7 +319,6 @@ func _input(_ev):
                 
         
 func _on_player_update_energy():
-    #$HUD.get_node('CanvasLayer').get_node('Energy').text = "ENERGY\n" + str($Player.player_energy);
     $HUD.get_node('CanvasLayer').get_node('EnergyProgressBar').value = $Player.player_energy
     
 func _on_enemy_update_score(score_to_add,enemy_global_position):
@@ -380,7 +363,6 @@ func _on_player_player_found_exit():
     wave_end_cleanup();
     
 func _on_main_menu_start_game_pressed():
-    print ("Signal to start OK")
     wave_end_prepare_for_next_wave()
 
 func _on_main_menu_exit_game_pressed():
@@ -388,7 +370,6 @@ func _on_main_menu_exit_game_pressed():
 
 
 func _on_pause_menu_unpause_game_pressed():
-    print("UNPAUSING")
     game_status = GAME_RUNNING;
     $PauseMenu.get_node('CanvasLayer').visible = false;
     $PauseMenu.set_process_input(false);

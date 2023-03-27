@@ -6,7 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://70bo017e2fwf" path="res://Scenes/Dinosaur.tscn" id="4_m8mii"]
 [ext_resource type="PackedScene" uid="uid://ds5km1djhril" path="res://Scenes/Arena.tscn" id="5_542nn"]
 [ext_resource type="PackedScene" uid="uid://b4aalf68jjkjh" path="res://Scenes/ArenaBlank.tscn" id="6_7plsl"]
-[ext_resource type="PackedScene" uid="uid://dlgd7e81sruh" path="res://Scenes/Item.tscn" id="6_kq75g"]
+[ext_resource type="PackedScene" path="res://Scenes/Item.tscn" id="6_kq75g"]
 [ext_resource type="PackedScene" uid="uid://bcqacic7yj4ds" path="res://Scenes/HUD.tscn" id="7_hr2nx"]
 [ext_resource type="PackedScene" uid="uid://dc60erflcrf6" path="res://Scenes/MainMenu.tscn" id="8_87611"]
 [ext_resource type="PackedScene" uid="uid://dfksl6get6jnk" path="res://Scenes/PauseMenu.tscn" id="9_jh32b"]

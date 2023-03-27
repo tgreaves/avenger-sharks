@@ -8,8 +8,6 @@ enum {
 var state = ACTIVE;
 
 func _ready():
-    #$AnimatedSprite2D.anim
-    
     var animation_options = $AnimatedSprite2D.sprite_frames.get_animation_names().size();
     var rng = RandomNumberGenerator.new()
     var index = rng.randi_range(0, animation_options-1);
@@ -22,10 +20,9 @@ func _physics_process(_delta):
     match state:
         ACTIVE:
             move_and_slide()
-            
         DESPAWNING:
             if $StateTimer.time_left == 0:
-                queue_free();
+                queue_free();  
 
 func _death(blood):
     $CollisionShape2D.set_deferred("disabled", true)
@@ -34,6 +31,7 @@ func _death(blood):
     
     if blood:
         $AnimatedSprite2DDamaged.play();
-    
-    state = 'DESPAWNING';
-    $StateTimer.start(2);
+        state = DESPAWNING;
+        $StateTimer.start(1)
+    else:
+        queue_free()

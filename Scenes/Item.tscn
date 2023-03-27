@@ -1,7 +1,7 @@
-[gd_scene load_steps=16 format=3 uid="uid://dlgd7e81sruh"]
+[gd_scene load_steps=16 format=3]
 
 [ext_resource type="Texture2D" uid="uid://bictya3rvolq1" path="res://Sprites/Chest/chest_1.png" id="1_pgdwj"]
-[ext_resource type="Script" path="res://Scenes/Item.gd" id="1_x2ahu"]
+[ext_resource type="Script" path="res://Scripts/Item.gd" id="1_x2ahu"]
 [ext_resource type="Texture2D" uid="uid://caredgs16ro2q" path="res://Sprites/Chest/chest_2.png" id="2_jw3wu"]
 [ext_resource type="Texture2D" uid="uid://cjyoge37ke585" path="res://Sprites/Chest/chest_3.png" id="3_4a2n8"]
 [ext_resource type="Texture2D" uid="uid://dejhfr7q1l4f6" path="res://Sprites/Chest/chest_4.png" id="4_6ukub"]
