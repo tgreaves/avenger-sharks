@@ -30,13 +30,15 @@
 
 * Some form of intro
 
-* IMMEDIATE
+# IMMEDIATE
+
+* Next intro stages to do....
+* Scary thing appears from left (with music), sharks turns to face.
+* Scary thing 'zaps' all the fish (makes them vanish / captured)
+* Scary thing retreats.
+* Shark gives chase
+* Feature mini sharks and dinosaur maybe?
 
 # Patch notes
 
-* Gameplay: New power-up: Increased fire rate.
-* Gameplay: Reduced player fire rate.
-* Bug fix: Despawn dinosaurs at wave end to prevent exit pathing block.
-* Bug fix: Fish not invoking queue_free() after collection.
-* Internal: Moved Item.gd to correct path.
-
+* Started pulling together the Intro animation.  Work in progress.
