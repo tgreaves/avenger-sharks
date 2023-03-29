@@ -32,13 +32,8 @@
 
 # IMMEDIATE
 
-* Next intro stages to do....
-* Scary thing appears from left (with music), sharks turns to face.
-* Scary thing 'zaps' all the fish (makes them vanish / captured)
-* Scary thing retreats.
-* Shark gives chase
-* Feature mini sharks and dinosaur maybe?
+* Add some form of water filter over the game itself...?
 
 # Patch notes
 
-* Started pulling together the Intro animation.  Work in progress.
+* Initial intro sequence now implemented.

@@ -1,7 +1,8 @@
-[gd_scene load_steps=15 format=3 uid="uid://cr81sfftinhnu"]
+[gd_scene load_steps=16 format=3 uid="uid://cr81sfftinhnu"]
 
 [ext_resource type="Script" path="res://Scripts/main.gd" id="1_gnjic"]
 [ext_resource type="PackedScene" uid="uid://bkmx1mvtb8dxr" path="res://Scenes/Enemy.tscn" id="2_3ugt8"]
+[ext_resource type="PackedScene" uid="uid://dde3f2uantk5b" path="res://Scenes/Intro.tscn" id="2_nb6e8"]
 [ext_resource type="PackedScene" uid="uid://18lymhdawjy7" path="res://Scenes/Fish.tscn" id="3_8jtwr"]
 [ext_resource type="PackedScene" uid="uid://70bo017e2fwf" path="res://Scenes/Dinosaur.tscn" id="4_m8mii"]
 [ext_resource type="PackedScene" uid="uid://ds5km1djhril" path="res://Scenes/Arena.tscn" id="5_542nn"]
@@ -17,6 +18,7 @@
 
 [node name="Main" type="Node"]
 script = ExtResource("1_gnjic")
+intro_scene = ExtResource("2_nb6e8")
 enemy_scene = ExtResource("2_3ugt8")
 fish_scene = ExtResource("3_8jtwr")
 dinosaur_scene = ExtResource("4_m8mii")

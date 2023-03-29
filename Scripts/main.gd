@@ -1,11 +1,12 @@
 extends Node
 
+@export var intro_scene: PackedScene
 @export var enemy_scene: PackedScene
 @export var fish_scene: PackedScene;
 @export var dinosaur_scene: PackedScene;
 @export var credits_scene: PackedScene;
 @export var item_scene: PackedScene;
-@export var game_status = INTRO_SCREEN;
+@export var game_status = INTRO_SEQUENCE;
 @export var cheat_mode = 0
 
 var score = 0;
@@ -14,9 +15,11 @@ var high_score = 0;
 var enemies_left_this_wave = 0;
 var fish_collected = 0;
 var spawned_items_this_wave = []
+var intro
 
 enum {
-    INTRO_SCREEN,
+    INTRO_SEQUENCE,
+    MAIN_MENU,
     CREDITS,
     WAVE_START,
     GAME_RUNNING,
@@ -38,7 +41,23 @@ signal player_move_to_starting_position;
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-    game_status = INTRO_SCREEN;
+    game_status = INTRO_SEQUENCE;
+    
+    $ArenaBlank.visible = false;
+    $Arena.visible = false;
+    $HUD/CanvasLayer.visible = false
+    $MainMenu.get_node('CanvasLayer').visible = false;
+    $PauseMenu.get_node('CanvasLayer').visible = false;
+    $Player.set_process(false);
+    $Player.set_physics_process(false);
+    $Player.visible = false;
+    $Player.get_node("CollisionShape2D").disabled = false;
+    
+    intro = intro_scene.instantiate()
+    add_child(intro)
+    
+    
+func main_menu():
     score=0;
     fish_collected=0;
     wave_number= constants.START_WAVE - 1
@@ -46,12 +65,14 @@ func _ready():
     if $AudioStreamPlayerMusic.playing == false:
         $AudioStreamPlayerMusic.play();
  
+    $Arena.visible = true
     $ArenaBlank.visible = false;   
     $MainMenu.get_node('CanvasLayer').visible = true;
     $MainMenu.set_process_input(true);
     $MainMenu._ready();
     $PauseMenu.get_node('CanvasLayer').visible = false;
     $PauseMenu.set_process_input(false);
+    $HUD/CanvasLayer.visible = true
     $HUD.get_node("CanvasLayer/Energy").visible = true;
     $HUD.get_node("CanvasLayer/Score").visible = true;
     $HUD.get_node("CanvasLayer/Label").visible = true;
@@ -59,6 +80,8 @@ func _ready():
     $HUD.get_node("CanvasLayer/EnemiesLeft").visible = false;
     $HUD.get_node("CanvasLayer/Fish").visible = false;
     
+    $Player/Camera2D.enabled = true
+    #$Player.position = $Player.position
     $Player.set_process(false);
     $Player.set_physics_process(false);
     $Player.visible = false;
@@ -219,7 +242,7 @@ func return_to_main_screen():
         
     despawn_all_items()
     
-    _ready();
+    main_menu();
     
 func spawn_item():	
     
@@ -292,7 +315,7 @@ func _process(_delta):
         
 func _input(_ev):
     if Input.is_action_just_pressed('cheat'):
-        if game_status == INTRO_SCREEN:
+        if game_status == MAIN_MENU:
             cheat_mode = 1;
             $MainMenu/CanvasLayer/MainMenuContainer/TitleLabel.text = "CHEAT SHARKS!\n\nBy Tristan Greaves";
             $Player.player_energy = constants.PLAYER_START_GAME_ENERGY_CHEATING;
@@ -312,8 +335,12 @@ func _input(_ev):
                 
     if Input.is_action_just_released('shark_fire') or Input.is_action_just_released('shark_fire_mouse'):
         match game_status:
+            INTRO_SEQUENCE:
+                game_status = MAIN_MENU
+                intro.queue_free()
+                main_menu()
             CREDITS:
-                game_status = INTRO_SCREEN
+                game_status = MAIN_MENU
                 $Credits.queue_free()
                 $MainMenu.get_node("CanvasLayer").visible = true
                 
@@ -388,3 +415,8 @@ func _on_main_menu_credits_pressed():
     var credits = credits_scene.instantiate();
     credits.visible = true
     add_child(credits)
+
+func intro_has_finished():
+    game_status = MAIN_MENU
+    intro.queue_free()
+    main_menu()

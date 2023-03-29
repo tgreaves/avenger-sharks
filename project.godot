@@ -26,7 +26,6 @@ constants="*res://Scripts/constants.gd"
 
 window/size/viewport_width=2560
 window/size/viewport_height=1440
-window/size/mode=3
 window/dpi/allow_hidpi=false
 window/stretch/mode="viewport"
 
@@ -167,3 +166,4 @@ cheat={
 
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
+environment/defaults/default_clear_color=Color(0, 0, 0, 1)

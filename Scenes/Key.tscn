@@ -30,6 +30,7 @@ animations = [{
 radius = 6.2026
 
 [node name="Key" type="CharacterBody2D"]
+visible = false
 z_index = 1
 scale = Vector2(6, 6)
 collision_layer = 32

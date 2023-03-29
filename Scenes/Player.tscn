@@ -197,6 +197,7 @@ motion_mode = 1
 script = ExtResource("1_m4brx")
 
 [node name="Camera2D" type="Camera2D" parent="."]
+enabled = false
 limit_left = 0
 limit_top = 0
 limit_right = 5120

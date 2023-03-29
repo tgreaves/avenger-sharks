@@ -3,11 +3,14 @@ extends CharacterBody2D
 enum {
     ACTIVE,
     DESPAWNING,
-    INTRO_WANDER
+    INTRO_WANDER,
+    INTRO_SWIM_TO_NECROMANCER,
+    INTRO_AT_NECROMANCER
 }
 
 var state = ACTIVE;
 var fish_speed;
+var intro_fish_id;
 
 func _ready():
     var animation_options = $AnimatedSprite2D.sprite_frames.get_animation_names().size();
@@ -40,6 +43,28 @@ func _physics_process(delta):
                 
             if collision:
                  velocity = velocity.bounce(collision.get_normal());
+                
+        INTRO_SWIM_TO_NECROMANCER:
+            # We want to end up in an evenly spaced circle around the necromancer.
+            var angle_step_degrees = 360 / get_tree().get_nodes_in_group('fishGroup').size()
+            var target_angle_degrees = intro_fish_id * angle_step_degrees
+            var angle = deg_to_rad(target_angle_degrees)
+            var offset = Vector2(sin(angle), cos(angle)) * 200;   # 100 = Radius
+            var target_position = get_parent().get_node('Necromancer').get_node('NecroSprite').global_position + offset
+            
+            # Forcibly stop when 'close enough' to target to prevent jitter.
+            if global_position.distance_to(target_position) < 2:
+                #state = INTRO_SWIM_TO_NECROMANCER
+                return
+            
+            var target_direction = (target_position - global_position).normalized()
+            velocity = target_direction * 200
+            
+            var collision = move_and_collide(velocity * delta)
+        
+        INTRO_AT_NECROMANCER:
+            set_collision_mask_value(1,false)
+            pass
 
 func _death(blood):
     $CollisionShape2D.set_deferred("disabled", true)
@@ -59,3 +84,9 @@ func set_intro_mode():
     z_index = 1
     
     $StateTimer.start(1)
+
+func swim_to_necromancer(passed_fish_id):
+    state = INTRO_SWIM_TO_NECROMANCER
+    intro_fish_id = passed_fish_id
+    $CollisionShape2D.disabled = true
+    
