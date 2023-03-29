@@ -536,6 +536,7 @@ physics_layer_1/collision_layer = 32
 sources/0 = SubResource("TileSetAtlasSource_81shb")
 
 [node name="ArenaBlank" type="TileMap"]
+modulate = Color(0.156863, 0.388235, 0.972549, 1)
 position = Vector2(2.08165e-12, 2.08165e-12)
 scale = Vector2(5, 5)
 tile_set = SubResource("TileSet_o2rj5")

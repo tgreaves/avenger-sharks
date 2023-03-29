@@ -227,13 +227,13 @@ func _physics_process(_delta):
                     
                     # Open door.
                     get_parent().get_node('Arena').set_cell(
-                        1,
+                        2,
                         Vector2(31,2),
                         -1,
                         Vector2i(9,7))
                     
                     get_parent().get_node('Arena').set_cell(
-                        1,
+                        2,
                         Vector2(32,2),
                         -1,
                         Vector2i(9,7))
@@ -261,13 +261,13 @@ func _physics_process(_delta):
                 if $DoorCloseTimer.time_left == 0:
                         # Close bottom door.
                             get_parent().get_node('Arena').set_cell(
-                                1,
+                                2,
                                 Vector2(31,33),
                                 0,
                                 Vector2i(6,6))
                             
                             get_parent().get_node('Arena').set_cell(
-                                1,
+                                2,
                                 Vector2(32,33),
                                 0,
                                 Vector2i(7,6))

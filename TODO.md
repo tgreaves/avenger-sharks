@@ -25,15 +25,13 @@
 
 * Necromancers sometimes flicker after death / level transitions.
 * Big spray doesn't work when player close to a wall.
+* Visual: Smoother transition between levels? (Colour mismatch)
+** Tween modulate Main to accomplish this.  If it works, we can remove ArenaBlank...
 
-# Flow
-
-* Some form of intro
-
-# IMMEDIATE
-
-* Add some form of water filter over the game itself...?
+* Best visual colour: 2863f8
 
 # Patch notes
 
-* Initial intro sequence now implemented.
+* Design: Experimenting with ocean-themed colour scheme for Tiles.
+* Bug fix: Camera was not moving to far right.
+* Internal: Converted Main scene parent to Node2D (was: Node) to prepare for fade in/out changes.

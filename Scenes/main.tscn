@@ -16,7 +16,7 @@
 [ext_resource type="PackedScene" uid="uid://c61dmtdssq0mw" path="res://Scenes/Key.tscn" id="11_wlg1c"]
 [ext_resource type="AudioStream" uid="uid://b65dtuu73n480" path="res://Sound/80s Synthpop Experiment - Steven O'Brien (Must Credit, CC-BY, www.steven-obrien.net).mp3" id="12_arleo"]
 
-[node name="Main" type="Node"]
+[node name="Main" type="Node2D"]
 script = ExtResource("1_gnjic")
 intro_scene = ExtResource("2_nb6e8")
 enemy_scene = ExtResource("2_3ugt8")

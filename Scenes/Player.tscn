@@ -200,7 +200,7 @@ script = ExtResource("1_m4brx")
 enabled = false
 limit_left = 0
 limit_top = 0
-limit_right = 5120
+limit_right = 5300
 limit_bottom = 2720
 editor_draw_limits = true
 

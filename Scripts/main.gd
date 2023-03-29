@@ -143,26 +143,26 @@ func wave_end_prepare_for_next_wave():
     
     # Close top door.
     $Arena.set_cell(
-        1,
+        2,
         Vector2(31,2),
         0,
         Vector2i(6,6))
     
     $Arena.set_cell(
-        1,
+        2,
         Vector2(32,2),
         0,
         Vector2i(7,6))
         
     # Open bottom door.
     $Arena.set_cell(
-        1,
+        2,
         Vector2(31,33),
         -1,
         Vector2i(6,6))
     
     $Arena.set_cell(
-        1,
+        2,
         Vector2(32,33),
         -1,
         Vector2i(7,6))
