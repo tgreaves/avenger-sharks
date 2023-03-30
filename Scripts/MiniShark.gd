@@ -8,8 +8,6 @@ var centre
 func _ready():
     centre = position
    
-    var number_of_mini_sharks = get_tree().get_nodes_in_group('miniSharkGroup').size()
-
     $MiniSharkTimer.start(constants.MINI_SHARK_ACTIVE_DURATION)
     $MiniSharkAnimatedSprite2D.play()
 

@@ -1,10 +1,7 @@
 # Gameplay
 
-* Necromancers...
-  * Check hit boxes as should be 5 hits only... might need to remove collision from SharkSpray on a hit.
-
 * Ability to shoot enemies when spawning in (but not collide)
-* Replace power-ups with sprites (NOTE: Tilemap has animations too), and implement more....
+* More power-up suggestions
   * Speed?
   * Bouncing shots?
   * Exploding shots
@@ -20,8 +17,11 @@
 * Bonus points for collecting all fish at end of wave?
 * Animation of fish being released back into the sea?
 
+* Boss wave
+
 # Bugs
 
+* Necromancersa have 5 HP but fewer hits seem to kill them. 
 * Necromancers sometimes flicker after death / level transitions.
 * Big spray doesn't work when player close to a wall.
 
@@ -29,9 +29,11 @@
 
 * IMMEDIATE
 
-# Patch notes
+* Patch notes
 
-* New tileset for dungeon floor to better fit water aesthetic.
-* Improved transitions between various Scenes.
-* Internal: Removed ArenaBlank scene as no longer required.
-
+* Minor adjustments to transition timings between Scenes and game status.
+* Bug fix: Fix broken cheat mode.
+* Bug fix: Fix player energy being reset at the wrong times.
+* Bug fix: Fix menus breaking for controller in certain scenarios.
+* Internal: Explictly set menu button Focus Neighbors.
+* Internal: General code tidy-up (esp around game state) and removal of Warnings.

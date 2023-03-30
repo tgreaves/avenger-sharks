@@ -7,7 +7,7 @@ extends Node
 @export var credits_scene: PackedScene;
 @export var item_scene: PackedScene;
 @export var game_status = INTRO_SEQUENCE;
-@export var cheat_mode = 0
+@export var cheat_mode = false
 
 var score = 0;
 var wave_number = 1;
@@ -16,6 +16,7 @@ var enemies_left_this_wave = 0;
 var fish_collected = 0;
 var spawned_items_this_wave = []
 var intro
+var credits
 
 enum {
     INTRO_SEQUENCE,
@@ -26,7 +27,7 @@ enum {
     GAME_PAUSED,
     GETTING_KEY,
     WAVE_END,
-    PREPARE_FOR_NEXT_WAVE,
+    PREPARE_FOR_WAVE,
     GAME_OVER
 }
 
@@ -67,11 +68,14 @@ func main_menu():
     $UnderwaterFar.visible = true
     $UnderwaterNear.visible = true
     $Arena.visible = false
-    $MainMenu.get_node('CanvasLayer').visible = true;
-    $MainMenu.set_process_input(true);
-    $MainMenu._ready();
     $PauseMenu.get_node('CanvasLayer').visible = false;
     $PauseMenu.set_process_input(false);
+    
+    $MainMenu.get_node('CanvasLayer').visible = true;
+    $HUD/CanvasLayer/HighScore.visible = true;
+    $MainMenu.set_process_input(true);
+    $MainMenu._ready();
+    
     $HUD/CanvasLayer.visible = true
     $HUD.get_node("CanvasLayer/Energy").visible = false;
     $HUD.get_node("CanvasLayer/EnergyProgressBar").visible = false;
@@ -80,22 +84,124 @@ func main_menu():
     $HUD.get_node("CanvasLayer/Label").text = "";
     $HUD.get_node("CanvasLayer/EnemiesLeft").visible = false;
     $HUD.get_node("CanvasLayer/Fish").visible = false;
-    
+        
     $Player/Camera2D.enabled = false
-    #$Player.position = $Player.position
     $Player.set_process(false);
     $Player.set_physics_process(false);
     $Player.visible = false;
     $Player.get_node("CollisionShape2D").disabled = false;
     $Player._ready();
     
-    
+func start_game():
+    if cheat_mode == true:
+        $Player.player_energy = constants.PLAYER_START_GAME_ENERGY_CHEATING
+        print ("Cheat energy set!")
+    else:
+        $Player.player_energy = constants.PLAYER_START_GAME_ENERGY
+        
+    $HUD.get_node("CanvasLayer/EnergyProgressBar").max_value = $Player.player_energy
+    prepare_for_wave()     
 
-func wave_start():
+func prepare_for_wave():
+    wave_number=wave_number+1;
+    
+    # Close top door.
+    $Arena.set_cell(
+        2,
+        Vector2(31,2),
+        0,
+        Vector2i(6,6))
+    
+    $Arena.set_cell(
+        2,
+        Vector2(32,2),
+        0,
+        Vector2i(7,6))
+        
+    # Open bottom door.
+    $Arena.set_cell(
+        2,
+        Vector2(31,33),
+        -1,
+        Vector2i(6,6))
+    
+    $Arena.set_cell(
+        2,
+        Vector2(32,33),
+        -1,
+        Vector2i(7,6))
+    
+    
+    #$HUD.get_node("CanvasLayer/EnergyProgressBar").max_value = constants.PLAYER_START_GAME_ENERGY
+    
+    $HUD.get_node("CanvasLayer/Energy").visible = true;
+    $HUD.get_node("CanvasLayer/Score").visible = true;
+    $HUD.get_node("CanvasLayer/Label").visible = false;
+    $HUD.get_node("CanvasLayer/EnemiesLeft").visible = true;
+    $HUD.get_node("CanvasLayer/EnergyProgressBar").visible = true;
+    $HUD.get_node("CanvasLayer/Fish").visible = true;
+    
+    $UnderwaterFar.visible = false
+    $UnderwaterNear.visible = false
+    $MainMenu.get_node('CanvasLayer').visible = false
+    $MainMenu.set_process_input(false)
+    $Arena.visible = true;
+    $Player.set_process(true);
+    $Player.set_physics_process(true);
+    $Player._ready();
+    $Player/Camera2D.enabled = true
+    $Player.visible = true
+    $Player.position = Vector2(2650, 2500);
+    $Player.get_node("AnimatedSprite2D").animation = 'default';
+    $Player.get_node("AnimatedSprite2D").play()
+    
+    var tween = get_tree().create_tween()
+    tween.tween_property(self, "modulate", Color(1,1,1,1), 0.5)
+    
+    emit_signal("player_move_to_starting_position");
+
+    _on_enemy_update_score_display()
+    _on_player_update_energy();
+    update_fish_display()
+
+    $Key/CollisionShape2D.disabled = true;
+    
+    wave_intro()
+
+func wave_intro():
     game_status = WAVE_START;
     $HUD.get_node("CanvasLayer/Label").text = "WAVE " + str(wave_number);
     $HUD.get_node("CanvasLayer/Label").visible = true;
     $WaveIntroTimer.start();
+
+func start_wave():
+    game_status = GAME_RUNNING;
+    var i = 0;
+    
+    $HUD.get_node("CanvasLayer/Energy").visible = true;
+    $HUD.get_node("CanvasLayer/Score").visible = true;
+    $HUD.get_node("CanvasLayer/Label").visible = false;
+    $HUD.get_node("CanvasLayer/EnemiesLeft").visible = true;
+    $HUD.get_node("CanvasLayer/Fish").visible = true;
+    
+    
+    
+    $ItemSpawnTimer.start(randf_range(constants.ITEM_SPAWN_MINIMUM_SECONDS,constants.ITEM_SPAWN_MAXIMUM_SECONDS));
+    $EnemySpawnTimer.start(randf_range(constants.ENEMY_SPAWN_MINIMUM_SECONDS,
+                                                constants.ENEMY_SPAWN_MAXIMUM_SECONDS));
+    
+    while (i < wave_number * constants.ENEMY_MULTIPLIER_AT_WAVE_START):
+        spawn_enemy();
+        i=i+1;
+        
+    enemies_left_this_wave = (wave_number * constants.ENEMY_MULTIPLIER_AT_WAVE_START) + (wave_number * constants.ENEMY_MULTIPLIER_DURING_WAVE);
+    update_enemies_left_display();
+
+    i=0;
+
+    while (i < constants.FISH_TO_SPAWN):
+        spawn_fish();
+        i=i+1;
 
 func wave_end():
     game_status = GETTING_KEY;
@@ -130,102 +236,10 @@ func wave_end_cleanup():
     for dinosaur_attack in get_tree().get_nodes_in_group('dinosaurAttack'):
         dinosaur_attack.queue_free()
         
-    game_status = PREPARE_FOR_NEXT_WAVE;
+    game_status = PREPARE_FOR_WAVE;
     $WaveEndTimer.start();
 
-func wave_end_prepare_for_next_wave():
-    wave_number=wave_number+1;
-    
-    # Close top door.
-    $Arena.set_cell(
-        2,
-        Vector2(31,2),
-        0,
-        Vector2i(6,6))
-    
-    $Arena.set_cell(
-        2,
-        Vector2(32,2),
-        0,
-        Vector2i(7,6))
-        
-    # Open bottom door.
-    $Arena.set_cell(
-        2,
-        Vector2(31,33),
-        -1,
-        Vector2i(6,6))
-    
-    $Arena.set_cell(
-        2,
-        Vector2(32,33),
-        -1,
-        Vector2i(7,6))
-    
-    $HUD.get_node("CanvasLayer/Energy").visible = true;
-    $HUD.get_node("CanvasLayer/Score").visible = true;
-    $HUD.get_node("CanvasLayer/Label").visible = false;
-    $HUD.get_node("CanvasLayer/EnemiesLeft").visible = true;
-    $HUD.get_node("CanvasLayer/EnergyProgressBar").visible = true;
-    $HUD.get_node("CanvasLayer/Fish").visible = true;
-    
-    $UnderwaterFar.visible = false
-    $UnderwaterNear.visible = false
-    $MainMenu.get_node('CanvasLayer').visible = false
-    $MainMenu.set_process_input(false)
-    $Arena.visible = true;
-    $Player.set_process(true);
-    $Player.set_physics_process(true);
-    $Player._ready();
-    $Player/Camera2D.enabled = true
-    $Player.visible = true
-    $Player.position = Vector2(2650, 2500);
-    $Player.get_node("AnimatedSprite2D").animation = 'default';
-    $Player.get_node("AnimatedSprite2D").play()
-    
-    var tween = get_tree().create_tween()
-    tween.tween_property(self, "modulate", Color(1,1,1,1), 0.5)
-    
-    emit_signal("player_move_to_starting_position");
 
-    _on_enemy_update_score_display()
-    _on_player_update_energy();
-    update_fish_display()
-
-    $Key/CollisionShape2D.disabled = true;
-    
-    wave_start()
-
-func start_game():
-    game_status = GAME_RUNNING;
-    var i = 0;
-    
-    
-    $HUD.get_node("CanvasLayer/Energy").visible = true;
-    $HUD.get_node("CanvasLayer/Score").visible = true;
-    $HUD.get_node("CanvasLayer/Label").visible = false;
-    $HUD.get_node("CanvasLayer/EnemiesLeft").visible = true;
-    $HUD.get_node("CanvasLayer/Fish").visible = true;
-    
-    $Player.player_energy = constants.PLAYER_START_GAME_ENERGY;
-    $HUD.get_node("CanvasLayer/EnergyProgressBar").max_value = constants.PLAYER_START_GAME_ENERGY
-    
-    $ItemSpawnTimer.start(randf_range(constants.ITEM_SPAWN_MINIMUM_SECONDS,constants.ITEM_SPAWN_MAXIMUM_SECONDS));
-    $EnemySpawnTimer.start(randf_range(constants.ENEMY_SPAWN_MINIMUM_SECONDS,
-                                                constants.ENEMY_SPAWN_MAXIMUM_SECONDS));
-    
-    while (i < wave_number * constants.ENEMY_MULTIPLIER_AT_WAVE_START):
-        spawn_enemy();
-        i=i+1;
-        
-    enemies_left_this_wave = (wave_number * constants.ENEMY_MULTIPLIER_AT_WAVE_START) + (wave_number * constants.ENEMY_MULTIPLIER_DURING_WAVE);
-    update_enemies_left_display();
-
-    i=0;
-
-    while (i < constants.FISH_TO_SPAWN):
-        spawn_fish();
-        i=i+1;
 
 func game_over():
     game_status = GAME_OVER;
@@ -234,7 +248,6 @@ func game_over():
     $GameOverTimer.start();
 
 func return_to_main_screen():
-    # TODO: Remove any Enemies, projectiles on screen.
     for enemy in get_tree().get_nodes_in_group("enemyGroup"):
         enemy.queue_free()
         
@@ -290,11 +303,11 @@ func spawn_fish():
 func _process(_delta):
     if game_status == WAVE_START:
         if $WaveIntroTimer.time_left == 0:
-            start_game();
+            start_wave();
             
-    if game_status == PREPARE_FOR_NEXT_WAVE:
+    if game_status == PREPARE_FOR_WAVE:
         if $WaveEndTimer.time_left == 0:
-            wave_end_prepare_for_next_wave();   
+            prepare_for_wave();   
     
     if game_status == GAME_RUNNING:
         if enemies_left_this_wave == 0:
@@ -324,15 +337,6 @@ func _process(_delta):
             return_to_main_screen();
         
 func _input(_ev):
-    if Input.is_action_just_pressed('cheat'):
-        if game_status == MAIN_MENU:
-            cheat_mode = 1;
-            $MainMenu/CanvasLayer/MainMenuContainer/TitleLabel.text = "CHEAT SHARKS!\n\nBy Tristan Greaves";
-            $Player.player_energy = constants.PLAYER_START_GAME_ENERGY_CHEATING;
-            $HUD.get_node("CanvasLayer/EnergyProgressBar").max_value = constants.PLAYER_START_GAME_ENERGY
-    
-            _on_player_update_energy();
-            
     if Input.is_action_just_pressed('start') or Input.is_action_just_pressed('quit'):
         match game_status:
             GAME_RUNNING:
@@ -351,10 +355,8 @@ func _input(_ev):
                 main_menu()
             CREDITS:
                 game_status = MAIN_MENU
-                $Credits.queue_free()
-                $HUD/CanvasLayer/HighScore.visible = true;
-                $MainMenu.get_node("CanvasLayer").visible = true
-                
+                credits.queue_free()
+                main_menu()
         
 func _on_player_update_energy():
     $HUD.get_node('CanvasLayer').get_node('EnergyProgressBar').value = $Player.player_energy
@@ -398,15 +400,13 @@ func _on_player_player_got_fish():
     update_fish_display();
 
 func _on_player_player_found_exit():
-    
     wave_end_cleanup();
     
 func _on_main_menu_start_game_pressed():
-    wave_end_prepare_for_next_wave()
+    start_game()
 
 func _on_main_menu_exit_game_pressed():
     get_tree().quit();
-
 
 func _on_pause_menu_unpause_game_pressed():
     game_status = GAME_RUNNING;
@@ -414,7 +414,6 @@ func _on_pause_menu_unpause_game_pressed():
     $PauseMenu.set_process_input(false);
     get_tree().paused = false;
     
-
 func _on_pause_menu_abandon_game_pressed():
     $PauseMenu.get_node('CanvasLayer').visible = false;
     $PauseMenu.set_process_input(false);
@@ -425,7 +424,7 @@ func _on_main_menu_credits_pressed():
     game_status = CREDITS;
     $MainMenu.get_node("CanvasLayer").visible = false
     $HUD/CanvasLayer/HighScore.visible = false;
-    var credits = credits_scene.instantiate();
+    credits = credits_scene.instantiate();
     credits.visible = true
     add_child(credits)
 
@@ -433,3 +432,6 @@ func intro_has_finished():
     game_status = MAIN_MENU
     intro.queue_free()
     main_menu()
+
+func _on_main_menu_cheats_pressed():
+    cheat_mode = true

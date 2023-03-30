@@ -201,10 +201,8 @@ func _physics_process(_delta):
               
             for i in get_slide_collision_count():
                 var collision = get_slide_collision(i)
-                print("PLAYER collided with ", collision.get_collider().name + " // " + collision.get_collider().get_class())
                 
                 if collision.get_collider().name == 'Key':  
-                    print("KEY FOUND");
                     shark_status = HUNTING_EXIT;
                     var target_direction = (get_parent().get_node('Arena').get_node('ExitDoor').global_position - global_position).normalized();
                     velocity = target_direction * constants.PLAYER_SPEED_ESCAPING;
@@ -221,7 +219,6 @@ func _physics_process(_delta):
                 var collision = get_slide_collision(i)
                 
                 if collision.get_collider().name == 'ExitDoor':  
-                    print("EXIT FOUND at " + str(global_position));
                     shark_status = FOUND_EXIT;
                     velocity = Vector2i(0,0)
                     
@@ -256,7 +253,6 @@ func _physics_process(_delta):
                                     
                 for i in get_slide_collision_count():
                     var collision = get_slide_collision(i)
-                    print("PLAYER collided with ", collision.get_collider().name + " // " + collision.get_collider().get_class())
                 
                     if collision.get_collider().name == 'ExitLocation':  
                         emit_signal('player_found_exit');  
@@ -277,7 +273,6 @@ func _physics_process(_delta):
             
                 for i in get_slide_collision_count():
                     var collision = get_slide_collision(i)
-                    print("PLAYER collided with ", collision.get_collider().name + " // " + collision.get_collider().get_class())
                      
                     if collision.get_collider().name == 'PlayerStartLocation':  
                         shark_status = ALIVE

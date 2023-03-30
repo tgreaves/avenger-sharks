@@ -1,3 +1,5 @@
+extends Node
+
 const GAME_VERSION = "0.1-alpha"
 
 const START_WAVE = 1

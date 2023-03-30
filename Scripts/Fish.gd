@@ -46,7 +46,7 @@ func _physics_process(delta):
                 
         INTRO_SWIM_TO_NECROMANCER:
             # We want to end up in an evenly spaced circle around the necromancer.
-            var angle_step_degrees = 360 / get_tree().get_nodes_in_group('fishGroup').size()
+            var angle_step_degrees = 360.0 / get_tree().get_nodes_in_group('fishGroup').size()
             var target_angle_degrees = intro_fish_id * angle_step_degrees
             var angle = deg_to_rad(target_angle_degrees)
             var offset = Vector2(sin(angle), cos(angle)) * 200;   # 100 = Radius
@@ -60,7 +60,7 @@ func _physics_process(delta):
             var target_direction = (target_position - global_position).normalized()
             velocity = target_direction * 200
             
-            var collision = move_and_collide(velocity * delta)
+            var _collision = move_and_collide(velocity * delta)
         
         INTRO_AT_NECROMANCER:
             set_collision_mask_value(1,false)
@@ -83,7 +83,7 @@ func set_intro_mode():
     fish_speed = randi_range(50,250)
     z_index = 1
     
-    $StateTimer.start(1)
+    $StateTimer.start(0)
 
 func swim_to_necromancer(passed_fish_id):
     state = INTRO_SWIM_TO_NECROMANCER

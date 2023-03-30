@@ -76,6 +76,7 @@ horizontal_alignment = 1
 [node name="StartGame" type="Button" parent="CanvasLayer/MainMenuContainer"]
 layout_mode = 2
 size_flags_vertical = 6
+focus_neighbor_bottom = NodePath("../Credits")
 theme_override_fonts/font = ExtResource("1_jvmua")
 theme_override_font_sizes/font_size = 64
 shortcut = SubResource("Shortcut_l265b")
@@ -85,6 +86,8 @@ text = "START GAME
 [node name="Credits" type="Button" parent="CanvasLayer/MainMenuContainer"]
 layout_mode = 2
 size_flags_vertical = 6
+focus_neighbor_top = NodePath("../StartGame")
+focus_neighbor_bottom = NodePath("../ExitGame")
 theme_override_fonts/font = ExtResource("1_jvmua")
 theme_override_font_sizes/font_size = 64
 shortcut = SubResource("Shortcut_l265b")
@@ -94,6 +97,7 @@ text = "CREDITS
 [node name="ExitGame" type="Button" parent="CanvasLayer/MainMenuContainer"]
 layout_mode = 2
 size_flags_vertical = 6
+focus_neighbor_top = NodePath("../Credits")
 theme_override_fonts/font = ExtResource("1_jvmua")
 theme_override_font_sizes/font_size = 64
 shortcut = SubResource("Shortcut_ed26y")

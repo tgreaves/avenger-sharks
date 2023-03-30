@@ -21,7 +21,6 @@ func _physics_process(_delta):
 
 
 func _on_player_player_got_key():
-    print("Signal OK player got key")
     $CollisionShape2D.disabled = true
     state = FOLLOWING_PLAYER
     

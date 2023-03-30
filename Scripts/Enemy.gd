@@ -53,8 +53,6 @@ func _physics_process(delta):
                 $TrapTimer.start(randf_range(constants.ENEMY_TRAP_MINIMUM_SECONDS,constants.ENEMY_TRAP_MAXIMUM_SECONDS));
 
         WANDER:
-            #print("WANDER!!");
-            
             if $FlashHitTimer.time_left == 0:
                 set_modulate(Color(1,1,1,1));
             

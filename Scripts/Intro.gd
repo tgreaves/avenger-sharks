@@ -37,15 +37,13 @@ func _ready():
     tween.tween_property(self, "modulate", Color(1,1,1,1), 2.0)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
+func _process(_delta):
     match state:
         ALL_IS_FINE:
             # Start happy music and set-up title fade.
             if $IntroLabelTimer.time_left == 0:
                 var tween = get_tree().create_tween()
                 tween.tween_property($IntroLabel, "modulate", Color(1,1,1,0), 2)
-                #tween.tween_callback(new_label.queue_free).set_delay(3)
-                
                 state = LABEL_GONE
                 
         LABEL_GONE:
@@ -110,8 +108,8 @@ func _process(delta):
             if $StateTimer.time_left == 0:
                 var tween = get_tree().create_tween()
                 tween.set_parallel()
-                tween.tween_property(self, "modulate", Color(0,0,0,0), 5.0)
-                tween.tween_property($BadThingsSong, "volume_db", -80, 5.0)
+                tween.tween_property(self, "modulate", Color(0,0,0,0), 4)
+                tween.tween_property($BadThingsSong, "volume_db", -80, 4)
                 
                 $StateTimer.start(4)
                 state=FADE_OUT
@@ -123,11 +121,11 @@ func _process(delta):
                 
 func spawn_fish():
     var mob = fish_scene.instantiate();
-    mob.get_node('.').set_position (Vector2(randf_range(constants.ARENA_SPAWN_MIN_X, constants.ARENA_SPAWN_MAX_X / 2),randf_range(constants.ARENA_SPAWN_MIN_Y,constants.ARENA_SPAWN_MAX_Y / 2)));
+    mob.get_node('.').set_position (Vector2(randf_range(constants.ARENA_SPAWN_MIN_X, constants.ARENA_SPAWN_MAX_X / 2.0),randf_range(constants.ARENA_SPAWN_MIN_Y,constants.ARENA_SPAWN_MAX_Y / 2.0)));
     mob.add_to_group('fishGroup');	
-    mob.set_intro_mode()
     add_child(mob);
-    
+    mob.set_intro_mode()
+
 func shark_spin():
     shark_rotation = shark_rotation + 5
     if shark_rotation > 350:

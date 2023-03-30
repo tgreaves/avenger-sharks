@@ -103,7 +103,7 @@ animation = &"fish_1"
 shape = SubResource("CircleShape2D_4b2pv")
 
 [node name="StateTimer" type="Timer" parent="."]
-wait_time = 2.0
+wait_time = 0.001
 one_shot = true
 
 [node name="AnimatedSprite2DDamaged" type="AnimatedSprite2D" parent="."]
