@@ -10,7 +10,6 @@
   * Exploding shots
   * Piercing shots
   * Mega Shark Mode?!
-  * 'Mini Shark' that rotates around the player
 * Scenery / Obstacles in room (Tileset has boxes)
 
 * Opens up possibilities of some rooms being special, e.g. just full of fish?
@@ -25,13 +24,14 @@
 
 * Necromancers sometimes flicker after death / level transitions.
 * Big spray doesn't work when player close to a wall.
-* Visual: Smoother transition between levels? (Colour mismatch)
-** Tween modulate Main to accomplish this.  If it works, we can remove ArenaBlank...
 
 * Best visual colour: 2863f8
 
+* IMMEDIATE
+
 # Patch notes
 
-* Design: Experimenting with ocean-themed colour scheme for Tiles.
-* Bug fix: Camera was not moving to far right.
-* Internal: Converted Main scene parent to Node2D (was: Node) to prepare for fade in/out changes.
+* New tileset for dungeon floor to better fit water aesthetic.
+* Improved transitions between various Scenes.
+* Internal: Removed ArenaBlank scene as no longer required.
+

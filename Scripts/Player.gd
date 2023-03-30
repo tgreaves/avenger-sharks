@@ -251,6 +251,9 @@ func _physics_process(_delta):
                     var target_direction = (get_parent().get_node('Arena').get_node('ExitLocation').global_position - global_position).normalized();
                     velocity = target_direction * constants.PLAYER_SPEED_ESCAPING;            
                      
+                    var tween = get_tree().create_tween()
+                    tween.tween_property(get_parent(), "modulate", Color(0,0,0,0), 0.35)
+                                    
                 for i in get_slide_collision_count():
                     var collision = get_slide_collision(i)
                     print("PLAYER collided with ", collision.get_collider().name + " // " + collision.get_collider().get_class())

@@ -113,7 +113,7 @@ func _process(delta):
                 tween.tween_property(self, "modulate", Color(0,0,0,0), 5.0)
                 tween.tween_property($BadThingsSong, "volume_db", -80, 5.0)
                 
-                $StateTimer.start(3)
+                $StateTimer.start(4)
                 state=FADE_OUT
                 
         FADE_OUT:

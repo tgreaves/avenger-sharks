@@ -12,8 +12,11 @@ ARTWORK
 Underwater Fantasy Pixel Art Environment: ansimuz
 https://ansimuz.itch.io/underwater-fantasy-pixel-art-environment
 
-Arena tiling: Pixel_Poem
+Arena tiling - Dungeon: Pixel_Poem
 https://pixel-poem.itch.io/dungeon-assetpuck
+
+Arena tiling - Water: SciGho
+https://ninjikin.itch.io/water
 
 Shark sprite: Sergeant_Slash
 https://sergeant-slash.itch.io/32x32-animated-shark-sprite
@@ -44,7 +47,7 @@ https://fonts.google.com/specimen/Press+Start+2P
 
 SOUND
 
-Main theme:
+Music:
 https://www.steven-obrien.net/
 
 Shark spray: mparsons99
