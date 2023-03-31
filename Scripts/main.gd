@@ -41,6 +41,8 @@ var ITEMS = {
 signal player_hunt_key;
 signal player_move_to_starting_position;
 signal player_enable_fish_frenzy;
+signal player_update_energy
+signal player_update_fish
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -79,14 +81,10 @@ func main_menu():
     $MainMenu._ready();
     
     $HUD/CanvasLayer.visible = true
-    $HUD.get_node("CanvasLayer/Energy").visible = false;
-    $HUD.get_node("CanvasLayer/EnergyProgressBar").visible = false;
     $HUD.get_node("CanvasLayer/Score").visible = false;
     $HUD.get_node("CanvasLayer/Label").visible = true;
     $HUD.get_node("CanvasLayer/Label").text = "";
     $HUD.get_node("CanvasLayer/EnemiesLeft").visible = false;
-    $HUD.get_node("CanvasLayer/Fish").visible = false;
-    $HUD.get_node("CanvasLayer/FishProgressBar").visible = false
         
     $Player/Camera2D.enabled = false
     $Player.set_process(false);
@@ -101,8 +99,8 @@ func start_game():
     else:
         $Player.player_energy = constants.PLAYER_START_GAME_ENERGY
         
-    $HUD.get_node("CanvasLayer/EnergyProgressBar").max_value = $Player.player_energy
-    $HUD.get_node("CanvasLayer/FishProgressBar").max_value = constants.FISH_TO_TRIGGER_FISH_FRENZY
+    $Player.get_node('EnergyProgressBar').max_value = $Player.player_energy
+    $Player.get_node("FishProgressBar").max_value = constants.FISH_TO_TRIGGER_FISH_FRENZY
     prepare_for_wave()     
 
 func prepare_for_wave():
@@ -134,16 +132,9 @@ func prepare_for_wave():
         -1,
         Vector2i(7,6))
     
-    
-    #$HUD.get_node("CanvasLayer/EnergyProgressBar").max_value = constants.PLAYER_START_GAME_ENERGY
-    
-    $HUD.get_node("CanvasLayer/Energy").visible = true;
     $HUD.get_node("CanvasLayer/Score").visible = true;
     $HUD.get_node("CanvasLayer/Label").visible = false;
     $HUD.get_node("CanvasLayer/EnemiesLeft").visible = true;
-    $HUD.get_node("CanvasLayer/EnergyProgressBar").visible = true;
-    $HUD.get_node("CanvasLayer/Fish").visible = true;
-    $HUD.get_node("CanvasLayer/FishProgressBar").visible = true;
     
     $UnderwaterFar.visible = false
     $UnderwaterNear.visible = false
@@ -165,8 +156,9 @@ func prepare_for_wave():
     emit_signal("player_move_to_starting_position");
 
     _on_enemy_update_score_display()
-    _on_player_update_energy();
-    update_fish_display()
+    
+    emit_signal('player_update_energy')
+    emit_signal('player_update_fish')
 
     $Key/CollisionShape2D.disabled = true;
     
@@ -182,13 +174,9 @@ func start_wave():
     game_status = GAME_RUNNING;
     var i = 0;
     
-    $HUD.get_node("CanvasLayer/Energy").visible = true;
     $HUD.get_node("CanvasLayer/Score").visible = true;
     $HUD.get_node("CanvasLayer/Label").visible = false;
     $HUD.get_node("CanvasLayer/EnemiesLeft").visible = true;
-    $HUD.get_node("CanvasLayer/Fish").visible = true;
-    
-    
     
     $ItemSpawnTimer.start(randf_range(constants.ITEM_SPAWN_MINIMUM_SECONDS,constants.ITEM_SPAWN_MAXIMUM_SECONDS));
     $EnemySpawnTimer.start(randf_range(constants.ENEMY_SPAWN_MINIMUM_SECONDS,
@@ -242,8 +230,6 @@ func wave_end_cleanup():
         
     game_status = PREPARE_FOR_WAVE;
     $WaveEndTimer.start();
-
-
 
 func game_over():
     game_status = GAME_OVER;
@@ -360,10 +346,7 @@ func _input(_ev):
                 game_status = MAIN_MENU
                 credits.queue_free()
                 main_menu()
-        
-func _on_player_update_energy():
-    $HUD.get_node('CanvasLayer').get_node('EnergyProgressBar').value = $Player.player_energy
-    
+            
 func _on_enemy_update_score(score_to_add,enemy_global_position):
     enemies_left_this_wave = enemies_left_this_wave - 1;
     score = score + score_to_add;
@@ -387,9 +370,6 @@ func _on_enemy_update_score_display():
 func update_enemies_left_display():
     $HUD.get_node('CanvasLayer').get_node('EnemiesLeft').text = "ENEMIES\n" + str(enemies_left_this_wave);
     
-func update_fish_display():
-    $HUD.get_node('CanvasLayer').get_node('FishProgressBar').value = fish_collected
-    
 func _on_player_player_died():
     game_over();
 
@@ -400,7 +380,7 @@ func _on_player_player_got_fish():
         
     fish_collected = fish_collected + 1;
     _on_enemy_update_score_display();
-    update_fish_display();
+    emit_signal('player_update_fish')
     
     if fish_collected == constants.FISH_TO_TRIGGER_FISH_FRENZY:
         emit_signal('player_enable_fish_frenzy')
@@ -441,7 +421,5 @@ func intro_has_finished():
 
 func _on_main_menu_cheats_pressed():
     cheat_mode = true
+    
 
-
-func _on_player_update_fish():
-    update_fish_display()

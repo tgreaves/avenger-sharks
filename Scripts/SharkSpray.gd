@@ -16,6 +16,8 @@ func _physics_process(_delta):
         if collision.get_collider().name == 'Arena':
             self.queue_free()
             break;
+
+        print ("Collision debug... " + str(collision.get_collider().name))
             
         collision.get_collider().get_node('.')._death();
         $CollisionShape2D.disabled = true;

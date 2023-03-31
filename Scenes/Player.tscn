@@ -1,4 +1,4 @@
-[gd_scene load_steps=50 format=3 uid="uid://5yp4e43ckdrj"]
+[gd_scene load_steps=54 format=3 uid="uid://5yp4e43ckdrj"]
 
 [ext_resource type="Script" path="res://Scripts/Player.gd" id="1_m4brx"]
 [ext_resource type="Texture2D" uid="uid://ikcchi1bmyrs" path="res://Sprites/Shark/Shark1.png" id="2_px875"]
@@ -189,6 +189,18 @@ animations = [{
 "speed": 10.0
 }]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bywa3"]
+bg_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pgp4c"]
+bg_color = Color(0.329412, 0.698039, 0.25098, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1kikt"]
+bg_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jyh0b"]
+bg_color = Color(0.972549, 0.321569, 0.580392, 1)
+
 [node name="Player" type="CharacterBody2D"]
 z_index = 1
 position = Vector2(1253, 666)
@@ -234,14 +246,24 @@ frame_progress = 1.0
 
 [node name="PowerUpLabel" type="Label" parent="."]
 visible = false
-offset_left = -116.0
-offset_top = -62.0
-offset_right = 124.0
-offset_bottom = -39.0
+offset_left = -112.0
+offset_top = -151.0
+offset_right = 128.0
+offset_bottom = -124.0
 theme_override_fonts/font = ExtResource("40_8elap")
 theme_override_font_sizes/font_size = 24
 text = "POWER-UP"
 horizontal_alignment = 1
+
+[node name="EnergyProgressBar" type="ProgressBar" parent="."]
+offset_left = -54.0
+offset_top = -76.0
+offset_right = 53.0
+offset_bottom = -55.0
+theme_override_styles/background = SubResource("StyleBoxFlat_bywa3")
+theme_override_styles/fill = SubResource("StyleBoxFlat_pgp4c")
+value = 50.0
+show_percentage = false
 
 [node name="FishFrenzyTimer" type="Timer" parent="."]
 wait_time = 3.0
@@ -254,6 +276,11 @@ one_shot = true
 [node name="PlayerExplosionTimer" type="Timer" parent="."]
 wait_time = 2.0
 one_shot = true
+
+[node name="ProgressBarBlinkTimer" type="Timer" parent="."]
+wait_time = 0.5
+one_shot = true
+autostart = true
 
 [node name="BigSprayTimer" type="Timer" parent="."]
 wait_time = 5.0
@@ -299,3 +326,13 @@ stream = ExtResource("39_sydp1")
 [node name="AudioStreamPlayerGotFish" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("45_fj125")
 volume_db = 6.558
+
+[node name="FishProgressBar" type="ProgressBar" parent="."]
+offset_left = -54.0
+offset_top = -102.0
+offset_right = 53.0
+offset_bottom = -81.0
+theme_override_styles/background = SubResource("StyleBoxFlat_1kikt")
+theme_override_styles/fill = SubResource("StyleBoxFlat_jyh0b")
+value = 50.0
+show_percentage = false

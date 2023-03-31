@@ -20,8 +20,6 @@ enum {
 @export var shark_status = ALIVE
 @export var big_spray = 0;
 
-signal update_energy;
-signal update_fish;
 signal player_died;
 signal player_got_fish;
 signal player_got_key;
@@ -99,11 +97,10 @@ func get_input():
             
         if Input.is_action_pressed('fish_frenzy') && fish_frenzy_enabled == true:
             fish_frenzy_enabled = false
-            get_parent().fish_collected = 0
-            emit_signal('update_fish')
             shark_status=FISH_FRENZY
             fish_frenzy_colour = 'BLUE'
             velocity = Vector2(0,0)
+            $CollisionShape2D.disabled = true
             $FishFrenzyTimer.start(constants.PLAYER_FISH_FRENZY_DURATION)
             $FishFrenzyFireTimer.start(constants.PLAYER_FISH_FRENZY_FIRE_DELAY)
     
@@ -119,6 +116,22 @@ func _physics_process(_delta):
         if fast_spray:
             fast_spray=false
          
+    if $ProgressBarBlinkTimer.time_left == 0:
+        if player_energy <= constants.PLAYER_LOW_ENERGY_BLINK:
+            if $EnergyProgressBar.visible:
+                $EnergyProgressBar.visible = false
+            else:
+                $EnergyProgressBar.visible = true
+        
+        if fish_frenzy_enabled:
+            if $FishProgressBar.visible:
+                $FishProgressBar.visible = false
+            else:
+                $FishProgressBar.visible = true
+
+        $ProgressBarBlinkTimer.start()
+    
+    
     match shark_status:
         ALIVE:
             if velocity.x > 0:
@@ -159,7 +172,7 @@ func _physics_process(_delta):
                                     
                             $AudioStreamHealth.play();
                             powerup_label_animation('HEALTH!')
-                            emit_signal('update_energy')
+                            _on_main_player_update_energy()
                             collided_with.get_node('.').despawn()
                             
                         "chest":
@@ -199,14 +212,20 @@ func _physics_process(_delta):
                
         FISH_FRENZY:
             if $FishFrenzyTimer.time_left == 0:
-                rotation_degrees = 0
+                $AnimatedSprite2D.rotation_degrees = 0
                 shake_reset()
+                get_parent().fish_collected = 0
+                _on_main_player_update_fish()
+                $CollisionShape2D.disabled = false
                 shark_status = ALIVE               
             else:
                 shake(10.0)
-                rotation_degrees += 20
-                if rotation_degrees >= 360:
-                    rotation_degrees = 0
+                $AnimatedSprite2D.rotation_degrees += 20
+                if $AnimatedSprite2D.rotation_degrees >= 360:
+                    $AnimatedSprite2D.rotation_degrees = 0
+                
+                get_parent().fish_collected = ($FishFrenzyTimer.time_left / constants.PLAYER_FISH_FRENZY_DURATION) * constants.FISH_TO_TRIGGER_FISH_FRENZY
+                _on_main_player_update_fish()
                 
                 if $FishFrenzyFireTimer.time_left == 0:
                     $FishFrenzyFireTimer.start(constants.PLAYER_FISH_FRENZY_FIRE_DELAY)
@@ -225,7 +244,8 @@ func _physics_process(_delta):
                         else:
                             shark_spray.modulate = Color(0,1,0) 
                             fish_frenzy_colour = 'BLUE'
-                        
+                            
+                        $AudioStreamPlayerSpray.play()
                         i+=1
                                  
         EXPLODING:
@@ -335,14 +355,15 @@ func _player_hit():
             $AnimatedSprite2DDamaged.visible = true;
             $AnimatedSprite2DDamaged.play();
         
-        emit_signal('update_energy');
+        $EnergyProgressBar.value = player_energy
+        _on_main_player_update_energy()
 
 func _on_main_player_hunt_key(passed_key_global_position):
     shark_status = HUNTING_KEY
     key_global_position = passed_key_global_position;
     var target_direction = (key_global_position - global_position).normalized();
     velocity = target_direction * constants.PLAYER_SPEED_ESCAPING;
-    rotation_degrees = 0        # In case we are in shark frenzy
+    $AnimatedSprite2D.rotation_degrees = 0        # In case we are in shark frenzy
 
 
 func _on_main_player_move_to_starting_position():
@@ -393,7 +414,6 @@ func recalculate_mini_shark_spacing():
         single_shark.set_circle_position(shark_count, number_of_mini_sharks)
         shark_count = shark_count + 1
 
-
 func _on_main_player_enable_fish_frenzy():
     powerup_label_animation('FRENZY READY!')
     fish_frenzy_enabled = true
@@ -406,3 +426,13 @@ func shake(shake_amount):
     
 func shake_reset():
     $Camera2D.set_offset(Vector2(0.0,0.0))
+
+
+func _on_main_player_update_energy():
+    $EnergyProgressBar.value = player_energy
+    $EnergyProgressBar.visible = true   
+
+func _on_main_player_update_fish():
+    $FishProgressBar.value = get_parent().fish_collected
+    $FishProgressBar.visible = true
+    print ("Fish value = " + str(get_parent().fish_collected))

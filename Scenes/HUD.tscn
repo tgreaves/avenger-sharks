@@ -1,15 +1,6 @@
-[gd_scene load_steps=5 format=3 uid="uid://bcqacic7yj4ds"]
+[gd_scene load_steps=2 format=3 uid="uid://bcqacic7yj4ds"]
 
 [ext_resource type="FontFile" uid="uid://dclfn1fjcq5i7" path="res://Fonts/PressStart2P-Regular.ttf" id="1_4l55f"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tpm7p"]
-bg_color = Color(0, 0, 0, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_i2m3c"]
-bg_color = Color(0.329412, 0.698039, 0.25098, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8t6gd"]
-bg_color = Color(0.972549, 0.321569, 0.580392, 1)
 
 [node name="HUD" type="Control"]
 layout_mode = 3
@@ -20,54 +11,6 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
-
-[node name="Energy" type="Label" parent="CanvasLayer"]
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -230.0
-offset_bottom = 91.0
-grow_horizontal = 0
-size_flags_horizontal = 8
-theme_override_fonts/font = ExtResource("1_4l55f")
-theme_override_font_sizes/font_size = 64
-text = "ENERGY"
-horizontal_alignment = 2
-
-[node name="EnergyProgressBar" type="ProgressBar" parent="CanvasLayer"]
-offset_left = 2168.0
-offset_top = 62.0
-offset_right = 2558.0
-offset_bottom = 134.0
-theme_override_styles/background = SubResource("StyleBoxFlat_tpm7p")
-theme_override_styles/fill = SubResource("StyleBoxFlat_i2m3c")
-value = 50.0
-show_percentage = false
-
-[node name="Fish" type="Label" parent="CanvasLayer"]
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -819.0
-offset_right = -563.0
-offset_bottom = 91.0
-grow_horizontal = 0
-size_flags_horizontal = 8
-theme_override_fonts/font = ExtResource("1_4l55f")
-theme_override_font_sizes/font_size = 64
-text = "FISH
-"
-horizontal_alignment = 1
-
-[node name="FishProgressBar" type="ProgressBar" parent="CanvasLayer"]
-offset_left = 1740.0
-offset_top = 62.0
-offset_right = 2058.0
-offset_bottom = 134.0
-theme_override_styles/background = SubResource("StyleBoxFlat_tpm7p")
-theme_override_styles/fill = SubResource("StyleBoxFlat_8t6gd")
-value = 50.0
-show_percentage = false
 
 [node name="Score" type="Label" parent="CanvasLayer"]
 offset_top = -2.0
@@ -85,9 +28,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -478.0
-offset_top = -133.0
+offset_top = -170.0
 offset_right = 482.0
-offset_bottom = -66.0
+offset_bottom = -103.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_fonts/font = ExtResource("1_4l55f")
@@ -110,17 +53,12 @@ text = "HIGH SCORE
 horizontal_alignment = 1
 
 [node name="EnemiesLeft" type="Label" parent="CanvasLayer"]
-anchors_preset = 3
+anchors_preset = 1
 anchor_left = 1.0
-anchor_top = 1.0
 anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -2244.0
-offset_top = -1442.0
-offset_right = -1604.0
-offset_bottom = -1308.0
+offset_left = -640.0
+offset_bottom = 134.0
 grow_horizontal = 0
-grow_vertical = 0
 size_flags_horizontal = 8
 theme_override_fonts/font = ExtResource("1_4l55f")
 theme_override_font_sizes/font_size = 64

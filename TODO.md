@@ -25,18 +25,12 @@
 * Necromancer have 5 HP but fewer hits seem to kill them. 
 * Necromancers sometimes flicker after death / level transitions.
 * Big spray doesn't work when player close to a wall.
+* Menu system is broken after game ends.
 
 * IMMEDIATE
 
-Change fish count to be a charging bar ?
-More noticeable FISH FRENZY READY (make bar flash at top?)
-Bug fixing for crash afterwards (collisions)
-Appropriate super sayan style sound effect. (Fade out music?)
-
 * Patch
 
-* Gameplay: Collect fish to charge up FISH FRENZY which you can then UNLEASH!
-* Gameplay: Enemies gain speed by a set % each wave.
-* Gameplay: When only x enemies left in a wave, all start chasing the player.
-* Gameplay: Traps have more HP
-* Gameplay: Misc other balance adjustments
+* UX: Energy and Fish Frenzy bars now appear above player sprite.
+* UX: Flashing bars when low (energy) or ready (fish frenzy!)
+* UX: Fish bar 'burns down' during FISH FRENZY
