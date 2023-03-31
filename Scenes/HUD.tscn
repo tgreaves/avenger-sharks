@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://bcqacic7yj4ds"]
+[gd_scene load_steps=5 format=3 uid="uid://bcqacic7yj4ds"]
 
 [ext_resource type="FontFile" uid="uid://dclfn1fjcq5i7" path="res://Fonts/PressStart2P-Regular.ttf" id="1_4l55f"]
 
@@ -7,6 +7,9 @@ bg_color = Color(0, 0, 0, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_i2m3c"]
 bg_color = Color(0.329412, 0.698039, 0.25098, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8t6gd"]
+bg_color = Color(0.972549, 0.321569, 0.580392, 1)
 
 [node name="HUD" type="Control"]
 layout_mode = 3
@@ -55,6 +58,16 @@ theme_override_font_sizes/font_size = 64
 text = "FISH
 "
 horizontal_alignment = 1
+
+[node name="FishProgressBar" type="ProgressBar" parent="CanvasLayer"]
+offset_left = 1740.0
+offset_top = 62.0
+offset_right = 2058.0
+offset_bottom = 134.0
+theme_override_styles/background = SubResource("StyleBoxFlat_tpm7p")
+theme_override_styles/fill = SubResource("StyleBoxFlat_8t6gd")
+value = 50.0
+show_percentage = false
 
 [node name="Score" type="Label" parent="CanvasLayer"]
 offset_top = -2.0

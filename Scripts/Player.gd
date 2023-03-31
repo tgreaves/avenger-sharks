@@ -5,6 +5,7 @@ const MiniSharkScene = preload("res://Scenes/MiniShark.tscn")
 
 enum {
     ALIVE,
+    FISH_FRENZY,
     HUNTING_KEY,
     HUNTING_EXIT,
     FOUND_EXIT,
@@ -20,6 +21,7 @@ enum {
 @export var big_spray = 0;
 
 signal update_energy;
+signal update_fish;
 signal player_died;
 signal player_got_fish;
 signal player_got_key;
@@ -30,6 +32,8 @@ signal player_found_exit;
 var key_global_position;
 var initial_player_position;
 var fast_spray = false
+var fish_frenzy_enabled = false
+var fish_frenzy_colour
 
 func _ready():
     shark_status = ALIVE;
@@ -92,6 +96,16 @@ func get_input():
             
             $AudioStreamPlayerSpray.play()
             set_fire_rate_delay_timer()
+            
+        if Input.is_action_pressed('fish_frenzy') && fish_frenzy_enabled == true:
+            fish_frenzy_enabled = false
+            get_parent().fish_collected = 0
+            emit_signal('update_fish')
+            shark_status=FISH_FRENZY
+            fish_frenzy_colour = 'BLUE'
+            velocity = Vector2(0,0)
+            $FishFrenzyTimer.start(constants.PLAYER_FISH_FRENZY_DURATION)
+            $FishFrenzyFireTimer.start(constants.PLAYER_FISH_FRENZY_FIRE_DELAY)
     
 func _physics_process(_delta):
     get_input()
@@ -117,8 +131,6 @@ func _physics_process(_delta):
             
             for i in get_slide_collision_count():
                 var collision = get_slide_collision(i)
-                print("PLAYER collided with ", collision.get_collider().name + " // " + collision.get_collider().get_class())
-                
                 var collided_with = collision.get_collider();
                    
                 if collision.get_collider().name == 'Arena':
@@ -177,8 +189,6 @@ func _physics_process(_delta):
                                     
                             $AudioStreamPowerUp.play()
                         
-                            
-                    
                     collided_with.get_node('.').despawn()
                 
                     break
@@ -186,11 +196,41 @@ func _physics_process(_delta):
                 # Default - Enemy	
                 collided_with.get_node('.')._death();
                 _player_hit();
+               
+        FISH_FRENZY:
+            if $FishFrenzyTimer.time_left == 0:
+                rotation_degrees = 0
+                shake_reset()
+                shark_status = ALIVE               
+            else:
+                shake(10.0)
+                rotation_degrees += 20
+                if rotation_degrees >= 360:
+                    rotation_degrees = 0
                 
+                if $FishFrenzyFireTimer.time_left == 0:
+                    $FishFrenzyFireTimer.start(constants.PLAYER_FISH_FRENZY_FIRE_DELAY)
+                    var i=0
+                    
+                    while i <= 32:  
+                        var target_direction = Vector2(1,1).normalized();
+                        target_direction = target_direction.rotated ( deg_to_rad(360.0/32.0) * i);
+                        var shark_spray = SharkSprayScene.instantiate();
+                        get_parent().add_child(shark_spray);
+                        shark_spray.global_position = position;
+                        shark_spray.velocity = target_direction * constants.PLAYER_FIRE_SPEED;
+                        
+                        if fish_frenzy_colour == 'BLUE':
+                            fish_frenzy_colour = 'GREEN'
+                        else:
+                            shark_spray.modulate = Color(0,1,0) 
+                            fish_frenzy_colour = 'BLUE'
+                        
+                        i+=1
+                                 
         EXPLODING:
             if $PlayerExplosionTimer.time_left == 0:
                 emit_signal('player_died');
-                print("Death signal");
                 shark_status = EXPLODED;
         HUNTING_KEY:
             if velocity.x > 0:
@@ -242,9 +282,7 @@ func _physics_process(_delta):
                    
                     $DoorOpenTimer.start()            
         GOING_THROUGH_DOOR:
-                print ("Going through door..");
                 if $DoorOpenTimer.time_left == 0:
-                    print("Timer done!");
                     var target_direction = (get_parent().get_node('Arena').get_node('ExitLocation').global_position - global_position).normalized();
                     velocity = target_direction * constants.PLAYER_SPEED_ESCAPING;            
                      
@@ -304,6 +342,7 @@ func _on_main_player_hunt_key(passed_key_global_position):
     key_global_position = passed_key_global_position;
     var target_direction = (key_global_position - global_position).normalized();
     velocity = target_direction * constants.PLAYER_SPEED_ESCAPING;
+    rotation_degrees = 0        # In case we are in shark frenzy
 
 
 func _on_main_player_move_to_starting_position():
@@ -353,3 +392,17 @@ func recalculate_mini_shark_spacing():
     for single_shark in get_tree().get_nodes_in_group('miniSharkGroup'):
         single_shark.set_circle_position(shark_count, number_of_mini_sharks)
         shark_count = shark_count + 1
+
+
+func _on_main_player_enable_fish_frenzy():
+    powerup_label_animation('FRENZY READY!')
+    fish_frenzy_enabled = true
+
+func shake(shake_amount):
+    $Camera2D.set_offset(Vector2( 
+        randf_range(-1.0, 1.0) * shake_amount,
+        randf_range(-1.0, 1.0) * shake_amount
+    ))
+    
+func shake_reset():
+    $Camera2D.set_offset(Vector2(0.0,0.0))

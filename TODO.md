@@ -1,5 +1,7 @@
 # Gameplay
 
+* Difficulty levels (fish themed, e.g Minnow upwards)
+
 * Ability to shoot enemies when spawning in (but not collide)
 * More power-up suggestions
   * Speed?
@@ -12,7 +14,6 @@
 * Opens up possibilities of some rooms being special, e.g. just full of fish?
 * Every x waves is a special room?
 
-* When only x enemy left, give hint arrows // change their behaviour to hunt for all types.
 * Keep count of fish rescued - use as currency in shop between x levels?
 * Bonus points for collecting all fish at end of wave?
 * Animation of fish being released back into the sea?
@@ -21,19 +22,21 @@
 
 # Bugs
 
-* Necromancersa have 5 HP but fewer hits seem to kill them. 
+* Necromancer have 5 HP but fewer hits seem to kill them. 
 * Necromancers sometimes flicker after death / level transitions.
 * Big spray doesn't work when player close to a wall.
 
-* Best visual colour: 2863f8
-
 * IMMEDIATE
 
-* Patch notes
+Change fish count to be a charging bar ?
+More noticeable FISH FRENZY READY (make bar flash at top?)
+Bug fixing for crash afterwards (collisions)
+Appropriate super sayan style sound effect. (Fade out music?)
 
-* Minor adjustments to transition timings between Scenes and game status.
-* Bug fix: Fix broken cheat mode.
-* Bug fix: Fix player energy being reset at the wrong times.
-* Bug fix: Fix menus breaking for controller in certain scenarios.
-* Internal: Explictly set menu button Focus Neighbors.
-* Internal: General code tidy-up (esp around game state) and removal of Warnings.
+* Patch
+
+* Gameplay: Collect fish to charge up FISH FRENZY which you can then UNLEASH!
+* Gameplay: Enemies gain speed by a set % each wave.
+* Gameplay: When only x enemies left in a wave, all start chasing the player.
+* Gameplay: Traps have more HP
+* Gameplay: Misc other balance adjustments

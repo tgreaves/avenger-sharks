@@ -29,6 +29,11 @@ func _ready():
     else:
         enemy_speed = constants.ENEMY_SPEED;
         enemy_health = constants.ENEMY_HEALTH;
+        
+    var i=1
+    while i <= get_parent().wave_number - 1:
+        enemy_speed = enemy_speed + (enemy_speed / constants.ENEMY_SPEED_WAVE_PERCENTAGE_MULTIPLIER)
+        i+=1
     
     $StateTimer.start();
     
@@ -92,6 +97,16 @@ func _physics_process(delta):
                         $StateTimer.start(randf_range(constants.ENEMY_DEFAULT_CHANGE_DIRECTION_MINIMUM_SECONDS,
                                                     constants.ENEMY_DEFAULT_CHANGE_DIRECTION_MAXIMUM_SECONDS));
                         velocity = Vector2(randf_range(-1,1), randf_range(-1,1)).normalized() * enemy_speed;
+                        
+                # OVERRIDE when only a limited number of enemies left
+                # Behaviour: Chase player.
+                if get_parent().enemies_left_this_wave <= constants.ENEMY_ALL_CHASE_WHEN_POPULATION_LOW:
+                    var target_direction = (get_parent().get_node("Player").global_position - global_position).normalized();
+                    velocity = target_direction * enemy_speed;
+                    $StateTimer.start(randf_range(constants.ENEMY_CHASE_REORIENT_MINIMUM_SECONDS,
+                                                constants.ENEMY_CHASE_REORIENT_MAXIMUM_SECONDS));
+                                                
+                                                
         DYING:
             if $FlashHitTimer.time_left == 0:
                 set_modulate(Color(1,1,1,1));

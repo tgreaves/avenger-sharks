@@ -79,6 +79,7 @@ func _process(_delta):
                 $StateTimer.start(12)
         SHARK_SPIN:
             shark_spin()
+            shake(5)
             
             if $StateTimer.time_left == 0:
                 # Fish collection will have completed.
@@ -94,6 +95,7 @@ func _process(_delta):
                 $StateTimer.start(8)
         NECRO_LEAVE:
             shark_spin()        # Keep spinning!
+            shake_reset()
             
             var target_direction = (necro_start_position - $Necromancer.global_position).normalized()
             $Necromancer.velocity = target_direction * 75
@@ -131,3 +133,12 @@ func shark_spin():
     if shark_rotation > 350:
         shark_rotation = 0
     $Shark.rotation_degrees = shark_rotation
+    
+func shake(shake_amount):
+    $Camera2D.set_offset(Vector2( 
+        randf_range(-1.0, 1.0) * shake_amount,
+        randf_range(-1.0, 1.0) * shake_amount
+    ))
+    
+func shake_reset():
+    $Camera2D.set_offset(Vector2(0.0,0.0))

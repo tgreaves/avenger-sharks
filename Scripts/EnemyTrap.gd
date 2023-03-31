@@ -5,14 +5,21 @@ enum {
     DYING
 }
 
+var trap_health = 0
+
 var state = ACTIVE;
 
 func _ready():
     $AnimatedSprite2DDeath.visible = false;
     $AnimatedSprite2D.play();
+    
+    trap_health = constants.ENEMY_TRAP_HEALTH
 
 func _physics_process(_delta):
     move_and_slide()
+    
+    if $FlashHitTimer.time_left == 0:
+        set_modulate(Color(1,1,1,1));
     
     match state:
         ACTIVE:
@@ -33,20 +40,24 @@ func _physics_process(_delta):
             if $StateTimer.time_left == 0:
                 self.queue_free();
                 
-            if $FlashHitTimer.time_left == 0:
-                set_modulate(Color(1,1,1,1));
-        
+            
 func _death():
-        $CollisionShape2D.set_deferred("disabled", true)
-        $AudioStreamPlayer.play();
-        $AnimatedSprite2D.stop();
-        $AnimatedSprite2D.visible = false;
-        $AnimatedSprite2DDeath.visible = true;
-        $AnimatedSprite2DDeath.play();
-        
-        $StateTimer.start(0.75);
-        state = DYING;
+    if state != DYING:
+        trap_health = trap_health - 1;
         
         set_modulate(Color(10,10,10,10));
         $FlashHitTimer.start()
-
+        
+        if trap_health <=0 :
+            $CollisionShape2D.set_deferred("disabled", true)
+            $AudioStreamPlayer.play();
+            $AnimatedSprite2D.stop();
+            $AnimatedSprite2D.visible = false;
+            $AnimatedSprite2DDeath.visible = true;
+            $AnimatedSprite2DDeath.play();
+            state = DYING;
+            
+            $StateTimer.start(0.75);
+        else:
+            set_modulate(Color(10,10,10,10));
+            $FlashHitTimer.start()

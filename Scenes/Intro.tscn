@@ -441,6 +441,14 @@ animations = [{
 script = ExtResource("1_pfwli")
 fish_scene = ExtResource("2_aktqh")
 
+[node name="Camera2D" type="Camera2D" parent="."]
+offset = Vector2(2.08165e-12, 2.08165e-12)
+limit_left = 0
+limit_top = 0
+limit_right = 5300
+limit_bottom = 2720
+editor_draw_limits = true
+
 [node name="IntroLabel" type="Label" parent="."]
 z_index = 3
 offset_left = 100.0

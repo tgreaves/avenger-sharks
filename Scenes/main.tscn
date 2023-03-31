@@ -84,6 +84,7 @@ one_shot = true
 [node name="AudioStreamPlayerMusic" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("12_arleo")
 
+[connection signal="player_enable_fish_frenzy" from="." to="Player" method="_on_main_player_enable_fish_frenzy"]
 [connection signal="player_hunt_key" from="." to="Player" method="_on_main_player_hunt_key"]
 [connection signal="player_move_to_starting_position" from="." to="Player" method="_on_main_player_move_to_starting_position"]
 [connection signal="cheats_pressed" from="MainMenu" to="." method="_on_main_menu_cheats_pressed"]
@@ -98,3 +99,4 @@ stream = ExtResource("12_arleo")
 [connection signal="player_got_fish" from="Player" to="." method="_on_player_player_got_fish"]
 [connection signal="player_got_key" from="Player" to="Key" method="_on_player_player_got_key"]
 [connection signal="update_energy" from="Player" to="." method="_on_player_update_energy"]
+[connection signal="update_fish" from="Player" to="." method="_on_player_update_fish"]

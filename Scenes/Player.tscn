@@ -197,6 +197,7 @@ motion_mode = 1
 script = ExtResource("1_m4brx")
 
 [node name="Camera2D" type="Camera2D" parent="."]
+offset = Vector2(2.08165e-12, 2.08165e-12)
 enabled = false
 limit_left = 0
 limit_top = 0
@@ -241,6 +242,14 @@ theme_override_fonts/font = ExtResource("40_8elap")
 theme_override_font_sizes/font_size = 24
 text = "POWER-UP"
 horizontal_alignment = 1
+
+[node name="FishFrenzyTimer" type="Timer" parent="."]
+wait_time = 3.0
+one_shot = true
+
+[node name="FishFrenzyFireTimer" type="Timer" parent="."]
+wait_time = 0.5
+one_shot = true
 
 [node name="PlayerExplosionTimer" type="Timer" parent="."]
 wait_time = 2.0
