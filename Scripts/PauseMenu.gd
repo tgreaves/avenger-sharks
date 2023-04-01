@@ -11,10 +11,6 @@ func _ready():
 func _process(_delta):
     pass
 
-#func input(_ev):
-#    if Input.is_action_just_pressed('start') or Input.is_action_just_pressed('quit'):
-#        emit_signal('unpause_game_pressed')
-
 func _on_unpause_game_pressed():
     emit_signal('unpause_game_pressed')
 

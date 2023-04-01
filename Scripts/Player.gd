@@ -32,9 +32,11 @@ var initial_player_position;
 var fast_spray = false
 var fish_frenzy_enabled = false
 var fish_frenzy_colour
+var blink_status = false
 
 func _ready():
     shark_status = ALIVE;
+    blink_status = false
     
     if initial_player_position:
         global_position = initial_player_position
@@ -42,6 +44,9 @@ func _ready():
         initial_player_position = global_position
 
     $AnimatedSprite2DDamaged.visible = false;
+    $EnergyProgressBar.visible = true
+    $FishProgressBar.visible = true
+    
     set_fire_rate_delay_timer();
 
 func get_input():
@@ -101,6 +106,7 @@ func get_input():
             fish_frenzy_colour = 'BLUE'
             velocity = Vector2(0,0)
             $CollisionShape2D.disabled = true
+            $FishProgressBar.visible = true
             $FishFrenzyTimer.start(constants.PLAYER_FISH_FRENZY_DURATION)
             $FishFrenzyFireTimer.start(constants.PLAYER_FISH_FRENZY_FIRE_DELAY)
     
@@ -117,17 +123,17 @@ func _physics_process(_delta):
             fast_spray=false
          
     if $ProgressBarBlinkTimer.time_left == 0:
-        if player_energy <= constants.PLAYER_LOW_ENERGY_BLINK:
-            if $EnergyProgressBar.visible:
-                $EnergyProgressBar.visible = false
-            else:
-                $EnergyProgressBar.visible = true
+        if blink_status == true:
+            blink_status = false
+        else:
+            blink_status = true
         
-        if fish_frenzy_enabled:
-            if $FishProgressBar.visible:
-                $FishProgressBar.visible = false
-            else:
-                $FishProgressBar.visible = true
+        if (shark_status != EXPLODING) and (shark_status != EXPLODED):
+            if player_energy <= constants.PLAYER_LOW_ENERGY_BLINK:
+                $EnergyProgressBar.visible = blink_status
+            
+            if fish_frenzy_enabled:
+                $FishProgressBar.visible = blink_status
 
         $ProgressBarBlinkTimer.start()
     
@@ -212,11 +218,8 @@ func _physics_process(_delta):
                
         FISH_FRENZY:
             if $FishFrenzyTimer.time_left == 0:
-                $AnimatedSprite2D.rotation_degrees = 0
-                shake_reset()
-                get_parent().fish_collected = 0
-                _on_main_player_update_fish()
-                $CollisionShape2D.disabled = false
+                stop_fish_frenzy()
+                
                 shark_status = ALIVE               
             else:
                 shake(10.0)
@@ -349,22 +352,26 @@ func _player_hit():
             velocity = Vector2(0,0);
             $AnimatedSprite2D.animation = 'explosion';
             $AudioStreamPlayerExplosion.play();
+            $EnergyProgressBar.visible=false
+            $FishProgressBar.visible=false
             shark_status=EXPLODING;
             $PlayerExplosionTimer.start();
+            despawn_mini_sharks()
         else:
             $AnimatedSprite2DDamaged.visible = true;
             $AnimatedSprite2DDamaged.play();
         
-        $EnergyProgressBar.value = player_energy
-        _on_main_player_update_energy()
+            $EnergyProgressBar.value = player_energy
+            _on_main_player_update_energy()
 
 func _on_main_player_hunt_key(passed_key_global_position):
+    if shark_status == FISH_FRENZY:
+        stop_fish_frenzy()
+    
     shark_status = HUNTING_KEY
     key_global_position = passed_key_global_position;
     var target_direction = (key_global_position - global_position).normalized();
     velocity = target_direction * constants.PLAYER_SPEED_ESCAPING;
-    $AnimatedSprite2D.rotation_degrees = 0        # In case we are in shark frenzy
-
 
 func _on_main_player_move_to_starting_position():
     shark_status = MOVING_TO_START_POSITION
@@ -414,6 +421,10 @@ func recalculate_mini_shark_spacing():
         single_shark.set_circle_position(shark_count, number_of_mini_sharks)
         shark_count = shark_count + 1
 
+func despawn_mini_sharks():
+    for single_shark in get_tree().get_nodes_in_group('miniSharkGroup'):
+        single_shark.queue_free()
+
 func _on_main_player_enable_fish_frenzy():
     powerup_label_animation('FRENZY READY!')
     fish_frenzy_enabled = true
@@ -434,5 +445,11 @@ func _on_main_player_update_energy():
 
 func _on_main_player_update_fish():
     $FishProgressBar.value = get_parent().fish_collected
-    $FishProgressBar.visible = true
     print ("Fish value = " + str(get_parent().fish_collected))
+    
+func stop_fish_frenzy():
+    $AnimatedSprite2D.rotation_degrees = 0
+    shake_reset()
+    get_parent().fish_collected = 0
+    _on_main_player_update_fish()
+    $CollisionShape2D.disabled = false

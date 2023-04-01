@@ -32,7 +32,7 @@ func _ready():
         
     var i=1
     while i <= get_parent().wave_number - 1:
-        enemy_speed = enemy_speed + (enemy_speed / constants.ENEMY_SPEED_WAVE_PERCENTAGE_MULTIPLIER)
+        enemy_speed = enemy_speed + int( (constants.ENEMY_SPEED_WAVE_PERCENTAGE_MULTIPLIER / enemy_speed)*100 )
         i+=1
     
     $StateTimer.start();
@@ -194,9 +194,20 @@ func _death():
             else:
                 enemy_killed_score = constants.KILL_ENEMY_SCORE;
         
-            get_parent()._on_enemy_update_score(enemy_killed_score,global_position);
+            get_parent()._on_enemy_update_score(enemy_killed_score,global_position)
+            
+            leave_behind_item()
+            
         else:
             $AnimatedSprite2D.animation = enemy_type + str('-hit');
             await($AnimatedSprite2D.animation_finished);
             $AnimatedSprite2D.animation = enemy_type + str('-run');
             $AnimatedSprite2D.play();
+            
+func leave_behind_item():
+    if randi_range(1,100) < constants.ENEMY_LEAVE_BEHIND_ITEM_PERCENTAGE:
+        var item = get_parent().item_scene.instantiate()
+        item.spawn_specific('health')
+        item.get_node('.').set_position(position)
+        item.add_to_group('itemGroup')
+        get_parent().add_child(item)

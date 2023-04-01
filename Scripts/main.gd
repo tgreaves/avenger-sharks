@@ -32,12 +32,8 @@ enum {
     GAME_OVER
 }
 
-var ITEMS = {
-    "health": Vector2i(9,8),
-    "chest": Vector2i(7,9),
-    "dinosaur": Vector2i(99,99)
-};
-
+var ITEMS = [ 'chest', 'dinosaur']
+   
 signal player_hunt_key;
 signal player_move_to_starting_position;
 signal player_enable_fish_frenzy;
@@ -62,6 +58,7 @@ func _ready():
     
     
 func main_menu():
+    game_status=MAIN_MENU
     score=0;
     fish_collected=0;
     wave_number= constants.START_WAVE - 1
@@ -69,6 +66,13 @@ func main_menu():
     if $AudioStreamPlayerMusic.playing == false:
         $AudioStreamPlayerMusic.play();
  
+    $Player/Camera2D.enabled = false
+    $Player.set_process(false);
+    $Player.set_physics_process(false);
+    $Player.visible = false;
+    $Player.get_node("CollisionShape2D").disabled = false;
+    $Player._ready();
+
     $UnderwaterFar.visible = true
     $UnderwaterNear.visible = true
     $Arena.visible = false
@@ -85,13 +89,6 @@ func main_menu():
     $HUD.get_node("CanvasLayer/Label").visible = true;
     $HUD.get_node("CanvasLayer/Label").text = "";
     $HUD.get_node("CanvasLayer/EnemiesLeft").visible = false;
-        
-    $Player/Camera2D.enabled = false
-    $Player.set_process(false);
-    $Player.set_physics_process(false);
-    $Player.visible = false;
-    $Player.get_node("CollisionShape2D").disabled = false;
-    $Player._ready();
     
 func start_game():
     if cheat_mode == true:
@@ -259,15 +256,16 @@ func return_to_main_screen():
     
 func spawn_item():	
     
-    var spawned_item = ITEMS[ ITEMS.keys()[ randi() % ITEMS.size() ] ];
-
-    if spawned_item == Vector2i(99,99):
+    var spawned_item = ITEMS[randi() % ITEMS.size()]
+    
+    if spawned_item == 'dinosaur':
         var dinosaur = dinosaur_scene.instantiate();
         dinosaur.get_node('.').set_position (Vector2(randf_range(constants.ARENA_SPAWN_MIN_X,constants.ARENA_SPAWN_MAX_X),randf_range(constants.ARENA_SPAWN_MIN_Y,constants.ARENA_SPAWN_MAX_Y)));
         dinosaur.add_to_group('dinosaurGroup');
         add_child(dinosaur)
     else:
         var item = item_scene.instantiate()
+        item.spawn_random()
         item.get_node('.').set_position (Vector2(randf_range(constants.ARENA_SPAWN_MIN_X,constants.ARENA_SPAWN_MAX_X),randf_range(constants.ARENA_SPAWN_MIN_Y,constants.ARENA_SPAWN_MAX_Y)));
         item.add_to_group('itemGroup')
         add_child(item)
@@ -339,11 +337,9 @@ func _input(_ev):
     if Input.is_action_just_released('shark_fire') or Input.is_action_just_released('shark_fire_mouse'):
         match game_status:
             INTRO_SEQUENCE:
-                game_status = MAIN_MENU
                 intro.queue_free()
                 main_menu()
             CREDITS:
-                game_status = MAIN_MENU
                 credits.queue_free()
                 main_menu()
             
@@ -415,7 +411,6 @@ func _on_main_menu_credits_pressed():
     add_child(credits)
 
 func intro_has_finished():
-    game_status = MAIN_MENU
     intro.queue_free()
     main_menu()
 
