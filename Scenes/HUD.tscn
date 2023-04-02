@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://bcqacic7yj4ds"]
+[gd_scene load_steps=3 format=3 uid="uid://bcqacic7yj4ds"]
 
 [ext_resource type="FontFile" uid="uid://dclfn1fjcq5i7" path="res://Fonts/PressStart2P-Regular.ttf" id="1_4l55f"]
+[ext_resource type="Script" path="res://Scripts/HUD.gd" id="1_bwdok"]
 
 [node name="HUD" type="Control"]
 layout_mode = 3
@@ -9,6 +10,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_bwdok")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
@@ -64,3 +66,96 @@ theme_override_fonts/font = ExtResource("1_4l55f")
 theme_override_font_sizes/font_size = 64
 text = "ENEMIES"
 horizontal_alignment = 1
+
+[node name="PowerUpContainer" type="HBoxContainer" parent="CanvasLayer"]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -810.0
+offset_top = -67.0
+offset_right = 919.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="SpeedUp" type="Label" parent="CanvasLayer/PowerUpContainer"]
+z_index = 1
+custom_minimum_size = Vector2(2.08165e-12, 2.08165e-12)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("1_4l55f")
+theme_override_font_sizes/font_size = 32
+text = "SPEED-UP"
+horizontal_alignment = 1
+
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer/PowerUpContainer/SpeedUp"]
+visible = false
+z_as_relative = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(1, 0, 1, 1)
+
+[node name="FastSpray" type="Label" parent="CanvasLayer/PowerUpContainer"]
+z_index = 1
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("1_4l55f")
+theme_override_font_sizes/font_size = 32
+text = "FAST SPRAY"
+horizontal_alignment = 1
+
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer/PowerUpContainer/FastSpray"]
+visible = false
+z_as_relative = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(1, 0, 1, 1)
+
+[node name="BigSpray" type="Label" parent="CanvasLayer/PowerUpContainer"]
+z_index = 1
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("1_4l55f")
+theme_override_font_sizes/font_size = 32
+text = "BIG SPRAY"
+horizontal_alignment = 1
+
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer/PowerUpContainer/BigSpray"]
+visible = false
+z_as_relative = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(1, 0, 1, 1)
+
+[node name="MiniShark" type="Label" parent="CanvasLayer/PowerUpContainer"]
+z_index = 1
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("1_4l55f")
+theme_override_font_sizes/font_size = 32
+text = "MINI SHARK"
+horizontal_alignment = 1
+
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer/PowerUpContainer/MiniShark"]
+visible = false
+z_as_relative = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(1, 0, 1, 1)

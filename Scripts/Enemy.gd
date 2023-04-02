@@ -20,7 +20,7 @@ func _ready():
     var mob_types = ['knight','knight', 'wizard','wizard', 'rogue','rogue','necromancer'];
     enemy_type = mob_types[randi() % mob_types.size()]
     $AnimatedSprite2D.animation = enemy_type + str('-run')
-    $CollisionShape2D.disabled = true;
+    #$CollisionShape2D.disabled = true;
     
     if enemy_type == 'necromancer':
         $AnimatedSprite2D.offset = Vector2(0,-20);
@@ -49,7 +49,8 @@ func _physics_process(delta):
             if $StateTimer.time_left == 0:
                 state = WANDER;
                 $AnimatedSprite2D.play();
-                $CollisionShape2D.disabled = false;
+                               
+                set_collision_mask_value(1,true); # Allow player collisions.
 
                 if enemy_type == 'necromancer':
                     $AttackTimer.start(randf_range(constants.ENEMY_NECROMANCER_ATTACK_MINIMUM_SECONDS,constants.ENEMY_NECROMANCER_ATTACK_MAXIMUM_SECONDS));
@@ -170,8 +171,13 @@ func _physics_process(delta):
             var collided_with = collision.get_collider();
             collided_with.get_node('.')._death(1);
             $AudioStreamPlayerFishSplat.play();
-        else:		
-            velocity = velocity.bounce(collision.get_normal());
+        else:
+            if collision.get_collider().name.contains('Player'):
+                var collided_with = collision.get_collider();
+                collided_with._player_hit();
+                _death()
+            else:
+                velocity = velocity.bounce(collision.get_normal());
     
 func _death():
     if state != DYING:
@@ -184,6 +190,7 @@ func _death():
             $CollisionShape2D.set_deferred("disabled", true)
             velocity = Vector2(0,0);
             $AnimatedSprite2D.animation = enemy_type + str('-death');
+            $AnimatedSprite2D.play()
             $AudioStreamPlayer.play();
             $StateTimer.start(2);
             state = DYING;

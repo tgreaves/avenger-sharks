@@ -182,31 +182,7 @@ func _physics_process(_delta):
                             collided_with.get_node('.').despawn()
                             
                         "chest":
-                            var powerup_selection = randi_range(1,3)
-                            
-                            match powerup_selection:
-                                1:
-                                    big_spray=1;
-                                    $BigSprayTimer.start(constants.POWER_UP_ACTIVE_DURATION);
-                                    powerup_label_animation('BIG SPRAY!')
-                                2:
-                                    fast_spray=true
-                                    $FastSprayTimer.start(constants.POWER_UP_ACTIVE_DURATION);
-                                    powerup_label_animation('FAST SPRAY!')
-                                3:
-                                    if get_tree().get_nodes_in_group('miniSharkGroup').size() < 8:
-                                            
-                                        var new_mini_shark = MiniSharkScene.instantiate()
-                                        add_child(new_mini_shark)
-                                        new_mini_shark.add_to_group('miniSharkGroup')
-                                    
-                                        # Reset circular position of the mini sharks when we spawn a new one, to ensure
-                                        # everything stays evenly spaced.
-                                        recalculate_mini_shark_spacing()
-                                     
-                                    powerup_label_animation('MINI SHARK!')
-                                    
-                            $AudioStreamPowerUp.play()
+                            get_parent().get_node('HUD').chest_collected()
                         
                     collided_with.get_node('.').despawn()
                 
