@@ -170,6 +170,3 @@ metadata/_aseprite_wizard_config_ = {
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CapsuleShape2D_mjoik")
 disabled = true
-
-[node name="MiniSharkTimer" type="Timer" parent="."]
-one_shot = true

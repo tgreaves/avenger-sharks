@@ -26,7 +26,10 @@ func _ready():
         i+= 1
         
     $Shark/SharkSprite.play()
-    $MusicBoxSong.play()
+    
+    if constants.MUSIC_ENABLED:
+        $MusicBoxSong.play()
+    
     $StateTimer.start(9.7)
     $IntroLabelTimer.start(5)
     

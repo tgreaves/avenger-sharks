@@ -42,8 +42,7 @@
 
 * Patch Notes
 
-
-* Gameplay: Enemies spawning in can now be hit with SharkSpray.
+* Internal: MUSIC_ENABLED constant.
 
 
 

@@ -11,9 +11,8 @@ var PowerUpIndex = 0;
 func _ready():
     PowerUpIndex = 0
 
-
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
+func _process(_delta):
     pass
 
 func chest_collected():
@@ -39,5 +38,19 @@ func get_selected_powerup():
     if PowerUpIndex == 0:
         return 'NIL'
         
-    return PowerUpBarSequence[ PowerUpIndex+1 ]
+    return PowerUpBarSequence[ PowerUpIndex-1 ]
+
+func show_powerup_bar():
+    $CanvasLayer/PowerUpContainer.visible = true
+
+func hide_powerup_bar():
+    $CanvasLayer/PowerUpContainer.visible = false
+ 
+func reset_powerup_bar():
+    PowerUpIndex = 0
+    
+    $CanvasLayer/PowerUpContainer/SpeedUp/ColorRect.visible = false
+    $CanvasLayer/PowerUpContainer/FastSpray/ColorRect.visible = false
+    $CanvasLayer/PowerUpContainer/BigSpray/ColorRect.visible = false
+    $CanvasLayer/PowerUpContainer/MiniShark/ColorRect.visible = false
 

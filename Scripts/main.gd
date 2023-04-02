@@ -32,7 +32,7 @@ enum {
     GAME_OVER
 }
 
-var ITEMS = [ 'chest', 'dinosaur']
+var ITEMS = [ 'dinosaur']
    
 signal player_hunt_key;
 signal player_move_to_starting_position;
@@ -63,7 +63,7 @@ func main_menu():
     fish_collected=0;
     wave_number= constants.START_WAVE - 1
     
-    if $AudioStreamPlayerMusic.playing == false:
+    if $AudioStreamPlayerMusic.playing == false and constants.MUSIC_ENABLED:
         $AudioStreamPlayerMusic.play();
  
     $Player/Camera2D.enabled = false
@@ -89,6 +89,8 @@ func main_menu():
     $HUD.get_node("CanvasLayer/Label").visible = true;
     $HUD.get_node("CanvasLayer/Label").text = "";
     $HUD.get_node("CanvasLayer/EnemiesLeft").visible = false;
+    $HUD.reset_powerup_bar()
+    $HUD.hide_powerup_bar()
     
 func start_game():
     if cheat_mode == true:
@@ -98,6 +100,7 @@ func start_game():
         
     $Player.get_node('EnergyProgressBar').max_value = $Player.player_energy
     $Player.get_node("FishProgressBar").max_value = constants.FISH_TO_TRIGGER_FISH_FRENZY
+    $Player.prepare_for_new_game()
     prepare_for_wave()     
 
 func prepare_for_wave():
@@ -132,6 +135,7 @@ func prepare_for_wave():
     $HUD.get_node("CanvasLayer/Score").visible = true;
     $HUD.get_node("CanvasLayer/Label").visible = false;
     $HUD.get_node("CanvasLayer/EnemiesLeft").visible = true;
+    $HUD.show_powerup_bar()
     
     $UnderwaterFar.visible = false
     $UnderwaterNear.visible = false
@@ -140,7 +144,7 @@ func prepare_for_wave():
     $Arena.visible = true;
     $Player.set_process(true);
     $Player.set_physics_process(true);
-    $Player._ready();
+    $Player.prepare_for_new_wave()
     $Player/Camera2D.enabled = true
     $Player.visible = true
     $Player.position = Vector2(2650, 2500);

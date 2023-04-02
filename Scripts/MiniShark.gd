@@ -7,18 +7,10 @@ var centre
 # Called when the node enters the scene tree for the first time.
 func _ready():
     centre = position
-   
-    $MiniSharkTimer.start(constants.MINI_SHARK_ACTIVE_DURATION)
     $MiniSharkAnimatedSprite2D.play()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
-    
-    if $MiniSharkTimer.time_left == 0:
-        remove_from_group('miniSharkGroup')
-        get_parent().recalculate_mini_shark_spacing()
-        queue_free()
-        
+func _process(delta):        
     if get_parent().velocity.x > 0:
         $MiniSharkAnimatedSprite2D.set_flip_h(true);
             

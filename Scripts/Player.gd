@@ -18,7 +18,7 @@ enum {
 @export var speed = constants.PLAYER_SPEED;
 @export var player_energy = constants.PLAYER_START_GAME_ENERGY;
 @export var shark_status = ALIVE
-@export var big_spray = 0;
+@export var spray_size = 0.5
 
 signal player_died;
 signal player_got_fish;
@@ -29,25 +29,30 @@ signal player_found_exit;
 
 var key_global_position;
 var initial_player_position;
-var fast_spray = false
 var fish_frenzy_enabled = false
 var fish_frenzy_colour
 var blink_status = false
+var fire_delay = constants.PLAYER_FIRE_DELAY
 
 func _ready():
     shark_status = ALIVE;
-    blink_status = false
     
     if initial_player_position:
         global_position = initial_player_position
     else:
         initial_player_position = global_position
 
+func prepare_for_new_game():
+    speed = constants.PLAYER_SPEED
+    fire_delay = constants.PLAYER_FIRE_DELAY
+    spray_size = 0.5
+    
+func prepare_for_new_wave():
+    blink_status = false
     $AnimatedSprite2DDamaged.visible = false;
     $EnergyProgressBar.visible = true
     $FishProgressBar.visible = true
-    
-    set_fire_rate_delay_timer();
+    set_fire_rate_delay_timer()
 
 func get_input():
     
@@ -109,19 +114,42 @@ func get_input():
             $FishProgressBar.visible = true
             $FishFrenzyTimer.start(constants.PLAYER_FISH_FRENZY_DURATION)
             $FishFrenzyFireTimer.start(constants.PLAYER_FISH_FRENZY_FIRE_DELAY)
+            
+        if Input.is_action_pressed('powerup_select'):
+            var powerup_selected = get_parent().get_node('HUD').get_selected_powerup()
+         
+            if powerup_selected != 'NIL':
+                get_parent().get_node('HUD').reset_powerup_bar()
+                 
+                match powerup_selected:
+                    'SPEEDUP':
+                        speed += constants.PLAYER_SPEED_POWERUP_INCREASE
+                        powerup_label_animation('SPEED UP!')
+                    'FAST SPRAY':
+                        fire_delay -= constants.PLAYER_FIRE_DELAY_POWERUP_DECREASE
+                        powerup_label_animation('FAST SPRAY!') 
+                    'BIG SPRAY':
+                        spray_size += constants.PLAYER_FIRE_SIZE_POWERUP_INCREASE
+                        powerup_label_animation('BIG SPRAY!')
+                    'MINI SHARK':       
+                        if get_tree().get_nodes_in_group('miniSharkGroup').size() < 8:
+                                
+                            var new_mini_shark = MiniSharkScene.instantiate()
+                            add_child(new_mini_shark)
+                            new_mini_shark.add_to_group('miniSharkGroup')
+                        
+                            # Reset circular position of the mini sharks when we spawn a new one, to ensure
+                            # everything stays evenly spaced.
+                            recalculate_mini_shark_spacing()
+                            
+                        powerup_label_animation('MINI SHARK!')
+                                    
+                $AudioStreamPowerUp.play()
     
 func _physics_process(_delta):
     get_input()
     move_and_slide()
-    
-    if $BigSprayTimer.time_left == 0:
-        if big_spray:
-            big_spray=0;
-       
-    if $FastSprayTimer.time_left == 0:
-        if fast_spray:
-            fast_spray=false
-         
+            
     if $ProgressBarBlinkTimer.time_left == 0:
         if blink_status == true:
             blink_status = false
@@ -183,6 +211,7 @@ func _physics_process(_delta):
                             
                         "chest":
                             get_parent().get_node('HUD').chest_collected()
+                            $AudioStreamPlayerGotChest.play()
                         
                     collided_with.get_node('.').despawn()
                 
@@ -378,10 +407,7 @@ func powerup_label_animation(powerup_name):
     tween.tween_callback(new_label.queue_free).set_delay(3)
     
 func set_fire_rate_delay_timer():
-    if fast_spray:
-        $FireRateTimer.start(constants.PLAYER_FIRE_DELAY / 2)
-    else:
-        $FireRateTimer.start(constants.PLAYER_FIRE_DELAY)
+    $FireRateTimer.start(fire_delay)    
         
 func mini_shark_fire(shark_fire_direction):
     for mini_shark in get_tree().get_nodes_in_group("miniSharkGroup"):

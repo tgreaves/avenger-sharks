@@ -214,7 +214,7 @@ func _death():
 func leave_behind_item():
     if randi_range(1,100) < constants.ENEMY_LEAVE_BEHIND_ITEM_PERCENTAGE:
         var item = get_parent().item_scene.instantiate()
-        item.spawn_specific('health')
+        item.spawn_random()
         item.get_node('.').set_position(position)
         item.add_to_group('itemGroup')
         get_parent().add_child(item)

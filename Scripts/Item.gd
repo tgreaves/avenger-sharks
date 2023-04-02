@@ -1,6 +1,6 @@
 extends StaticBody2D
 
-var ITEMS = ["chest"]
+var ITEMS = ["chest",'health']
 @export var item_type = ""
 
 # Called when the node enters the scene tree for the first time.
