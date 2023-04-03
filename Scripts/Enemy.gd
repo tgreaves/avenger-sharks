@@ -172,7 +172,8 @@ func _physics_process(delta):
             collided_with.get_node('.')._death(1);
             $AudioStreamPlayerFishSplat.play();
         else:
-            if collision.get_collider().name.contains('Player'):
+            print ("Necro debug.... " + str(collision.get_collider().name))
+            if collision.get_collider().name == 'Player':
                 var collided_with = collision.get_collider();
                 collided_with._player_hit();
                 _death()

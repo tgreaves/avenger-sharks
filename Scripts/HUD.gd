@@ -24,6 +24,7 @@ func chest_collected():
     match PowerUpIndex:
         1:
             $CanvasLayer/PowerUpContainer/SpeedUp/ColorRect.visible = true
+            $CanvasLayer/PowerUpContainer/MiniShark/ColorRect.visible = false
         2:
             $CanvasLayer/PowerUpContainer/FastSpray/ColorRect.visible = true
             $CanvasLayer/PowerUpContainer/SpeedUp/ColorRect.visible = false

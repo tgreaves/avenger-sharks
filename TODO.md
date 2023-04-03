@@ -25,6 +25,8 @@
 * How to play
 * Basic options (e.g. full screen and windowed selection)
 
+* Set limits on power up scaling.
+* Difficulty - make 'normal' enemies have additional HP at later levels.
 
 # Bugs
 
@@ -32,44 +34,15 @@
 * Necromancers sometimes flicker after death / level transitions.
 * Big spray doesn't work when player close to a wall.
 
-* New Powerup system design
-* Selection bar....
-  * Speed-up
-  * Fast Spray
-  * Big Spray
-  * Mini Shark
-
+*
 
 * Patch Notes
 
-* Internal: MUSIC_ENABLED constant.
+* Gameplay: Reduce initial player speed and fire rate.
+* Bug fix: Ensure Mini Sharks do not persist between games.
+* Bug fix: Ensure FishProgressBar blinking does not persist between games.
+* Bug fix: Remove lag from trigger buttons (due to being embedded in FireRateTimer logic)
+* Bug fix: Stop CTD on collision with Necromancer
+* Bug fix: Power-up bar - wrap around work properly.
 
-
-
-"chest":
-                            var powerup_selection = randi_range(1,3)
-                            
-                            match powerup_selection:
-                                1:
-                                    big_spray=1;
-                                    $BigSprayTimer.start(constants.POWER_UP_ACTIVE_DURATION);
-                                    powerup_label_animation('BIG SPRAY!')
-                                2:
-                                    fast_spray=true
-                                    $FastSprayTimer.start(constants.POWER_UP_ACTIVE_DURATION);
-                                    powerup_label_animation('FAST SPRAY!')
-                                3:
-                                    if get_tree().get_nodes_in_group('miniSharkGroup').size() < 8:
-                                            
-                                        var new_mini_shark = MiniSharkScene.instantiate()
-                                        add_child(new_mini_shark)
-                                        new_mini_shark.add_to_group('miniSharkGroup')
-                                    
-                                        # Reset circular position of the mini sharks when we spawn a new one, to ensure
-                                        # everything stays evenly spaced.
-                                        recalculate_mini_shark_spacing()
-                                     
-                                    powerup_label_animation('MINI SHARK!')
-                                    
-                            $AudioStreamPowerUp.play()
 

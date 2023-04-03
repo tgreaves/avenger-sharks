@@ -46,6 +46,8 @@ func prepare_for_new_game():
     speed = constants.PLAYER_SPEED
     fire_delay = constants.PLAYER_FIRE_DELAY
     spray_size = 0.5
+    fish_frenzy_enabled = false
+    despawn_mini_sharks()
     
 func prepare_for_new_wave():
     blink_status = false
@@ -105,46 +107,46 @@ func get_input():
             $AudioStreamPlayerSpray.play()
             set_fire_rate_delay_timer()
             
-        if Input.is_action_pressed('fish_frenzy') && fish_frenzy_enabled == true:
-            fish_frenzy_enabled = false
-            shark_status=FISH_FRENZY
-            fish_frenzy_colour = 'BLUE'
-            velocity = Vector2(0,0)
-            $CollisionShape2D.disabled = true
-            $FishProgressBar.visible = true
-            $FishFrenzyTimer.start(constants.PLAYER_FISH_FRENZY_DURATION)
-            $FishFrenzyFireTimer.start(constants.PLAYER_FISH_FRENZY_FIRE_DELAY)
-            
-        if Input.is_action_pressed('powerup_select'):
-            var powerup_selected = get_parent().get_node('HUD').get_selected_powerup()
-         
-            if powerup_selected != 'NIL':
-                get_parent().get_node('HUD').reset_powerup_bar()
-                 
-                match powerup_selected:
-                    'SPEEDUP':
-                        speed += constants.PLAYER_SPEED_POWERUP_INCREASE
-                        powerup_label_animation('SPEED UP!')
-                    'FAST SPRAY':
-                        fire_delay -= constants.PLAYER_FIRE_DELAY_POWERUP_DECREASE
-                        powerup_label_animation('FAST SPRAY!') 
-                    'BIG SPRAY':
-                        spray_size += constants.PLAYER_FIRE_SIZE_POWERUP_INCREASE
-                        powerup_label_animation('BIG SPRAY!')
-                    'MINI SHARK':       
-                        if get_tree().get_nodes_in_group('miniSharkGroup').size() < 8:
-                                
-                            var new_mini_shark = MiniSharkScene.instantiate()
-                            add_child(new_mini_shark)
-                            new_mini_shark.add_to_group('miniSharkGroup')
-                        
-                            # Reset circular position of the mini sharks when we spawn a new one, to ensure
-                            # everything stays evenly spaced.
-                            recalculate_mini_shark_spacing()
+    if Input.is_action_pressed('fish_frenzy') && fish_frenzy_enabled == true:
+        fish_frenzy_enabled = false
+        shark_status=FISH_FRENZY
+        fish_frenzy_colour = 'BLUE'
+        velocity = Vector2(0,0)
+        $CollisionShape2D.disabled = true
+        $FishProgressBar.visible = true
+        $FishFrenzyTimer.start(constants.PLAYER_FISH_FRENZY_DURATION)
+        $FishFrenzyFireTimer.start(constants.PLAYER_FISH_FRENZY_FIRE_DELAY)
+        
+    if Input.is_action_pressed('powerup_select'):
+        var powerup_selected = get_parent().get_node('HUD').get_selected_powerup()
+        
+        if powerup_selected != 'NIL':
+            get_parent().get_node('HUD').reset_powerup_bar()
+                
+            match powerup_selected:
+                'SPEEDUP':
+                    speed += constants.PLAYER_SPEED_POWERUP_INCREASE
+                    powerup_label_animation('SPEED UP!')
+                'FAST SPRAY':
+                    fire_delay -= constants.PLAYER_FIRE_DELAY_POWERUP_DECREASE
+                    powerup_label_animation('FAST SPRAY!') 
+                'BIG SPRAY':
+                    spray_size += constants.PLAYER_FIRE_SIZE_POWERUP_INCREASE
+                    powerup_label_animation('BIG SPRAY!')
+                'MINI SHARK':       
+                    if get_tree().get_nodes_in_group('miniSharkGroup').size() < 8:
                             
-                        powerup_label_animation('MINI SHARK!')
-                                    
-                $AudioStreamPowerUp.play()
+                        var new_mini_shark = MiniSharkScene.instantiate()
+                        add_child(new_mini_shark)
+                        new_mini_shark.add_to_group('miniSharkGroup')
+                    
+                        # Reset circular position of the mini sharks when we spawn a new one, to ensure
+                        # everything stays evenly spaced.
+                        recalculate_mini_shark_spacing()
+                        
+                    powerup_label_animation('MINI SHARK!')
+                                
+            $AudioStreamPowerUp.play()
     
 func _physics_process(_delta):
     get_input()
