@@ -85,3 +85,6 @@ sprite_frames = SubResource("SpriteFrames_4771i")
 animation = &"chest-open"
 frame = 3
 frame_progress = 1.0
+
+[node name="DespawnTimer" type="Timer" parent="."]
+one_shot = true

@@ -19,13 +19,15 @@ enum {
 @export var player_energy = constants.PLAYER_START_GAME_ENERGY;
 @export var shark_status = ALIVE
 @export var spray_size = 0.5
+@export var current_powerup_levels = {}
+@export var max_powerup_levels = {}
 
 signal player_died;
 signal player_got_fish;
 signal player_got_key;
 signal player_found_exit_stop_key_movement;
 signal player_found_exit;
-@onready var screen_size = get_viewport_rect().size
+#@onready var screen_size = get_viewport_rect().size
 
 var key_global_position;
 var initial_player_position;
@@ -41,12 +43,24 @@ func _ready():
         global_position = initial_player_position
     else:
         initial_player_position = global_position
-
+        
+    # Initiate maximum levels for each power-up
+    max_powerup_levels = {
+        'SPEEDUP':      constants.POWERUP_SPEEDUP_MAX_LEVEL,
+        'FAST SPRAY':   constants.POWERUP_FASTSPRAY_MAX_LEVEL,
+        'BIG SPRAY':    constants.POWERUP_BIGSPRAY_MAX_LEVEL,
+        'MINI SHARK':   constants.POWERUP_MINISHARK_MAX_LEVEL
+    }
+    
 func prepare_for_new_game():
     speed = constants.PLAYER_SPEED
     fire_delay = constants.PLAYER_FIRE_DELAY
     spray_size = 0.5
     fish_frenzy_enabled = false
+    
+    for single_powerup in max_powerup_levels:
+        current_powerup_levels[single_powerup] = 0
+    
     despawn_mini_sharks()
     
 func prepare_for_new_wave():
@@ -121,8 +135,16 @@ func get_input():
         var powerup_selected = get_parent().get_node('HUD').get_selected_powerup()
         
         if powerup_selected != 'NIL':
+                        
+            # Do not allow selection if max powerup level reached.
+            if current_powerup_levels[powerup_selected] == max_powerup_levels[powerup_selected]:
+                powerup_label_animation('MAX LEVEL REACHED!')
+                return
+               
             get_parent().get_node('HUD').reset_powerup_bar()
-                
+            current_powerup_levels[powerup_selected] += 1
+            get_parent().get_node('HUD').set_powerup_level(powerup_selected, current_powerup_levels[powerup_selected]) 
+            
             match powerup_selected:
                 'SPEEDUP':
                     speed += constants.PLAYER_SPEED_POWERUP_INCREASE
@@ -449,7 +471,6 @@ func _on_main_player_update_energy():
 
 func _on_main_player_update_fish():
     $FishProgressBar.value = get_parent().fish_collected
-    print ("Fish value = " + str(get_parent().fish_collected))
     
 func stop_fish_frenzy():
     $AnimatedSprite2D.rotation_degrees = 0

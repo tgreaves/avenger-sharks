@@ -90,6 +90,7 @@ func main_menu():
     $HUD.get_node("CanvasLayer/Label").text = "";
     $HUD.get_node("CanvasLayer/EnemiesLeft").visible = false;
     $HUD.reset_powerup_bar()
+    $HUD.reset_powerup_bar_text()
     $HUD.hide_powerup_bar()
     
 func start_game():

@@ -79,7 +79,11 @@ offset_right = 919.0
 grow_horizontal = 2
 grow_vertical = 0
 
-[node name="SpeedUp" type="Label" parent="CanvasLayer/PowerUpContainer"]
+[node name="SpeedUpContainer" type="VBoxContainer" parent="CanvasLayer/PowerUpContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SpeedUp" type="Label" parent="CanvasLayer/PowerUpContainer/SpeedUpContainer"]
 z_index = 1
 custom_minimum_size = Vector2(2.08165e-12, 2.08165e-12)
 layout_mode = 2
@@ -89,7 +93,7 @@ theme_override_font_sizes/font_size = 32
 text = "SPEED-UP"
 horizontal_alignment = 1
 
-[node name="ColorRect" type="ColorRect" parent="CanvasLayer/PowerUpContainer/SpeedUp"]
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer/PowerUpContainer/SpeedUpContainer/SpeedUp"]
 visible = false
 z_as_relative = false
 layout_mode = 1
@@ -100,7 +104,18 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(1, 0, 1, 1)
 
-[node name="FastSpray" type="Label" parent="CanvasLayer/PowerUpContainer"]
+[node name="Label" type="Label" parent="CanvasLayer/PowerUpContainer/SpeedUpContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("1_4l55f")
+theme_override_font_sizes/font_size = 16
+text = "LEVEL 1"
+horizontal_alignment = 1
+
+[node name="FastSprayContainer" type="VBoxContainer" parent="CanvasLayer/PowerUpContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="FastSpray" type="Label" parent="CanvasLayer/PowerUpContainer/FastSprayContainer"]
 z_index = 1
 layout_mode = 2
 size_flags_horizontal = 3
@@ -109,7 +124,7 @@ theme_override_font_sizes/font_size = 32
 text = "FAST SPRAY"
 horizontal_alignment = 1
 
-[node name="ColorRect" type="ColorRect" parent="CanvasLayer/PowerUpContainer/FastSpray"]
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer/PowerUpContainer/FastSprayContainer/FastSpray"]
 visible = false
 z_as_relative = false
 layout_mode = 1
@@ -120,7 +135,18 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(1, 0, 1, 1)
 
-[node name="BigSpray" type="Label" parent="CanvasLayer/PowerUpContainer"]
+[node name="Label" type="Label" parent="CanvasLayer/PowerUpContainer/FastSprayContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("1_4l55f")
+theme_override_font_sizes/font_size = 16
+text = "LEVEL 1"
+horizontal_alignment = 1
+
+[node name="BigSprayContainer" type="VBoxContainer" parent="CanvasLayer/PowerUpContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="BigSpray" type="Label" parent="CanvasLayer/PowerUpContainer/BigSprayContainer"]
 z_index = 1
 layout_mode = 2
 size_flags_horizontal = 3
@@ -129,7 +155,7 @@ theme_override_font_sizes/font_size = 32
 text = "BIG SPRAY"
 horizontal_alignment = 1
 
-[node name="ColorRect" type="ColorRect" parent="CanvasLayer/PowerUpContainer/BigSpray"]
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer/PowerUpContainer/BigSprayContainer/BigSpray"]
 visible = false
 z_as_relative = false
 layout_mode = 1
@@ -140,7 +166,18 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(1, 0, 1, 1)
 
-[node name="MiniShark" type="Label" parent="CanvasLayer/PowerUpContainer"]
+[node name="Label" type="Label" parent="CanvasLayer/PowerUpContainer/BigSprayContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("1_4l55f")
+theme_override_font_sizes/font_size = 16
+text = "LEVEL 1"
+horizontal_alignment = 1
+
+[node name="MiniSharkContainer" type="VBoxContainer" parent="CanvasLayer/PowerUpContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MiniShark" type="Label" parent="CanvasLayer/PowerUpContainer/MiniSharkContainer"]
 z_index = 1
 layout_mode = 2
 size_flags_horizontal = 3
@@ -149,7 +186,7 @@ theme_override_font_sizes/font_size = 32
 text = "MINI SHARK"
 horizontal_alignment = 1
 
-[node name="ColorRect" type="ColorRect" parent="CanvasLayer/PowerUpContainer/MiniShark"]
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer/PowerUpContainer/MiniSharkContainer/MiniShark"]
 visible = false
 z_as_relative = false
 layout_mode = 1
@@ -159,3 +196,10 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 color = Color(1, 0, 1, 1)
+
+[node name="Label" type="Label" parent="CanvasLayer/PowerUpContainer/MiniSharkContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("1_4l55f")
+theme_override_font_sizes/font_size = 16
+text = "LEVEL 1"
+horizontal_alignment = 1

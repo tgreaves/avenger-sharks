@@ -172,7 +172,6 @@ func _physics_process(delta):
             collided_with.get_node('.')._death(1);
             $AudioStreamPlayerFishSplat.play();
         else:
-            print ("Necro debug.... " + str(collision.get_collider().name))
             if collision.get_collider().name == 'Player':
                 var collided_with = collision.get_collider();
                 collided_with._player_hit();
@@ -215,6 +214,7 @@ func _death():
 func leave_behind_item():
     if randi_range(1,100) < constants.ENEMY_LEAVE_BEHIND_ITEM_PERCENTAGE:
         var item = get_parent().item_scene.instantiate()
+        get_parent().add_child(item)
         item.spawn_random()
         item.get_node('.').set_position(position)
         item.add_to_group('itemGroup')
