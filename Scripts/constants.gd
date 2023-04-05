@@ -1,7 +1,7 @@
 extends Node
 
 const GAME_VERSION = "0.1-alpha"
-const MUSIC_ENABLED = false
+const MUSIC_ENABLED = true
 
 const START_WAVE = 1
 
