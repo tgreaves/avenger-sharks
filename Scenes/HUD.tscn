@@ -1,7 +1,13 @@
-[gd_scene load_steps=3 format=3 uid="uid://bcqacic7yj4ds"]
+[gd_scene load_steps=5 format=3 uid="uid://bcqacic7yj4ds"]
 
 [ext_resource type="FontFile" uid="uid://dclfn1fjcq5i7" path="res://Fonts/PressStart2P-Regular.ttf" id="1_4l55f"]
 [ext_resource type="Script" path="res://Scripts/HUD.gd" id="1_bwdok"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_aujmq"]
+bg_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bf8k5"]
+bg_color = Color(0.972549, 0.321569, 0.580392, 1)
 
 [node name="HUD" type="Control"]
 layout_mode = 3
@@ -93,8 +99,7 @@ theme_override_font_sizes/font_size = 32
 text = "SPEED-UP"
 horizontal_alignment = 1
 
-[node name="ColorRect" type="ColorRect" parent="CanvasLayer/PowerUpContainer/SpeedUpContainer/SpeedUp"]
-visible = false
+[node name="ProgressBar" type="ProgressBar" parent="CanvasLayer/PowerUpContainer/SpeedUpContainer/SpeedUp"]
 z_as_relative = false
 layout_mode = 1
 anchors_preset = 15
@@ -102,7 +107,10 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(1, 0, 1, 1)
+theme_override_styles/background = SubResource("StyleBoxFlat_aujmq")
+theme_override_styles/fill = SubResource("StyleBoxFlat_bf8k5")
+value = 50.0
+show_percentage = false
 
 [node name="Label" type="Label" parent="CanvasLayer/PowerUpContainer/SpeedUpContainer"]
 layout_mode = 2
@@ -124,8 +132,7 @@ theme_override_font_sizes/font_size = 32
 text = "FAST SPRAY"
 horizontal_alignment = 1
 
-[node name="ColorRect" type="ColorRect" parent="CanvasLayer/PowerUpContainer/FastSprayContainer/FastSpray"]
-visible = false
+[node name="ProgressBar" type="ProgressBar" parent="CanvasLayer/PowerUpContainer/FastSprayContainer/FastSpray"]
 z_as_relative = false
 layout_mode = 1
 anchors_preset = 15
@@ -133,7 +140,10 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(1, 0, 1, 1)
+theme_override_styles/background = SubResource("StyleBoxFlat_aujmq")
+theme_override_styles/fill = SubResource("StyleBoxFlat_bf8k5")
+value = 50.0
+show_percentage = false
 
 [node name="Label" type="Label" parent="CanvasLayer/PowerUpContainer/FastSprayContainer"]
 layout_mode = 2
@@ -155,8 +165,7 @@ theme_override_font_sizes/font_size = 32
 text = "BIG SPRAY"
 horizontal_alignment = 1
 
-[node name="ColorRect" type="ColorRect" parent="CanvasLayer/PowerUpContainer/BigSprayContainer/BigSpray"]
-visible = false
+[node name="ProgressBar" type="ProgressBar" parent="CanvasLayer/PowerUpContainer/BigSprayContainer/BigSpray"]
 z_as_relative = false
 layout_mode = 1
 anchors_preset = 15
@@ -164,7 +173,10 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(1, 0, 1, 1)
+theme_override_styles/background = SubResource("StyleBoxFlat_aujmq")
+theme_override_styles/fill = SubResource("StyleBoxFlat_bf8k5")
+value = 50.0
+show_percentage = false
 
 [node name="Label" type="Label" parent="CanvasLayer/PowerUpContainer/BigSprayContainer"]
 layout_mode = 2
@@ -186,8 +198,7 @@ theme_override_font_sizes/font_size = 32
 text = "MINI SHARK"
 horizontal_alignment = 1
 
-[node name="ColorRect" type="ColorRect" parent="CanvasLayer/PowerUpContainer/MiniSharkContainer/MiniShark"]
-visible = false
+[node name="ProgressBar" type="ProgressBar" parent="CanvasLayer/PowerUpContainer/MiniSharkContainer/MiniShark"]
 z_as_relative = false
 layout_mode = 1
 anchors_preset = 15
@@ -195,7 +206,10 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(1, 0, 1, 1)
+theme_override_styles/background = SubResource("StyleBoxFlat_aujmq")
+theme_override_styles/fill = SubResource("StyleBoxFlat_bf8k5")
+value = 50.0
+show_percentage = false
 
 [node name="Label" type="Label" parent="CanvasLayer/PowerUpContainer/MiniSharkContainer"]
 layout_mode = 2

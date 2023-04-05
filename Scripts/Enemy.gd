@@ -20,7 +20,6 @@ func _ready():
     var mob_types = ['knight','knight', 'wizard','wizard', 'rogue','rogue','necromancer'];
     enemy_type = mob_types[randi() % mob_types.size()]
     $AnimatedSprite2D.animation = enemy_type + str('-run')
-    #$CollisionShape2D.disabled = true;
     
     if enemy_type == 'necromancer':
         $AnimatedSprite2D.offset = Vector2(0,-20);
@@ -67,7 +66,7 @@ func _physics_process(delta):
                 
                 match enemy_type:
                     "knight":
-                        # Knights and Necromancers - chase the player.
+                        # Knights
                         var target_direction = (get_parent().get_node("Player").global_position - global_position).normalized();
                         velocity = target_direction * enemy_speed;
                         $StateTimer.start(randf_range(constants.ENEMY_CHASE_REORIENT_MINIMUM_SECONDS,
@@ -86,13 +85,16 @@ func _physics_process(delta):
                                         nearest_fish = single_fish
                             
                             target_direction = (nearest_fish.global_position - global_position).normalized();
+                            velocity = target_direction * enemy_speed;
+                            $StateTimer.start(randf_range(constants.ENEMY_CHASE_REORIENT_MINIMUM_SECONDS,
+                                                        constants.ENEMY_CHASE_REORIENT_MAXIMUM_SECONDS));
                         else:
-                            # No fish? Default to heading towards player.
-                            target_direction = (get_parent().get_node("Player").global_position - global_position).normalized();
-                        
-                        velocity = target_direction * enemy_speed;
-                        $StateTimer.start(randf_range(constants.ENEMY_CHASE_REORIENT_MINIMUM_SECONDS,
-                                                    constants.ENEMY_CHASE_REORIENT_MAXIMUM_SECONDS));
+                            #target_direction = (get_parent().get_node("Player").global_position - global_position).normalized();
+                            # If no fish left, go into normal wander.
+                            $StateTimer.start(randf_range(constants.ENEMY_DEFAULT_CHANGE_DIRECTION_MINIMUM_SECONDS,
+                                                    constants.ENEMY_DEFAULT_CHANGE_DIRECTION_MAXIMUM_SECONDS));
+                            velocity = Vector2(randf_range(-1,1), randf_range(-1,1)).normalized() * enemy_speed;
+                            
                     _:
                         # Anything else.
                         $StateTimer.start(randf_range(constants.ENEMY_DEFAULT_CHANGE_DIRECTION_MINIMUM_SECONDS,
@@ -218,4 +220,3 @@ func leave_behind_item():
         item.spawn_random()
         item.get_node('.').set_position(position)
         item.add_to_group('itemGroup')
-        get_parent().add_child(item)

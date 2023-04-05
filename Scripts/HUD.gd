@@ -15,27 +15,36 @@ func _ready():
 func _process(_delta):
     pass
 
-func chest_collected():
+func activate_powerup(powerup):
+    match powerup:
+        'SPEEDUP':
+            $CanvasLayer/PowerUpContainer/SpeedUpContainer/SpeedUp/ProgressBar.value = $CanvasLayer/PowerUpContainer/SpeedUpContainer/SpeedUp/ProgressBar.max_value
+            $CanvasLayer/PowerUpContainer/SpeedUpContainer/SpeedUp/ProgressBar.visible = true
+        'FAST SPRAY':
+            $CanvasLayer/PowerUpContainer/FastSprayContainer/FastSpray/ProgressBar.value = $CanvasLayer/PowerUpContainer/FastSprayContainer/FastSpray/ProgressBar.max_value
+            $CanvasLayer/PowerUpContainer/FastSprayContainer/FastSpray/ProgressBar.visible = true
+        'BIG SPRAY':
+            $CanvasLayer/PowerUpContainer/BigSprayContainer/BigSpray/ProgressBar.value = $CanvasLayer/PowerUpContainer/BigSprayContainer/BigSpray/ProgressBar.max_value 
+            $CanvasLayer/PowerUpContainer/BigSprayContainer/BigSpray/ProgressBar.visible = true
+        'MINI SHARK':
+            $CanvasLayer/PowerUpContainer/MiniSharkContainer/MiniShark/ProgressBar.value =   $CanvasLayer/PowerUpContainer/MiniSharkContainer/MiniShark/ProgressBar.max_value
+            $CanvasLayer/PowerUpContainer/MiniSharkContainer/MiniShark/ProgressBar.visible = true
 
-    PowerUpIndex += 1
-    
-    if PowerUpIndex > PowerUpBarSequence.size():
-        PowerUpIndex = 1
-    
-    match PowerUpIndex:
-        1:
-            $CanvasLayer/PowerUpContainer/SpeedUpContainer/SpeedUp/ColorRect.visible = true
-            $CanvasLayer/PowerUpContainer/MiniSharkContainer/MiniShark/ColorRect.visible = false
-        2:
-            $CanvasLayer/PowerUpContainer/FastSprayContainer/FastSpray/ColorRect.visible = true
-            $CanvasLayer/PowerUpContainer/SpeedUpContainer/SpeedUp/ColorRect.visible = false
-        3:
-            $CanvasLayer/PowerUpContainer/BigSprayContainer/BigSpray/ColorRect.visible = true
-            $CanvasLayer/PowerUpContainer/FastSprayContainer/FastSpray/ColorRect.visible = false
-        4:
-            $CanvasLayer/PowerUpContainer/MiniSharkContainer/MiniShark/ColorRect.visible = true
-            $CanvasLayer/PowerUpContainer/BigSprayContainer/BigSpray/ColorRect.visible = false
-            
+func deactivate_powerup(powerup):
+    match powerup:
+        'SPEEDUP':
+            $CanvasLayer/PowerUpContainer/SpeedUpContainer/SpeedUp/ProgressBar.value = $CanvasLayer/PowerUpContainer/SpeedUpContainer/SpeedUp/ProgressBar.max_value
+            $CanvasLayer/PowerUpContainer/SpeedUpContainer/SpeedUp/ProgressBar.visible = false
+        'FAST SPRAY':
+            $CanvasLayer/PowerUpContainer/FastSprayContainer/FastSpray/ProgressBar.value = $CanvasLayer/PowerUpContainer/FastSprayContainer/FastSpray/ProgressBar.max_value
+            $CanvasLayer/PowerUpContainer/FastSprayContainer/FastSpray/ProgressBar.visible = false
+        'BIG SPRAY':
+            $CanvasLayer/PowerUpContainer/BigSprayContainer/BigSpray/ProgressBar.value = $CanvasLayer/PowerUpContainer/BigSprayContainer/BigSpray/ProgressBar.max_value 
+            $CanvasLayer/PowerUpContainer/BigSprayContainer/BigSpray/ProgressBar.visible = false
+        'MINI SHARK':
+            $CanvasLayer/PowerUpContainer/MiniSharkContainer/MiniShark/ProgressBar.value =   $CanvasLayer/PowerUpContainer/MiniSharkContainer/MiniShark/ProgressBar.max_value
+            $CanvasLayer/PowerUpContainer/MiniSharkContainer/MiniShark/ProgressBar.visible = false    
+       
 func get_selected_powerup():
     if PowerUpIndex == 0:
         return 'NIL'
@@ -51,10 +60,15 @@ func hide_powerup_bar():
 func reset_powerup_bar():
     PowerUpIndex = 0
     
-    $CanvasLayer/PowerUpContainer/SpeedUpContainer/SpeedUp/ColorRect.visible = false
-    $CanvasLayer/PowerUpContainer/FastSprayContainer/FastSpray/ColorRect.visible = false
-    $CanvasLayer/PowerUpContainer/BigSprayContainer/BigSpray/ColorRect.visible = false
-    $CanvasLayer/PowerUpContainer/MiniSharkContainer/MiniShark/ColorRect.visible = false
+    $CanvasLayer/PowerUpContainer/SpeedUpContainer/SpeedUp/ProgressBar.visible = false
+    $CanvasLayer/PowerUpContainer/FastSprayContainer/FastSpray/ProgressBar.visible = false
+    $CanvasLayer/PowerUpContainer/BigSprayContainer/BigSpray/ProgressBar.visible = false
+    $CanvasLayer/PowerUpContainer/MiniSharkContainer/MiniShark/ProgressBar.visible = false
+    
+    $CanvasLayer/PowerUpContainer/SpeedUpContainer/SpeedUp/ProgressBar.max_value = constants.POWERUP_ACTIVE_DURATION
+    $CanvasLayer/PowerUpContainer/FastSprayContainer/FastSpray/ProgressBar.max_value = constants.POWERUP_ACTIVE_DURATION
+    $CanvasLayer/PowerUpContainer/BigSprayContainer/BigSpray/ProgressBar.max_value = constants.POWERUP_ACTIVE_DURATION
+    $CanvasLayer/PowerUpContainer/MiniSharkContainer/MiniShark/ProgressBar.max_value = constants.POWERUP_ACTIVE_DURATION
 
 func reset_powerup_bar_text():
     
@@ -64,8 +78,10 @@ func reset_powerup_bar_text():
     $CanvasLayer/PowerUpContainer/MiniSharkContainer/Label.text = ""
 
 func set_powerup_level(powerup, level):
-    
     var text = "LEVEL " + str(level)
+    
+    if level == 0:
+        text=""
     
     if level == get_parent().get_node('Player').max_powerup_levels[powerup]:
         text = "LEVEL MAX"
@@ -80,3 +96,8 @@ func set_powerup_level(powerup, level):
         'MINI SHARK':
             $CanvasLayer/PowerUpContainer/MiniSharkContainer/Label.text = text
     
+func set_all_powerup_levels():
+    for powerup in PowerUpBarSequence:
+        set_powerup_level(powerup, get_parent().get_node('Player').current_powerup_levels[powerup])
+        
+

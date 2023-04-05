@@ -34,9 +34,10 @@
 
 * Patch Notes
 
-* Gameplay: Power Ups have level limits (to stop balance borking the game)
-* Gameplay: Items despawn after x seconds (ITEM_DESPAWN_TIME)
-* Design: HUD now indicates level attained of each Power Up.
 
-
+* Gameplay: Power-ups now have individual and visual timers.
+* Gameplay: Power-ups have individual max levels - timing out reduces their level.
+* Gameplay: Adjustments to enemy spawning (balance)
+* Gameplay: Necromancers now wander when no fish left (before: chase player)
+* Internal: Fix Item scene addition Warnings.
 

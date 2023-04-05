@@ -276,6 +276,9 @@ theme_override_styles/fill = SubResource("StyleBoxFlat_jyh0b")
 value = 50.0
 show_percentage = false
 
+[node name="PowerUpTickTimer" type="Timer" parent="."]
+one_shot = true
+
 [node name="FishFrenzyTimer" type="Timer" parent="."]
 wait_time = 3.0
 one_shot = true
@@ -306,7 +309,7 @@ wait_time = 0.25
 one_shot = true
 
 [node name="PlayerHitGracePeriodTimer" type="Timer" parent="."]
-wait_time = 0.5
+wait_time = 0.25
 one_shot = true
 autostart = true
 

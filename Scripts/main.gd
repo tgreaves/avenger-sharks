@@ -89,8 +89,7 @@ func main_menu():
     $HUD.get_node("CanvasLayer/Label").visible = true;
     $HUD.get_node("CanvasLayer/Label").text = "";
     $HUD.get_node("CanvasLayer/EnemiesLeft").visible = false;
-    $HUD.reset_powerup_bar()
-    $HUD.reset_powerup_bar_text()
+    
     $HUD.hide_powerup_bar()
     
 func start_game():
@@ -181,8 +180,7 @@ func start_wave():
     $HUD.get_node("CanvasLayer/EnemiesLeft").visible = true;
     
     $ItemSpawnTimer.start(randf_range(constants.ITEM_SPAWN_MINIMUM_SECONDS,constants.ITEM_SPAWN_MAXIMUM_SECONDS));
-    $EnemySpawnTimer.start(randf_range(constants.ENEMY_SPAWN_MINIMUM_SECONDS,
-                                                constants.ENEMY_SPAWN_MAXIMUM_SECONDS));
+    $EnemySpawnTimer.start(constants.ENEMY_REINFORCEMENTS_SPAWN_BASE_SECONDS);
     
     while (i < wave_number * constants.ENEMY_MULTIPLIER_AT_WAVE_START):
         spawn_enemy();
@@ -312,7 +310,7 @@ func _process(_delta):
         if $EnemySpawnTimer.time_left == 0:
             if enemies_left_this_wave > get_tree().get_nodes_in_group("enemyGroup").size():
                 
-                var enemies_to_spawn = randi_range(constants.ENEMY_SPAWN_MIN_BATCH_SIZE, constants.ENEMY_SPAWN_MAX_BATCH_SIZE);
+                var enemies_to_spawn = constants.ENEMY_REINFORCEMENTS_SPAWN_BATCH_SIZE + (wave_number * constants.ENEMY_REINFORCEMENTS_SPAWN_BATCH_MULTIPLIER)
                 if enemies_to_spawn > enemies_left_this_wave - get_tree().get_nodes_in_group("enemyGroup").size():
                     enemies_to_spawn = enemies_left_this_wave - get_tree().get_nodes_in_group("enemyGroup").size()
                       
@@ -322,8 +320,7 @@ func _process(_delta):
                     spawn_enemy()
                     i=i+1
                 
-                $EnemySpawnTimer.start(randf_range(constants.ENEMY_SPAWN_MINIMUM_SECONDS,
-                                                constants.ENEMY_SPAWN_MAXIMUM_SECONDS));
+                $EnemySpawnTimer.start(constants.ENEMY_REINFORCEMENTS_SPAWN_BASE_SECONDS);
             
     if game_status == GAME_OVER:
         if $GameOverTimer.time_left == 0:
