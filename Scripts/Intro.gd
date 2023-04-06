@@ -52,8 +52,11 @@ func _process(_delta):
         LABEL_GONE:
             # Start creepy music, commence necromancer movement onto screen.
             if $StateTimer.time_left == 0:
-                $MusicBoxSong.stop()
-                $BadThingsSong.play()
+                
+                if constants.MUSIC_ENABLED:
+                    $MusicBoxSong.stop()
+                    $BadThingsSong.play()
+                    
                 $Necromancer/NecroSprite.play()
                 state = NECRO_STOP
                 var target_direction = ($Shark.global_position - $Necromancer.global_position).normalized()

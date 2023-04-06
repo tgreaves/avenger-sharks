@@ -1,7 +1,5 @@
 extends CharacterBody2D
 
-@export var spray_speed = 800
-
 func _ready():
     $AnimatedSprite2D.play();
         
@@ -24,7 +22,6 @@ func _physics_process(_delta):
         if collision.get_collider().name == 'PlayerStartLocation':
             break 
             
-        print (collision.get_collider().name);
         collision.get_collider().get_node('.')._death();
         $CollisionShape2D.disabled = true;
         self.queue_free()

@@ -35,3 +35,5 @@
 
 * Patch Notes
 
+* Interface: Custom mouse pointer for aiming.
+* Interface: Allow hiDPI.
