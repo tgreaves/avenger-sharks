@@ -27,17 +27,11 @@
 
 # Bugs
 
+* Visual - Power up bar a bit small on Steam Deck
 * Difficulty - make 'normal' enemies have additional HP at later levels.
 * Necromancer have 5 HP but fewer hits seem to kill them. 
 * Necromancers sometimes flicker after death / level transitions.
 * Big spray doesn't work when player close to a wall.
 
 * Patch Notes
-
-
-* Gameplay: Power-ups now have individual and visual timers.
-* Gameplay: Power-ups have individual max levels - timing out reduces their level.
-* Gameplay: Adjustments to enemy spawning (balance)
-* Gameplay: Necromancers now wander when no fish left (before: chase player)
-* Internal: Fix Item scene addition Warnings.
 
