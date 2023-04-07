@@ -27,7 +27,8 @@ signal player_got_fish;
 signal player_got_key;
 signal player_found_exit_stop_key_movement;
 signal player_found_exit;
-#@onready var screen_size = get_viewport_rect().size
+signal player_low_energy
+signal player_no_longer_low_energy
 
 var key_global_position;
 var initial_player_position;
@@ -191,6 +192,7 @@ func _physics_process(_delta):
                 if collision.get_collider().name.contains('Item'):
                     match collided_with.get_node('.').item_type:
                         "health":
+                            var original_energy = player_energy
                             player_energy = player_energy + constants.HEALTH_POTION_BONUS;
                             if get_parent().cheat_mode:
                                 if player_energy > constants.PLAYER_START_GAME_ENERGY_CHEATING:
@@ -202,6 +204,10 @@ func _physics_process(_delta):
                             $AudioStreamHealth.play();
                             powerup_label_animation('HEALTH!')
                             _on_main_player_update_energy()
+                            
+                            if (original_energy <= constants.PLAYER_LOW_ENERGY_BLINK) && (player_energy > constants.PLAYER_LOW_ENERGY_BLINK):
+                                emit_signal('player_no_longer_low_energy')
+                            
                             collided_with.get_node('.').despawn()
                             
                         "chest":
@@ -374,6 +380,10 @@ func _physics_process(_delta):
                         get_parent().get_node('Arena').get_node('PlayerStartLocation').get_node('CollisionShape2D').disabled = true;
                                 
 func _player_hit():
+    
+    if shark_status != ALIVE:
+        return
+    
     if $PlayerHitGracePeriodTimer.time_left == 0:
     
         $PlayerHitGracePeriodTimer.start();
@@ -397,7 +407,10 @@ func _player_hit():
         
             $EnergyProgressBar.value = player_energy
             _on_main_player_update_energy()
-
+            
+            if player_energy <= constants.PLAYER_LOW_ENERGY_BLINK:
+                emit_signal('player_low_energy')
+                
 func _on_main_player_hunt_key(passed_key_global_position):
     if shark_status == FISH_FRENZY:
         stop_fish_frenzy()

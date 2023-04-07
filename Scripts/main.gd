@@ -235,6 +235,7 @@ func game_over():
     game_status = GAME_OVER;
     $HUD.get_node("CanvasLayer/Label").visible = true;
     $HUD.get_node("CanvasLayer/Label").text = "GAME OVER";
+    $AudioStreamPlayerMusic.pitch_scale = 1.0
     $GameOverTimer.start();
 
 func return_to_main_screen():
@@ -419,4 +420,8 @@ func intro_has_finished():
 func _on_main_menu_cheats_pressed():
     cheat_mode = true
     
-
+func _on_player_player_low_energy():
+    $AudioStreamPlayerMusic.pitch_scale = 1.2
+    
+func _on_player_player_no_longer_low_energy():
+    $AudioStreamPlayerMusic.pitch_scale = 1.0
