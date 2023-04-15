@@ -442,10 +442,14 @@ func powerup_label_animation(powerup_name):
     new_label.text = powerup_name
     new_label.visible = true
     
+    # Text should move upwards slightly.
+    var target_position = new_label.position
+    target_position.y += -50
+    
     var tween = get_tree().create_tween()
     tween.set_parallel()
     tween.tween_property(new_label, "modulate", Color(0,0,0,0), 2)
-    tween.tween_property(new_label, "position", Vector2(-116,-150), 2)
+    tween.tween_property(new_label, "position", target_position, 2)
     tween.tween_callback(new_label.queue_free).set_delay(3)
     
 func set_fire_rate_delay_timer():

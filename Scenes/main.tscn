@@ -63,7 +63,7 @@ position = Vector2(2650, 714)
 [node name="Key" parent="." instance=ExtResource("11_wlg1c")]
 
 [node name="WaveIntroTimer" type="Timer" parent="."]
-wait_time = 2.2
+wait_time = 2.4
 one_shot = true
 
 [node name="WaveEndTimer" type="Timer" parent="."]

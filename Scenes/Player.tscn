@@ -247,13 +247,13 @@ frame_progress = 1.0
 
 [node name="PowerUpLabel" type="Label" parent="."]
 visible = false
-offset_left = -112.0
-offset_top = -151.0
-offset_right = 128.0
-offset_bottom = -124.0
+offset_left = -348.0
+offset_top = -150.0
+offset_right = 361.0
+offset_bottom = -115.0
 theme_override_fonts/font = ExtResource("40_8elap")
-theme_override_font_sizes/font_size = 24
-text = "POWER-UP"
+theme_override_font_sizes/font_size = 32
+text = "POWER UP!"
 horizontal_alignment = 1
 
 [node name="EnergyProgressBar" type="ProgressBar" parent="."]

@@ -64,7 +64,7 @@ func main_menu():
     wave_number= constants.START_WAVE - 1
     
     if $AudioStreamPlayerMusic.playing == false and constants.MUSIC_ENABLED:
-        $AudioStreamPlayerMusic.play();
+        $AudioStreamPlayerMusic.play(0.6);
  
     $Player/Camera2D.enabled = false
     $Player.set_process(false);
@@ -101,6 +101,8 @@ func start_game():
     $Player.get_node('EnergyProgressBar').max_value = $Player.player_energy
     $Player.get_node("FishProgressBar").max_value = constants.FISH_TO_TRIGGER_FISH_FRENZY
     $Player.prepare_for_new_game()
+    enemies_left_this_wave = 0
+    update_enemies_left_display()
     prepare_for_wave()     
 
 func prepare_for_wave():
