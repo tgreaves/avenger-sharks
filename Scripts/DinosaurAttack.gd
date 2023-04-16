@@ -14,9 +14,11 @@ func _physics_process(_delta):
             break;
             
         if collision.get_collider().name == 'ExitDoor':
+            self.queue_free()
             break    
             
         if collision.get_collider().name == 'ExitLocation':
+            self.queue_free()
             break      
         
         if collision.get_collider().name == 'PlayerStartLocation':

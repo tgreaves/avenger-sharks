@@ -32,5 +32,5 @@ Additional Design and Inspiration: Jack and Emilia Greaves
 
 ![Avenger Sharks screenshot 1](/Images/screenshot-intro.png)
 
-![Avenger Sharks screensho t2](/Images/screenshot-gameplay.png)
+![Avenger Sharks screenshot 2](/Images/screenshot-gameplay.png)
 
