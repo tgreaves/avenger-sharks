@@ -16,6 +16,7 @@ func _physics_process(_delta):
             break;
         
         if collision.get_collider().name == 'ExitDoor':
+            self.queue_free()
             break;
         
         collision.get_collider().get_node('.')._player_hit();

@@ -13,6 +13,8 @@ var state = SPAWNING;
 var enemy_type;
 var enemy_speed;
 var enemy_health;
+var stored_modulate;
+var hit_to_be_processed;
 
 @onready var screen_size = get_viewport_rect().size
 
@@ -22,7 +24,8 @@ func _ready():
     $AnimatedSprite2D.animation = enemy_type + str('-run')
     
     if enemy_type == 'necromancer':
-        $AnimatedSprite2D.offset = Vector2(0,-20);
+        $AnimatedSprite2D.offset = Vector2(0,-25)
+        $CollisionShape2D.scale = Vector2(1.5, 1.5)
         enemy_speed = constants.ENEMY_NECROMANCER_SPEED;
         enemy_health = constants.ENEMY_NECROMANCER_HEALTH;
     else:
@@ -37,6 +40,7 @@ func _ready():
     $StateTimer.start();
     
     set_modulate(Color(0,0,0,0));
+    hit_to_be_processed = false
 
 func _physics_process(delta):
     set_modulate(lerp(get_modulate(), Color(1,1,1,1), 0.02));
@@ -45,6 +49,11 @@ func _physics_process(delta):
         SPAWNING:
             velocity = Vector2(0,0);
             
+            if $FlashHitTimer.time_left == 0 and hit_to_be_processed:
+                set_modulate(stored_modulate);
+                #set_modulate(lerp(get_modulate(), Color(1,1,1,1), 0.02));
+                hit_to_be_processed = false
+                
             if $StateTimer.time_left == 0:
                 state = WANDER;
                 $AnimatedSprite2D.play();
@@ -185,6 +194,8 @@ func _death():
     if state != DYING:
         enemy_health = enemy_health - 1;
         
+        hit_to_be_processed = true
+        stored_modulate = get_modulate()
         set_modulate(Color(10,10,10,10));
         $FlashHitTimer.start()
         
@@ -206,12 +217,6 @@ func _death():
             get_parent()._on_enemy_update_score(enemy_killed_score,global_position)
             
             leave_behind_item()
-            
-        else:
-            $AnimatedSprite2D.animation = enemy_type + str('-hit');
-            await($AnimatedSprite2D.animation_finished);
-            $AnimatedSprite2D.animation = enemy_type + str('-run');
-            $AnimatedSprite2D.play();
             
 func leave_behind_item():
     if randi_range(1,100) < constants.ENEMY_LEAVE_BEHIND_ITEM_PERCENTAGE:

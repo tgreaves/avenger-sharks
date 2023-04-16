@@ -2,6 +2,7 @@
 
 * Difficulty levels (fish themed, e.g Minnow upwards)
 * Boss wave
+* Pacifist mode
 
 # Power-ups / Progression
 
@@ -27,13 +28,9 @@
 
 # Bugs
 
-* Visual - Power up bar a bit small on Steam Deck
 * Difficulty - make 'normal' enemies have additional HP at later levels.
-* Necromancer have 5 HP but fewer hits seem to kill them. 
-* Necromancers sometimes flicker after death / level transitions.
 * Big spray doesn't work when player close to a wall.
 
-* Patch Notes
+* Commit notes
 
-* Interface: Custom mouse pointer for aiming.
-* Interface: Allow hiDPI.
+* Bug fix: Tidy up projectiles getting stuck around exit locations in transitions.
