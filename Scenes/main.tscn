@@ -89,6 +89,7 @@ stream = ExtResource("12_arleo")
 [connection signal="player_move_to_starting_position" from="." to="Player" method="_on_main_player_move_to_starting_position"]
 [connection signal="player_update_energy" from="." to="Player" method="_on_main_player_update_energy"]
 [connection signal="player_update_fish" from="." to="Player" method="_on_main_player_update_fish"]
+[connection signal="upgrade_button_pressed" from="HUD" to="Player" method="_on_hud_upgrade_button_pressed"]
 [connection signal="cheats_pressed" from="MainMenu" to="." method="_on_main_menu_cheats_pressed"]
 [connection signal="credits_pressed" from="MainMenu" to="." method="_on_main_menu_credits_pressed"]
 [connection signal="exit_game_pressed" from="MainMenu" to="." method="_on_main_menu_exit_game_pressed"]
@@ -101,4 +102,5 @@ stream = ExtResource("12_arleo")
 [connection signal="player_got_fish" from="Player" to="." method="_on_player_player_got_fish"]
 [connection signal="player_got_key" from="Player" to="Key" method="_on_player_player_got_key"]
 [connection signal="player_low_energy" from="Player" to="." method="_on_player_player_low_energy"]
+[connection signal="player_made_upgrade_choice" from="Player" to="." method="_on_player_player_made_upgrade_choice"]
 [connection signal="player_no_longer_low_energy" from="Player" to="." method="_on_player_player_no_longer_low_energy"]

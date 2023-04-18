@@ -7,6 +7,8 @@ var PowerUpBarSequence = [  'SPEEDUP',
 
 var PowerUpIndex = 0;
 
+signal upgrade_button_pressed(button_number)
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
     PowerUpIndex = 0
@@ -100,4 +102,7 @@ func set_all_powerup_levels():
     for powerup in PowerUpBarSequence:
         set_powerup_level(powerup, get_parent().get_node('Player').current_powerup_levels[powerup])
         
-
+func _on_upgrade_button_pressed(button_number):
+    print("PRESSED: " + str(button_number))
+    emit_signal("upgrade_button_pressed", button_number)
+    

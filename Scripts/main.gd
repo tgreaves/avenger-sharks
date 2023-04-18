@@ -18,6 +18,7 @@ var high_score = 0;
 var spawned_items_this_wave = []
 var intro
 var credits
+var first_game_played = false
 
 enum {
     INTRO_SEQUENCE,
@@ -28,6 +29,8 @@ enum {
     GAME_PAUSED,
     GETTING_KEY,
     WAVE_END,
+    UPGRADE_SCREEN,
+    UPGRADE_WAITING_FOR_CHOICE,
     PREPARE_FOR_WAVE,
     GAME_OVER
 }
@@ -53,8 +56,11 @@ func _ready():
     $Player.visible = false;
     $Player.get_node("CollisionShape2D").disabled = false;
     
-    intro = intro_scene.instantiate()
-    add_child(intro)
+    if constants.DEV_SKIP_INTRO:
+        main_menu()
+    else:
+        intro = intro_scene.instantiate()
+        add_child(intro)
     
     
 func main_menu():
@@ -85,6 +91,7 @@ func main_menu():
     $MainMenu._ready();
     
     $HUD/CanvasLayer.visible = true
+    $HUD/CanvasLayer/UpgradeChoiceContainer.visible = false
     $HUD.get_node("CanvasLayer/Score").visible = false;
     $HUD.get_node("CanvasLayer/Label").visible = true;
     $HUD.get_node("CanvasLayer/Label").text = "";
@@ -92,7 +99,12 @@ func main_menu():
     
     $HUD.hide_powerup_bar()
     
+    if constants.DEV_START_GAME_IMMEDIATELY && !first_game_played:
+        start_game()
+    
 func start_game():
+    first_game_played = true
+    
     if cheat_mode == true:
         $Player.player_energy = constants.PLAYER_START_GAME_ENERGY_CHEATING
     else:
@@ -230,7 +242,9 @@ func wave_end_cleanup():
     for dinosaur_attack in get_tree().get_nodes_in_group('dinosaurAttack'):
         dinosaur_attack.queue_free()
         
-    game_status = PREPARE_FOR_WAVE;
+    #game_status = PREPARE_FOR_WAVE
+    game_status = UPGRADE_SCREEN
+    
     $WaveEndTimer.start();
 
 func game_over():
@@ -297,11 +311,15 @@ func spawn_fish():
 func _process(_delta):
     if game_status == WAVE_START:
         if $WaveIntroTimer.time_left == 0:
-            start_wave();
+            start_wave()
+    
+    if game_status == UPGRADE_SCREEN:
+        if $WaveEndTimer.time_left == 0:
+            upgrade_screen()
             
     if game_status == PREPARE_FOR_WAVE:
         if $WaveEndTimer.time_left == 0:
-            prepare_for_wave();   
+            prepare_for_wave()
     
     if game_status == GAME_RUNNING:
         if enemies_left_this_wave == 0:
@@ -427,3 +445,38 @@ func _on_player_player_low_energy():
     
 func _on_player_player_no_longer_low_energy():
     $AudioStreamPlayerMusic.pitch_scale = 1.0
+    
+func upgrade_screen():
+    # Select two upgrades to offer the player at random.
+    
+    # 'MAGNET':       [ 0, 1, 'res://Images/placeholder.png', 'A powerful magnet which does magnet things.'],
+    # 'ARMOUR':       [ 0, 3, 'Images/placeholder.png', 'Decrease incoming damage by 10%']
+    
+    var upgrade_one_index = 0
+    var upgrade_two_index = 0
+    
+    while (upgrade_one_index == upgrade_two_index):
+        upgrade_one_index = $Player.upgrades.keys()[ randi() % $Player.upgrades.size() ]
+        upgrade_two_index = $Player.upgrades.keys()[ randi() % $Player.upgrades.size() ]
+    
+        print ("Indexes: " + str(upgrade_one_index) + " ... " + str(upgrade_two_index))
+    
+    print ("DEADLOCK SOLVED")
+       
+    $HUD/CanvasLayer/UpgradeChoiceContainer/Choice1/TextureRect.texture = load($Player.upgrades[upgrade_one_index][2])
+    $HUD/CanvasLayer/UpgradeChoiceContainer/Choice2/TextureRect.texture = load($Player.upgrades[upgrade_two_index][2])
+    
+    $HUD/CanvasLayer/UpgradeChoiceContainer/Choice1/Title.text = upgrade_one_index
+    $HUD/CanvasLayer/UpgradeChoiceContainer/Choice2/Title.text = upgrade_two_index
+    
+    $HUD/CanvasLayer/UpgradeChoiceContainer/Choice1/Description.text = $Player.upgrades[upgrade_one_index][3]
+    $HUD/CanvasLayer/UpgradeChoiceContainer/Choice2/Description.text = $Player.upgrades[upgrade_two_index][3]
+    
+    $HUD/CanvasLayer/UpgradeChoiceContainer.visible = true
+    game_status = UPGRADE_WAITING_FOR_CHOICE
+
+func _on_player_player_made_upgrade_choice():
+    $HUD/CanvasLayer/UpgradeChoiceContainer.visible = false
+    game_status = PREPARE_FOR_WAVE
+    $WaveEndTimer.start();
+    

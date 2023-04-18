@@ -11,6 +11,10 @@
   * Exploding shots
   * Piercing shots
 
+* Selectable things at end of each wave / level up
+  * Magnet (pull items towards player)
+  * Slow down enemies
+
 * Keep count of fish rescued - use as currency in pre-game shop...
   * Start with more health.
   * Other characters?
@@ -28,7 +32,6 @@
 
 # Bugs
 
-* Difficulty - make 'normal' enemies have additional HP at later levels.
 * Big spray doesn't work when player close to a wall.
 
 * Commit notes

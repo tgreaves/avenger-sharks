@@ -21,6 +21,7 @@ enum {
 @export var spray_size = 0.5
 @export var current_powerup_levels = {}
 @export var max_powerup_levels = {}
+@export var upgrades = {}
 
 signal player_died;
 signal player_got_fish;
@@ -29,13 +30,16 @@ signal player_found_exit_stop_key_movement;
 signal player_found_exit;
 signal player_low_energy
 signal player_no_longer_low_energy
+signal player_made_upgrade_choice
 
 var key_global_position;
 var initial_player_position;
 var fish_frenzy_enabled = false
 var fish_frenzy_colour
+var item_magnet_enabled = true
 var blink_status = false
 var fire_delay = constants.PLAYER_FIRE_DELAY
+
 
 func _ready():
     shark_status = ALIVE;
@@ -51,6 +55,13 @@ func _ready():
         'FAST SPRAY':   constants.POWERUP_FASTSPRAY_MAX_LEVEL,
         'BIG SPRAY':    constants.POWERUP_BIGSPRAY_MAX_LEVEL,
         'MINI SHARK':   constants.POWERUP_MINISHARK_MAX_LEVEL
+    }
+    
+    upgrades = {
+        # Code          [ Current Level, Max Level, Image path, Description
+        # If Max Level is 1 then it can only ever be purchased once (Binary item)
+        'MAGNET':       [ 0, 1, 'res://Images/crosshair184.png', 'A powerful magnet which does magnet things.'],
+        'ARMOUR':       [ 0, 3, 'res://Images/crosshair184.png', 'Decrease incoming damage by 10%']
     }
     
 func prepare_for_new_game():
@@ -558,3 +569,14 @@ func decrease_powerup_level(powerup):
         get_parent().get_node('HUD').activate_powerup(powerup)
     
     get_parent().get_node('HUD').set_powerup_level(powerup, current_powerup_levels[powerup])
+    
+
+
+func _on_hud_upgrade_button_pressed(button_number):
+    print("PRESSED STAGE 2: " + str(button_number))
+    
+    # TODO: Handle the upgrade.
+    
+    # Go to next wave.
+    emit_signal('player_made_upgrade_choice')
+

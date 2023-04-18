@@ -1,5 +1,13 @@
 # Changelog
 
+# 0.3-alpha
+
+* Internal: DEV_SKIP_INTRO and DEV_START_GAME_IMMEDIATELY options added.
+* In progress:
+    * Upgrade between waves (choice of two).
+    * Magnet item pull.
+    
+
 # 0.2-alpha
 
 * Gameplay: Make player invulnerable during wave exit.
