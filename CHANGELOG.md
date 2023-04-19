@@ -5,7 +5,8 @@
 * Internal: DEV_SKIP_INTRO and DEV_START_GAME_IMMEDIATELY options added.
 * In progress:
     * Upgrade between waves (choice of two).
-    * Magnet item pull.
+    * Magnet item pull.  Changed Items to be CharacterBody2D to support.
+    * Armour reduces damage.
     
 
 # 0.2-alpha

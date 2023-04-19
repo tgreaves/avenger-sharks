@@ -34,6 +34,10 @@
 
 * Big spray doesn't work when player close to a wall.
 
-* Commit notes
+* Upgrade system next stuff...
 
-* Bug fix: Tidy up projectiles getting stuck around exit locations in transitions.
+* Display upgrades on left of HUD etc.
+* Armour plating enabled when selected
+* Levelling for armour plating so it can be selected more than once
+* Make sure magnet can only be selected once (same for any other single level upgrades)
+* Ideas for more !!

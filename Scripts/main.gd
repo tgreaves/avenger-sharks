@@ -20,6 +20,9 @@ var intro
 var credits
 var first_game_played = false
 
+var upgrade_one_index
+var upgrade_two_index
+
 enum {
     INTRO_SEQUENCE,
     MAIN_MENU,
@@ -452,8 +455,8 @@ func upgrade_screen():
     # 'MAGNET':       [ 0, 1, 'res://Images/placeholder.png', 'A powerful magnet which does magnet things.'],
     # 'ARMOUR':       [ 0, 3, 'Images/placeholder.png', 'Decrease incoming damage by 10%']
     
-    var upgrade_one_index = 0
-    var upgrade_two_index = 0
+    upgrade_one_index = 0
+    upgrade_two_index = 0
     
     while (upgrade_one_index == upgrade_two_index):
         upgrade_one_index = $Player.upgrades.keys()[ randi() % $Player.upgrades.size() ]
@@ -472,11 +475,16 @@ func upgrade_screen():
     $HUD/CanvasLayer/UpgradeChoiceContainer/Choice1/Description.text = $Player.upgrades[upgrade_one_index][3]
     $HUD/CanvasLayer/UpgradeChoiceContainer/Choice2/Description.text = $Player.upgrades[upgrade_two_index][3]
     
+    $HUD/CanvasLayer/UpgradeChoiceContainer.modulate = Color(0,0,0,0)
     $HUD/CanvasLayer/UpgradeChoiceContainer.visible = true
+    
+    var tween = get_tree().create_tween()
+    tween.tween_property($HUD/CanvasLayer/UpgradeChoiceContainer, "modulate", Color(1,1,1,1), 0.5)
+    
     game_status = UPGRADE_WAITING_FOR_CHOICE
 
 func _on_player_player_made_upgrade_choice():
     $HUD/CanvasLayer/UpgradeChoiceContainer.visible = false
     game_status = PREPARE_FOR_WAVE
-    $WaveEndTimer.start();
+    #$WaveEndTimer.start();
     

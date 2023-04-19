@@ -71,7 +71,7 @@ animations = [{
 "speed": 5.0
 }]
 
-[node name="Item" type="StaticBody2D"]
+[node name="Item" type="CharacterBody2D"]
 collision_layer = 32
 script = ExtResource("1_x2ahu")
 

@@ -1,4 +1,4 @@
-extends StaticBody2D
+extends CharacterBody2D
 
 var ITEMS = ["chest",'health']
 
@@ -32,6 +32,18 @@ func spawn_specific(item_selection):
 func _process(_delta):
     if (state==READY) && ($DespawnTimer.time_left == 0):
         despawn()
+        
+func _physics_process(_delta):
+    match state:
+        READY:
+            move_and_slide()
+            
+            var distance = position.distance_to( get_parent().get_node('Player').position )
+            
+            if get_parent().get_node('Player').item_magnet_enabled:
+                if distance < 250:
+                    var target_direction = (get_parent().get_node("Player").global_position - global_position).normalized();
+                    velocity = target_direction * ( get_parent().get_node("Player").speed + 200 )
 
 func despawn():
     # TODO: Chest should play a different animation, and then spawn text to match item type.

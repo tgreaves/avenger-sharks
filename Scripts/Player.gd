@@ -36,7 +36,7 @@ var key_global_position;
 var initial_player_position;
 var fish_frenzy_enabled = false
 var fish_frenzy_colour
-var item_magnet_enabled = true
+var item_magnet_enabled = false
 var blink_status = false
 var fire_delay = constants.PLAYER_FIRE_DELAY
 
@@ -399,7 +399,14 @@ func _player_hit():
     
         $PlayerHitGracePeriodTimer.start();
         $AudioStreamPlayerHit.play();
-        player_energy = player_energy - constants.PLAYER_HIT_BY_ENEMY_DAMAGE;
+        
+        var damage_reduction_percentage = upgrades['ARMOUR'][0] * constants.ARMOUR_DAMAGE_REDUCTION_PERCENTAGE
+        var damage_to_perform = constants.PLAYER_HIT_BY_ENEMY_DAMAGE - (( damage_reduction_percentage / 100.0) * constants.PLAYER_HIT_BY_ENEMY_DAMAGE)
+        
+        print ("_player_hit() Reduct percentage = " + str(damage_reduction_percentage))
+        print ("_player_hit() Damage to perform = " + str(damage_to_perform))
+        
+        player_energy = player_energy - damage_to_perform
         
         if player_energy <= 0:
             player_energy = 0;
@@ -570,12 +577,34 @@ func decrease_powerup_level(powerup):
     
     get_parent().get_node('HUD').set_powerup_level(powerup, current_powerup_levels[powerup])
     
-
-
 func _on_hud_upgrade_button_pressed(button_number):
     print("PRESSED STAGE 2: " + str(button_number))
     
     # TODO: Handle the upgrade.
+    
+    var selected_upgrade
+    if button_number == 1:
+        selected_upgrade = get_parent().upgrade_one_index
+    else:
+        selected_upgrade = get_parent().upgrade_two_index
+
+    print("Selected upgrade = " + str(selected_upgrade))
+    
+    $AudioStreamPlayerSelectecUpgrade.play()
+    
+    match selected_upgrade:
+        'MAGNET':
+            item_magnet_enabled = true
+        'ARMOUR':
+            pass    # No further action other than marking upgrade as in use needed.
+            
+            
+    # Mark upgrade as in use by increasing its level.
+    # Ensure level does not exceed the maximum allowed.
+    upgrades[selected_upgrade][0] = upgrades[selected_upgrade][0] + 1
+    if upgrades[selected_upgrade][0] > upgrades[selected_upgrade][1]:
+        upgrades[selected_upgrade][0] = upgrades[selected_upgrade][1]
+    
     
     # Go to next wave.
     emit_signal('player_made_upgrade_choice')
