@@ -219,7 +219,11 @@ func _death():
             leave_behind_item()
             
 func leave_behind_item():
-    if randi_range(1,100) < constants.ENEMY_LEAVE_BEHIND_ITEM_PERCENTAGE:
+    var leave_percentage = constants.ENEMY_LEAVE_BEHIND_ITEM_PERCENTAGE + (get_parent().get_node('Player').upgrades['LOOT LOVER'][0] * 10)
+
+    print ("Leave percentage = " + str(leave_percentage))
+    
+    if randi_range(1,100) < leave_percentage:
         var item = get_parent().item_scene.instantiate()
         get_parent().add_child(item)
         item.spawn_random()

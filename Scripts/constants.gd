@@ -5,7 +5,7 @@ const GAME_VERSION = "0.3-alpha"
 # Developer settings.
 const DEV_SKIP_INTRO = true
 const DEV_START_GAME_IMMEDIATELY = true
-const MUSIC_ENABLED = true
+const MUSIC_ENABLED = false
 
 # Game settings
 const START_WAVE = 1
@@ -80,7 +80,7 @@ const FISH_TO_TRIGGER_FISH_FRENZY = 10
 # Items
 const ITEM_SPAWN_MINIMUM_SECONDS = 5
 const ITEM_SPAWN_MAXIMUM_SECONDS = 15
-const ENEMY_LEAVE_BEHIND_ITEM_PERCENTAGE = 100   # 25
+const ENEMY_LEAVE_BEHIND_ITEM_PERCENTAGE = 25
 const ITEM_DESPAWN_TIME = 10
 
 const HEALTH_POTION_BONUS = 20;

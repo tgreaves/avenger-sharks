@@ -2,12 +2,17 @@
 
 # 0.3-alpha
 
-* Internal: DEV_SKIP_INTRO and DEV_START_GAME_IMMEDIATELY options added.
-* In progress:
+* Upgrade system:
     * Upgrade between waves (choice of two).
     * Magnet item pull.  Changed Items to be CharacterBody2D to support.
-    * Armour reduces damage.
-    
+    * Armour: Reduces damage (10% per level)
+    * Fish Affinity: Reduces number of fish to rescue to enable FISH FRENZY (10% per level)
+    * Potion Power: Increases health potion efficiency (10% per level)
+    * Dominant Dino: Increase dinosaur rampage time (20% per level)
+    * More Power: Increase Power Up duration (20% per level)
+    * Loot Lover: Increase item drop rate (10% per level)
+* HUD: Display obtained upgrades.
+* Internal: DEV_SKIP_INTRO and DEV_START_GAME_IMMEDIATELY options added.
 
 # 0.2-alpha
 

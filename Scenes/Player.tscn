@@ -333,5 +333,5 @@ stream = ExtResource("39_sydp1")
 stream = ExtResource("45_fj125")
 volume_db = 6.558
 
-[node name="AudioStreamPlayerSelectecUpgrade" type="AudioStreamPlayer" parent="."]
+[node name="AudioStreamPlayerSelectedUpgrade" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("47_1ngf2")

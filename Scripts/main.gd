@@ -95,6 +95,7 @@ func main_menu():
     
     $HUD/CanvasLayer.visible = true
     $HUD/CanvasLayer/UpgradeChoiceContainer.visible = false
+    $HUD/CanvasLayer/UpgradeSummary.visible = false
     $HUD.get_node("CanvasLayer/Score").visible = false;
     $HUD.get_node("CanvasLayer/Label").visible = true;
     $HUD.get_node("CanvasLayer/Label").text = "";
@@ -116,6 +117,10 @@ func start_game():
     $Player.get_node('EnergyProgressBar').max_value = $Player.player_energy
     $Player.get_node("FishProgressBar").max_value = constants.FISH_TO_TRIGGER_FISH_FRENZY
     $Player.prepare_for_new_game()
+    
+    $HUD/CanvasLayer/UpgradeSummary.text = ""
+    $HUD/CanvasLayer/UpgradeSummary.visible = true
+    
     enemies_left_this_wave = 0
     update_enemies_left_display()
     prepare_for_wave()     
@@ -404,7 +409,7 @@ func _on_player_player_got_fish():
     _on_enemy_update_score_display();
     emit_signal('player_update_fish')
     
-    if fish_collected == constants.FISH_TO_TRIGGER_FISH_FRENZY:
+    if fish_collected == $Player.get_node('FishProgressBar').max_value:
         emit_signal('player_enable_fish_frenzy')
 
 func _on_player_player_found_exit():
@@ -458,13 +463,28 @@ func upgrade_screen():
     upgrade_one_index = 0
     upgrade_two_index = 0
     
-    while (upgrade_one_index == upgrade_two_index):
+    var deadlock_solved = false
+    
+    while (!deadlock_solved):
         upgrade_one_index = $Player.upgrades.keys()[ randi() % $Player.upgrades.size() ]
         upgrade_two_index = $Player.upgrades.keys()[ randi() % $Player.upgrades.size() ]
     
         print ("Indexes: " + str(upgrade_one_index) + " ... " + str(upgrade_two_index))
     
-    print ("DEADLOCK SOLVED")
+        # 1st check: Don't suggest identical upgrades.
+        if upgrade_one_index != upgrade_two_index:
+            
+            print("DEADLOCK STAGE ONE PASSED")
+            
+            # 2nd check: Don't suggest upgrades that are at max level already
+            # (Option for future: Ability to swap out upgrades?)
+            
+            if $Player.upgrades[upgrade_one_index][0] < $Player.upgrades[upgrade_one_index][1] and $Player.upgrades[upgrade_two_index][0] < $Player.upgrades[upgrade_two_index][1]:
+                deadlock_solved = true
+                print("DEADLOCK STAGE TWO PASSED")
+         
+    # Uncomment to force a certain upgrade to be offered (Testing)       
+    upgrade_one_index = 'LOOT LOVER'
        
     $HUD/CanvasLayer/UpgradeChoiceContainer/Choice1/TextureRect.texture = load($Player.upgrades[upgrade_one_index][2])
     $HUD/CanvasLayer/UpgradeChoiceContainer/Choice2/TextureRect.texture = load($Player.upgrades[upgrade_two_index][2])
@@ -486,5 +506,4 @@ func upgrade_screen():
 func _on_player_player_made_upgrade_choice():
     $HUD/CanvasLayer/UpgradeChoiceContainer.visible = false
     game_status = PREPARE_FOR_WAVE
-    #$WaveEndTimer.start();
     

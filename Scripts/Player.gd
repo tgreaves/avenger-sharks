@@ -60,8 +60,13 @@ func _ready():
     upgrades = {
         # Code          [ Current Level, Max Level, Image path, Description
         # If Max Level is 1 then it can only ever be purchased once (Binary item)
-        'MAGNET':       [ 0, 1, 'res://Images/crosshair184.png', 'A powerful magnet which does magnet things.'],
-        'ARMOUR':       [ 0, 3, 'res://Images/crosshair184.png', 'Decrease incoming damage by 10%']
+        'MAGNET':           [ 0, 1, 'res://Images/crosshair184.png', 'A powerful magnet which does magnet things.'],
+        'ARMOUR':           [ 0, 3, 'res://Images/crosshair184.png', 'Decrease incoming damage by 10%'],
+        'POTION POWER':     [ 0, 3, 'res://Images/crosshair184.png', 'Healthy potions are 10% more efficient'],
+        'FISH AFFINITY':    [ 0, 3, 'res://Images/crosshair184.png', 'Decrease fish needed for FRENZY by 10%'],
+        'DOMINANT DINO':    [ 0, 3, 'res://Images/crosshair184.png', 'Increase Mr Dinosaur attack time by 20%'],
+        'MORE POWER':       [ 0, 3, 'res://Images/crosshair184.png', 'Increase Power Up duration by 20%'],
+        'LOOT LOVER':       [ 0, 3, 'res://Images/crosshair184.png',' Increase item drop rate by 10%']
     }
     
 func prepare_for_new_game():
@@ -148,8 +153,6 @@ func get_input():
         $FishFrenzyTimer.start(constants.PLAYER_FISH_FRENZY_DURATION)
         $FishFrenzyFireTimer.start(constants.PLAYER_FISH_FRENZY_FIRE_DELAY)
         
-    
-    
 func _physics_process(_delta):
     get_input()
     move_and_slide()
@@ -204,7 +207,13 @@ func _physics_process(_delta):
                     match collided_with.get_node('.').item_type:
                         "health":
                             var original_energy = player_energy
-                            player_energy = player_energy + constants.HEALTH_POTION_BONUS;
+                            
+                            var health_percentage = upgrades['POTION POWER'][0] * 10
+                            var health_to_add = int(constants.HEALTH_POTION_BONUS + ((health_percentage / 100.0) * constants.HEALTH_POTION_BONUS))
+                            
+                            print("Health potion - adding " + str(health_to_add))
+                            
+                            player_energy = player_energy + health_to_add
                             if get_parent().cheat_mode:
                                 if player_energy > constants.PLAYER_START_GAME_ENERGY_CHEATING:
                                     player_energy = constants.PLAYER_START_GAME_ENERGY_CHEATING
@@ -590,21 +599,28 @@ func _on_hud_upgrade_button_pressed(button_number):
 
     print("Selected upgrade = " + str(selected_upgrade))
     
-    $AudioStreamPlayerSelectecUpgrade.play()
+    $AudioStreamPlayerSelectedUpgrade.play()
     
-    match selected_upgrade:
-        'MAGNET':
-            item_magnet_enabled = true
-        'ARMOUR':
-            pass    # No further action other than marking upgrade as in use needed.
-            
-            
     # Mark upgrade as in use by increasing its level.
     # Ensure level does not exceed the maximum allowed.
     upgrades[selected_upgrade][0] = upgrades[selected_upgrade][0] + 1
     if upgrades[selected_upgrade][0] > upgrades[selected_upgrade][1]:
         upgrades[selected_upgrade][0] = upgrades[selected_upgrade][1]
     
+    match selected_upgrade:
+        'MAGNET':
+            item_magnet_enabled = true
+        'ARMOUR':
+            pass    # No further action other than marking upgrade as in use needed.
+        'FISH AFFINITY':
+            var affinity_percentage = upgrades['FISH AFFINITY'][0] * 10
+            var fish_needed = int(constants.FISH_TO_TRIGGER_FISH_FRENZY - ((affinity_percentage / 100.0) * constants.FISH_TO_TRIGGER_FISH_FRENZY))
+            $FishProgressBar.max_value = fish_needed
+            print("Fish needed now: " + str(fish_needed))
+        'MORE POWER':
+            get_parent().get_node('HUD').reset_powerup_bar_durations()
+    
+    get_parent().get_node('HUD').update_upgrade_summary()
     
     # Go to next wave.
     emit_signal('player_made_upgrade_choice')

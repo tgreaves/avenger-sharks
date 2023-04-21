@@ -240,7 +240,7 @@ stretch_mode = 2
 layout_mode = 2
 theme_override_fonts/font = ExtResource("1_4l55f")
 theme_override_font_sizes/font_size = 48
-text = "Dummy descriptiopn"
+text = "Dummy description"
 horizontal_alignment = 1
 autowrap_mode = 2
 
@@ -249,7 +249,7 @@ layout_mode = 2
 size_flags_vertical = 3
 theme_override_fonts/font = ExtResource("1_4l55f")
 theme_override_font_sizes/font_size = 36
-text = "Dummy descriptiopn"
+text = "Dummy description"
 horizontal_alignment = 1
 autowrap_mode = 2
 
@@ -272,7 +272,7 @@ stretch_mode = 2
 layout_mode = 2
 theme_override_fonts/font = ExtResource("1_4l55f")
 theme_override_font_sizes/font_size = 48
-text = "Dummy descriptiopn"
+text = "Dummy description"
 horizontal_alignment = 1
 autowrap_mode = 2
 
@@ -281,7 +281,7 @@ layout_mode = 2
 size_flags_vertical = 3
 theme_override_fonts/font = ExtResource("1_4l55f")
 theme_override_font_sizes/font_size = 36
-text = "Dummy descriptiopn"
+text = "Dummy description"
 horizontal_alignment = 1
 autowrap_mode = 2
 
@@ -290,6 +290,19 @@ layout_mode = 2
 theme_override_fonts/font = ExtResource("1_4l55f")
 theme_override_font_sizes/font_size = 48
 text = "SELECT"
+
+[node name="UpgradeSummary" type="Label" parent="CanvasLayer"]
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 6.0
+offset_top = 216.0
+offset_right = 658.0
+offset_bottom = 589.0
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("1_4l55f")
+theme_override_font_sizes/font_size = 24
+vertical_alignment = 2
 
 [connection signal="pressed" from="CanvasLayer/UpgradeChoiceContainer/Choice1/Button" to="." method="_on_upgrade_button_pressed" binds= [1]]
 [connection signal="pressed" from="CanvasLayer/UpgradeChoiceContainer/Choice2/Button" to="." method="_on_upgrade_button_pressed" binds= [2]]

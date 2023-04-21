@@ -11,10 +11,6 @@
   * Exploding shots
   * Piercing shots
 
-* Selectable things at end of each wave / level up
-  * Magnet (pull items towards player)
-  * Slow down enemies
-
 * Keep count of fish rescued - use as currency in pre-game shop...
   * Start with more health.
   * Other characters?
@@ -36,8 +32,12 @@
 
 * Upgrade system next stuff...
 
-* Display upgrades on left of HUD etc.
-* Armour plating enabled when selected
-* Levelling for armour plating so it can be selected more than once
-* Make sure magnet can only be selected once (same for any other single level upgrades)
+* Display upgrades and status / level on left of HUD etc.
+* Upgrade rarity? (Curretly all have equal chance)
 * Ideas for more !!
+    * Perma power-up: Sets power-up to start a level at Level 1 or more (So have one per power-up)
+    * Upgrade that only works for x stages (e.g. confuse enemies)
+
+* SteamWorks support / Cloud saving?
+* Other persistent storage (high scores, options)
+* Ability to toggle full screen or not in game.
