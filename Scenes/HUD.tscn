@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://bcqacic7yj4ds"]
+[gd_scene load_steps=7 format=3 uid="uid://bcqacic7yj4ds"]
 
 [ext_resource type="FontFile" uid="uid://dclfn1fjcq5i7" path="res://Fonts/PressStart2P-Regular.ttf" id="1_4l55f"]
 [ext_resource type="Script" path="res://Scripts/HUD.gd" id="1_bwdok"]
@@ -8,6 +8,12 @@ bg_color = Color(0, 0, 0, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bf8k5"]
 bg_color = Color(0.972549, 0.321569, 0.580392, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_i176l"]
+bg_color = Color(0.180392, 0.290196, 0.756863, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_q8ag0"]
+bg_color = Color(0.180392, 0.290196, 0.756863, 1)
 
 [node name="HUD" type="Control"]
 layout_mode = 3
@@ -255,9 +261,11 @@ autowrap_mode = 2
 
 [node name="Button" type="Button" parent="CanvasLayer/UpgradeChoiceContainer/Choice1"]
 layout_mode = 2
+size_flags_horizontal = 4
 theme_override_fonts/font = ExtResource("1_4l55f")
 theme_override_font_sizes/font_size = 48
-text = "SELECT"
+theme_override_styles/normal = SubResource("StyleBoxFlat_i176l")
+text = "  SELECT  "
 
 [node name="Choice2" type="VBoxContainer" parent="CanvasLayer/UpgradeChoiceContainer"]
 layout_mode = 2
@@ -287,9 +295,11 @@ autowrap_mode = 2
 
 [node name="Button" type="Button" parent="CanvasLayer/UpgradeChoiceContainer/Choice2"]
 layout_mode = 2
+size_flags_horizontal = 4
 theme_override_fonts/font = ExtResource("1_4l55f")
 theme_override_font_sizes/font_size = 48
-text = "SELECT"
+theme_override_styles/normal = SubResource("StyleBoxFlat_q8ag0")
+text = "  SELECT  "
 
 [node name="UpgradeSummary" type="Label" parent="CanvasLayer"]
 anchors_preset = 4

@@ -495,6 +495,8 @@ func upgrade_screen():
     $HUD/CanvasLayer/UpgradeChoiceContainer/Choice1/Description.text = $Player.upgrades[upgrade_one_index][3]
     $HUD/CanvasLayer/UpgradeChoiceContainer/Choice2/Description.text = $Player.upgrades[upgrade_two_index][3]
     
+    $HUD/CanvasLayer/UpgradeChoiceContainer/Choice1/Button.grab_focus()
+    
     $HUD/CanvasLayer/UpgradeChoiceContainer.modulate = Color(0,0,0,0)
     $HUD/CanvasLayer/UpgradeChoiceContainer.visible = true
     
