@@ -321,6 +321,7 @@ func _physics_process(_delta):
                     get_parent().get_node('HUD').update_upgrade_summary()
                     
                     player_energy = 0.5 * constants.PLAYER_START_GAME_ENERGY
+                    $EnergyProgressBar.value = player_energy
                     
                     # Play explosion backwards (a bit slower so sound FX fits)
                     $AnimatedSprite2D.animation = 'explosion'
