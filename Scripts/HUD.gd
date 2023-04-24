@@ -83,8 +83,6 @@ func reset_powerup_bar_durations():
     var duration_percentage = get_parent().get_node('Player').upgrades['MORE POWER'][0] * 20
     var duration = int(constants.POWERUP_ACTIVE_DURATION + ((duration_percentage / 100.0) * constants.POWERUP_ACTIVE_DURATION))
                             
-    print("Powerup duration now = " + str(duration))
-    
     $CanvasLayer/PowerUpContainer/SpeedUpContainer/SpeedUp/ProgressBar.max_value = duration
     $CanvasLayer/PowerUpContainer/FastSprayContainer/FastSpray/ProgressBar.max_value = duration
     $CanvasLayer/PowerUpContainer/BigSprayContainer/BigSpray/ProgressBar.max_value = duration
@@ -114,7 +112,6 @@ func set_all_powerup_levels():
         set_powerup_level(powerup, get_parent().get_node('Player').current_powerup_levels[powerup])
         
 func _on_upgrade_button_pressed(button_number):
-    print("PRESSED: " + str(button_number))
     emit_signal("upgrade_button_pressed", button_number)
     
 func update_upgrade_summary():

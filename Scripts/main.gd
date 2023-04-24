@@ -38,7 +38,7 @@ enum {
     GAME_OVER
 }
 
-var ITEMS = [ 'dinosaur']
+var ITEMS = ['dinosaur']
    
 signal player_hunt_key;
 signal player_move_to_starting_position;
@@ -218,6 +218,11 @@ func start_wave():
         i=i+1;
 
 func wave_end():
+    
+    # Don't let wave end if the player beat it by dying!
+    if !$Player.is_player_alive():
+        return
+    
     game_status = GETTING_KEY;
     
     $HUD.get_node("CanvasLayer/Label").text = "WAVE COMPLETE!"
@@ -250,7 +255,6 @@ func wave_end_cleanup():
     for dinosaur_attack in get_tree().get_nodes_in_group('dinosaurAttack'):
         dinosaur_attack.queue_free()
         
-    #game_status = PREPARE_FOR_WAVE
     game_status = UPGRADE_SCREEN
     
     $WaveEndTimer.start();
@@ -364,8 +368,8 @@ func _input(_ev):
                 $PauseMenu.set_process_input(true)
                 $PauseMenu._ready()
                 get_tree().paused = true;
-                
-    if Input.is_action_just_released('shark_fire') or Input.is_action_just_released('shark_fire_mouse'):
+                            
+    if Input.is_action_just_released('shark_fire') or Input.is_action_just_released('shark_fire_mouse') or Input.is_action_just_released('quit'):
         match game_status:
             INTRO_SEQUENCE:
                 intro.queue_free()
@@ -468,23 +472,18 @@ func upgrade_screen():
     while (!deadlock_solved):
         upgrade_one_index = $Player.upgrades.keys()[ randi() % $Player.upgrades.size() ]
         upgrade_two_index = $Player.upgrades.keys()[ randi() % $Player.upgrades.size() ]
-    
-        print ("Indexes: " + str(upgrade_one_index) + " ... " + str(upgrade_two_index))
-    
+        
         # 1st check: Don't suggest identical upgrades.
         if upgrade_one_index != upgrade_two_index:
-            
-            print("DEADLOCK STAGE ONE PASSED")
             
             # 2nd check: Don't suggest upgrades that are at max level already
             # (Option for future: Ability to swap out upgrades?)
             
             if $Player.upgrades[upgrade_one_index][0] < $Player.upgrades[upgrade_one_index][1] and $Player.upgrades[upgrade_two_index][0] < $Player.upgrades[upgrade_two_index][1]:
                 deadlock_solved = true
-                print("DEADLOCK STAGE TWO PASSED")
          
     # Uncomment to force a certain upgrade to be offered (Testing)       
-    upgrade_one_index = 'LOOT LOVER'
+    #upgrade_one_index = 'CHEAT DEATH'
        
     $HUD/CanvasLayer/UpgradeChoiceContainer/Choice1/TextureRect.texture = load($Player.upgrades[upgrade_one_index][2])
     $HUD/CanvasLayer/UpgradeChoiceContainer/Choice2/TextureRect.texture = load($Player.upgrades[upgrade_two_index][2])

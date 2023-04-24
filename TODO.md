@@ -30,14 +30,35 @@
 
 * Big spray doesn't work when player close to a wall.
 
-* Upgrade system next stuff...
+# THINGS FOR 0.3-alpha
 
-* Display upgrades and status / level on left of HUD etc.
-* Upgrade rarity? (Curretly all have equal chance)
-* Ideas for more !!
+* UPGRADE SYSTEM
     * Perma power-up: Sets power-up to start a level at Level 1 or more (So have one per power-up)
     * Upgrade that only works for x stages (e.g. confuse enemies)
 
-* SteamWorks support / Cloud saving?
-* Other persistent storage (high scores, options)
-* Ability to toggle full screen or not in game.
+* ENEMY TYPES
+    * Static turret - probably new Scene to support
+        * Rotate during physics.
+        * After random timer, charge animation + second timer
+        * Fire solid laser - persist for third timer
+        * Damages player
+        * Return to turrent
+        * Statuses
+            * ROTATING
+            * CHARGING
+            * FIRING
+
+* SPAWN PATTERNS
+    * Currently placement is 100% random.
+    * Start as circle around player as an option? (Randomise if this happens)
+
+* SPECIAL WAVE
+    * Linked to pattern.
+    * e.g. Only necromancers, or traps, or chasers, or whatever.
+    
+* STEAM
+    * Initial listing / assets
+    * Cloud saving (but of what?)
+    * Achievements
+    * Leaderboard support (High scores)
+    

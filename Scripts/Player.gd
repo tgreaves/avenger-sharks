@@ -12,7 +12,8 @@ enum {
     GOING_THROUGH_DOOR,
     MOVING_TO_START_POSITION,
     EXPLODING,
-    EXPLODED
+    EXPLODED,
+    CHEATING_DEATH
 }
 
 @export var speed = constants.PLAYER_SPEED;
@@ -62,11 +63,12 @@ func _ready():
         # If Max Level is 1 then it can only ever be purchased once (Binary item)
         'MAGNET':           [ 0, 1, 'res://Images/crosshair184.png', 'A powerful magnet which does magnet things.'],
         'ARMOUR':           [ 0, 3, 'res://Images/crosshair184.png', 'Decrease incoming damage by 10%'],
-        'POTION POWER':     [ 0, 3, 'res://Images/crosshair184.png', 'Healthy potions are 10% more efficient'],
+        'POTION POWER':     [ 0, 3, 'res://Images/crosshair184.png', 'Health potions are 10% more efficient'],
         'FISH AFFINITY':    [ 0, 3, 'res://Images/crosshair184.png', 'Decrease fish needed for FRENZY by 10%'],
         'DOMINANT DINO':    [ 0, 3, 'res://Images/crosshair184.png', 'Increase Mr Dinosaur attack time by 20%'],
         'MORE POWER':       [ 0, 3, 'res://Images/crosshair184.png', 'Increase Power Up duration by 20%'],
-        'LOOT LOVER':       [ 0, 3, 'res://Images/crosshair184.png',' Increase item drop rate by 10%']
+        'LOOT LOVER':       [ 0, 3, 'res://Images/crosshair184.png', 'Increase item drop rate by 10%'],
+        'CHEAT DEATH':      [ 0, 1, 'res://Images/crosshair184.png', 'Regain 50% health upon death - Once!']
     }
     
 func prepare_for_new_game():
@@ -211,8 +213,6 @@ func _physics_process(_delta):
                             var health_percentage = upgrades['POTION POWER'][0] * 10
                             var health_to_add = int(constants.HEALTH_POTION_BONUS + ((health_percentage / 100.0) * constants.HEALTH_POTION_BONUS))
                             
-                            print("Health potion - adding " + str(health_to_add))
-                            
                             player_energy = player_energy + health_to_add
                             if get_parent().cheat_mode:
                                 if player_energy > constants.PLAYER_START_GAME_ENERGY_CHEATING:
@@ -313,8 +313,39 @@ func _physics_process(_delta):
                                  
         EXPLODING:
             if $PlayerExplosionTimer.time_left == 0:
-                emit_signal('player_died');
-                shark_status = EXPLODED;
+                # TODO: Hook in CHEAT DEATH here.
+                
+                # Can the player cheat death?
+                if upgrades['CHEAT DEATH'][0]:
+                    upgrades['CHEAT DEATH'][0] = 0
+                    get_parent().get_node('HUD').update_upgrade_summary()
+                    
+                    player_energy = 0.5 * constants.PLAYER_START_GAME_ENERGY
+                    
+                    # Play explosion backwards (a bit slower so sound FX fits)
+                    $AnimatedSprite2D.animation = 'explosion'
+                    $AnimatedSprite2D.speed_scale = -0.5
+                    $AnimatedSprite2D.play()
+                    $AudioStreamPlayerExplosionReverse.play()
+                    
+                    shark_status = CHEATING_DEATH
+                    $PlayerExplosionTimer.start()
+                else:       
+                    emit_signal('player_died');
+                    shark_status = EXPLODED;
+        CHEATING_DEATH:
+            if $PlayerExplosionTimer.time_left == 0:
+                # Activate player again.
+                shark_status = ALIVE
+                $CollisionShape2D.set_deferred("disabled", false)
+                $AnimatedSprite2D.animation = 'default'
+                $AnimatedSprite2D.speed_scale = 1
+                $EnergyProgressBar.visible=true
+                $FishProgressBar.visible=true    
+                powerup_label_animation('DEATH CHEATED!')
+                
+                # Give a 1s grace period before taking damage again.
+                $PlayerHitGracePeriodTimer.start(1)      
         HUNTING_KEY:
             if velocity.x > 0:
                 $AnimatedSprite2D.set_flip_h(true);
@@ -411,10 +442,7 @@ func _player_hit():
         
         var damage_reduction_percentage = upgrades['ARMOUR'][0] * constants.ARMOUR_DAMAGE_REDUCTION_PERCENTAGE
         var damage_to_perform = constants.PLAYER_HIT_BY_ENEMY_DAMAGE - (( damage_reduction_percentage / 100.0) * constants.PLAYER_HIT_BY_ENEMY_DAMAGE)
-        
-        print ("_player_hit() Reduct percentage = " + str(damage_reduction_percentage))
-        print ("_player_hit() Damage to perform = " + str(damage_to_perform))
-        
+ 
         player_energy = player_energy - damage_to_perform
         
         if player_energy <= 0:
@@ -587,17 +615,12 @@ func decrease_powerup_level(powerup):
     get_parent().get_node('HUD').set_powerup_level(powerup, current_powerup_levels[powerup])
     
 func _on_hud_upgrade_button_pressed(button_number):
-    print("PRESSED STAGE 2: " + str(button_number))
-    
-    # TODO: Handle the upgrade.
-    
+
     var selected_upgrade
     if button_number == 1:
         selected_upgrade = get_parent().upgrade_one_index
     else:
         selected_upgrade = get_parent().upgrade_two_index
-
-    print("Selected upgrade = " + str(selected_upgrade))
     
     $AudioStreamPlayerSelectedUpgrade.play()
     
@@ -616,7 +639,6 @@ func _on_hud_upgrade_button_pressed(button_number):
             var affinity_percentage = upgrades['FISH AFFINITY'][0] * 10
             var fish_needed = int(constants.FISH_TO_TRIGGER_FISH_FRENZY - ((affinity_percentage / 100.0) * constants.FISH_TO_TRIGGER_FISH_FRENZY))
             $FishProgressBar.max_value = fish_needed
-            print("Fish needed now: " + str(fish_needed))
         'MORE POWER':
             get_parent().get_node('HUD').reset_powerup_bar_durations()
     
@@ -625,3 +647,8 @@ func _on_hud_upgrade_button_pressed(button_number):
     # Go to next wave.
     emit_signal('player_made_upgrade_choice')
 
+func is_player_alive():
+    if shark_status == ALIVE:
+        return true
+    else:
+        return false

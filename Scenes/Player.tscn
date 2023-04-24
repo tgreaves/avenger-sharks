@@ -1,4 +1,4 @@
-[gd_scene load_steps=55 format=3 uid="uid://5yp4e43ckdrj"]
+[gd_scene load_steps=56 format=3 uid="uid://5yp4e43ckdrj"]
 
 [ext_resource type="Script" path="res://Scripts/Player.gd" id="1_m4brx"]
 [ext_resource type="Texture2D" uid="uid://ikcchi1bmyrs" path="res://Sprites/Shark/Shark1.png" id="2_px875"]
@@ -40,6 +40,7 @@
 [ext_resource type="AudioStream" uid="uid://vq6a2soq7m0i" path="res://Sound/glug-glug-glug-39140.mp3" id="38_86qdg"]
 [ext_resource type="AudioStream" uid="uid://di185cyn4vxdo" path="res://Sound/powering_up_funny_sci-fi_dry-102263.mp3" id="39_sydp1"]
 [ext_resource type="FontFile" uid="uid://dclfn1fjcq5i7" path="res://Fonts/PressStart2P-Regular.ttf" id="40_8elap"]
+[ext_resource type="AudioStream" uid="uid://dee567wkg1cj" path="res://Sound/hq-explosion-6288-reverse.mp3" id="44_dvals"]
 [ext_resource type="AudioStream" uid="uid://dl3w6ch8pux8d" path="res://Sound/yay-6120.mp3" id="45_fj125"]
 [ext_resource type="AudioStream" uid="uid://dwquinjikuv4o" path="res://Sound/notification-for-game-scenes-132473.mp3" id="47_1ngf2"]
 [ext_resource type="Texture2D" uid="uid://be1l4stvjmcog" path="res://Sprites/Blood/bloodfx001_01.png" id="71_f4bva"]
@@ -228,6 +229,7 @@ shape = SubResource("CapsuleShape2D_1hb8q")
 texture_filter = 1
 scale = Vector2(4, 4)
 sprite_frames = SubResource("SpriteFrames_wa15s")
+animation = &"explosion"
 metadata/_aseprite_wizard_config_ = {
 "layer": "",
 "o_ex_p": "",
@@ -319,6 +321,9 @@ stream = ExtResource("10_v8evc")
 [node name="AudioStreamPlayerHit" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("11_g4ac8")
 volume_db = 2.811
+
+[node name="AudioStreamPlayerExplosionReverse" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("44_dvals")
 
 [node name="AudioStreamPlayerExplosion" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("37_g7u1l")

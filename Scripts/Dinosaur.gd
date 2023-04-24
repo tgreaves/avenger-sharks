@@ -25,8 +25,6 @@ func _go_on_a_rampage():
     var rampage_percentage = get_parent().get_node('Player').upgrades['DOMINANT DINO'][0] * 20
     var survival_time = constants.DINOSAUR_SURVIVAL_TIME + ((rampage_percentage / 100.0) * constants.DINOSAUR_SURVIVAL_TIME)
     
-    print("Setting survival time to " + str(survival_time))
-    
     $DinosaurSurvivalTimer.start(survival_time);
     $AudioStreamDinosaurGrowl.play();
     

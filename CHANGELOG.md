@@ -11,10 +11,17 @@
     * Dominant Dino: Increase dinosaur rampage time (20% per level)
     * More Power: Increase Power Up duration (20% per level)
     * Loot Lover: Increase item drop rate (10% per level)
+    * Cheat death: Respawn upon death with 50% health.
 * HUD: Display obtained upgrades.
+* Misc: ESC key can now exit intro and credits.
+* Steam: Initial store assets.
+* Bug fixes:
+    * Stop game breaking if player dies at the same time as beating a wave.
 * Internal: DEV_SKIP_INTRO and DEV_START_GAME_IMMEDIATELY options added.
 
 # 0.2-alpha
+
+This is primarily a bug fix / 'quality of life' release.
 
 * Gameplay: Make player invulnerable during wave exit.
 * Gameplay: Improved necromancer hit box.
