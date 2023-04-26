@@ -25,6 +25,7 @@ constants="*res://Scripts/constants.gd"
 window/size/viewport_width=2560
 window/size/viewport_height=1440
 window/stretch/mode="viewport"
+window/dpi/allow_hidpi=false
 mouse_cursor/custom_image="res://Images/crosshair184.png"
 mouse_cursor/custom_image_hotspot=Vector2(32, 32)
 

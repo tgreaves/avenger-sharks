@@ -3,6 +3,7 @@
 * Difficulty levels (fish themed, e.g Minnow upwards)
 * Boss wave
 * Pacifist mode
+* Dinosaur mode - Only triggering dinosaurs will kill enemies, but have more of them?
 
 # Power-ups / Progression
 
@@ -47,6 +48,7 @@
             * ROTATING
             * CHARGING
             * FIRING
+    * Turret could fire a homing missile instead.
 
 * SPAWN PATTERNS
     * Currently placement is 100% random.
