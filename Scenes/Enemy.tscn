@@ -1,9 +1,11 @@
-[gd_scene load_steps=72 format=3 uid="uid://bkmx1mvtb8dxr"]
+[gd_scene load_steps=82 format=3 uid="uid://bkmx1mvtb8dxr"]
 
 [ext_resource type="Script" path="res://Scripts/Enemy.gd" id="1_6udno"]
 [ext_resource type="Texture2D" uid="uid://ps2dg61ty76w" path="res://Sprites/knight-run-sheet.png" id="2_7pnuj"]
+[ext_resource type="Texture2D" uid="uid://q6dsymwdbl1c" path="res://Sprites/Bee/Bee_Death.png" id="2_phgyt"]
 [ext_resource type="Texture2D" uid="uid://c4xfdnq5c38c0" path="res://Sprites/knight-death-sheet.png" id="2_q1u0q"]
 [ext_resource type="Texture2D" uid="uid://cc8l7jmv24vle" path="res://Sprites/wizard-run-sheet.png" id="3_8f23o"]
+[ext_resource type="Texture2D" uid="uid://pq28qkn5p8p5" path="res://Sprites/Bee/Bee_Walk.png" id="3_57hdm"]
 [ext_resource type="Texture2D" uid="uid://71x34ukulwpb" path="res://Sprites/Necromancer_creativekind-Sheet.png" id="4_6nouq"]
 [ext_resource type="Texture2D" uid="uid://c6sytqupcgoul" path="res://Sprites/rogue-death-sheet.png" id="4_chvat"]
 [ext_resource type="Texture2D" uid="uid://b3oxns30ei64v" path="res://Sprites/wizard-death-sheet.png" id="4_mvkr8"]
@@ -14,6 +16,38 @@
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_brpyb"]
 radius = 59.0
 height = 132.0
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_uxtxg"]
+atlas = ExtResource("2_phgyt")
+region = Rect2(0, 128, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6envg"]
+atlas = ExtResource("2_phgyt")
+region = Rect2(64, 128, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_p3i72"]
+atlas = ExtResource("2_phgyt")
+region = Rect2(128, 128, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_d1u5e"]
+atlas = ExtResource("2_phgyt")
+region = Rect2(192, 128, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_t3ee0"]
+atlas = ExtResource("3_57hdm")
+region = Rect2(0, 128, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_n1068"]
+atlas = ExtResource("3_57hdm")
+region = Rect2(64, 128, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5g12d"]
+atlas = ExtResource("3_57hdm")
+region = Rect2(128, 128, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hd86b"]
+atlas = ExtResource("3_57hdm")
+region = Rect2(192, 128, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_nv8hw"]
 atlas = ExtResource("2_q1u0q")
@@ -255,6 +289,43 @@ region = Rect2(320, 32, 64, 32)
 animations = [{
 "frames": [{
 "duration": 1.0,
+"texture": SubResource("AtlasTexture_uxtxg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6envg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_p3i72")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_d1u5e")
+}, {
+"duration": 1.0,
+"texture": null
+}],
+"loop": false,
+"name": &"bee-death",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_t3ee0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_n1068")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5g12d")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hd86b")
+}],
+"loop": true,
+"name": &"bee-run",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
 "texture": SubResource("AtlasTexture_nv8hw")
 }, {
 "duration": 1.0,
@@ -332,7 +403,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"necromancer-death",
-"speed": 5.0
+"speed": 10.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -491,7 +562,9 @@ shape = SubResource("CapsuleShape2D_brpyb")
 texture_filter = 1
 scale = Vector2(4, 4)
 sprite_frames = SubResource("SpriteFrames_4gmcv")
-animation = &"necromancer-hit"
+animation = &"knight-death"
+frame = 5
+frame_progress = 1.0
 metadata/_aseprite_wizard_config_ = {
 "layer": "",
 "o_ex_p": "",

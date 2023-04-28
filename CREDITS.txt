@@ -30,6 +30,9 @@ https://anokolisa.itch.io/dungeon-crawler-pixel-art-asset-pack
 Necromancer sprite: CreativeKind
 https://creativekind.itch.io/necromancer-free
 
+Bee sprite: Admurin
+https://admurin.itch.io/top-down-mobs-bee
+
 Water spray sprites: Cethiel
 https://opengameart.org/content/water-magic-effect
 

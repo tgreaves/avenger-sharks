@@ -12,9 +12,20 @@
     * More Power: Increase Power Up duration (20% per level)
     * Loot Lover: Increase item drop rate (10% per level)
     * Cheat death: Respawn upon death with 50% health.
-* HUD: Display obtained upgrades.
+* New game mode: Pacifist
+    * Player cannot shoot or Frenzy and has to collect the fish to clear waves.
+    * No upgrades.
+    * Enemies do not drop power-ups.  Health Potions spawn randomly in the arena.
+* New enemy type: Bee! (bzzzzzz)
+* Game balance: 
+    * Enemy types that spawn start simple and grow more complex as waves progress.
+    * Chests 2 x likely to be dropped than health potions.
+    * Spawn traps less frequently.
+* Graphics: 
+    * Display obtained upgrades on HUD.
+    * Speed up Necromancer death animation.
 * Misc: ESC key can now exit intro and credits.
-* Steam: Initial store assets.
+* Steam: Initial store assets and listing.
 * Bug fixes:
     * Stop game breaking if player dies at the same time as beating a wave.
 * Internal: DEV_SKIP_INTRO and DEV_START_GAME_IMMEDIATELY options added.

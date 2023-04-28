@@ -19,18 +19,30 @@ var hit_to_be_processed;
 @onready var screen_size = get_viewport_rect().size
 
 func _ready():
-    var mob_types = ['knight','knight', 'wizard','wizard', 'rogue','rogue','necromancer'];
+    var mob_types
+    
+    # Determine spawn list for this wave.
+    for local_wave_number in constants.ENEMY_SPAWN_WAVE_CONFIGURATION:
+        if get_parent().wave_number >= local_wave_number: 
+            mob_types = constants.ENEMY_SPAWN_WAVE_CONFIGURATION[local_wave_number]
+            
+    print("Determined spawn list: " + str(mob_types))
+    
     enemy_type = mob_types[randi() % mob_types.size()]
     $AnimatedSprite2D.animation = enemy_type + str('-run')
     
-    if enemy_type == 'necromancer':
-        $AnimatedSprite2D.offset = Vector2(0,-25)
-        $CollisionShape2D.scale = Vector2(1.5, 1.5)
-        enemy_speed = constants.ENEMY_NECROMANCER_SPEED;
-        enemy_health = constants.ENEMY_NECROMANCER_HEALTH;
-    else:
-        enemy_speed = constants.ENEMY_SPEED;
-        enemy_health = constants.ENEMY_HEALTH;
+    match enemy_type:
+        'necromancer':
+            $AnimatedSprite2D.offset = Vector2(0,-25)
+            $CollisionShape2D.scale = Vector2(1.5, 1.5)
+            enemy_speed = constants.ENEMY_NECROMANCER_SPEED;
+            enemy_health = constants.ENEMY_NECROMANCER_HEALTH;
+        'bee':
+            enemy_speed = constants.ENEMY_BEE_SPEED
+            enemy_health = constants.ENEMY_HEALTH
+        _:
+            enemy_speed = constants.ENEMY_SPEED;
+            enemy_health = constants.ENEMY_HEALTH;
         
     var i=1
     while i <= get_parent().wave_number - 1:
@@ -86,7 +98,8 @@ func _physics_process(delta):
                         
                         var fish_points = get_tree().get_nodes_in_group("fishGroup");
                         
-                        if fish_points.size():
+                        # In Pacifist mode, Necros do not go after fish.
+                        if fish_points.size() and get_parent().game_mode == 'ARCADE':
                             var nearest_fish = fish_points[0];
                         
                             for single_fish in fish_points:
@@ -112,7 +125,8 @@ func _physics_process(delta):
                         
                 # OVERRIDE when only a limited number of enemies left
                 # Behaviour: Chase player.
-                if get_parent().enemies_left_this_wave <= constants.ENEMY_ALL_CHASE_WHEN_POPULATION_LOW:
+                # BEES always chase the player with no respite!
+                if enemy_type == 'bee' or get_parent().enemies_left_this_wave <= constants.ENEMY_ALL_CHASE_WHEN_POPULATION_LOW:
                     var target_direction = (get_parent().get_node("Player").global_position - global_position).normalized();
                     velocity = target_direction * enemy_speed;
                     $StateTimer.start(randf_range(constants.ENEMY_CHASE_REORIENT_MINIMUM_SECONDS,
@@ -178,7 +192,7 @@ func _physics_process(delta):
             $TrapTimer.start(randf_range(constants.ENEMY_TRAP_MINIMUM_SECONDS,constants.ENEMY_TRAP_MAXIMUM_SECONDS));
         
     if collision:		
-        if enemy_type == 'necromancer' && collision.get_collider().name.contains('Fish'):
+        if enemy_type == 'necromancer' && collision.get_collider().name.contains('Fish') && get_parent().game_mode == 'ARCADE':
             var collided_with = collision.get_collider();
             collided_with.get_node('.')._death(1);
             $AudioStreamPlayerFishSplat.play();
@@ -216,7 +230,8 @@ func _death():
         
             get_parent()._on_enemy_update_score(enemy_killed_score,global_position)
             
-            leave_behind_item()
+            if get_parent().game_mode == 'ARCADE':
+                leave_behind_item()
             
 func leave_behind_item():
     var leave_percentage = constants.ENEMY_LEAVE_BEHIND_ITEM_PERCENTAGE + (get_parent().get_node('Player').upgrades['LOOT LOVER'][0] * 10)

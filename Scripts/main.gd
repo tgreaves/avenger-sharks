@@ -11,6 +11,8 @@ extends Node
 @export var wave_number = 1;
 @export var enemies_left_this_wave = 0;
 @export var fish_collected = 0;
+@export var fish_left_this_wave = 0
+@export var game_mode = 'ARCADE'
 
 var score = 0;
 var high_score = 0;
@@ -37,8 +39,6 @@ enum {
     PREPARE_FOR_WAVE,
     GAME_OVER
 }
-
-var ITEMS = ['dinosaur']
    
 signal player_hunt_key;
 signal player_move_to_starting_position;
@@ -68,8 +68,9 @@ func _ready():
     
 func main_menu():
     game_status=MAIN_MENU
-    score=0;
-    fish_collected=0;
+    score=0
+    fish_collected=0
+    fish_left_this_wave=0
     wave_number= constants.START_WAVE - 1
     
     if $AudioStreamPlayerMusic.playing == false and constants.MUSIC_ENABLED:
@@ -122,7 +123,14 @@ func start_game():
     $HUD/CanvasLayer/UpgradeSummary.visible = true
     
     enemies_left_this_wave = 0
-    update_enemies_left_display()
+    
+    if game_mode == 'ARCADE':
+        update_enemies_left_display()
+        #DisplayServer.mouse_set_mode(DisplayServer.MOUSE_MODE_HIDDEN)
+    else:
+        update_fish_left_display()
+        $Player.get_node('FishProgressBar').visible = false
+        
     prepare_for_wave()     
 
 func prepare_for_wave():
@@ -189,7 +197,19 @@ func prepare_for_wave():
 
 func wave_intro():
     game_status = WAVE_START;
-    $HUD.get_node("CanvasLayer/Label").text = "WAVE " + str(wave_number);
+    
+    var wave_text
+    
+    if wave_number == 1:
+        match game_mode:
+            'ARCADE':
+                wave_text = 'CLEAR ALL ENEMIES FOR NEXT WAVE!'
+            'PACIFIST':
+                wave_text = 'COLLECT ALL FISH FOR NEXT WAVE!' 
+    else:
+        wave_text = "WAVE " + str(wave_number)
+                
+    $HUD.get_node("CanvasLayer/Label").text = wave_text
     $HUD.get_node("CanvasLayer/Label").visible = true;
     $WaveIntroTimer.start();
 
@@ -209,13 +229,23 @@ func start_wave():
         i=i+1;
         
     enemies_left_this_wave = (wave_number * constants.ENEMY_MULTIPLIER_AT_WAVE_START) + (wave_number * constants.ENEMY_MULTIPLIER_DURING_WAVE);
-    update_enemies_left_display();
 
+    # Fish spawning
+    if game_mode == 'ARCADE':
+        fish_left_this_wave = constants.FISH_TO_SPAWN_ARCADE
+    else:
+        fish_left_this_wave = constants.FISH_TO_SPAWN_PACIFIST_BASE + ( (wave_number-1) * constants.FISH_TO_SPAWN_PACIFIST_WAVE_MULTIPLIER )
+    
     i=0;
 
-    while (i < constants.FISH_TO_SPAWN):
+    while (i < fish_left_this_wave):
         spawn_fish();
         i=i+1;
+    
+    if game_mode == 'ARCADE':
+        update_enemies_left_display()
+    else:
+        update_fish_left_display()
 
 func wave_end():
     
@@ -236,6 +266,10 @@ func wave_end():
     # Auto send player to get the key.
     emit_signal('player_hunt_key', $Key.global_position);
     
+    if game_mode == 'PACIFIST':
+        for enemy in get_tree().get_nodes_in_group('enemyGroup'):
+            enemy.queue_free()
+    
     for fish in get_tree().get_nodes_in_group('fishGroup'):
         fish.queue_free()
         
@@ -254,8 +288,11 @@ func wave_end_cleanup():
     
     for dinosaur_attack in get_tree().get_nodes_in_group('dinosaurAttack'):
         dinosaur_attack.queue_free()
-        
-    game_status = UPGRADE_SCREEN
+    
+    if game_mode == 'ARCADE':
+        game_status = UPGRADE_SCREEN
+    else:
+        game_status = PREPARE_FOR_WAVE
     
     $WaveEndTimer.start();
 
@@ -288,6 +325,13 @@ func return_to_main_screen():
     
 func spawn_item():	
     
+    var ITEMS
+    
+    if game_mode == 'ARCADE':
+        ITEMS = constants.ARCADE_SPAWNING_ITEMS
+    else:
+        ITEMS = constants.PACIFIST_SPAWNING_ITEMS
+       
     var spawned_item = ITEMS[randi() % ITEMS.size()]
     
     if spawned_item == 'dinosaur':
@@ -297,7 +341,7 @@ func spawn_item():
         add_child(dinosaur)
     else:
         var item = item_scene.instantiate()
-        item.spawn_random()
+        item.spawn_specific(spawned_item)
         item.get_node('.').set_position (Vector2(randf_range(constants.ARENA_SPAWN_MIN_X,constants.ARENA_SPAWN_MAX_X),randf_range(constants.ARENA_SPAWN_MIN_Y,constants.ARENA_SPAWN_MAX_Y)));
         item.add_to_group('itemGroup')
         add_child(item)
@@ -336,6 +380,15 @@ func _process(_delta):
     if game_status == GAME_RUNNING:
         if enemies_left_this_wave == 0:
             wave_end();
+            
+        if fish_left_this_wave == 0 && game_mode == 'PACIFIST':
+            # Spawn key where player is.
+            $Key.global_position = $Player.global_position
+            $Key.show();
+            $Key/CollisionShape2D.disabled = false;
+            $Key/AnimatedSprite2D.play();
+            
+            wave_end()
             
         if $ItemSpawnTimer.time_left == 0:
             spawn_item();
@@ -392,7 +445,9 @@ func _on_enemy_update_score(score_to_add,enemy_global_position):
         $Key/AnimatedSprite2D.play();
             
     _on_enemy_update_score_display();
-    update_enemies_left_display();
+    
+    if game_mode == 'ARCADE':
+        update_enemies_left_display();
 
 func _on_enemy_update_score_display():
     $HUD.get_node('CanvasLayer').get_node('Score').text = "SCORE\n" + str(score);
@@ -400,7 +455,11 @@ func _on_enemy_update_score_display():
 
 func update_enemies_left_display():
     $HUD.get_node('CanvasLayer').get_node('EnemiesLeft').text = "ENEMIES\n" + str(enemies_left_this_wave);
+
+func update_fish_left_display():
+    $HUD.get_node('CanvasLayer').get_node('EnemiesLeft').text = "FISH\n" + str(fish_left_this_wave);
     
+
 func _on_player_player_died():
     game_over();
 
@@ -409,12 +468,16 @@ func _on_player_player_got_fish():
     if score > high_score:
         high_score = score;
         
-    fish_collected = fish_collected + 1;
+    fish_collected += 1
+    fish_left_this_wave -= 1
     _on_enemy_update_score_display();
     emit_signal('player_update_fish')
     
-    if fish_collected == $Player.get_node('FishProgressBar').max_value:
-        emit_signal('player_enable_fish_frenzy')
+    if game_mode == 'PACIFIST':
+        update_fish_left_display()
+    else:
+        if fish_collected == $Player.get_node('FishProgressBar').max_value:
+            emit_signal('player_enable_fish_frenzy')
 
 func _on_player_player_found_exit():
     wave_end_cleanup();
@@ -507,4 +570,12 @@ func upgrade_screen():
 func _on_player_player_made_upgrade_choice():
     $HUD/CanvasLayer/UpgradeChoiceContainer.visible = false
     game_status = PREPARE_FOR_WAVE
+    
+func _on_main_menu_game_mode_pressed():
+    if game_mode == 'ARCADE':
+        game_mode = 'PACIFIST'
+    else:
+        game_mode = 'ARCADE'
+        
+    $MainMenu/CanvasLayer/MainMenuContainer/GameMode.text = 'MODE: ' + str(game_mode)
     

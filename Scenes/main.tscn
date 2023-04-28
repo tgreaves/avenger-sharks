@@ -93,6 +93,7 @@ stream = ExtResource("12_arleo")
 [connection signal="cheats_pressed" from="MainMenu" to="." method="_on_main_menu_cheats_pressed"]
 [connection signal="credits_pressed" from="MainMenu" to="." method="_on_main_menu_credits_pressed"]
 [connection signal="exit_game_pressed" from="MainMenu" to="." method="_on_main_menu_exit_game_pressed"]
+[connection signal="game_mode_pressed" from="MainMenu" to="." method="_on_main_menu_game_mode_pressed"]
 [connection signal="start_game_pressed" from="MainMenu" to="." method="_on_main_menu_start_game_pressed"]
 [connection signal="abandon_game_pressed" from="PauseMenu" to="." method="_on_pause_menu_abandon_game_pressed"]
 [connection signal="unpause_game_pressed" from="PauseMenu" to="." method="_on_pause_menu_unpause_game_pressed"]

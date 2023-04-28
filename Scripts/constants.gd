@@ -3,9 +3,9 @@ extends Node
 const GAME_VERSION = "0.3-alpha"
 
 # Developer settings.
-const DEV_SKIP_INTRO = false
-const DEV_START_GAME_IMMEDIATELY = true
-const MUSIC_ENABLED = true
+const DEV_SKIP_INTRO = true
+const DEV_START_GAME_IMMEDIATELY = false
+const MUSIC_ENABLED = false
 
 # Game settings
 const START_WAVE = 1
@@ -39,6 +39,12 @@ const DINOSAUR_ATTACK_SPEED = 800;
 const DINOSAUR_SURVIVAL_TIME = 5;
 
 # Enemy spawning
+const ENEMY_SPAWN_WAVE_CONFIGURATION = {
+    1:      ['knight','wizard'],
+    2:      ['knight','knight','wizard','rogue'],
+    5:      ['knight','knight', 'wizard','wizard', 'rogue', 'necromancer'],
+    7:      ['knight','knight', 'wizard','wizard', 'rogue', 'necromancer', 'bee'],
+}
 
 const ENEMY_MULTIPLIER_AT_WAVE_START = 10
 const ENEMY_MULTIPLIER_DURING_WAVE = 10
@@ -47,8 +53,9 @@ const ENEMY_REINFORCEMENTS_SPAWN_BASE_SECONDS = 5
 const ENEMY_REINFORCEMENTS_SPAWN_BATCH_SIZE = 5
 const ENEMY_REINFORCEMENTS_SPAWN_BATCH_MULTIPLIER = 1
 
-const ENEMY_SPEED = 450;
-const ENEMY_NECROMANCER_SPEED = 100;
+const ENEMY_SPEED = 450
+const ENEMY_NECROMANCER_SPEED = 100
+const ENEMY_BEE_SPEED = 600
 const ENEMY_SPEED_WAVE_PERCENTAGE_MULTIPLIER = 10
 
 const ENEMY_HEALTH = 1;
@@ -68,18 +75,23 @@ const ENEMY_DEFAULT_CHANGE_DIRECTION_MAXIMUM_SECONDS = 3;
 const ENEMY_ALL_CHASE_WHEN_POPULATION_LOW = 10
 
 const ENEMY_TRAP_MINIMUM_SECONDS = 4;
-const ENEMY_TRAP_MAXIMUM_SECONDS = 7;
+const ENEMY_TRAP_MAXIMUM_SECONDS = 10;
 const ENEMY_TRAP_HEALTH = 5
 
 const KILL_ENEMY_SCORE = 10;
 const KILL_ENEMY_NECROMANCER_SCORE = 30;
 
 # Fish
-const FISH_TO_SPAWN = 20;
+const FISH_TO_SPAWN_ARCADE = 20;
+const FISH_TO_SPAWN_PACIFIST_BASE = 5
+const FISH_TO_SPAWN_PACIFIST_WAVE_MULTIPLIER = 2
 const GET_FISH_SCORE = 50;
 const FISH_TO_TRIGGER_FISH_FRENZY = 10
 
 # Items
+const ARCADE_SPAWNING_ITEMS = ['dinosaur']
+const PACIFIST_SPAWNING_ITEMS = ['health']
+
 const ITEM_SPAWN_MINIMUM_SECONDS = 5
 const ITEM_SPAWN_MAXIMUM_SECONDS = 15
 const ENEMY_LEAVE_BEHIND_ITEM_PERCENTAGE = 25

@@ -1,6 +1,6 @@
 extends CharacterBody2D
 
-var ITEMS = ["chest",'health']
+var ITEMS = ['chest','chest','health']
 
 @export var item_type = ""
 
@@ -21,6 +21,7 @@ func spawn_random():
     
 func spawn_specific(item_selection):
     item_type = item_selection
+    
     $AnimatedSprite2D.animation = item_selection + str('-idle')
     $CollisionShape2D.disabled = false;
     $AnimatedSprite2D.play()
@@ -43,7 +44,7 @@ func _physics_process(_delta):
             if get_parent().get_node('Player').item_magnet_enabled:
                 if distance < 250:
                     var target_direction = (get_parent().get_node("Player").global_position - global_position).normalized();
-                    velocity = target_direction * ( get_parent().get_node("Player").speed + 200 )
+                    velocity = target_direction * ( get_parent().get_node("Player").speed + 750 )
 
 func despawn():
     # TODO: Chest should play a different animation, and then spawn text to match item type.

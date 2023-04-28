@@ -91,7 +91,10 @@ func prepare_for_new_wave():
     blink_status = false
     $AnimatedSprite2DDamaged.visible = false;
     $EnergyProgressBar.visible = true
-    $FishProgressBar.visible = true
+    
+    if get_parent().game_mode == 'ARCADE':
+        $FishProgressBar.visible = true
+    
     set_fire_rate_delay_timer()
 
 func get_input():
@@ -102,7 +105,7 @@ func get_input():
     var input_direction = Input.get_vector("left", "right", "up", "down")
     velocity = input_direction * speed
     
-    if $FireRateTimer.time_left == 0:
+    if $FireRateTimer.time_left == 0 && get_parent().game_mode == 'ARCADE':
         if input_direction && Input.is_action_pressed('shark_fire'):
             var shark_spray = SharkSprayScene.instantiate();
             get_parent().add_child(shark_spray);
@@ -342,7 +345,10 @@ func _physics_process(_delta):
                 $AnimatedSprite2D.animation = 'default'
                 $AnimatedSprite2D.speed_scale = 1
                 $EnergyProgressBar.visible=true
-                $FishProgressBar.visible=true    
+                
+                if get_parent().game_mode == 'ARCADE':
+                    $FishProgressBar.visible=true    
+                
                 powerup_label_animation('DEATH CHEATED!')
                 
                 # Give a 1s grace period before taking damage again.

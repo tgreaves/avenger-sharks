@@ -3,6 +3,7 @@
 * Difficulty levels (fish themed, e.g Minnow upwards)
 * Boss wave
 * Pacifist mode
+* Chill mode
 * Dinosaur mode - Only triggering dinosaurs will kill enemies, but have more of them?
 
 # Power-ups / Progression
@@ -33,10 +34,30 @@
 
 # THINGS FOR 0.3-alpha
 
+* BALANCE AND FIXES
+    * Upgrades currently not balanced...
+        * Armour + Health basically makes it hard to die!
+    * Spawning...
+        * Introduce certain enemies at different waves.
+        
 * UPGRADE SYSTEM
     * Perma power-up: Sets power-up to start a level at Level 1 or more (So have one per power-up)
     * Upgrade that only works for x stages (e.g. confuse enemies)
 
+* SURVIVAL MODE
+    * [DONE] Implement game mode selection from main menu.
+    * Disable mouse cursor during game (remember to enable again after game finishes) - also pause?
+    * [DONE] Player cannot shoot
+    * [DONE] Wave ends if all fish collected
+    * [DONE] Spawn key at last fish location so game loop does not break
+    * [DONE] Necros do not try and eat the fish
+    * [DONE] Disable necro / fish collisions in this mode
+    * [DONE] HUD: Needs to display FISH instead if ENEMIES
+    * [DONE] Number of fish could change with wave progression
+    * Disable power-ups in this mode as they don't apply
+    * [DONE] Disable fish frenzy bar / ability to enable and use
+    * Health random spawning on level
+    
 * ENEMY TYPES
     * Static turret - probably new Scene to support
         * Rotate during physics.
@@ -59,7 +80,7 @@
     * e.g. Only necromancers, or traps, or chasers, or whatever.
     
 * STEAM
-    * Initial listing / assets
+    * Initial store presence.
     * Cloud saving (but of what?)
     * Achievements
     * Leaderboard support (High scores)
