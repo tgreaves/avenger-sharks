@@ -111,6 +111,7 @@ func get_input():
             get_parent().add_child(shark_spray);
             shark_spray.global_position = position;
             shark_spray.velocity = input_direction * constants.PLAYER_FIRE_SPEED;
+            Storage.increase_stat('player','shots_fired',1)
             
             mini_shark_fire(input_direction)
             
@@ -123,6 +124,7 @@ func get_input():
             var target_direction = (get_global_mouse_position() - global_position).normalized()
             shark_spray.global_position = position;
             shark_spray.velocity = target_direction * constants.PLAYER_FIRE_SPEED
+            Storage.increase_stat('player','shots_fired',1)
             
             mini_shark_fire(target_direction)
             
@@ -142,6 +144,7 @@ func get_input():
             shoot_direction = shoot_direction.normalized();
             
             shark_spray.velocity = shoot_direction * constants.PLAYER_FIRE_SPEED;
+            Storage.increase_stat('player','shots_fired',1)
             
             mini_shark_fire(shoot_direction)
             

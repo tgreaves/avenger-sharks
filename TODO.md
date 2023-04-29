@@ -54,9 +54,9 @@
     * [DONE] Disable necro / fish collisions in this mode
     * [DONE] HUD: Needs to display FISH instead if ENEMIES
     * [DONE] Number of fish could change with wave progression
-    * Disable power-ups in this mode as they don't apply
+    * Disable power-ups in this mode as they don't apply (HUD?)
     * [DONE] Disable fish frenzy bar / ability to enable and use
-    * Health random spawning on level
+    * [DONE] Health random spawning on level
     
 * ENEMY TYPES
     * Static turret - probably new Scene to support
@@ -74,14 +74,30 @@
 * SPAWN PATTERNS
     * Currently placement is 100% random.
     * Start as circle around player as an option? (Randomise if this happens)
+    * Movement patterns as well (sine wave for example enemies in a group)
 
 * SPECIAL WAVE
     * Linked to pattern.
     * e.g. Only necromancers, or traps, or chasers, or whatever.
+    * BEEEEEE only wave
+    * % chance of triggering (after an initial wave?) then decide which one applies.
+    
+* PERSISTENT STORAGE
+    * Encryption
     
 * STEAM
     * Initial store presence.
     * Cloud saving (but of what?)
+        * Statistics!
+            * Games played
+            * Shots fired
+            * Chests collected
+            * Max wave reached
+            * ... etc...
+            * Enemies killed
     * Achievements
+        * Beat a wave
+        * Beat 5 waves
+        * Beat 10 waves
     * Leaderboard support (High scores)
     

@@ -24,11 +24,12 @@
 * Graphics: 
     * Display obtained upgrades on HUD.
     * Speed up Necromancer death animation.
+* Misc: Persistent storage support.
+* Misc: Statistics (which use the persistent storage...) now tracked and viewable.
 * Misc: ESC key can now exit intro and credits.
 * Steam: Initial store assets and listing.
 * Bug fixes:
     * Stop game breaking if player dies at the same time as beating a wave.
-* Internal: DEV_SKIP_INTRO and DEV_START_GAME_IMMEDIATELY options added.
 
 # 0.2-alpha
 

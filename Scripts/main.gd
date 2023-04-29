@@ -6,6 +6,7 @@ extends Node
 @export var dinosaur_scene: PackedScene;
 @export var credits_scene: PackedScene;
 @export var item_scene: PackedScene;
+@export var statistics_scene: PackedScene
 @export var game_status = INTRO_SEQUENCE;
 @export var cheat_mode = false
 @export var wave_number = 1;
@@ -15,11 +16,11 @@ extends Node
 @export var game_mode = 'ARCADE'
 
 var score = 0;
-var high_score = 0;
 
 var spawned_items_this_wave = []
 var intro
 var credits
+var statistics
 var first_game_played = false
 
 var upgrade_one_index
@@ -29,6 +30,7 @@ enum {
     INTRO_SEQUENCE,
     MAIN_MENU,
     CREDITS,
+    STATISTICS,
     WAVE_START,
     GAME_RUNNING,
     GAME_PAUSED,
@@ -48,16 +50,22 @@ signal player_update_fish
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+    Storage.load_stats()
+    
     game_status = INTRO_SEQUENCE;
     
     $Arena.visible = false;
     $HUD/CanvasLayer.visible = false
     $MainMenu.get_node('CanvasLayer').visible = false;
     $PauseMenu.get_node('CanvasLayer').visible = false;
+    $Statistics.get_node('CanvasLayer').visible = false
     $Player.set_process(false);
     $Player.set_physics_process(false);
     $Player.visible = false;
     $Player.get_node("CollisionShape2D").disabled = false;
+    
+    # Ensure we update high score as this may have been located from storage.
+    _on_enemy_update_score_display()
     
     if constants.DEV_SKIP_INTRO:
         main_menu()
@@ -109,6 +117,8 @@ func main_menu():
     
 func start_game():
     first_game_played = true
+    
+    Storage.increase_stat('player','games_played',1)
     
     if cheat_mode == true:
         $Player.player_energy = constants.PLAYER_START_GAME_ENERGY_CHEATING
@@ -321,6 +331,8 @@ func return_to_main_screen():
         
     despawn_all_items()
     
+    Storage.save_stats()
+    
     main_menu();
     
 func spawn_item():	
@@ -434,8 +446,8 @@ func _input(_ev):
 func _on_enemy_update_score(score_to_add,enemy_global_position):
     enemies_left_this_wave = enemies_left_this_wave - 1;
     score = score + score_to_add;
-    if score > high_score:
-        high_score = score;
+    if score > Storage.Stats.get_value('player','high_score'):
+        Storage.Stats.set_value('player','high_score', score)
     
     if enemies_left_this_wave == 0:
         # If last wave enemy is dead, spawn the key.
@@ -451,7 +463,7 @@ func _on_enemy_update_score(score_to_add,enemy_global_position):
 
 func _on_enemy_update_score_display():
     $HUD.get_node('CanvasLayer').get_node('Score').text = "SCORE\n" + str(score);
-    $HUD.get_node('CanvasLayer').get_node('HighScore').text = "HIGH SCORE\n" + str(high_score);
+    $HUD.get_node('CanvasLayer').get_node('HighScore').text = "HIGH SCORE\n" + str(Storage.Stats.get_value('player','high_score'));
 
 func update_enemies_left_display():
     $HUD.get_node('CanvasLayer').get_node('EnemiesLeft').text = "ENEMIES\n" + str(enemies_left_this_wave);
@@ -465,8 +477,8 @@ func _on_player_player_died():
 
 func _on_player_player_got_fish():
     score = score + constants.GET_FISH_SCORE;
-    if score > high_score:
-        high_score = score;
+    if score > Storage.Stats.get_value('player','high_score'):
+        Storage.Stats.set_value('player','high_score',score)
         
     fish_collected += 1
     fish_left_this_wave -= 1
@@ -579,3 +591,15 @@ func _on_main_menu_game_mode_pressed():
         
     $MainMenu/CanvasLayer/MainMenuContainer/GameMode.text = 'MODE: ' + str(game_mode)
     
+func _on_main_menu_statistics_pressed():
+    game_status = STATISTICS
+    $MainMenu.get_node("CanvasLayer").visible = false
+    $HUD/CanvasLayer/HighScore.visible = false;
+    $Statistics.build_statistics_screen()
+    $Statistics/CanvasLayer.visible = true
+
+func _on_statistics_statistics_return_button_pressed():
+    game_status = MAIN_MENU
+    $MainMenu.get_node("CanvasLayer").visible = true
+    $HUD/CanvasLayer/HighScore.visible = true
+    $Statistics/CanvasLayer.visible = false

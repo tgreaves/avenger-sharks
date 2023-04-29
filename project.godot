@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 constants="*res://Scripts/constants.gd"
+Storage="*res://Scripts/Storage.gd"
 
 [display]
 

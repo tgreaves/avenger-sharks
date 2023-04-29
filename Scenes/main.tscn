@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://cr81sfftinhnu"]
+[gd_scene load_steps=18 format=3 uid="uid://cr81sfftinhnu"]
 
 [ext_resource type="Script" path="res://Scripts/main.gd" id="1_gnjic"]
 [ext_resource type="PackedScene" uid="uid://bkmx1mvtb8dxr" path="res://Scenes/Enemy.tscn" id="2_3ugt8"]
@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" uid="uid://ds5km1djhril" path="res://Scenes/Arena.tscn" id="5_542nn"]
 [ext_resource type="PackedScene" uid="uid://naxhraby3ng2" path="res://Scenes/Item.tscn" id="6_kq75g"]
 [ext_resource type="PackedScene" uid="uid://bcqacic7yj4ds" path="res://Scenes/HUD.tscn" id="7_hr2nx"]
+[ext_resource type="PackedScene" uid="uid://bp6cf18pjw2bc" path="res://Scenes/Statistics.tscn" id="8_188m4"]
 [ext_resource type="PackedScene" uid="uid://dc60erflcrf6" path="res://Scenes/MainMenu.tscn" id="8_87611"]
 [ext_resource type="Texture2D" uid="uid://dyxji31lsvmml" path="res://Images/UnderwaterFantasy/far.png" id="8_ya1ds"]
 [ext_resource type="Texture2D" uid="uid://b11pog2gr6q20" path="res://Images/UnderwaterFantasy/foregound-merged.png" id="9_62wt3"]
@@ -25,6 +26,7 @@ fish_scene = ExtResource("3_8jtwr")
 dinosaur_scene = ExtResource("4_m8mii")
 credits_scene = ExtResource("10_esxjd")
 item_scene = ExtResource("6_kq75g")
+statistics_scene = ExtResource("8_188m4")
 
 [node name="UnderwaterFar" type="TextureRect" parent="."]
 visible = false
@@ -55,6 +57,9 @@ offset_bottom = 93.0
 
 [node name="PauseMenu" parent="." instance=ExtResource("9_jh32b")]
 process_mode = 3
+visible = false
+
+[node name="Statistics" parent="." instance=ExtResource("8_188m4")]
 visible = false
 
 [node name="Player" parent="." instance=ExtResource("10_ympph")]
@@ -95,8 +100,10 @@ stream = ExtResource("12_arleo")
 [connection signal="exit_game_pressed" from="MainMenu" to="." method="_on_main_menu_exit_game_pressed"]
 [connection signal="game_mode_pressed" from="MainMenu" to="." method="_on_main_menu_game_mode_pressed"]
 [connection signal="start_game_pressed" from="MainMenu" to="." method="_on_main_menu_start_game_pressed"]
+[connection signal="statistics_pressed" from="MainMenu" to="." method="_on_main_menu_statistics_pressed"]
 [connection signal="abandon_game_pressed" from="PauseMenu" to="." method="_on_pause_menu_abandon_game_pressed"]
 [connection signal="unpause_game_pressed" from="PauseMenu" to="." method="_on_pause_menu_unpause_game_pressed"]
+[connection signal="statistics_return_button_pressed" from="Statistics" to="." method="_on_statistics_statistics_return_button_pressed"]
 [connection signal="player_died" from="Player" to="." method="_on_player_player_died"]
 [connection signal="player_found_exit" from="Player" to="." method="_on_player_player_found_exit"]
 [connection signal="player_found_exit_stop_key_movement" from="Player" to="Key" method="_on_player_player_found_exit_stop_key_movement"]
