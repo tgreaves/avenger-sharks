@@ -17,10 +17,14 @@
     * No upgrades.
     * Enemies do not drop power-ups.  Health Potions spawn randomly in the arena.
 * New enemy type: Bee! (bzzzzzz)
+* Wave / Spawning mechanics:
+    * Introduce different enemy types as player progresses.
+    * % chance of a special wave ('All bees')
+    * Spawning methods during a wave: Random, Circle around player
 * Game balance: 
-    * Enemy types that spawn start simple and grow more complex as waves progress.
-    * Chests 2 x likely to be dropped than health potions.
+    * Chests more likely to be dropped than health potions.
     * Spawn traps less frequently.
+    * Reduced dropped item % (was: 25, now 20)
 * Graphics: 
     * Display obtained upgrades on HUD.
     * Speed up Necromancer death animation.

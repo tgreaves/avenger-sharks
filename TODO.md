@@ -72,9 +72,10 @@
     * Turret could fire a homing missile instead.
 
 * SPAWN PATTERNS
-    * Currently placement is 100% random.
-    * Start as circle around player as an option? (Randomise if this happens)
     * Movement patterns as well (sine wave for example enemies in a group)
+    * Option on Circle spawn for all to be the same.
+        * Will need to re-work Enemy logic to not all be done in _ready() as is making things awkward.
+        * Base on Item and spawn_specific() and spawn_random
 
 * SPECIAL WAVE
     * Linked to pattern.
@@ -101,3 +102,10 @@
         * Beat 10 waves
     * Leaderboard support (High scores)
     
+
+
+This commit:
+    
+* Fix controller order on main menu.
+* Spawning
+* Bug fix: Mini shark exceeding max power up level.

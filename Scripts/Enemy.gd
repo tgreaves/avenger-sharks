@@ -21,12 +21,14 @@ var hit_to_be_processed;
 func _ready():
     var mob_types
     
-    # Determine spawn list for this wave.
-    for local_wave_number in constants.ENEMY_SPAWN_WAVE_CONFIGURATION:
-        if get_parent().wave_number >= local_wave_number: 
-            mob_types = constants.ENEMY_SPAWN_WAVE_CONFIGURATION[local_wave_number]
-            
-    print("Determined spawn list: " + str(mob_types))
+    match get_parent().wave_special_type:
+        'STANDARD':
+            # Determine spawn list for this wave.
+            for local_wave_number in constants.ENEMY_SPAWN_WAVE_CONFIGURATION:
+                if get_parent().wave_number >= local_wave_number: 
+                    mob_types = constants.ENEMY_SPAWN_WAVE_CONFIGURATION[local_wave_number]
+        'ALL_BEE':
+            mob_types = ['bee']            
     
     enemy_type = mob_types[randi() % mob_types.size()]
     $AnimatedSprite2D.animation = enemy_type + str('-run')
@@ -239,6 +241,6 @@ func leave_behind_item():
     if randi_range(1,100) <= leave_percentage:
         var item = get_parent().item_scene.instantiate()
         get_parent().add_child(item)
-        item.spawn_random()
+        item.spawn_random(true)
         item.get_node('.').set_position(position)
         item.add_to_group('itemGroup')

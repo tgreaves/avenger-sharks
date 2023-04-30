@@ -1,6 +1,6 @@
 extends CharacterBody2D
 
-var ITEMS = ['chest','chest','health']
+var ITEMS = ['chest', 'chest', 'chest', 'health']
 
 @export var item_type = ""
 
@@ -15,18 +15,20 @@ var state = SPAWNING
 func _ready():
     state=SPAWNING
 
-func spawn_random():
+func spawn_random(despawn_mode):
     item_type = ITEMS[randi() % ITEMS.size()]
-    spawn_specific(item_type)
+    spawn_specific(item_type, despawn_mode)
     
-func spawn_specific(item_selection):
+func spawn_specific(item_selection, despawn_mode):
     item_type = item_selection
     
     $AnimatedSprite2D.animation = item_selection + str('-idle')
     $CollisionShape2D.disabled = false;
     $AnimatedSprite2D.play()
     
-    $DespawnTimer.start(constants.ITEM_DESPAWN_TIME)
+    if despawn_mode:
+        $DespawnTimer.start(constants.ITEM_DESPAWN_TIME)
+    
     state=READY
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.

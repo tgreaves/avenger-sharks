@@ -14,6 +14,7 @@ extends Node
 @export var fish_collected = 0;
 @export var fish_left_this_wave = 0
 @export var game_mode = 'ARCADE'
+@export var wave_special_type = 'STANDARD'
 
 var score = 0;
 
@@ -233,11 +234,23 @@ func start_wave():
     
     $ItemSpawnTimer.start(randf_range(constants.ITEM_SPAWN_MINIMUM_SECONDS,constants.ITEM_SPAWN_MAXIMUM_SECONDS));
     $EnemySpawnTimer.start(constants.ENEMY_REINFORCEMENTS_SPAWN_BASE_SECONDS);
+     
+    wave_special_type = 'STANDARD'
     
-    while (i < wave_number * constants.ENEMY_MULTIPLIER_AT_WAVE_START):
-        spawn_enemy();
-        i=i+1;
-        
+    # Determine if this is a 'special' wave as this will influece things....
+    if wave_number >= constants.ENEMY_SPAWN_WAVE_SPECIAL_MIN_WAVE:
+        var spawn_choice = randi_range(1,100)
+        var spawn_message = ''
+    
+        for spawn_key in constants.ENEMY_SPAWN_WAVE_SPECIAL_CONFIGURATION:
+            if spawn_choice <= spawn_key:
+                wave_special_type = constants.ENEMY_SPAWN_WAVE_SPECIAL_CONFIGURATION[spawn_key][0]
+                break
+    
+    print("WAVE SPECIAL TYPE = " + str(wave_special_type))
+    
+    spawn_enemy(wave_number * constants.ENEMY_MULTIPLIER_AT_WAVE_START)
+       
     enemies_left_this_wave = (wave_number * constants.ENEMY_MULTIPLIER_AT_WAVE_START) + (wave_number * constants.ENEMY_MULTIPLIER_DURING_WAVE);
 
     # Fish spawning
@@ -353,7 +366,7 @@ func spawn_item():
         add_child(dinosaur)
     else:
         var item = item_scene.instantiate()
-        item.spawn_specific(spawned_item)
+        item.spawn_specific(spawned_item, false)
         item.get_node('.').set_position (Vector2(randf_range(constants.ARENA_SPAWN_MIN_X,constants.ARENA_SPAWN_MAX_X),randf_range(constants.ARENA_SPAWN_MIN_Y,constants.ARENA_SPAWN_MAX_Y)));
         item.add_to_group('itemGroup')
         add_child(item)
@@ -364,11 +377,56 @@ func despawn_all_items():
     for item in get_tree().get_nodes_in_group('itemGroup'):
         item.queue_free()
 
-func spawn_enemy():
+func spawn_enemy(number_to_spawn):
+    
+    # If only one, only real option is random.
+    if number_to_spawn==1:
+        spawn_enemy_random()
+        return
+        
+    var spawn_choice = randi_range(1,100)
+    var spawn_pattern
+    
+    print("spawn_enemy() Number is " + str(spawn_choice))
+    
+    for spawn_key in constants.ENEMY_SPAWN_PLACEMENT_CONFIGURATION:
+        if spawn_choice <= spawn_key:
+            spawn_pattern = constants.ENEMY_SPAWN_PLACEMENT_CONFIGURATION[spawn_key]
+            break
+    
+    print("spawn_enemy() pattern is: " + str(spawn_pattern))
+    
+    match spawn_pattern:
+        'RANDOM':
+            var i=0
+            while (i < number_to_spawn):
+                spawn_enemy_random()
+                i+=1
+        'CIRCLE_SURROUND_PLAYER':
+            var i=0
+            while (i < number_to_spawn):
+                var angle_degrees = ( 360 / number_to_spawn ) * (i+1)
+                var angle_rad = deg_to_rad(angle_degrees)
+                var offset = Vector2(sin(angle_rad), cos(angle_rad)) * 600;       
+                var enemy_position = $Player.position + offset
+                
+                spawn_enemy_set_position(enemy_position)
+                i+=1
+      
+func spawn_enemy_random():
     var mob = enemy_scene.instantiate();
     mob.get_node('.').set_position (Vector2(randf_range(constants.ARENA_SPAWN_MIN_X,constants.ARENA_SPAWN_MAX_X),randf_range(constants.ARENA_SPAWN_MIN_Y,constants.ARENA_SPAWN_MAX_Y)));
     mob.add_to_group('enemyGroup');	
-    add_child(mob);
+    add_child(mob);    
+    
+func spawn_enemy_set_position(enemy_position):
+    enemy_position.x = clamp(enemy_position.x, constants.ARENA_SPAWN_MIN_X, constants.ARENA_SPAWN_MAX_X )        
+    enemy_position.y = clamp(enemy_position.y, constants.ARENA_SPAWN_MIN_Y, constants.ARENA_SPAWN_MAX_Y )   
+    
+    var mob = enemy_scene.instantiate();
+    mob.get_node('.').set_position (enemy_position);
+    mob.add_to_group('enemyGroup');	
+    add_child(mob);            
     
 func spawn_fish():
     var mob = fish_scene.instantiate();
@@ -411,12 +469,8 @@ func _process(_delta):
                 var enemies_to_spawn = constants.ENEMY_REINFORCEMENTS_SPAWN_BATCH_SIZE + (wave_number * constants.ENEMY_REINFORCEMENTS_SPAWN_BATCH_MULTIPLIER)
                 if enemies_to_spawn > enemies_left_this_wave - get_tree().get_nodes_in_group("enemyGroup").size():
                     enemies_to_spawn = enemies_left_this_wave - get_tree().get_nodes_in_group("enemyGroup").size()
-                      
-                var i = 0;
-                
-                while i < enemies_to_spawn:
-                    spawn_enemy()
-                    i=i+1
+                 
+                spawn_enemy(enemies_to_spawn)
                 
                 $EnemySpawnTimer.start(constants.ENEMY_REINFORCEMENTS_SPAWN_BASE_SECONDS);
             
@@ -441,6 +495,7 @@ func _input(_ev):
                 main_menu()
             CREDITS:
                 credits.queue_free()
+                $MainMenu/CanvasLayer/MainMenuContainer/Credits.grab_focus()
                 main_menu()
             
 func _on_enemy_update_score(score_to_add,enemy_global_position):
@@ -601,5 +656,6 @@ func _on_main_menu_statistics_pressed():
 func _on_statistics_statistics_return_button_pressed():
     game_status = MAIN_MENU
     $MainMenu.get_node("CanvasLayer").visible = true
+    $MainMenu/CanvasLayer/MainMenuContainer/Statistics.grab_focus()
     $HUD/CanvasLayer/HighScore.visible = true
     $Statistics/CanvasLayer.visible = false

@@ -11,14 +11,14 @@ config_version=5
 [application]
 
 config/name="avenger-sharks"
-run/main_scene="res://Scenes/main.tscn"
+run/main_scene="res://Scenes/Main.tscn"
 config/features=PackedStringArray("4.0", "GL Compatibility")
 boot_splash/show_image=false
 config/icon="res://icon.svg"
 
 [autoload]
 
-constants="*res://Scripts/constants.gd"
+constants="*res://Scripts/Constants.gd"
 Storage="*res://Scripts/Storage.gd"
 
 [display]
@@ -172,5 +172,4 @@ fish_frenzy={
 
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
-textures/vram_compression/import_s3tc_bptc=true
 environment/defaults/default_clear_color=Color(0, 0, 0, 1)

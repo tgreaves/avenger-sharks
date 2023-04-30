@@ -258,7 +258,7 @@ func _physics_process(_delta):
                                     spray_size = 0.5 + (constants.PLAYER_FIRE_SIZE_POWERUP_INCREASE * current_powerup_levels[powerup_selected])
                                     powerup_label_animation('BIG SPRAY!')
                                 'MINI SHARK':       
-                                    if get_tree().get_nodes_in_group('miniSharkGroup').size() < 8:
+                                    if get_tree().get_nodes_in_group('miniSharkGroup').size() < max_powerup_levels[powerup_selected]:
                                             
                                         var new_mini_shark = MiniSharkScene.instantiate()
                                         add_child(new_mini_shark)
