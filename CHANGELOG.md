@@ -21,7 +21,8 @@
     * Introduce different enemy types as player progresses.
     * % chance of a special wave ('All bees')
     * Spawning methods during a wave: Random, Circle around player
-* Game balance: 
+* Gameplay and balance:
+    * Score multiplier introduced.  Multiplier lost if a shot misses or player takes damage.
     * Chests more likely to be dropped than health potions.
     * Spawn traps less frequently.
     * Reduced dropped item % (was: 25, now 20)

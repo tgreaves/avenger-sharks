@@ -16,21 +16,23 @@ var enemy_health;
 var stored_modulate;
 var hit_to_be_processed;
 
-@onready var screen_size = get_viewport_rect().size
-
 func _ready():
+    pass
+    
+func spawn_random():
     var mob_types
     
-    match get_parent().wave_special_type:
-        'STANDARD':
-            # Determine spawn list for this wave.
-            for local_wave_number in constants.ENEMY_SPAWN_WAVE_CONFIGURATION:
-                if get_parent().wave_number >= local_wave_number: 
-                    mob_types = constants.ENEMY_SPAWN_WAVE_CONFIGURATION[local_wave_number]
-        'ALL_BEE':
-            mob_types = ['bee']            
-    
+    # Determine spawn list for this wave.
+    for local_wave_number in constants.ENEMY_SPAWN_WAVE_CONFIGURATION:
+        if get_parent().wave_number >= local_wave_number: 
+            mob_types = constants.ENEMY_SPAWN_WAVE_CONFIGURATION[local_wave_number] 
+
     enemy_type = mob_types[randi() % mob_types.size()]
+    spawn_specific(enemy_type)
+
+func spawn_specific(enemy_type_in):
+    enemy_type = enemy_type_in
+    
     $AnimatedSprite2D.animation = enemy_type + str('-run')
     
     match enemy_type:
@@ -202,11 +204,11 @@ func _physics_process(delta):
             if collision.get_collider().name == 'Player':
                 var collided_with = collision.get_collider();
                 collided_with._player_hit();
-                _death()
+                _death('PLAYER-BODY')
             else:
                 velocity = velocity.bounce(collision.get_normal());
     
-func _death():
+func _death(death_source):
     if state != DYING:
         enemy_health = enemy_health - 1;
         
@@ -230,7 +232,7 @@ func _death():
             else:
                 enemy_killed_score = constants.KILL_ENEMY_SCORE;
         
-            get_parent()._on_enemy_update_score(enemy_killed_score,global_position)
+            get_parent()._on_enemy_update_score(enemy_killed_score,global_position,death_source)
             
             if get_parent().game_mode == 'ARCADE':
                 leave_behind_item()

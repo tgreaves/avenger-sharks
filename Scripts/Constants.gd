@@ -4,7 +4,7 @@ const GAME_VERSION = "0.3-alpha"
 
 # Developer settings.
 const DEV_SKIP_INTRO = true
-const DEV_START_GAME_IMMEDIATELY = true
+const DEV_START_GAME_IMMEDIATELY = false
 const MUSIC_ENABLED = false
 
 # Game settings
@@ -49,8 +49,8 @@ const ENEMY_SPAWN_WAVE_CONFIGURATION = {
 const ENEMY_SPAWN_WAVE_SPECIAL_MIN_WAVE = 2
 
 const ENEMY_SPAWN_WAVE_SPECIAL_CONFIGURATION = {
-    90:     ['STANDARD'],
-    100:     ['ALL_BEE', 'Feel the buzz!']
+    90:      ['STANDARD', '', ''],
+    100:     ['ALL_THE_SAME', 'bee', 'Feel the buzz!']
 }
 
 const ENEMY_SPAWN_PLACEMENT_CONFIGURATION = {

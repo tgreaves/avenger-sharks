@@ -76,12 +76,6 @@
     * Option on Circle spawn for all to be the same.
         * Will need to re-work Enemy logic to not all be done in _ready() as is making things awkward.
         * Base on Item and spawn_specific() and spawn_random
-
-* SPECIAL WAVE
-    * Linked to pattern.
-    * e.g. Only necromancers, or traps, or chasers, or whatever.
-    * BEEEEEE only wave
-    * % chance of triggering (after an initial wave?) then decide which one applies.
     
 * PERSISTENT STORAGE
     * Encryption
@@ -102,10 +96,16 @@
         * Beat 10 waves
     * Leaderboard support (High scores)
     
+* JACK'S IDEAS
+    * Hammerhead shark
+        * Hits one time to lose one life
+        * If it loses two more, then it is done but can take three lives one hit.
+        
 
 
 This commit:
     
-* Fix controller order on main menu.
-* Spawning
-* Bug fix: Mini shark exceeding max power up level.
+* Tidy up spawning code.
+* Display custom message for special waves.
+* Score multiplier system
+* TODO: Display score pop-up above enemy when dead

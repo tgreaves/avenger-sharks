@@ -14,13 +14,16 @@ func _physics_process(_delta):
         var collision = get_slide_collision(i)
         
         if collision.get_collider().name == 'Arena':
+            get_parent()._reset_score_multiplier()
             self.queue_free()
             break;
             
         if collision.get_collider().name == 'ExitDoor':
+            get_parent()._reset_score_multiplier()
             self.queue_free()
             break;
-            
-        collision.get_collider().get_node('.')._death();
+        
+        print ("Collider name: " + str(collision.get_collider().name))
+        collision.get_collider().get_node('.')._death('PLAYER-SHOT');
         $CollisionShape2D.disabled = true;
         self.queue_free()

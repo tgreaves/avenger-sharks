@@ -41,7 +41,7 @@ func _physics_process(_delta):
                 self.queue_free();
                 
             
-func _death():
+func _death(_death_source):
     if state != DYING:
         trap_health = trap_health - 1;
         

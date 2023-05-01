@@ -15,8 +15,10 @@ extends Node
 @export var fish_left_this_wave = 0
 @export var game_mode = 'ARCADE'
 @export var wave_special_type = 'STANDARD'
+@export var wave_special_data = ''
 
 var score = 0;
+var score_multiplier = 1
 
 var spawned_items_this_wave = []
 var intro
@@ -78,6 +80,7 @@ func _ready():
 func main_menu():
     game_status=MAIN_MENU
     score=0
+    score_multiplier=1
     fish_collected=0
     fish_left_this_wave=0
     wave_number= constants.START_WAVE - 1
@@ -219,8 +222,31 @@ func wave_intro():
                 wave_text = 'COLLECT ALL FISH FOR NEXT WAVE!' 
     else:
         wave_text = "WAVE " + str(wave_number)
+    
+    var spawn_text = ''
+    
+    # Determine if this is a 'special' wave as this will influece things....
+    if wave_number >= constants.ENEMY_SPAWN_WAVE_SPECIAL_MIN_WAVE:
+        var spawn_choice = randi_range(1,100)
+    
+        for spawn_key in constants.ENEMY_SPAWN_WAVE_SPECIAL_CONFIGURATION:
+            if spawn_choice <= spawn_key:
+                wave_special_type = constants.ENEMY_SPAWN_WAVE_SPECIAL_CONFIGURATION[spawn_key][0]
+                wave_special_data = constants.ENEMY_SPAWN_WAVE_SPECIAL_CONFIGURATION[spawn_key][1]
+                spawn_text = constants.ENEMY_SPAWN_WAVE_SPECIAL_CONFIGURATION[spawn_key][2]
                 
+                break
+    else:
+        wave_special_type = 'STANDARD'
+    
+    print("WAVE SPECIAL TYPE = " + str(wave_special_type))
+    print("WAVE SPECIAL DATA = " + str(wave_special_data))    
+            
     $HUD.get_node("CanvasLayer/Label").text = wave_text
+
+    if spawn_text:
+        $HUD.get_node("CanvasLayer/Label").text += '\n\n' + spawn_text
+    
     $HUD.get_node("CanvasLayer/Label").visible = true;
     $WaveIntroTimer.start();
 
@@ -234,20 +260,8 @@ func start_wave():
     
     $ItemSpawnTimer.start(randf_range(constants.ITEM_SPAWN_MINIMUM_SECONDS,constants.ITEM_SPAWN_MAXIMUM_SECONDS));
     $EnemySpawnTimer.start(constants.ENEMY_REINFORCEMENTS_SPAWN_BASE_SECONDS);
-     
-    wave_special_type = 'STANDARD'
     
-    # Determine if this is a 'special' wave as this will influece things....
-    if wave_number >= constants.ENEMY_SPAWN_WAVE_SPECIAL_MIN_WAVE:
-        var spawn_choice = randi_range(1,100)
-        var spawn_message = ''
     
-        for spawn_key in constants.ENEMY_SPAWN_WAVE_SPECIAL_CONFIGURATION:
-            if spawn_choice <= spawn_key:
-                wave_special_type = constants.ENEMY_SPAWN_WAVE_SPECIAL_CONFIGURATION[spawn_key][0]
-                break
-    
-    print("WAVE SPECIAL TYPE = " + str(wave_special_type))
     
     spawn_enemy(wave_number * constants.ENEMY_MULTIPLIER_AT_WAVE_START)
        
@@ -381,7 +395,7 @@ func spawn_enemy(number_to_spawn):
     
     # If only one, only real option is random.
     if number_to_spawn==1:
-        spawn_enemy_random()
+        spawn_enemy_random_position()
         return
         
     var spawn_choice = randi_range(1,100)
@@ -400,7 +414,7 @@ func spawn_enemy(number_to_spawn):
         'RANDOM':
             var i=0
             while (i < number_to_spawn):
-                spawn_enemy_random()
+                spawn_enemy_random_position()
                 i+=1
         'CIRCLE_SURROUND_PLAYER':
             var i=0
@@ -413,21 +427,31 @@ func spawn_enemy(number_to_spawn):
                 spawn_enemy_set_position(enemy_position)
                 i+=1
       
-func spawn_enemy_random():
-    var mob = enemy_scene.instantiate();
+func spawn_enemy_random_position():
+    var mob = enemy_scene.instantiate()
     mob.get_node('.').set_position (Vector2(randf_range(constants.ARENA_SPAWN_MIN_X,constants.ARENA_SPAWN_MAX_X),randf_range(constants.ARENA_SPAWN_MIN_Y,constants.ARENA_SPAWN_MAX_Y)));
     mob.add_to_group('enemyGroup');	
-    add_child(mob);    
+    add_child(mob); 
+
+    if wave_special_type == 'ALL_THE_SAME':
+        mob.spawn_specific(wave_special_data)
+    else:
+        mob.spawn_random()
     
 func spawn_enemy_set_position(enemy_position):
     enemy_position.x = clamp(enemy_position.x, constants.ARENA_SPAWN_MIN_X, constants.ARENA_SPAWN_MAX_X )        
     enemy_position.y = clamp(enemy_position.y, constants.ARENA_SPAWN_MIN_Y, constants.ARENA_SPAWN_MAX_Y )   
     
-    var mob = enemy_scene.instantiate();
+    var mob = enemy_scene.instantiate()
     mob.get_node('.').set_position (enemy_position);
     mob.add_to_group('enemyGroup');	
-    add_child(mob);            
+    add_child(mob)  
     
+    if wave_special_type == 'ALL_THE_SAME':
+        mob.spawn_specific(wave_special_data)
+    else:
+        mob.spawn_random()
+        
 func spawn_fish():
     var mob = fish_scene.instantiate();
     mob.get_node('.').set_position (Vector2(randf_range(constants.ARENA_SPAWN_MIN_X,constants.ARENA_SPAWN_MAX_X),randf_range(constants.ARENA_SPAWN_MIN_Y,constants.ARENA_SPAWN_MAX_Y)));
@@ -498,9 +522,15 @@ func _input(_ev):
                 $MainMenu/CanvasLayer/MainMenuContainer/Credits.grab_focus()
                 main_menu()
             
-func _on_enemy_update_score(score_to_add,enemy_global_position):
+func _on_enemy_update_score(score_to_add,enemy_global_position,death_source):
     enemies_left_this_wave = enemies_left_this_wave - 1;
-    score = score + score_to_add;
+    score = score + (score_to_add*score_multiplier);
+    
+    # Don't increase multiplier for dinosaur kills
+    print("Death source: " + str(death_source))
+    if death_source == 'PLAYER-SHOT':
+        score_multiplier+= 1
+    
     if score > Storage.Stats.get_value('player','high_score'):
         Storage.Stats.set_value('player','high_score', score)
     
@@ -518,7 +548,15 @@ func _on_enemy_update_score(score_to_add,enemy_global_position):
 
 func _on_enemy_update_score_display():
     $HUD.get_node('CanvasLayer').get_node('Score').text = "SCORE\n" + str(score);
+    
+    if score_multiplier > 1:
+        $HUD.get_node('CanvasLayer').get_node('Score').text += " x" + str(score_multiplier)
+    
     $HUD.get_node('CanvasLayer').get_node('HighScore').text = "HIGH SCORE\n" + str(Storage.Stats.get_value('player','high_score'));
+
+func _reset_score_multiplier():
+    score_multiplier=1
+    _on_enemy_update_score_display()
 
 func update_enemies_left_display():
     $HUD.get_node('CanvasLayer').get_node('EnemiesLeft').text = "ENEMIES\n" + str(enemies_left_this_wave);

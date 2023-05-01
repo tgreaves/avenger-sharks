@@ -41,7 +41,6 @@ var item_magnet_enabled = false
 var blink_status = false
 var fire_delay = constants.PLAYER_FIRE_DELAY
 
-
 func _ready():
     shark_status = ALIVE;
     
@@ -279,7 +278,8 @@ func _physics_process(_delta):
                     break
                 
                 # Default - Enemy	
-                collided_with.get_node('.')._death();
+                print("Player body collision")
+                collided_with.get_node('.')._death('PLAYER-BODY');
                 _player_hit();
                
         FISH_FRENZY:
@@ -442,6 +442,8 @@ func _physics_process(_delta):
                                 
 func _player_hit():
     
+    print("_player_hit() invoked")
+    
     if shark_status != ALIVE:
         return
     
@@ -449,6 +451,8 @@ func _player_hit():
     
         $PlayerHitGracePeriodTimer.start();
         $AudioStreamPlayerHit.play();
+        
+        get_parent()._reset_score_multiplier()
         
         var damage_reduction_percentage = upgrades['ARMOUR'][0] * constants.ARMOUR_DAMAGE_REDUCTION_PERCENTAGE
         var damage_to_perform = constants.PLAYER_HIT_BY_ENEMY_DAMAGE - (( damage_reduction_percentage / 100.0) * constants.PLAYER_HIT_BY_ENEMY_DAMAGE)
