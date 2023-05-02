@@ -519,7 +519,7 @@ func powerup_label_animation(powerup_name):
     tween.set_parallel()
     tween.tween_property(new_label, "modulate", Color(0,0,0,0), 2)
     tween.tween_property(new_label, "position", target_position, 2)
-    tween.tween_callback(new_label.queue_free).set_delay(3)
+    tween.tween_callback(new_label.queue_free).set_delay(2)
     
 func set_fire_rate_delay_timer():
     $FireRateTimer.start(fire_delay)    

@@ -2,15 +2,16 @@ extends Node
 
 @export var intro_scene: PackedScene
 @export var enemy_scene: PackedScene
-@export var fish_scene: PackedScene;
-@export var dinosaur_scene: PackedScene;
-@export var credits_scene: PackedScene;
-@export var item_scene: PackedScene;
+@export var fish_scene: PackedScene
+@export var dinosaur_scene: PackedScene
+@export var credits_scene: PackedScene
+@export var item_scene: PackedScene
 @export var statistics_scene: PackedScene
-@export var game_status = INTRO_SEQUENCE;
+@export var game_status = INTRO_SEQUENCE
 @export var cheat_mode = false
-@export var wave_number = 1;
-@export var enemies_left_this_wave = 0;
+@export var wave_number = 1
+@export var enemies_left_this_wave = 0
+@export var enemies_on_screen = 0
 @export var fish_collected = 0;
 @export var fish_left_this_wave = 0
 @export var game_mode = 'ARCADE'
@@ -84,6 +85,7 @@ func main_menu():
     fish_collected=0
     fish_left_this_wave=0
     wave_number= constants.START_WAVE - 1
+    enemies_on_screen = 0
     
     if $AudioStreamPlayerMusic.playing == false and constants.MUSIC_ENABLED:
         $AudioStreamPlayerMusic.play(0.6);
@@ -261,11 +263,8 @@ func start_wave():
     $ItemSpawnTimer.start(randf_range(constants.ITEM_SPAWN_MINIMUM_SECONDS,constants.ITEM_SPAWN_MAXIMUM_SECONDS));
     $EnemySpawnTimer.start(constants.ENEMY_REINFORCEMENTS_SPAWN_BASE_SECONDS);
     
-    
-    
-    spawn_enemy(wave_number * constants.ENEMY_MULTIPLIER_AT_WAVE_START)
-       
     enemies_left_this_wave = (wave_number * constants.ENEMY_MULTIPLIER_AT_WAVE_START) + (wave_number * constants.ENEMY_MULTIPLIER_DURING_WAVE);
+    spawn_enemy(wave_number * constants.ENEMY_MULTIPLIER_AT_WAVE_START)   
 
     # Fish spawning
     if game_mode == 'ARCADE':
@@ -338,6 +337,7 @@ func game_over():
     $HUD.get_node("CanvasLayer/Label").visible = true;
     $HUD.get_node("CanvasLayer/Label").text = "GAME OVER";
     $AudioStreamPlayerMusic.pitch_scale = 1.0
+    
     $GameOverTimer.start();
 
 func return_to_main_screen():
@@ -392,23 +392,26 @@ func despawn_all_items():
         item.queue_free()
 
 func spawn_enemy(number_to_spawn):
-    
-    # If only one, only real option is random.
-    if number_to_spawn==1:
-        spawn_enemy_random_position()
-        return
         
     var spawn_choice = randi_range(1,100)
     var spawn_pattern
-    
-    print("spawn_enemy() Number is " + str(spawn_choice))
     
     for spawn_key in constants.ENEMY_SPAWN_PLACEMENT_CONFIGURATION:
         if spawn_choice <= spawn_key:
             spawn_pattern = constants.ENEMY_SPAWN_PLACEMENT_CONFIGURATION[spawn_key]
             break
     
-    print("spawn_enemy() pattern is: " + str(spawn_pattern))
+    # If this is the final spawn this wave, AND it is considered a 'low population' spawn, surround the player.
+    # Why? Stops the end of the wave being boring with the player having to wait to find the enemies.
+    if (enemies_on_screen+number_to_spawn <= constants.ENEMY_ALL_CHASE_WHEN_POPULATION_LOW) && (enemies_left_this_wave <= constants.ENEMY_ALL_CHASE_WHEN_POPULATION_LOW):
+        print("spawn_enemy(): Boredom avoidance")
+        spawn_pattern = 'CIRCLE_SURROUND_PLAYER'
+
+    #if (number_to_spawn == (enemies_left_this_wave - enemies_on_screen)) && (number_to_spawn <= constants.ENEMY_ALL_CHASE_WHEN_POPULATION_LOW):
+        
+        
+    # Uncomment this to force a spawn pattern for testing.
+    #spawn_pattern='RANDOM'
     
     match spawn_pattern:
         'RANDOM':
@@ -424,7 +427,35 @@ func spawn_enemy(number_to_spawn):
                 var offset = Vector2(sin(angle_rad), cos(angle_rad)) * 600;       
                 var enemy_position = $Player.position + offset
                 
-                spawn_enemy_set_position(enemy_position)
+                spawn_enemy_set_position(enemy_position,'DEFAULT',Vector2(0,0).normalized())
+                i+=1
+        'HARD_TOP':
+            var i=0
+            var y_pos = constants.ARENA_SPAWN_MIN_Y
+            var x_step = (constants.ARENA_SPAWN_MAX_X - constants.ARENA_SPAWN_MIN_X) / number_to_spawn
+            while (i < number_to_spawn):
+                spawn_enemy_set_position(Vector2(constants.ARENA_SPAWN_MIN_X + (i*x_step), y_pos), 'DEFERRED_UNTIL_WALL', Vector2(0,1).normalized())
+                i+=1
+        'HARD_BOTTOM':
+            var i=0
+            var y_pos = constants.ARENA_SPAWN_MAX_Y
+            var x_step = (constants.ARENA_SPAWN_MAX_X - constants.ARENA_SPAWN_MIN_X) / number_to_spawn
+            while (i < number_to_spawn):
+                spawn_enemy_set_position(Vector2(constants.ARENA_SPAWN_MIN_X + (i*x_step), y_pos), 'DEFERRED_UNTIL_WALL', Vector2(0,-1).normalized())
+                i+=1
+        'HARD_LEFT':
+            var i=0
+            var x_pos = constants.ARENA_SPAWN_MIN_X
+            var y_step = (constants.ARENA_SPAWN_MAX_Y - constants.ARENA_SPAWN_MIN_Y) / number_to_spawn
+            while (i < number_to_spawn):
+                spawn_enemy_set_position(Vector2(x_pos, constants.ARENA_SPAWN_MIN_Y + (i*y_step)), 'DEFERRED_UNTIL_WALL', Vector2(1,0).normalized())
+                i+=1
+        'HARD_RIGHT':
+            var i=0
+            var x_pos = constants.ARENA_SPAWN_MAX_X
+            var y_step = (constants.ARENA_SPAWN_MAX_Y - constants.ARENA_SPAWN_MIN_Y) / number_to_spawn
+            while (i < number_to_spawn):
+                spawn_enemy_set_position(Vector2(x_pos, constants.ARENA_SPAWN_MIN_Y + (i*y_step)), 'DEFERRED_UNTIL_WALL', Vector2(-1,0).normalized())
                 i+=1
       
 func spawn_enemy_random_position():
@@ -437,13 +468,17 @@ func spawn_enemy_random_position():
         mob.spawn_specific(wave_special_data)
     else:
         mob.spawn_random()
+        
+    enemies_on_screen+=1
     
-func spawn_enemy_set_position(enemy_position):
+func spawn_enemy_set_position(enemy_position,ai_mode,initial_direction):
     enemy_position.x = clamp(enemy_position.x, constants.ARENA_SPAWN_MIN_X, constants.ARENA_SPAWN_MAX_X )        
     enemy_position.y = clamp(enemy_position.y, constants.ARENA_SPAWN_MIN_Y, constants.ARENA_SPAWN_MAX_Y )   
     
     var mob = enemy_scene.instantiate()
     mob.get_node('.').set_position (enemy_position);
+    mob.set_ai_mode(ai_mode)
+    mob.set_initial_direction(initial_direction)
     mob.add_to_group('enemyGroup');	
     add_child(mob)  
     
@@ -451,6 +486,8 @@ func spawn_enemy_set_position(enemy_position):
         mob.spawn_specific(wave_special_data)
     else:
         mob.spawn_random()
+        
+    enemies_on_screen+=1
         
 func spawn_fish():
     var mob = fish_scene.instantiate();
@@ -488,15 +525,24 @@ func _process(_delta):
             spawn_item();
             
         if $EnemySpawnTimer.time_left == 0:
-            if enemies_left_this_wave > get_tree().get_nodes_in_group("enemyGroup").size():
+            print ("Spawning: enemies_left_this_wave=" + str(enemies_left_this_wave)+ "   Enemies on screen: " + str(enemies_on_screen))
+            if enemies_left_this_wave > enemies_on_screen:
                 
                 var enemies_to_spawn = constants.ENEMY_REINFORCEMENTS_SPAWN_BATCH_SIZE + (wave_number * constants.ENEMY_REINFORCEMENTS_SPAWN_BATCH_MULTIPLIER)
-                if enemies_to_spawn > enemies_left_this_wave - get_tree().get_nodes_in_group("enemyGroup").size():
-                    enemies_to_spawn = enemies_left_this_wave - get_tree().get_nodes_in_group("enemyGroup").size()
-                 
+                if enemies_to_spawn > enemies_left_this_wave - enemies_on_screen:
+                    enemies_to_spawn = enemies_left_this_wave - enemies_on_screen
+                    
+                var how_many_left_to_spawn = enemies_left_this_wave - (enemies_to_spawn + enemies_on_screen)
+                print ("Spawning: How many left to spawn after this: " + str(how_many_left_to_spawn))
+                
+                if how_many_left_to_spawn < constants.ENEMY_REINFORCEMENTS_SPAWN_MINIMUM_NUMBER:
+                    print ("Spawning: Bumping to minimum number")
+                    enemies_to_spawn += how_many_left_to_spawn
+    
+                print ("Spawning: Spawning " + str(enemies_to_spawn) + " enemies")
                 spawn_enemy(enemies_to_spawn)
                 
-                $EnemySpawnTimer.start(constants.ENEMY_REINFORCEMENTS_SPAWN_BASE_SECONDS);
+            $EnemySpawnTimer.start(constants.ENEMY_REINFORCEMENTS_SPAWN_BASE_SECONDS);
             
     if game_status == GAME_OVER:
         if $GameOverTimer.time_left == 0:
@@ -523,11 +569,12 @@ func _input(_ev):
                 main_menu()
             
 func _on_enemy_update_score(score_to_add,enemy_global_position,death_source):
-    enemies_left_this_wave = enemies_left_this_wave - 1;
+    enemies_left_this_wave = enemies_left_this_wave - 1
+    enemies_on_screen = enemies_on_screen - 1
     score = score + (score_to_add*score_multiplier);
+    var score_to_return = score_to_add*score_multiplier
     
-    # Don't increase multiplier for dinosaur kills
-    print("Death source: " + str(death_source))
+    # Don't increase multiplier for dinosaur killsaw
     if death_source == 'PLAYER-SHOT':
         score_multiplier+= 1
     
@@ -545,6 +592,8 @@ func _on_enemy_update_score(score_to_add,enemy_global_position,death_source):
     
     if game_mode == 'ARCADE':
         update_enemies_left_display();
+
+    return score_to_return
 
 func _on_enemy_update_score_display():
     $HUD.get_node('CanvasLayer').get_node('Score').text = "SCORE\n" + str(score);
@@ -651,7 +700,7 @@ func upgrade_screen():
                 deadlock_solved = true
          
     # Uncomment to force a certain upgrade to be offered (Testing)       
-    #upgrade_one_index = 'CHEAT DEATH'
+    #upgrade_one_index = 'LOOT LOVER'
        
     $HUD/CanvasLayer/UpgradeChoiceContainer/Choice1/TextureRect.texture = load($Player.upgrades[upgrade_one_index][2])
     $HUD/CanvasLayer/UpgradeChoiceContainer/Choice2/TextureRect.texture = load($Player.upgrades[upgrade_two_index][2])

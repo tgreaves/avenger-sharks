@@ -1,4 +1,4 @@
-[gd_scene load_steps=82 format=3 uid="uid://bkmx1mvtb8dxr"]
+[gd_scene load_steps=83 format=3 uid="uid://bkmx1mvtb8dxr"]
 
 [ext_resource type="Script" path="res://Scripts/Enemy.gd" id="1_6udno"]
 [ext_resource type="Texture2D" uid="uid://ps2dg61ty76w" path="res://Sprites/knight-run-sheet.png" id="2_7pnuj"]
@@ -12,6 +12,7 @@
 [ext_resource type="Texture2D" uid="uid://1wf8llk48bgj" path="res://Sprites/rogue-run-sheet.png" id="5_kkmra"]
 [ext_resource type="AudioStream" uid="uid://vioqdrtdy1x3" path="res://Sound/086398_game-die-81356.mp3" id="8_wxbp6"]
 [ext_resource type="AudioStream" uid="uid://dmmjjx68g3x6e" path="res://Sound/090035_splatwav-91604.mp3" id="10_o51ug"]
+[ext_resource type="FontFile" uid="uid://dclfn1fjcq5i7" path="res://Fonts/PressStart2P-Regular.ttf" id="13_r0p1q"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_brpyb"]
 radius = 59.0
@@ -550,7 +551,7 @@ animations = [{
 [node name="Enemy" type="CharacterBody2D"]
 z_index = 1
 collision_layer = 4
-collision_mask = 80
+collision_mask = 16
 motion_mode = 1
 script = ExtResource("1_6udno")
 
@@ -576,7 +577,7 @@ metadata/_aseprite_wizard_config_ = {
 }
 
 [node name="StateTimer" type="Timer" parent="."]
-wait_time = 2.0
+wait_time = 1.5
 one_shot = true
 
 [node name="AttackTimer" type="Timer" parent="."]
@@ -596,3 +597,14 @@ stream = ExtResource("8_wxbp6")
 
 [node name="AudioStreamPlayerFishSplat" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("10_o51ug")
+
+[node name="ScoreLabel" type="Label" parent="."]
+visible = false
+offset_left = -348.0
+offset_top = -100.0
+offset_right = 361.0
+offset_bottom = -65.0
+theme_override_fonts/font = ExtResource("13_r0p1q")
+theme_override_font_sizes/font_size = 32
+text = "POWER UP!"
+horizontal_alignment = 1

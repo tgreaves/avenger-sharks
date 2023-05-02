@@ -20,14 +20,23 @@
 * Wave / Spawning mechanics:
     * Introduce different enemy types as player progresses.
     * % chance of a special wave ('All bees')
-    * Spawning methods during a wave: Random, Circle around player
+    * Spawning methods during a wave:
+        * Random (Default for previous releases)
+        * Circle around the player
+        * Arena edge and move inwards (Top / Bottom / Left / Right)
+    * Enemy AI can be deferred to support custom wave patterns
+    * Enemies move FASTER if spawning from an edge to keep the tension up.
+    * Final enemy spawn during a wave will appear near player (to save having to hunt)
+    * Final enemies will move faster in the wave.
 * Gameplay and balance:
-    * Score multiplier introduced.  Multiplier lost if a shot misses or player takes damage.
+    * Score multiplier introduced.  Multiplier lost when the player takes damage.
     * Chests more likely to be dropped than health potions.
     * Spawn traps less frequently.
     * Reduced dropped item % (was: 25, now 20)
+    * Reduced time between enemies spawning in and becoming dangerous to 1.5s (was: 2s)
 * Graphics: 
     * Display obtained upgrades on HUD.
+    * Pop-up points scored from enemies as they are defeated.
     * Speed up Necromancer death animation.
 * Misc: Persistent storage support.
 * Misc: Statistics (which use the persistent storage...) now tracked and viewable.
@@ -35,6 +44,8 @@
 * Steam: Initial store assets and listing.
 * Bug fixes:
     * Stop game breaking if player dies at the same time as beating a wave.
+    * Improve arena spawn co-ordinates range to prevent insta-collisions.
+    * Fixed shonky calculations for enemy spawn numbers within a wave.
 
 # 0.2-alpha
 

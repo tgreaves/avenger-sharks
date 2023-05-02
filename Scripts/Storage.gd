@@ -6,7 +6,6 @@ var Config
 var Stats
 
 func load_stats():
-    print ("load_stats() called")
     Stats = ConfigFile.new()
     
     var err = Stats.load("user://stats.ini")
@@ -22,7 +21,6 @@ func load_stats():
         return
         
 func save_stats():
-    print("save_stats() called")
     var err = Stats.save("user://stats.ini")
     
     if err != OK:

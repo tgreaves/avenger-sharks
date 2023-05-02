@@ -72,10 +72,7 @@
     * Turret could fire a homing missile instead.
 
 * SPAWN PATTERNS
-    * Movement patterns as well (sine wave for example enemies in a group)
-    * Option on Circle spawn for all to be the same.
-        * Will need to re-work Enemy logic to not all be done in _ready() as is making things awkward.
-        * Base on Item and spawn_specific() and spawn_random
+    * Spawn from multiple walls simultaneously?
     
 * PERSISTENT STORAGE
     * Encryption
@@ -101,11 +98,9 @@
         * Hits one time to lose one life
         * If it loses two more, then it is done but can take three lives one hit.
         
-
+* MUSIC
+    * Anything suitable for GAME OVER?
 
 This commit:
     
-* Tidy up spawning code.
-* Display custom message for special waves.
-* Score multiplier system
-* TODO: Display score pop-up above enemy when dead
+* 

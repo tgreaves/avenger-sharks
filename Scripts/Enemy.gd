@@ -15,6 +15,8 @@ var enemy_speed;
 var enemy_health;
 var stored_modulate;
 var hit_to_be_processed;
+var ai_mode = 'DEFAULT'
+var initial_direction = 0
 
 func _ready():
     pass
@@ -39,6 +41,8 @@ func spawn_specific(enemy_type_in):
         'necromancer':
             $AnimatedSprite2D.offset = Vector2(0,-25)
             $CollisionShape2D.scale = Vector2(1.5, 1.5)
+            set_collision_mask_value(7,true)
+            
             enemy_speed = constants.ENEMY_NECROMANCER_SPEED;
             enemy_health = constants.ENEMY_NECROMANCER_HEALTH;
         'bee':
@@ -57,6 +61,15 @@ func spawn_specific(enemy_type_in):
     
     set_modulate(Color(0,0,0,0));
     hit_to_be_processed = false
+
+func set_ai_mode(ai_mode_in):
+    ai_mode = ai_mode_in
+    
+func set_initial_direction(initial_direction_in):
+    initial_direction = initial_direction_in
+    
+    if initial_direction.x < 0:
+        $AnimatedSprite2D.set_flip_h(true);
 
 func _physics_process(delta):
     set_modulate(lerp(get_modulate(), Color(1,1,1,1), 0.02));
@@ -80,6 +93,7 @@ func _physics_process(delta):
                     $AttackTimer.start(randf_range(constants.ENEMY_NECROMANCER_ATTACK_MINIMUM_SECONDS,constants.ENEMY_NECROMANCER_ATTACK_MAXIMUM_SECONDS));
                 else:
                     $AttackTimer.start(randf_range(constants.ENEMY_ATTACK_MINIMUM_SECONDS,constants.ENEMY_ATTACK_MAXIMUM_SECONDS));
+                    
                 $TrapTimer.start(randf_range(constants.ENEMY_TRAP_MINIMUM_SECONDS,constants.ENEMY_TRAP_MAXIMUM_SECONDS));
 
         WANDER:
@@ -89,54 +103,63 @@ func _physics_process(delta):
             if $StateTimer.time_left == 0:
                 state = WANDER;
                 
-                match enemy_type:
-                    "knight":
-                        # Knights
-                        var target_direction = (get_parent().get_node("Player").global_position - global_position).normalized();
-                        velocity = target_direction * enemy_speed;
-                        $StateTimer.start(randf_range(constants.ENEMY_CHASE_REORIENT_MINIMUM_SECONDS,
-                                                    constants.ENEMY_CHASE_REORIENT_MAXIMUM_SECONDS));
-                    "necromancer":
-                        # Necromancer - Move towards nearest fish if present
-                        var target_direction;
-                        
-                        var fish_points = get_tree().get_nodes_in_group("fishGroup");
-                        
-                        # In Pacifist mode, Necros do not go after fish.
-                        if fish_points.size() and get_parent().game_mode == 'ARCADE':
-                            var nearest_fish = fish_points[0];
-                        
-                            for single_fish in fish_points:
-                                if single_fish.global_position.distance_to(global_position) < nearest_fish.global_position.distance_to(global_position):
-                                        nearest_fish = single_fish
-                            
-                            target_direction = (nearest_fish.global_position - global_position).normalized();
+                #print ("Enemy - position... x=" + str(position.x) + " y=" + str(position.y))
+                
+                if ai_mode == 'DEFERRED_UNTIL_WALL':
+                    velocity = initial_direction * (enemy_speed * constants.ENEMY_SPEED_DEFERRED_AI_MULTIPLIER)
+                else:
+                    match enemy_type:
+                        "knight":
+                            # Knights
+                            var target_direction = (get_parent().get_node("Player").global_position - global_position).normalized();
                             velocity = target_direction * enemy_speed;
                             $StateTimer.start(randf_range(constants.ENEMY_CHASE_REORIENT_MINIMUM_SECONDS,
                                                         constants.ENEMY_CHASE_REORIENT_MAXIMUM_SECONDS));
-                        else:
-                            #target_direction = (get_parent().get_node("Player").global_position - global_position).normalized();
-                            # If no fish left, go into normal wander.
-                            $StateTimer.start(randf_range(constants.ENEMY_DEFAULT_CHANGE_DIRECTION_MINIMUM_SECONDS,
-                                                    constants.ENEMY_DEFAULT_CHANGE_DIRECTION_MAXIMUM_SECONDS));
-                            velocity = Vector2(randf_range(-1,1), randf_range(-1,1)).normalized() * enemy_speed;
+                        "necromancer":
+                            # Necromancer - Move towards nearest fish if present
+                            var target_direction;
                             
-                    _:
-                        # Anything else.
-                        $StateTimer.start(randf_range(constants.ENEMY_DEFAULT_CHANGE_DIRECTION_MINIMUM_SECONDS,
-                                                    constants.ENEMY_DEFAULT_CHANGE_DIRECTION_MAXIMUM_SECONDS));
-                        velocity = Vector2(randf_range(-1,1), randf_range(-1,1)).normalized() * enemy_speed;
+                            var fish_points = get_tree().get_nodes_in_group("fishGroup");
+                            
+                            # In Pacifist mode, Necros do not go after fish.
+                            if fish_points.size() and get_parent().game_mode == 'ARCADE':
+                                var nearest_fish = fish_points[0];
+                            
+                                for single_fish in fish_points:
+                                    if single_fish.global_position.distance_to(global_position) < nearest_fish.global_position.distance_to(global_position):
+                                            nearest_fish = single_fish
+                                
+                                target_direction = (nearest_fish.global_position - global_position).normalized();
+                                velocity = target_direction * enemy_speed;
+                                $StateTimer.start(randf_range(constants.ENEMY_CHASE_REORIENT_MINIMUM_SECONDS,
+                                                            constants.ENEMY_CHASE_REORIENT_MAXIMUM_SECONDS));
+                            else:
+                                #target_direction = (get_parent().get_node("Player").global_position - global_position).normalized();
+                                # If no fish left, go into normal wander.
+                                $StateTimer.start(randf_range(constants.ENEMY_DEFAULT_CHANGE_DIRECTION_MINIMUM_SECONDS,
+                                                        constants.ENEMY_DEFAULT_CHANGE_DIRECTION_MAXIMUM_SECONDS));
+                                velocity = Vector2(randf_range(-1,1), randf_range(-1,1)).normalized() * enemy_speed;
+                                
+                        _:
+                            # Anything else.
+                            $StateTimer.start(randf_range(constants.ENEMY_DEFAULT_CHANGE_DIRECTION_MINIMUM_SECONDS,
+                                                        constants.ENEMY_DEFAULT_CHANGE_DIRECTION_MAXIMUM_SECONDS));
+                            velocity = Vector2(randf_range(-1,1), randf_range(-1,1)).normalized() * enemy_speed;
                         
-                # OVERRIDE when only a limited number of enemies left
-                # Behaviour: Chase player.
-                # BEES always chase the player with no respite!
-                if enemy_type == 'bee' or get_parent().enemies_left_this_wave <= constants.ENEMY_ALL_CHASE_WHEN_POPULATION_LOW:
-                    var target_direction = (get_parent().get_node("Player").global_position - global_position).normalized();
-                    velocity = target_direction * enemy_speed;
-                    $StateTimer.start(randf_range(constants.ENEMY_CHASE_REORIENT_MINIMUM_SECONDS,
-                                                constants.ENEMY_CHASE_REORIENT_MAXIMUM_SECONDS));
-                                                
-                                                
+                    # OVERRIDE when only a limited number of enemies left
+                    # Behaviour: Chase player.
+                    # BEES always chase the player with no respite!
+                    if enemy_type == 'bee' or get_parent().enemies_left_this_wave <= constants.ENEMY_ALL_CHASE_WHEN_POPULATION_LOW:
+                        var target_direction = (get_parent().get_node("Player").global_position - global_position).normalized();
+                        
+                        if (get_parent().enemies_left_this_wave <= constants.ENEMY_ALL_CHASE_WHEN_POPULATION_LOW):
+                            velocity = target_direction * (enemy_speed * constants.ENEMY_SPEED_POPULATION_LOW_MULTIPLIER)
+                        else:
+                            velocity = target_direction * enemy_speed;
+                        
+                        $StateTimer.start(randf_range(constants.ENEMY_CHASE_REORIENT_MINIMUM_SECONDS,
+                                                    constants.ENEMY_CHASE_REORIENT_MAXIMUM_SECONDS));
+                                                                                
         DYING:
             if $FlashHitTimer.time_left == 0:
                 set_modulate(Color(1,1,1,1));
@@ -195,7 +218,7 @@ func _physics_process(delta):
             
             $TrapTimer.start(randf_range(constants.ENEMY_TRAP_MINIMUM_SECONDS,constants.ENEMY_TRAP_MAXIMUM_SECONDS));
         
-    if collision:		
+    if collision:	
         if enemy_type == 'necromancer' && collision.get_collider().name.contains('Fish') && get_parent().game_mode == 'ARCADE':
             var collided_with = collision.get_collider();
             collided_with.get_node('.')._death(1);
@@ -207,6 +230,7 @@ func _physics_process(delta):
                 _death('PLAYER-BODY')
             else:
                 velocity = velocity.bounce(collision.get_normal());
+                ai_mode='DEFAULT'
     
 func _death(death_source):
     if state != DYING:
@@ -232,13 +256,16 @@ func _death(death_source):
             else:
                 enemy_killed_score = constants.KILL_ENEMY_SCORE;
         
-            get_parent()._on_enemy_update_score(enemy_killed_score,global_position,death_source)
+            var actual_scored = get_parent()._on_enemy_update_score(enemy_killed_score,global_position,death_source)
+            
+            score_label_animation(str(actual_scored))
             
             if get_parent().game_mode == 'ARCADE':
                 leave_behind_item()
             
 func leave_behind_item():
-    var leave_percentage = constants.ENEMY_LEAVE_BEHIND_ITEM_PERCENTAGE + (get_parent().get_node('Player').upgrades['LOOT LOVER'][0] * 10)
+    var percentage_calc  = (get_parent().get_node('Player').upgrades['LOOT LOVER'][0] * 10.0) / 100.0
+    var leave_percentage = constants.ENEMY_LEAVE_BEHIND_ITEM_PERCENTAGE + (percentage_calc * constants.ENEMY_LEAVE_BEHIND_ITEM_PERCENTAGE)
     
     if randi_range(1,100) <= leave_percentage:
         var item = get_parent().item_scene.instantiate()
@@ -246,3 +273,21 @@ func leave_behind_item():
         item.spawn_random(true)
         item.get_node('.').set_position(position)
         item.add_to_group('itemGroup')
+
+func score_label_animation(label_text):
+    var new_label = $ScoreLabel.duplicate()
+    add_child(new_label)
+    
+    new_label.set_modulate(Color(1,1,1,1));
+    new_label.text = label_text
+    new_label.visible = true
+    
+    # Text should move upwards slightly.
+    var target_position = new_label.position
+    target_position.y += -50
+    
+    var tween = get_tree().create_tween()
+    tween.set_parallel()
+    tween.tween_property(new_label, "modulate", Color(0,0,0,0), 2)
+    tween.tween_property(new_label, "position", target_position, 2)
+    tween.tween_callback(new_label.queue_free).set_delay(2)
