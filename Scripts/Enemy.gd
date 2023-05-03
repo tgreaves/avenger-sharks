@@ -61,6 +61,7 @@ func spawn_specific(enemy_type_in):
     
     set_modulate(Color(0,0,0,0));
     hit_to_be_processed = false
+    $SpawnParticles.emitting = true
 
 func set_ai_mode(ai_mode_in):
     ai_mode = ai_mode_in
@@ -84,6 +85,7 @@ func _physics_process(delta):
                 hit_to_be_processed = false
                 
             if $StateTimer.time_left == 0:
+                $SpawnParticles.emitting = false
                 state = WANDER;
                 $AnimatedSprite2D.play();
                                
@@ -102,8 +104,6 @@ func _physics_process(delta):
             
             if $StateTimer.time_left == 0:
                 state = WANDER;
-                
-                #print ("Enemy - position... x=" + str(position.x) + " y=" + str(position.y))
                 
                 if ai_mode == 'DEFERRED_UNTIL_WALL':
                     velocity = initial_direction * (enemy_speed * constants.ENEMY_SPEED_DEFERRED_AI_MULTIPLIER)
@@ -163,6 +163,9 @@ func _physics_process(delta):
         DYING:
             if $FlashHitTimer.time_left == 0:
                 set_modulate(Color(1,1,1,1));
+                
+            if $DeathParticlesTimer.time_left == 0:
+                $DeathParticles.emitting = false
                 
             if $StateTimer.time_left == 0:
                 self.queue_free();
@@ -237,9 +240,6 @@ func _death(death_source):
         enemy_health = enemy_health - 1;
         
         hit_to_be_processed = true
-        stored_modulate = get_modulate()
-        set_modulate(Color(10,10,10,10));
-        $FlashHitTimer.start()
         
         if enemy_health <=0 :
             $CollisionShape2D.set_deferred("disabled", true)
@@ -248,6 +248,9 @@ func _death(death_source):
             $AnimatedSprite2D.play()
             $AudioStreamPlayer.play();
             $StateTimer.start(2);
+            $SpawnParticles.emitting = false
+            $DeathParticles.emitting = true
+            $DeathParticlesTimer.start()
             state = DYING;
             
             var enemy_killed_score = 0;
@@ -260,8 +263,12 @@ func _death(death_source):
             
             score_label_animation(str(actual_scored))
             
-            if get_parent().game_mode == 'ARCADE':
+            if get_parent().game_mode == 'ARCADE' && (get_parent().dropped_items_on_screen < constants.ARCADE_MAXIMUM_DROPPED_ITEMS_ON_SCREEN):
                 leave_behind_item()
+        else:
+            stored_modulate = get_modulate()
+            set_modulate(Color(10,10,10,10));
+            $FlashHitTimer.start()
             
 func leave_behind_item():
     var percentage_calc  = (get_parent().get_node('Player').upgrades['LOOT LOVER'][0] * 10.0) / 100.0
@@ -271,8 +278,10 @@ func leave_behind_item():
         var item = get_parent().item_scene.instantiate()
         get_parent().add_child(item)
         item.spawn_random(true)
+        item.set_source('DROPPED')
         item.get_node('.').set_position(position)
         item.add_to_group('itemGroup')
+        get_parent().dropped_items_on_screen += 1
 
 func score_label_animation(label_text):
     var new_label = $ScoreLabel.duplicate()

@@ -10,6 +10,7 @@ enum {
 }
 
 var state = SPAWNING
+var source = ''
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -31,9 +32,14 @@ func spawn_specific(item_selection, despawn_mode):
     
     state=READY
 
+func set_source(in_source):
+    source=in_source
+
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
     if (state==READY) && ($DespawnTimer.time_left == 0):
+        if source == 'DROPPED':
+            get_parent().dropped_items_on_screen = get_parent().dropped_items_on_screen - 1
         despawn()
         
 func _physics_process(_delta):

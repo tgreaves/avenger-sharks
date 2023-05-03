@@ -3,9 +3,9 @@ extends Node
 const GAME_VERSION = "0.3-alpha"
 
 # Developer settings.
-const DEV_SKIP_INTRO = true
+const DEV_SKIP_INTRO = false
 const DEV_START_GAME_IMMEDIATELY = false
-const MUSIC_ENABLED = false
+const MUSIC_ENABLED = true
 
 # Game settings
 const START_WAVE = 1
@@ -42,34 +42,35 @@ const DINOSAUR_SURVIVAL_TIME = 5
 const ENEMY_SPAWN_WAVE_CONFIGURATION = {
     1:      ['knight','wizard'],
     2:      ['knight','knight','wizard','rogue'],
-    5:      ['knight','knight', 'wizard','wizard', 'rogue', 'necromancer'],
-    7:      ['knight','knight', 'wizard','wizard', 'rogue', 'necromancer', 'bee'],
+    3:      ['knight','knight', 'wizard','wizard', 'rogue', 'necromancer'],
+    5:      ['knight','knight', 'wizard','wizard', 'rogue', 'necromancer', 'bee'],
 }
 
 const ENEMY_SPAWN_WAVE_SPECIAL_MIN_WAVE = 2
 
 const ENEMY_SPAWN_WAVE_SPECIAL_CONFIGURATION = {
     90:      ['STANDARD', '', ''],
-    100:     ['ALL_THE_SAME', 'bee', 'Feel the buzz!']
+    95:      ['ALL_THE_SAME', 'bee', 'Feel the buzz!'],
+    100:     ['ALL_THE_SAME', 'necromancer', 'The fish become fearful!'],
+    
 }
 
 const ENEMY_SPAWN_PLACEMENT_CONFIGURATION = {
-    40:     'RANDOM',
-    60:     'CIRCLE_SURROUND_PLAYER',
-    70:     'HARD_TOP', 
-    80:     'HARD_BOTTOM',
-    90:     'HARD_LEFT',
+    50:     'RANDOM',
+    80:     'CIRCLE_SURROUND_PLAYER',
+    85:     'HARD_TOP', 
+    90:     'HARD_BOTTOM',
+    95:     'HARD_LEFT',
     100:    'HARD_RIGHT'
 }
 
-const ENEMY_MULTIPLIER_AT_WAVE_START = 5
-const ENEMY_MULTIPLIER_DURING_WAVE = 10
+const ENEMY_MULTIPLIER_AT_WAVE_START = 10
+const ENEMY_MULTIPLIER_DURING_WAVE = 15
 
 const ENEMY_REINFORCEMENTS_SPAWN_BASE_SECONDS = 5
 const ENEMY_REINFORCEMENTS_SPAWN_BATCH_SIZE = 5
 const ENEMY_REINFORCEMENTS_SPAWN_BATCH_MULTIPLIER = 1
 const ENEMY_REINFORCEMENTS_SPAWN_MINIMUM_NUMBER = 5
-
 
 # Enemy (General)
 
@@ -80,14 +81,14 @@ const ENEMY_SPEED_WAVE_PERCENTAGE_MULTIPLIER = 10
 const ENEMY_SPEED_DEFERRED_AI_MULTIPLIER = 1.5
 const ENEMY_SPEED_POPULATION_LOW_MULTIPLIER = 1.5
 
-const ENEMY_HEALTH = 1;
-const ENEMY_NECROMANCER_HEALTH = 5;
+const ENEMY_HEALTH = 1
+const ENEMY_NECROMANCER_HEALTH = 3
 
 const ENEMY_ATTACK_MINIMUM_SECONDS = 3;
 const ENEMY_ATTACK_MAXIMUM_SECONDS = 5;
 const ENEMY_ATTACK_ARC_DEGREES = 20;
-const ENEMY_NECROMANCER_ATTACK_MINIMUM_SECONDS = 4;
-const ENEMY_NECROMANCER_ATTACK_MAXIMUM_SECONDS = 8;
+const ENEMY_NECROMANCER_ATTACK_MINIMUM_SECONDS = 5;
+const ENEMY_NECROMANCER_ATTACK_MAXIMUM_SECONDS = 10;
 
 const ENEMY_CHASE_REORIENT_MINIMUM_SECONDS = 0.5;
 const ENEMY_CHASE_REORIENT_MAXIMUM_SECONDS = 1.0;
@@ -114,10 +115,11 @@ const FISH_TO_TRIGGER_FISH_FRENZY = 15
 const ARCADE_SPAWNING_ITEMS = ['dinosaur']
 const PACIFIST_SPAWNING_ITEMS = ['health']
 
-const ITEM_SPAWN_MINIMUM_SECONDS = 5
+const ITEM_SPAWN_MINIMUM_SECONDS = 10
 const ITEM_SPAWN_MAXIMUM_SECONDS = 15
-const ENEMY_LEAVE_BEHIND_ITEM_PERCENTAGE = 20
+const ENEMY_LEAVE_BEHIND_ITEM_PERCENTAGE = 15
 const ITEM_DESPAWN_TIME = 10
+const ARCADE_MAXIMUM_DROPPED_ITEMS_ON_SCREEN = 5
 
 const HEALTH_POTION_BONUS = 20;
 

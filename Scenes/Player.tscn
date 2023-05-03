@@ -229,7 +229,6 @@ shape = SubResource("CapsuleShape2D_1hb8q")
 texture_filter = 1
 scale = Vector2(4, 4)
 sprite_frames = SubResource("SpriteFrames_wa15s")
-animation = &"explosion"
 metadata/_aseprite_wizard_config_ = {
 "layer": "",
 "o_ex_p": "",

@@ -211,6 +211,9 @@ func _physics_process(_delta):
                     break
                 
                 if collision.get_collider().name.contains('Item'):
+                    if collided_with.get_node('.').source == 'DROPPED':
+                        get_parent().dropped_items_on_screen = get_parent().dropped_items_on_screen - 1
+                    
                     match collided_with.get_node('.').item_type:
                         "health":
                             var original_energy = player_energy
@@ -278,7 +281,6 @@ func _physics_process(_delta):
                     break
                 
                 # Default - Enemy	
-                print("Player body collision")
                 collided_with.get_node('.')._death('PLAYER-BODY');
                 _player_hit();
                
@@ -441,9 +443,6 @@ func _physics_process(_delta):
                         get_parent().get_node('Arena').get_node('PlayerStartLocation').get_node('CollisionShape2D').disabled = true;
                                 
 func _player_hit():
-    
-    print("_player_hit() invoked")
-    
     if shark_status != ALIVE:
         return
     

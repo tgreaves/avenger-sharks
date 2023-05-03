@@ -15,8 +15,9 @@ func load_stats():
         Stats.set_value('player','high_score',0)
         Stats.set_value('player','games_played', 0)
         Stats.set_value('player','shots_fired', 0)
-        
-        print("load_stat(): Error, setting defaults.")
+        Stats.set_value('player','enemies_defeated', 0)
+        Stats.set_value('player','furthest_wave', 0)
+        Stats.set_value('player','fish_rescued', 0)
         
         return
         

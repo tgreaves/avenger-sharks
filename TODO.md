@@ -1,8 +1,6 @@
 # Gameplay
 
-* Difficulty levels (fish themed, e.g Minnow upwards)
-* Boss wave
-* Pacifist mode
+* Difficulty levels (fish themed, e.g Minnow upwards)+
 * Chill mode
 * Dinosaur mode - Only triggering dinosaurs will kill enemies, but have more of them?
 
@@ -20,8 +18,6 @@
 # Game environment
 
 * Scenery / Obstacles in room (Tileset has boxes)
-* Opens up possibilities of some rooms being special, e.g. just full of fish?
-* Every x waves is a special room?
 
 # User Experience
 
@@ -32,31 +28,10 @@
 
 * Big spray doesn't work when player close to a wall.
 
-# THINGS FOR 0.3-alpha
-
-* BALANCE AND FIXES
-    * Upgrades currently not balanced...
-        * Armour + Health basically makes it hard to die!
-    * Spawning...
-        * Introduce certain enemies at different waves.
-        
-* UPGRADE SYSTEM
-    * Perma power-up: Sets power-up to start a level at Level 1 or more (So have one per power-up)
-    * Upgrade that only works for x stages (e.g. confuse enemies)
+# THINGS FOR 0.4-alpha
 
 * SURVIVAL MODE
-    * [DONE] Implement game mode selection from main menu.
-    * Disable mouse cursor during game (remember to enable again after game finishes) - also pause?
-    * [DONE] Player cannot shoot
-    * [DONE] Wave ends if all fish collected
-    * [DONE] Spawn key at last fish location so game loop does not break
-    * [DONE] Necros do not try and eat the fish
-    * [DONE] Disable necro / fish collisions in this mode
-    * [DONE] HUD: Needs to display FISH instead if ENEMIES
-    * [DONE] Number of fish could change with wave progression
-    * Disable power-ups in this mode as they don't apply (HUD?)
-    * [DONE] Disable fish frenzy bar / ability to enable and use
-    * [DONE] Health random spawning on level
+    * Remove power-ups from HUD
     
 * ENEMY TYPES
     * Static turret - probably new Scene to support
@@ -69,16 +44,23 @@
             * ROTATING
             * CHARGING
             * FIRING
-    * Turret could fire a homing missile instead.
+        * Turret could fire a homing missile instead.
+
+* WAVE PROGRESSION
+    * Boss level?
+    * Choice of which level
+    * Palette swaps (different areas) - could use shaders here.
 
 * SPAWN PATTERNS
     * Spawn from multiple walls simultaneously?
     
+* GRAPHICS
+    * Shaders for water effects
+    
 * PERSISTENT STORAGE
-    * Encryption
+    * Implement encryption
     
 * STEAM
-    * Initial store presence.
     * Cloud saving (but of what?)
         * Statistics!
             * Games played
@@ -98,9 +80,4 @@
         * Hits one time to lose one life
         * If it loses two more, then it is done but can take three lives one hit.
         
-* MUSIC
-    * Anything suitable for GAME OVER?
 
-This commit:
-    
-* 

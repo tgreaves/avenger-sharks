@@ -1,4 +1,4 @@
-[gd_scene load_steps=83 format=3 uid="uid://bkmx1mvtb8dxr"]
+[gd_scene load_steps=86 format=3 uid="uid://bkmx1mvtb8dxr"]
 
 [ext_resource type="Script" path="res://Scripts/Enemy.gd" id="1_6udno"]
 [ext_resource type="Texture2D" uid="uid://ps2dg61ty76w" path="res://Sprites/knight-run-sheet.png" id="2_7pnuj"]
@@ -12,6 +12,8 @@
 [ext_resource type="Texture2D" uid="uid://1wf8llk48bgj" path="res://Sprites/rogue-run-sheet.png" id="5_kkmra"]
 [ext_resource type="AudioStream" uid="uid://vioqdrtdy1x3" path="res://Sound/086398_game-die-81356.mp3" id="8_wxbp6"]
 [ext_resource type="AudioStream" uid="uid://dmmjjx68g3x6e" path="res://Sound/090035_splatwav-91604.mp3" id="10_o51ug"]
+[ext_resource type="Texture2D" uid="uid://blmls1u06ubt2" path="res://Particles/flare_01.png" id="11_irhtg"]
+[ext_resource type="Texture2D" uid="uid://bu65b2r4jrqy7" path="res://Particles/smoke_01.png" id="12_5k78v"]
 [ext_resource type="FontFile" uid="uid://dclfn1fjcq5i7" path="res://Fonts/PressStart2P-Regular.ttf" id="13_r0p1q"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_brpyb"]
@@ -548,6 +550,10 @@ animations = [{
 "speed": 5.0
 }]
 
+[sub_resource type="Gradient" id="Gradient_erpy6"]
+offsets = PackedFloat32Array(0.461111, 1)
+colors = PackedColorArray(1, 1, 0, 1, 1, 0.0392157, 0.996078, 1)
+
 [node name="Enemy" type="CharacterBody2D"]
 z_index = 1
 collision_layer = 4
@@ -563,9 +569,7 @@ shape = SubResource("CapsuleShape2D_brpyb")
 texture_filter = 1
 scale = Vector2(4, 4)
 sprite_frames = SubResource("SpriteFrames_4gmcv")
-animation = &"knight-death"
-frame = 5
-frame_progress = 1.0
+animation = &"knight-run"
 metadata/_aseprite_wizard_config_ = {
 "layer": "",
 "o_ex_p": "",
@@ -576,8 +580,38 @@ metadata/_aseprite_wizard_config_ = {
 "source": "res://Shark.aseprite"
 }
 
+[node name="SpawnParticles" type="CPUParticles2D" parent="."]
+speed_scale = 2.0
+texture = ExtResource("11_irhtg")
+emission_shape = 1
+emission_sphere_radius = 75.0
+direction = Vector2(2.08165e-12, 2.08165e-12)
+gravity = Vector2(2.08165e-12, 2.08165e-12)
+radial_accel_min = -20.0
+radial_accel_max = -20.0
+scale_amount_min = 0.5
+scale_amount_max = 0.75
+color_ramp = SubResource("Gradient_erpy6")
+hue_variation_max = 0.75
+
+[node name="DeathParticles" type="CPUParticles2D" parent="."]
+emitting = false
+texture = ExtResource("12_5k78v")
+emission_shape = 1
+emission_sphere_radius = 40.0
+gravity = Vector2(2.08165e-12, 2.08165e-12)
+initial_velocity_max = 5.0
+radial_accel_min = 20.0
+radial_accel_max = 20.0
+scale_amount_min = 0.25
+scale_amount_max = 0.5
+
 [node name="StateTimer" type="Timer" parent="."]
 wait_time = 1.5
+one_shot = true
+
+[node name="DeathParticlesTimer" type="Timer" parent="."]
+wait_time = 0.2
 one_shot = true
 
 [node name="AttackTimer" type="Timer" parent="."]

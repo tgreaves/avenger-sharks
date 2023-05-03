@@ -17,6 +17,7 @@ extends Node
 @export var game_mode = 'ARCADE'
 @export var wave_special_type = 'STANDARD'
 @export var wave_special_data = ''
+@export var dropped_items_on_screen = 0
 
 var score = 0;
 var score_multiplier = 1
@@ -240,9 +241,6 @@ func wave_intro():
                 break
     else:
         wave_special_type = 'STANDARD'
-    
-    print("WAVE SPECIAL TYPE = " + str(wave_special_type))
-    print("WAVE SPECIAL DATA = " + str(wave_special_data))    
             
     $HUD.get_node("CanvasLayer/Label").text = wave_text
 
@@ -256,9 +254,14 @@ func start_wave():
     game_status = GAME_RUNNING;
     var i = 0;
     
+    if wave_number > Storage.Stats.get_value('player','furthest_wave',0):
+        Storage.increase_stat('player','furthest_wave',1)
+    
     $HUD.get_node("CanvasLayer/Score").visible = true;
     $HUD.get_node("CanvasLayer/Label").visible = false;
     $HUD.get_node("CanvasLayer/EnemiesLeft").visible = true;
+
+    dropped_items_on_screen = 0
     
     $ItemSpawnTimer.start(randf_range(constants.ITEM_SPAWN_MINIMUM_SECONDS,constants.ITEM_SPAWN_MAXIMUM_SECONDS));
     $EnemySpawnTimer.start(constants.ENEMY_REINFORCEMENTS_SPAWN_BASE_SECONDS);
@@ -404,7 +407,6 @@ func spawn_enemy(number_to_spawn):
     # If this is the final spawn this wave, AND it is considered a 'low population' spawn, surround the player.
     # Why? Stops the end of the wave being boring with the player having to wait to find the enemies.
     if (enemies_on_screen+number_to_spawn <= constants.ENEMY_ALL_CHASE_WHEN_POPULATION_LOW) && (enemies_left_this_wave <= constants.ENEMY_ALL_CHASE_WHEN_POPULATION_LOW):
-        print("spawn_enemy(): Boredom avoidance")
         spawn_pattern = 'CIRCLE_SURROUND_PLAYER'
 
     #if (number_to_spawn == (enemies_left_this_wave - enemies_on_screen)) && (number_to_spawn <= constants.ENEMY_ALL_CHASE_WHEN_POPULATION_LOW):
@@ -525,7 +527,6 @@ func _process(_delta):
             spawn_item();
             
         if $EnemySpawnTimer.time_left == 0:
-            print ("Spawning: enemies_left_this_wave=" + str(enemies_left_this_wave)+ "   Enemies on screen: " + str(enemies_on_screen))
             if enemies_left_this_wave > enemies_on_screen:
                 
                 var enemies_to_spawn = constants.ENEMY_REINFORCEMENTS_SPAWN_BATCH_SIZE + (wave_number * constants.ENEMY_REINFORCEMENTS_SPAWN_BATCH_MULTIPLIER)
@@ -533,13 +534,10 @@ func _process(_delta):
                     enemies_to_spawn = enemies_left_this_wave - enemies_on_screen
                     
                 var how_many_left_to_spawn = enemies_left_this_wave - (enemies_to_spawn + enemies_on_screen)
-                print ("Spawning: How many left to spawn after this: " + str(how_many_left_to_spawn))
                 
                 if how_many_left_to_spawn < constants.ENEMY_REINFORCEMENTS_SPAWN_MINIMUM_NUMBER:
-                    print ("Spawning: Bumping to minimum number")
                     enemies_to_spawn += how_many_left_to_spawn
     
-                print ("Spawning: Spawning " + str(enemies_to_spawn) + " enemies")
                 spawn_enemy(enemies_to_spawn)
                 
             $EnemySpawnTimer.start(constants.ENEMY_REINFORCEMENTS_SPAWN_BASE_SECONDS);
@@ -567,6 +565,8 @@ func _input(_ev):
                 credits.queue_free()
                 $MainMenu/CanvasLayer/MainMenuContainer/Credits.grab_focus()
                 main_menu()
+            STATISTICS:
+                _on_statistics_statistics_return_button_pressed()
             
 func _on_enemy_update_score(score_to_add,enemy_global_position,death_source):
     enemies_left_this_wave = enemies_left_this_wave - 1
@@ -574,12 +574,14 @@ func _on_enemy_update_score(score_to_add,enemy_global_position,death_source):
     score = score + (score_to_add*score_multiplier);
     var score_to_return = score_to_add*score_multiplier
     
-    # Don't increase multiplier for dinosaur killsaw
+    # Don't increase multiplier for dinosaur kills
     if death_source == 'PLAYER-SHOT':
         score_multiplier+= 1
     
     if score > Storage.Stats.get_value('player','high_score'):
         Storage.Stats.set_value('player','high_score', score)
+        
+    Storage.increase_stat('player', 'enemies_defeated', 1)
     
     if enemies_left_this_wave == 0:
         # If last wave enemy is dead, spawn the key.
@@ -621,6 +623,8 @@ func _on_player_player_got_fish():
     score = score + constants.GET_FISH_SCORE;
     if score > Storage.Stats.get_value('player','high_score'):
         Storage.Stats.set_value('player','high_score',score)
+        
+    Storage.increase_stat('player', 'fish_rescued', 1)    
         
     fish_collected += 1
     fish_left_this_wave -= 1
