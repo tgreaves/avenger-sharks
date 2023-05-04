@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://ch08b0kbbu3je"]
+[gd_scene load_steps=11 format=3 uid="uid://ch08b0kbbu3je"]
 
 [ext_resource type="Script" path="res://Scripts/DinosaurAttack.gd" id="1_w8br7"]
 [ext_resource type="Texture2D" uid="uid://ig2s00164uhd" path="res://Sprites/SharkSpray/Water__01.png" id="2_1wwod"]
@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://beqfs5j7nfpc3" path="res://Sprites/SharkSpray/Water__03.png" id="4_1nwek"]
 [ext_resource type="Texture2D" uid="uid://brtia1eocoama" path="res://Sprites/SharkSpray/Water__04.png" id="5_kxy63"]
 [ext_resource type="Texture2D" uid="uid://da60t2goyisif" path="res://Sprites/SharkSpray/Water__05.png" id="6_x5k5a"]
+[ext_resource type="Texture2D" uid="uid://ci5knfcfxqxqr" path="res://Particles/dirt_01.png" id="7_v3xt3"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_lwg83"]
 radius = 40.0
@@ -39,6 +40,10 @@ animations = [{
 "speed": 10.0
 }]
 
+[sub_resource type="Gradient" id="Gradient_0e304"]
+offsets = PackedFloat32Array(0, 0.683333)
+colors = PackedColorArray(0, 0, 1, 1, 0.4, 0.827451, 1, 1)
+
 [node name="DinosaurAttack" type="CharacterBody2D"]
 scale = Vector2(0.5, 0.5)
 collision_layer = 2
@@ -51,3 +56,17 @@ shape = SubResource("CircleShape2D_lwg83")
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_3lkrx")
 frame_progress = 0.0241135
+
+[node name="CPUParticles2D" type="CPUParticles2D" parent="."]
+amount = 16
+lifetime = 0.2
+texture = ExtResource("7_v3xt3")
+emission_shape = 1
+emission_sphere_radius = 11.11
+direction = Vector2(2.08165e-12, 2.08165e-12)
+gravity = Vector2(2.08165e-12, 2.08165e-12)
+angle_min = 27.3
+angle_max = 68.2
+scale_amount_min = 0.1
+scale_amount_max = 0.1
+color_ramp = SubResource("Gradient_0e304")

@@ -7,6 +7,8 @@ var PowerUpBarSequence = [  'SPEEDUP',
 
 var PowerUpIndex = 0;
 
+signal upgrade_button_pressed(button_number)
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
     PowerUpIndex = 0
@@ -77,6 +79,15 @@ func reset_powerup_bar_text():
     $CanvasLayer/PowerUpContainer/BigSprayContainer/Label.text = ""
     $CanvasLayer/PowerUpContainer/MiniSharkContainer/Label.text = ""
 
+func reset_powerup_bar_durations():
+    var duration_percentage = get_parent().get_node('Player').upgrades['MORE POWER'][0] * 20
+    var duration = int(constants.POWERUP_ACTIVE_DURATION + ((duration_percentage / 100.0) * constants.POWERUP_ACTIVE_DURATION))
+                            
+    $CanvasLayer/PowerUpContainer/SpeedUpContainer/SpeedUp/ProgressBar.max_value = duration
+    $CanvasLayer/PowerUpContainer/FastSprayContainer/FastSpray/ProgressBar.max_value = duration
+    $CanvasLayer/PowerUpContainer/BigSprayContainer/BigSpray/ProgressBar.max_value = duration
+    $CanvasLayer/PowerUpContainer/MiniSharkContainer/MiniShark/ProgressBar.max_value = duration
+
 func set_powerup_level(powerup, level):
     var text = "LEVEL " + str(level)
     
@@ -100,4 +111,25 @@ func set_all_powerup_levels():
     for powerup in PowerUpBarSequence:
         set_powerup_level(powerup, get_parent().get_node('Player').current_powerup_levels[powerup])
         
+func _on_upgrade_button_pressed(button_number):
+    emit_signal("upgrade_button_pressed", button_number)
+    
+func update_upgrade_summary():
+#        'MAGNET':           [ 0, 1, 'res://Images/crosshair184.png', 'A powerful magnet which does magnet things.'],
+#        'ARMOUR':           [ 0, 3, 'res://Images/crosshair184.png', 'Decrease incoming damage by 10%'],
 
+    var sidebar_text = ""
+    var upgrades = get_parent().get_node('Player').upgrades
+    
+    for single_upgrade in upgrades:
+        if upgrades[single_upgrade][0]:
+            if upgrades[single_upgrade][1] > 1:
+                # Upgrade has multiple levels.
+                sidebar_text += single_upgrade + " " + str(upgrades[single_upgrade][0])
+            else:
+                # Upgrade has one level (i.e. is either on or off)
+                sidebar_text += single_upgrade
+        
+            sidebar_text += "\n"
+        
+    $CanvasLayer/UpgradeSummary.text = sidebar_text

@@ -30,6 +30,9 @@ https://anokolisa.itch.io/dungeon-crawler-pixel-art-asset-pack
 Necromancer sprite: CreativeKind
 https://creativekind.itch.io/necromancer-free
 
+Bee sprite: Admurin
+https://admurin.itch.io/top-down-mobs-bee
+
 Water spray sprites: Cethiel
 https://opengameart.org/content/water-magic-effect
 
@@ -41,6 +44,9 @@ https://opengameart.org/content/fish-pack-0
 
 Explosions: Limofeus
 https://limofeus.itch.io/pixel-simulations
+
+Particles: Kenney
+https://www.kenney.nl/assets/particle-pack
 
 Font: Press Start 2P by CodeMan38
 https://fonts.google.com/specimen/Press+Start+2P

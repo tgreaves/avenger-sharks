@@ -25,6 +25,14 @@ func _physics_process(delta):
     match state:
         ACTIVE:
             move_and_slide()
+            
+            var distance = position.distance_to( get_parent().get_node('Player').position )
+            
+            if get_parent().get_node('Player').item_magnet_enabled:
+                if distance < 250:
+                    var target_direction = (get_parent().get_node("Player").global_position - global_position).normalized();
+                    velocity = target_direction * ( get_parent().get_node("Player").speed + 200 )
+            
         DESPAWNING:
             if $StateTimer.time_left == 0:
                 queue_free();  

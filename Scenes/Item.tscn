@@ -71,7 +71,7 @@ animations = [{
 "speed": 5.0
 }]
 
-[node name="Item" type="StaticBody2D"]
+[node name="Item" type="CharacterBody2D"]
 collision_layer = 32
 script = ExtResource("1_x2ahu")
 
@@ -80,11 +80,10 @@ shape = SubResource("CircleShape2D_b47ak")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 texture_filter = 1
+position = Vector2(1, 0)
 scale = Vector2(5, 5)
 sprite_frames = SubResource("SpriteFrames_4771i")
-animation = &"chest-open"
-frame = 3
-frame_progress = 1.0
+animation = &"chest-idle"
 
 [node name="DespawnTimer" type="Timer" parent="."]
 one_shot = true

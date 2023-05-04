@@ -1,8 +1,8 @@
 # Gameplay
 
-* Difficulty levels (fish themed, e.g Minnow upwards)
-* Boss wave
-* Pacifist mode
+* Difficulty levels (fish themed, e.g Minnow upwards)+
+* Chill mode
+* Dinosaur mode - Only triggering dinosaurs will kill enemies, but have more of them?
 
 # Power-ups / Progression
 
@@ -18,8 +18,6 @@
 # Game environment
 
 * Scenery / Obstacles in room (Tileset has boxes)
-* Opens up possibilities of some rooms being special, e.g. just full of fish?
-* Every x waves is a special room?
 
 # User Experience
 
@@ -28,9 +26,58 @@
 
 # Bugs
 
-* Difficulty - make 'normal' enemies have additional HP at later levels.
 * Big spray doesn't work when player close to a wall.
 
-* Commit notes
+# THINGS FOR 0.4-alpha
 
-* Bug fix: Tidy up projectiles getting stuck around exit locations in transitions.
+* SURVIVAL MODE
+    * Remove power-ups from HUD
+    
+* ENEMY TYPES
+    * Static turret - probably new Scene to support
+        * Rotate during physics.
+        * After random timer, charge animation + second timer
+        * Fire solid laser - persist for third timer
+        * Damages player
+        * Return to turrent
+        * Statuses
+            * ROTATING
+            * CHARGING
+            * FIRING
+        * Turret could fire a homing missile instead.
+
+* WAVE PROGRESSION
+    * Boss level?
+    * Choice of which level
+    * Palette swaps (different areas) - could use shaders here.
+
+* SPAWN PATTERNS
+    * Spawn from multiple walls simultaneously?
+    
+* GRAPHICS
+    * Shaders for water effects
+    
+* PERSISTENT STORAGE
+    * Implement encryption
+    
+* STEAM
+    * Cloud saving (but of what?)
+        * Statistics!
+            * Games played
+            * Shots fired
+            * Chests collected
+            * Max wave reached
+            * ... etc...
+            * Enemies killed
+    * Achievements
+        * Beat a wave
+        * Beat 5 waves
+        * Beat 10 waves
+    * Leaderboard support (High scores)
+    
+* JACK'S IDEAS
+    * Hammerhead shark
+        * Hits one time to lose one life
+        * If it loses two more, then it is done but can take three lives one hit.
+        
+
