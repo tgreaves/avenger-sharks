@@ -25,6 +25,7 @@ Storage="*res://Scripts/Storage.gd"
 
 window/size/viewport_width=2560
 window/size/viewport_height=1440
+window/size/mode=3
 window/stretch/mode="viewport"
 window/dpi/allow_hidpi=false
 mouse_cursor/custom_image="res://Images/crosshair184.png"
@@ -172,4 +173,5 @@ fish_frenzy={
 
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
+textures/vram_compression/import_s3tc_bptc=true
 environment/defaults/default_clear_color=Color(0, 0, 0, 1)
