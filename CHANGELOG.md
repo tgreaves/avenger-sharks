@@ -1,5 +1,16 @@
 # Changelog
 
+# 0.4-alpha
+
+* Gameplay
+    * Player now has a targetting laser when using a controller.
+* Misc
+    * Credits screen re-jigged.
+* Bug fixes
+    * Controller START button mapped to too many menu items (and so not working).
+    * Steam Deck: STATISTICS not consistently working when selected with controller.
+    * Steam Deck: CREDITS not consistently working when selected with controller.
+
 # 0.3-alpha
 
 This release introduces the upgrade system, a new Pacifist game mode, more interesting wave /

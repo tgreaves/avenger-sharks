@@ -61,13 +61,14 @@ func _ready():
     
     $Arena.visible = false;
     $HUD/CanvasLayer.visible = false
-    $MainMenu.get_node('CanvasLayer').visible = false;
-    $PauseMenu.get_node('CanvasLayer').visible = false;
+    $MainMenu.get_node('CanvasLayer').visible = false
+    $PauseMenu.get_node('CanvasLayer').visible = false
     $Statistics.get_node('CanvasLayer').visible = false
+    $Credits.get_node('CanvasLayer').visible = false
     $Player.set_process(false);
     $Player.set_physics_process(false);
     $Player.visible = false;
-    $Player.get_node("CollisionShape2D").disabled = false;
+    $Player.get_node("CollisionShape2D").disabled = false
     
     # Ensure we update high score as this may have been located from storage.
     _on_enemy_update_score_display()
@@ -561,12 +562,6 @@ func _input(_ev):
             INTRO_SEQUENCE:
                 intro.queue_free()
                 main_menu()
-            CREDITS:
-                credits.queue_free()
-                $MainMenu/CanvasLayer/MainMenuContainer/Credits.grab_focus()
-                main_menu()
-            STATISTICS:
-                _on_statistics_statistics_return_button_pressed()
             
 func _on_enemy_update_score(score_to_add,enemy_global_position,death_source):
     enemies_left_this_wave = enemies_left_this_wave - 1
@@ -661,10 +656,10 @@ func _on_pause_menu_abandon_game_pressed():
 func _on_main_menu_credits_pressed():
     game_status = CREDITS;
     $MainMenu.get_node("CanvasLayer").visible = false
+    $Credits/CanvasLayer/VBoxContainer/ReturnButton.grab_focus()
     $HUD/CanvasLayer/HighScore.visible = false;
-    credits = credits_scene.instantiate();
-    credits.visible = true
-    add_child(credits)
+    $Credits/CanvasLayer.visible = true
+    $Credits.commence_scroll()
 
 func intro_has_finished():
     intro.queue_free()
@@ -750,3 +745,10 @@ func _on_statistics_statistics_return_button_pressed():
     $MainMenu/CanvasLayer/MainMenuContainer/Statistics.grab_focus()
     $HUD/CanvasLayer/HighScore.visible = true
     $Statistics/CanvasLayer.visible = false
+
+func _on_credits_credits_return_button_pressed():
+    game_status = MAIN_MENU
+    $MainMenu.get_node("CanvasLayer").visible = true
+    $MainMenu/CanvasLayer/MainMenuContainer/Credits.grab_focus()
+    $HUD/CanvasLayer/HighScore.visible = true
+    $Credits/CanvasLayer.visible = false

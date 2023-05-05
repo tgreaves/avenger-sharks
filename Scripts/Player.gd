@@ -144,11 +144,38 @@ func get_input():
             
             shark_spray.velocity = shoot_direction * constants.PLAYER_FIRE_SPEED;
             Storage.increase_stat('player','shots_fired',1)
-            
+             
             mini_shark_fire(shoot_direction)
             
             $AudioStreamPlayerSpray.play()
             set_fire_rate_delay_timer()
+            
+    # Aiming line support (Controller only)
+    if get_parent().game_mode == 'ARCADE':
+        var shoot_direction = Input.get_vector("shoot_left", "shoot_right", "shoot_up", "shoot_down")
+        
+        if shoot_direction:
+            var shoot_input = Vector2.ZERO;
+            shoot_input.x = Input.get_action_strength("shoot_right") - Input.get_action_strength("shoot_left");
+            shoot_input.y = Input.get_action_strength("shoot_down") - Input.get_action_strength("shoot_up");
+            shoot_direction = shoot_direction.normalized();
+                
+            $RayCast2D.target_position = shoot_direction*10000
+            if $RayCast2D.is_colliding():
+                var line_end_position = $RayCast2D.get_collider().position 
+                
+                # Tilemaps default to (0,0) hit location unless we do something special...
+                if $RayCast2D.get_collider().name == 'Arena':
+                    line_end_position = $RayCast2D.get_collision_point()
+                
+                # Remove existing target.
+                remove_aiming_line()
+                
+                $AimingLine.add_point(to_local(line_end_position) )
+            
+        else:
+            # Remove targetting line when stick not being used.
+            remove_aiming_line()
             
     if Input.is_action_pressed('fish_frenzy') && fish_frenzy_enabled == true:
         fish_frenzy_enabled = false
@@ -469,6 +496,7 @@ func _player_hit():
             shark_status=EXPLODING;
             $PlayerExplosionTimer.start();
             despawn_mini_sharks()
+            remove_aiming_line()
         else:
             $AnimatedSprite2DDamaged.visible = true;
             $AnimatedSprite2DDamaged.play();
@@ -482,6 +510,8 @@ func _player_hit():
 func _on_main_player_hunt_key(passed_key_global_position):
     if shark_status == FISH_FRENZY:
         stop_fish_frenzy()
+    
+    remove_aiming_line()
     
     shark_status = HUNTING_KEY
     key_global_position = passed_key_global_position;
@@ -665,3 +695,7 @@ func is_player_alive():
         return true
     else:
         return false
+        
+func remove_aiming_line():
+    if $AimingLine.get_point_count() > 1:
+        $AimingLine.remove_point(1)

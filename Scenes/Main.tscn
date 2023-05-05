@@ -59,6 +59,9 @@ offset_bottom = 93.0
 process_mode = 3
 visible = false
 
+[node name="Credits" parent="." instance=ExtResource("6_epeem")]
+visible = false
+
 [node name="Statistics" parent="." instance=ExtResource("8_jsswd")]
 visible = false
 
@@ -103,6 +106,7 @@ stream = ExtResource("17_mh5cd")
 [connection signal="statistics_pressed" from="MainMenu" to="." method="_on_main_menu_statistics_pressed"]
 [connection signal="abandon_game_pressed" from="PauseMenu" to="." method="_on_pause_menu_abandon_game_pressed"]
 [connection signal="unpause_game_pressed" from="PauseMenu" to="." method="_on_pause_menu_unpause_game_pressed"]
+[connection signal="credits_return_button_pressed" from="Credits" to="." method="_on_credits_credits_return_button_pressed"]
 [connection signal="statistics_return_button_pressed" from="Statistics" to="." method="_on_statistics_statistics_return_button_pressed"]
 [connection signal="player_died" from="Player" to="." method="_on_player_player_died"]
 [connection signal="player_found_exit" from="Player" to="." method="_on_player_player_found_exit"]

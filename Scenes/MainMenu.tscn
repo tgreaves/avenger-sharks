@@ -90,7 +90,6 @@ focus_neighbor_top = NodePath("../StartGame")
 focus_neighbor_bottom = NodePath("../Statistics")
 theme_override_fonts/font = ExtResource("1_jvmua")
 theme_override_font_sizes/font_size = 64
-shortcut = SubResource("Shortcut_l265b")
 text = "MODE: ARCADE"
 
 [node name="BlankLabel2" type="Label" parent="CanvasLayer/MainMenuContainer"]
@@ -107,7 +106,6 @@ focus_neighbor_top = NodePath("../GameMode")
 focus_neighbor_bottom = NodePath("../Credits")
 theme_override_fonts/font = ExtResource("1_jvmua")
 theme_override_font_sizes/font_size = 64
-shortcut = SubResource("Shortcut_l265b")
 text = "STATISTICS
 "
 
@@ -118,7 +116,6 @@ focus_neighbor_top = NodePath("../Statistics")
 focus_neighbor_bottom = NodePath("../ExitGame")
 theme_override_fonts/font = ExtResource("1_jvmua")
 theme_override_font_sizes/font_size = 64
-shortcut = SubResource("Shortcut_l265b")
 text = "CREDITS
 "
 

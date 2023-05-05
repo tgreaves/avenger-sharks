@@ -1,11 +1,11 @@
 extends Node
 
-const GAME_VERSION = "0.3-alpha"
+const GAME_VERSION = "0.4-alpha"
 
 # Developer settings.
 const DEV_SKIP_INTRO = false
 const DEV_START_GAME_IMMEDIATELY = false
-const MUSIC_ENABLED = true
+const MUSIC_ENABLED = false
 
 # Game settings
 const START_WAVE = 1

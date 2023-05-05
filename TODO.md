@@ -30,6 +30,10 @@
 
 # THINGS FOR 0.4-alpha
 
+* CONFIGURATION
+    * Full screen / Windowed
+    * Particles on / off
+
 * SURVIVAL MODE
     * Remove power-ups from HUD
     
@@ -50,6 +54,7 @@
     * Boss level?
     * Choice of which level
     * Palette swaps (different areas) - could use shaders here.
+    * Dialogues ?!!! (Try not to boil the ocean)
 
 * SPAWN PATTERNS
     * Spawn from multiple walls simultaneously?

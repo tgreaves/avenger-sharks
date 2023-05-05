@@ -246,6 +246,16 @@ sprite_frames = SubResource("SpriteFrames_bvem5")
 frame = 5
 frame_progress = 1.0
 
+[node name="AimingLine" type="Line2D" parent="."]
+points = PackedVector2Array(0, 0)
+width = 2.0
+default_color = Color(1, 0, 0, 1)
+
+[node name="RayCast2D" type="RayCast2D" parent="."]
+target_position = Vector2(2.08165e-12, 2.08165e-12)
+collision_mask = 20
+collide_with_areas = true
+
 [node name="PowerUpLabel" type="Label" parent="."]
 visible = false
 offset_left = -348.0
