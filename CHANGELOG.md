@@ -2,10 +2,23 @@
 
 # 0.4-alpha
 
-* Gameplay
-    * Player now has a targetting laser when using a controller.
+* Gameplay:
+    * Increase player fire rate and re-balance FAST SPRAY
+    * Enemies can no longer take damage while they are spawning.
+    * Increase enemy spawn numbers.
+    * % chance of multiple spawns happening at the same time (Will be different types)
+    * Increase knight health to 5 (was: 1)
+    * Increase necromancer health to 10 (was: 3)
+    * Increase trap health to 10 (was: 5)
+* Controls:
+    * Controller: Player now has a targetting laser! 
 * Misc
+    * Options screen added.
+        * Screen mode (Full screen, windowed)
     * Credits screen re-jigged.
+    * Pacifist Mode: Hide power-up bar.
+    * Windowed Mode: Use 1920x1080 as a default (User can re-size)
+    * HTML5: Disable storage, Statistics and Exit Game.
 * Bug fixes
     * Controller START button mapped to too many menu items (and so not working).
     * Steam Deck: STATISTICS not consistently working when selected with controller.

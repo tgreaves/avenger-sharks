@@ -1,0 +1,70 @@
+[gd_scene load_steps=3 format=3 uid="uid://ci0jxmpdr3ue5"]
+
+[ext_resource type="Script" path="res://Scripts/Options.gd" id="1_c8165"]
+[ext_resource type="FontFile" uid="uid://dclfn1fjcq5i7" path="res://Fonts/PressStart2P-Regular.ttf" id="2_2d14t"]
+
+[node name="Options" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_c8165")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="MainMenuContainer" type="VBoxContainer" parent="CanvasLayer"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -576.0
+offset_top = -220.0
+offset_right = 576.0
+offset_bottom = 293.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 3
+alignment = 1
+
+[node name="TitleLabel" type="Label" parent="CanvasLayer/MainMenuContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_2d14t")
+theme_override_font_sizes/font_size = 64
+text = "OPTIONS"
+horizontal_alignment = 1
+
+[node name="BlankLabel" type="Label" parent="CanvasLayer/MainMenuContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_2d14t")
+theme_override_font_sizes/font_size = 64
+horizontal_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/MainMenuContainer"]
+layout_mode = 2
+
+[node name="ScreenModeButton" type="Button" parent="CanvasLayer/MainMenuContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_2d14t")
+theme_override_font_sizes/font_size = 64
+text = "SCREEN MODE"
+
+[node name="ScreenModeSetting" type="Label" parent="CanvasLayer/MainMenuContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_2d14t")
+theme_override_font_sizes/font_size = 64
+text = "FULL SCREEN"
+horizontal_alignment = 1
+
+[node name="ReturnButton" type="Button" parent="CanvasLayer/MainMenuContainer"]
+custom_minimum_size = Vector2(600, 2.08165e-12)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_fonts/font = ExtResource("2_2d14t")
+theme_override_font_sizes/font_size = 64
+text = "RETURN"
+
+[connection signal="pressed" from="CanvasLayer/MainMenuContainer/HBoxContainer/ScreenModeButton" to="." method="_on_screen_mode_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/MainMenuContainer/ReturnButton" to="." method="_on_return_button_pressed"]

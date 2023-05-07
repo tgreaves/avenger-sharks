@@ -38,6 +38,9 @@ func spawn_specific(enemy_type_in):
     $AnimatedSprite2D.animation = enemy_type + str('-run')
     
     match enemy_type:
+        'knight':
+            enemy_speed = constants.ENEMY_SPEED
+            enemy_health = constants.ENEMY_KNIGHT_HEALTH
         'necromancer':
             $AnimatedSprite2D.offset = Vector2(0,-25)
             $CollisionShape2D.scale = Vector2(1.5, 1.5)
@@ -81,7 +84,6 @@ func _physics_process(delta):
             
             if $FlashHitTimer.time_left == 0 and hit_to_be_processed:
                 set_modulate(stored_modulate);
-                #set_modulate(lerp(get_modulate(), Color(1,1,1,1), 0.02));
                 hit_to_be_processed = false
                 
             if $StateTimer.time_left == 0:
@@ -236,6 +238,9 @@ func _physics_process(delta):
                 ai_mode='DEFAULT'
     
 func _death(death_source):
+    if state == SPAWNING && !constants.ENEMY_ALLOW_DAMAGE_WHEN_SPAWNING:
+        return
+    
     if state != DYING:
         enemy_health = enemy_health - 1;
         

@@ -36,6 +36,7 @@ enum {
     MAIN_MENU,
     CREDITS,
     STATISTICS,
+    OPTIONS,
     WAVE_START,
     GAME_RUNNING,
     GAME_PAUSED,
@@ -55,6 +56,16 @@ signal player_update_fish
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+    Storage.load_config()
+    
+    # Set screen mode based on config.
+    if Storage.Config.get_value('config','screen_mode','FULL SCREEN') == 'FULL_SCREEN':
+        DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+    else:
+        DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+    
+    get_window().title = constants.WINDOW_TITLE
+    
     Storage.load_stats()
     
     game_status = INTRO_SEQUENCE;
@@ -65,6 +76,7 @@ func _ready():
     $PauseMenu.get_node('CanvasLayer').visible = false
     $Statistics.get_node('CanvasLayer').visible = false
     $Credits.get_node('CanvasLayer').visible = false
+    $Options.get_node('CanvasLayer').visible = false
     $Player.set_process(false);
     $Player.set_physics_process(false);
     $Player.visible = false;
@@ -183,7 +195,9 @@ func prepare_for_wave():
     $HUD.get_node("CanvasLayer/Score").visible = true;
     $HUD.get_node("CanvasLayer/Label").visible = false;
     $HUD.get_node("CanvasLayer/EnemiesLeft").visible = true;
-    $HUD.show_powerup_bar()
+    
+    if game_mode == 'ARCADE':
+        $HUD.show_powerup_bar()
     
     $UnderwaterFar.visible = false
     $UnderwaterNear.visible = false
@@ -268,7 +282,7 @@ func start_wave():
     $EnemySpawnTimer.start(constants.ENEMY_REINFORCEMENTS_SPAWN_BASE_SECONDS);
     
     enemies_left_this_wave = (wave_number * constants.ENEMY_MULTIPLIER_AT_WAVE_START) + (wave_number * constants.ENEMY_MULTIPLIER_DURING_WAVE);
-    spawn_enemy(wave_number * constants.ENEMY_MULTIPLIER_AT_WAVE_START)   
+    spawn_enemy(wave_number * constants.ENEMY_MULTIPLIER_AT_WAVE_START, '')   
 
     # Fish spawning
     if game_mode == 'ARCADE':
@@ -395,26 +409,39 @@ func despawn_all_items():
     for item in get_tree().get_nodes_in_group('itemGroup'):
         item.queue_free()
 
-func spawn_enemy(number_to_spawn):
+func spawn_enemy(number_to_spawn, previous_spawn_pattern):
         
-    var spawn_choice = randi_range(1,100)
-    var spawn_pattern
+    var spawn_choice = 0
+    var spawn_pattern = ''
     
-    for spawn_key in constants.ENEMY_SPAWN_PLACEMENT_CONFIGURATION:
-        if spawn_choice <= spawn_key:
-            spawn_pattern = constants.ENEMY_SPAWN_PLACEMENT_CONFIGURATION[spawn_key]
-            break
+    var acceptable_choice = false
+    
+    print("spawn_enemy() called with " + str(number_to_spawn) + " and " + str(previous_spawn_pattern))
+    
+    # If we have been passed the previous_spawn_pattern, do not allow the same pattern to be used
+    # again.
+    while (!acceptable_choice):
+        spawn_choice = randi_range(1,100)
+            
+        for spawn_key in constants.ENEMY_SPAWN_PLACEMENT_CONFIGURATION:
+            if spawn_choice <= spawn_key:
+                spawn_pattern = constants.ENEMY_SPAWN_PLACEMENT_CONFIGURATION[spawn_key]
+                break
+        
+        print("Spawn pattern suggsted: " + str(spawn_pattern))
+                
+        if spawn_pattern != previous_spawn_pattern:
+            acceptable_choice=true
     
     # If this is the final spawn this wave, AND it is considered a 'low population' spawn, surround the player.
     # Why? Stops the end of the wave being boring with the player having to wait to find the enemies.
     if (enemies_on_screen+number_to_spawn <= constants.ENEMY_ALL_CHASE_WHEN_POPULATION_LOW) && (enemies_left_this_wave <= constants.ENEMY_ALL_CHASE_WHEN_POPULATION_LOW):
         spawn_pattern = 'CIRCLE_SURROUND_PLAYER'
 
-    #if (number_to_spawn == (enemies_left_this_wave - enemies_on_screen)) && (number_to_spawn <= constants.ENEMY_ALL_CHASE_WHEN_POPULATION_LOW):
-        
-        
     # Uncomment this to force a spawn pattern for testing.
     #spawn_pattern='RANDOM'
+    
+    print("SPAWN: Using pattern " + str(spawn_pattern))
     
     match spawn_pattern:
         'RANDOM':
@@ -460,6 +487,8 @@ func spawn_enemy(number_to_spawn):
             while (i < number_to_spawn):
                 spawn_enemy_set_position(Vector2(x_pos, constants.ARENA_SPAWN_MIN_Y + (i*y_step)), 'DEFERRED_UNTIL_WALL', Vector2(-1,0).normalized())
                 i+=1
+                
+    return spawn_pattern
       
 func spawn_enemy_random_position():
     var mob = enemy_scene.instantiate()
@@ -539,7 +568,19 @@ func _process(_delta):
                 if how_many_left_to_spawn < constants.ENEMY_REINFORCEMENTS_SPAWN_MINIMUM_NUMBER:
                     enemies_to_spawn += how_many_left_to_spawn
     
-                spawn_enemy(enemies_to_spawn)
+                print("REINFORCEMENTS - I want to spawn " + str(enemies_to_spawn))
+    
+                # Multi-wave spawn at the same time?
+                if ( randi_range(1,100) <= constants.ENEMY_REINFORCEMENTS_SPAWN_MULTI_PLACEMENT_PERCENTAGE):
+                    var spawn_a = int(enemies_to_spawn/2)
+                    var spawn_b = enemies_to_spawn - spawn_a
+                    print("MULTI-SPAWN: Using " + str(spawn_a) + " and " + str(spawn_b))
+                    
+                    var first_spawn_result = spawn_enemy(spawn_a,'')
+                    spawn_enemy(spawn_b, first_spawn_result)
+                    
+                else:
+                    spawn_enemy(enemies_to_spawn,'')
                 
             $EnemySpawnTimer.start(constants.ENEMY_REINFORCEMENTS_SPAWN_BASE_SECONDS);
             
@@ -752,3 +793,19 @@ func _on_credits_credits_return_button_pressed():
     $MainMenu/CanvasLayer/MainMenuContainer/Credits.grab_focus()
     $HUD/CanvasLayer/HighScore.visible = true
     $Credits/CanvasLayer.visible = false
+
+func _on_main_menu_options_pressed():
+    game_status = OPTIONS
+    $MainMenu.get_node("CanvasLayer").visible = false
+    $HUD/CanvasLayer/HighScore.visible = false;
+    $Options.build_options_screen()
+    $Options/CanvasLayer.visible = true
+
+func _on_options_options_return_button_pressed():
+    Storage.save_config()
+    
+    game_status = MAIN_MENU
+    $MainMenu.get_node("CanvasLayer").visible = true
+    $MainMenu/CanvasLayer/MainMenuContainer/Options.grab_focus()
+    $HUD/CanvasLayer/HighScore.visible = true
+    $Options/CanvasLayer.visible = false

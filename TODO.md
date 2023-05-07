@@ -31,13 +31,19 @@
 # THINGS FOR 0.4-alpha
 
 * CONFIGURATION
-    * Full screen / Windowed
     * Particles on / off
+    * Music on / off
+    * Sound on / off
+    * Adjustable volumes for the above?
+
+* STATISTICS
+    * Ability for user to reset
 
 * SURVIVAL MODE
     * Remove power-ups from HUD
-    
+
 * ENEMY TYPES
+    * An enemy that charges the player
     * Static turret - probably new Scene to support
         * Rotate during physics.
         * After random timer, charge animation + second timer
@@ -49,18 +55,19 @@
             * CHARGING
             * FIRING
         * Turret could fire a homing missile instead.
+        
+* POWER UPS
+    * Add flame thrower!
 
 * WAVE PROGRESSION
     * Boss level?
     * Choice of which level
     * Palette swaps (different areas) - could use shaders here.
     * Dialogues ?!!! (Try not to boil the ocean)
-
-* SPAWN PATTERNS
-    * Spawn from multiple walls simultaneously?
     
 * GRAPHICS
     * Shaders for water effects
+    * More vibrant shader for enemy death
     
 * PERSISTENT STORAGE
     * Implement encryption
@@ -68,12 +75,6 @@
 * STEAM
     * Cloud saving (but of what?)
         * Statistics!
-            * Games played
-            * Shots fired
-            * Chests collected
-            * Max wave reached
-            * ... etc...
-            * Enemies killed
     * Achievements
         * Beat a wave
         * Beat 5 waves

@@ -2,8 +2,29 @@ extends Node
 
 
 var Config
-
 var Stats
+
+# -- SYSTEM CONFIGURATION --
+# Per-system.  Should NOT be Cloud Saved.  And so deliberately a different file.
+
+func load_config():
+    Config = ConfigFile.new()
+    
+    var err = Config.load("user://config.ini")
+
+    if err != OK:
+        Config.set_value('config','screen_mode','FULL_SCREEN')
+
+func save_config():
+    if OS.has_feature('web'):
+        return
+
+    var err = Config.save("user://config.ini")
+    
+    if err != OK:
+        print("config(): Fail")
+
+# -- STATISTICS --
 
 func load_stats():
     Stats = ConfigFile.new()
@@ -19,9 +40,10 @@ func load_stats():
         Stats.set_value('player','furthest_wave', 0)
         Stats.set_value('player','fish_rescued', 0)
         
-        return
-        
 func save_stats():
+    if OS.has_feature('web'):
+        return
+    
     var err = Stats.save("user://stats.ini")
     
     if err != OK:
