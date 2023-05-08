@@ -12,14 +12,18 @@
     * Increase trap health to 10 (was: 5)
 * Controls:
     * Controller: Player now has a targetting laser! 
+* Sound:
+    * Master / Music / Volume audio buses implemented.
 * Misc
-    * Options screen added.
+    * Options screen added.  Persistent storage used.
         * Screen mode (Full screen, windowed)
+        * Volume (Master, Music, Effects)
     * Credits screen re-jigged.
     * Pacifist Mode: Hide power-up bar.
     * Windowed Mode: Use 1920x1080 as a default (User can re-size)
     * HTML5: Disable storage, Statistics and Exit Game.
 * Bug fixes
+    * Magnet: Make a bit stronger to avoid items chasing the player(!)
     * Controller START button mapped to too many menu items (and so not working).
     * Steam Deck: STATISTICS not consistently working when selected with controller.
     * Steam Deck: CREDITS not consistently working when selected with controller.

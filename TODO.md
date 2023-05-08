@@ -32,18 +32,13 @@
 
 * CONFIGURATION
     * Particles on / off
-    * Music on / off
-    * Sound on / off
-    * Adjustable volumes for the above?
 
 * STATISTICS
     * Ability for user to reset
 
-* SURVIVAL MODE
-    * Remove power-ups from HUD
-
 * ENEMY TYPES
     * An enemy that charges the player
+    * Enemy that splits when hit
     * Static turret - probably new Scene to support
         * Rotate during physics.
         * After random timer, charge animation + second timer
@@ -80,6 +75,9 @@
         * Beat 5 waves
         * Beat 10 waves
     * Leaderboard support (High scores)
+    
+* GENERAL DEVELOPMENT
+    * CI/CD pipeline
     
 * JACK'S IDEAS
     * Hammerhead shark

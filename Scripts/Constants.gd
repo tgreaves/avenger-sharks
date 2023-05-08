@@ -5,7 +5,6 @@ const GAME_VERSION = "0.4-alpha"
 # Developer settings.
 const DEV_SKIP_INTRO = true
 const DEV_START_GAME_IMMEDIATELY = false
-const MUSIC_ENABLED = false
 
 # Hardware settings
 const WINDOW_TITLE = "Avenger Sharks " + GAME_VERSION

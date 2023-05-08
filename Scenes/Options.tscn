@@ -14,51 +14,109 @@ script = ExtResource("1_c8165")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
-[node name="MainMenuContainer" type="VBoxContainer" parent="CanvasLayer"]
+[node name="OptionsContainer" type="VBoxContainer" parent="CanvasLayer"]
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -576.0
+offset_left = -916.0
 offset_top = -220.0
-offset_right = 576.0
+offset_right = 1000.0
 offset_bottom = 293.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_vertical = 3
 alignment = 1
 
-[node name="TitleLabel" type="Label" parent="CanvasLayer/MainMenuContainer"]
+[node name="TitleLabel" type="Label" parent="CanvasLayer/OptionsContainer"]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("2_2d14t")
 theme_override_font_sizes/font_size = 64
 text = "OPTIONS"
 horizontal_alignment = 1
 
-[node name="BlankLabel" type="Label" parent="CanvasLayer/MainMenuContainer"]
+[node name="BlankLabel" type="Label" parent="CanvasLayer/OptionsContainer"]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("2_2d14t")
 theme_override_font_sizes/font_size = 64
 horizontal_alignment = 1
 
-[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/MainMenuContainer"]
+[node name="ScreenModeContainer" type="HBoxContainer" parent="CanvasLayer/OptionsContainer"]
 layout_mode = 2
 
-[node name="ScreenModeButton" type="Button" parent="CanvasLayer/MainMenuContainer/HBoxContainer"]
+[node name="ScreenModeLabel" type="Label" parent="CanvasLayer/OptionsContainer/ScreenModeContainer"]
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_fonts/font = ExtResource("2_2d14t")
 theme_override_font_sizes/font_size = 64
 text = "SCREEN MODE"
 
-[node name="ScreenModeSetting" type="Label" parent="CanvasLayer/MainMenuContainer/HBoxContainer"]
+[node name="ScreenModeSetting" type="Button" parent="CanvasLayer/OptionsContainer/ScreenModeContainer"]
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_fonts/font = ExtResource("2_2d14t")
 theme_override_font_sizes/font_size = 64
 text = "FULL SCREEN"
-horizontal_alignment = 1
 
-[node name="ReturnButton" type="Button" parent="CanvasLayer/MainMenuContainer"]
+[node name="MasterVolumeContainer" type="HBoxContainer" parent="CanvasLayer/OptionsContainer"]
+layout_mode = 2
+
+[node name="MasterVolumeLabel" type="Label" parent="CanvasLayer/OptionsContainer/MasterVolumeContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+theme_override_fonts/font = ExtResource("2_2d14t")
+theme_override_font_sizes/font_size = 64
+text = "MASTER VOLUME
+"
+
+[node name="MasterVolumeSetting" type="HSlider" parent="CanvasLayer/OptionsContainer/MasterVolumeContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+max_value = 1.0
+step = 0.05
+
+[node name="MusicVolumeContainer" type="HBoxContainer" parent="CanvasLayer/OptionsContainer"]
+layout_mode = 2
+
+[node name="MusicVolumeLabel" type="Label" parent="CanvasLayer/OptionsContainer/MusicVolumeContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+theme_override_fonts/font = ExtResource("2_2d14t")
+theme_override_font_sizes/font_size = 64
+text = "MUSIC VOLUME
+"
+
+[node name="MusicVolumeSetting" type="HSlider" parent="CanvasLayer/OptionsContainer/MusicVolumeContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+max_value = 1.0
+step = 0.05
+
+[node name="EffectsVolumeContainer" type="HBoxContainer" parent="CanvasLayer/OptionsContainer"]
+layout_mode = 2
+
+[node name="EffectsVolumeLabel" type="Label" parent="CanvasLayer/OptionsContainer/EffectsVolumeContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+theme_override_fonts/font = ExtResource("2_2d14t")
+theme_override_font_sizes/font_size = 64
+text = "EFFECTS VOLUME
+"
+
+[node name="EffectsVolumeSetting" type="HSlider" parent="CanvasLayer/OptionsContainer/EffectsVolumeContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+max_value = 1.0
+step = 0.05
+
+[node name="ReturnButton" type="Button" parent="CanvasLayer/OptionsContainer"]
 custom_minimum_size = Vector2(600, 2.08165e-12)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -66,5 +124,8 @@ theme_override_fonts/font = ExtResource("2_2d14t")
 theme_override_font_sizes/font_size = 64
 text = "RETURN"
 
-[connection signal="pressed" from="CanvasLayer/MainMenuContainer/HBoxContainer/ScreenModeButton" to="." method="_on_screen_mode_button_pressed"]
-[connection signal="pressed" from="CanvasLayer/MainMenuContainer/ReturnButton" to="." method="_on_return_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/OptionsContainer/ScreenModeContainer/ScreenModeSetting" to="." method="_on_screen_mode_button_pressed"]
+[connection signal="value_changed" from="CanvasLayer/OptionsContainer/MasterVolumeContainer/MasterVolumeSetting" to="." method="_on_master_volume_setting_value_changed"]
+[connection signal="value_changed" from="CanvasLayer/OptionsContainer/MusicVolumeContainer/MusicVolumeSetting" to="." method="_on_music_volume_setting_value_changed"]
+[connection signal="value_changed" from="CanvasLayer/OptionsContainer/EffectsVolumeContainer/EffectsVolumeSetting" to="." method="_on_effects_volume_setting_value_changed"]
+[connection signal="pressed" from="CanvasLayer/OptionsContainer/ReturnButton" to="." method="_on_return_button_pressed"]

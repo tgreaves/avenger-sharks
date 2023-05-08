@@ -27,8 +27,7 @@ func _ready():
         
     $Shark/SharkSprite.play()
     
-    if constants.MUSIC_ENABLED:
-        $MusicBoxSong.play()
+    $MusicBoxSong.play()
     
     $StateTimer.start(9.7)
     $IntroLabelTimer.start(5)
@@ -53,9 +52,8 @@ func _process(_delta):
             # Start creepy music, commence necromancer movement onto screen.
             if $StateTimer.time_left == 0:
                 
-                if constants.MUSIC_ENABLED:
-                    $MusicBoxSong.stop()
-                    $BadThingsSong.play()
+                $MusicBoxSong.stop()
+                $BadThingsSong.play()
                     
                 $Necromancer/NecroSprite.play()
                 state = NECRO_STOP

@@ -628,9 +628,11 @@ one_shot = true
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("8_wxbp6")
+bus = &"Effects"
 
 [node name="AudioStreamPlayerFishSplat" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("10_o51ug")
+bus = &"Effects"
 
 [node name="ScoreLabel" type="Label" parent="."]
 visible = false

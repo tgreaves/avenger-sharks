@@ -95,6 +95,7 @@ one_shot = true
 
 [node name="AudioStreamPlayerMusic" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("17_mh5cd")
+bus = &"Music"
 
 [connection signal="player_enable_fish_frenzy" from="." to="Player" method="_on_main_player_enable_fish_frenzy"]
 [connection signal="player_hunt_key" from="." to="Player" method="_on_main_player_hunt_key"]

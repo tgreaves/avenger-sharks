@@ -59,12 +59,18 @@ func _ready():
     Storage.load_config()
     
     # Set screen mode based on config.
-    if Storage.Config.get_value('config','screen_mode','FULL SCREEN') == 'FULL_SCREEN':
+    if Storage.Config.get_value('config','screen_mode','FULL_SCREEN') == 'FULL_SCREEN':
         DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
     else:
         DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+        get_window().size = constants.WINDOW_SIZE
     
     get_window().title = constants.WINDOW_TITLE
+    
+    # Set volume levels from config.
+    AudioServer.set_bus_volume_db(AudioServer.get_bus_index('Master'), linear_to_db(Storage.Config.get_value('config','master_volume',1.0)))
+    AudioServer.set_bus_volume_db(AudioServer.get_bus_index('Music'), linear_to_db(Storage.Config.get_value('config','music_volume',1.0)))
+    AudioServer.set_bus_volume_db(AudioServer.get_bus_index('Effects'), linear_to_db(Storage.Config.get_value('config','effects_volume',1.0)))
     
     Storage.load_stats()
     
@@ -90,8 +96,7 @@ func _ready():
     else:
         intro = intro_scene.instantiate()
         add_child(intro)
-    
-    
+       
 func main_menu():
     game_status=MAIN_MENU
     score=0
@@ -101,7 +106,7 @@ func main_menu():
     wave_number= constants.START_WAVE - 1
     enemies_on_screen = 0
     
-    if $AudioStreamPlayerMusic.playing == false and constants.MUSIC_ENABLED:
+    if $AudioStreamPlayerMusic.playing == false:
         $AudioStreamPlayerMusic.play(0.6);
  
     $Player/Camera2D.enabled = false

@@ -93,6 +93,7 @@ sprite_frames = SubResource("SpriteFrames_1vjyt")
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("8_sb0g0")
+bus = &"Effects"
 
 [node name="StateTimer" type="Timer" parent="."]
 wait_time = 2.0

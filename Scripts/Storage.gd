@@ -14,6 +14,9 @@ func load_config():
 
     if err != OK:
         Config.set_value('config','screen_mode','FULL_SCREEN')
+        Config.set_value('config','master_volume',1.0)
+        Config.set_value('config','music_volume',1.0)
+        Config.set_value('config','effects_volume',1.0)
 
 func save_config():
     if OS.has_feature('web'):

@@ -326,26 +326,34 @@ autostart = true
 
 [node name="AudioStreamPlayerSpray" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("10_v8evc")
+bus = &"Effects"
 
 [node name="AudioStreamPlayerHit" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("11_g4ac8")
 volume_db = 2.811
+bus = &"Effects"
 
 [node name="AudioStreamPlayerExplosionReverse" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("44_dvals")
+bus = &"Effects"
 
 [node name="AudioStreamPlayerExplosion" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("37_g7u1l")
+bus = &"Effects"
 
 [node name="AudioStreamHealth" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("38_86qdg")
+bus = &"Effects"
 
 [node name="AudioStreamPowerUp" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("39_sydp1")
+bus = &"Effects"
 
 [node name="AudioStreamPlayerGotFish" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("45_fj125")
 volume_db = 6.558
+bus = &"Effects"
 
 [node name="AudioStreamPlayerSelectedUpgrade" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("47_1ngf2")
+bus = &"Effects"

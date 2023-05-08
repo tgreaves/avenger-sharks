@@ -552,9 +552,11 @@ metadata/_aseprite_wizard_config_ = {
 
 [node name="MusicBoxSong" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("38_ux0ay")
+bus = &"Music"
 
 [node name="BadThingsSong" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("39_pe1b1")
+bus = &"Music"
 
 [node name="StateTimer" type="Timer" parent="."]
 one_shot = true
