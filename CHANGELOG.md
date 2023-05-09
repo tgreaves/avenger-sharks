@@ -10,8 +10,13 @@
     * Increase knight health to 5 (was: 1)
     * Increase necromancer health to 10 (was: 3)
     * Increase trap health to 10 (was: 5)
+* Power-ups:
+    * Added GRENADE power-up (Boom!)
+    * Power-ups no longer 'tick' unless the player is actively controlling the shark.
 * Controls:
     * Controller: Player now has a targetting laser! 
+* Graphics:
+    * Power up bar moved to RHS.  Non-activated power-ups are not shown.
 * Sound:
     * Master / Music / Volume audio buses implemented.
 * Misc

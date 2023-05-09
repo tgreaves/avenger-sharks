@@ -42,6 +42,9 @@ https://stealthix.itch.io/animated-traps
 Fish sprites: Kenney
 https://opengameart.org/content/fish-pack-0
 
+Weapons: VladdPenn
+https://vladpenn.itch.io/weapon
+
 Explosions: Limofeus
 https://limofeus.itch.io/pixel-simulations
 

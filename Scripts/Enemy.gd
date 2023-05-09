@@ -305,3 +305,9 @@ func score_label_animation(label_text):
     tween.tween_property(new_label, "modulate", Color(0,0,0,0), 2)
     tween.tween_property(new_label, "position", target_position, 2)
     tween.tween_callback(new_label.queue_free).set_delay(2)
+    
+func is_enemy_alive():
+    if state == WANDER:
+        return true
+    else:
+        return false

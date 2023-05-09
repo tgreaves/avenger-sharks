@@ -53,6 +53,13 @@
         
 * POWER UPS
     * Add flame thrower!
+    * Add grenade.
+        * Velocity: Need to include player momentum.
+            * INCLUDE THIS INTO FIX FOR SHARK SPRAY TO MAKE IT SEEM MORE NATURAL!
+        * Explosion: Find animation / particle setup
+        * Explosion: Damage
+        * Hook into power-up system.
+        * Proper Constants support.
 
 * WAVE PROGRESSION
     * Boss level?

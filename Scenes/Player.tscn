@@ -311,6 +311,9 @@ autostart = true
 wait_time = 5.0
 one_shot = true
 
+[node name="GrenadeRateTimer" type="Timer" parent="."]
+one_shot = true
+
 [node name="DoorOpenTimer" type="Timer" parent="."]
 wait_time = 0.5
 one_shot = true
