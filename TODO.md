@@ -38,7 +38,6 @@
 
 * ENEMY TYPES
     * An enemy that charges the player
-    * Enemy that splits when hit
     * Static turret - probably new Scene to support
         * Rotate during physics.
         * After random timer, charge animation + second timer
@@ -53,13 +52,7 @@
         
 * POWER UPS
     * Add flame thrower!
-    * Add grenade.
-        * Velocity: Need to include player momentum.
-            * INCLUDE THIS INTO FIX FOR SHARK SPRAY TO MAKE IT SEEM MORE NATURAL!
-        * Explosion: Find animation / particle setup
-        * Explosion: Damage
-        * Hook into power-up system.
-        * Proper Constants support.
+    * Cursed power-ups :D
 
 * WAVE PROGRESSION
     * Boss level?

@@ -10,6 +10,8 @@
     * Increase knight health to 5 (was: 1)
     * Increase necromancer health to 10 (was: 3)
     * Increase trap health to 10 (was: 5)
+* Enemies:
+    * Added Skeletons (that split into 4 when vanquished!)
 * Power-ups:
     * Added GRENADE power-up (Boom!)
     * Power-ups no longer 'tick' unless the player is actively controlling the shark.
@@ -28,6 +30,7 @@
     * Windowed Mode: Use 1920x1080 as a default (User can re-size)
     * HTML5: Disable storage, Statistics and Exit Game.
 * Bug fixes
+    * Player projectiles would not pass through spawning enemies.
     * Magnet: Make a bit stronger to avoid items chasing the player(!)
     * Controller START button mapped to too many menu items (and so not working).
     * Steam Deck: STATISTICS not consistently working when selected with controller.

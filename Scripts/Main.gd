@@ -462,35 +462,35 @@ func spawn_enemy(number_to_spawn, previous_spawn_pattern):
                 var offset = Vector2(sin(angle_rad), cos(angle_rad)) * 600;       
                 var enemy_position = $Player.position + offset
                 
-                spawn_enemy_set_position(enemy_position,'DEFAULT',Vector2(0,0).normalized())
+                spawn_enemy_set_position(enemy_position,'DEFAULT',Vector2(0,0).normalized(), false)
                 i+=1
         'HARD_TOP':
             var i=0
             var y_pos = constants.ARENA_SPAWN_MIN_Y
             var x_step = (constants.ARENA_SPAWN_MAX_X - constants.ARENA_SPAWN_MIN_X) / number_to_spawn
             while (i < number_to_spawn):
-                spawn_enemy_set_position(Vector2(constants.ARENA_SPAWN_MIN_X + (i*x_step), y_pos), 'DEFERRED_UNTIL_WALL', Vector2(0,1).normalized())
+                spawn_enemy_set_position(Vector2(constants.ARENA_SPAWN_MIN_X + (i*x_step), y_pos), 'DEFERRED_UNTIL_WALL', Vector2(0,1).normalized(), false)
                 i+=1
         'HARD_BOTTOM':
             var i=0
             var y_pos = constants.ARENA_SPAWN_MAX_Y
             var x_step = (constants.ARENA_SPAWN_MAX_X - constants.ARENA_SPAWN_MIN_X) / number_to_spawn
             while (i < number_to_spawn):
-                spawn_enemy_set_position(Vector2(constants.ARENA_SPAWN_MIN_X + (i*x_step), y_pos), 'DEFERRED_UNTIL_WALL', Vector2(0,-1).normalized())
+                spawn_enemy_set_position(Vector2(constants.ARENA_SPAWN_MIN_X + (i*x_step), y_pos), 'DEFERRED_UNTIL_WALL', Vector2(0,-1).normalized(), false)
                 i+=1
         'HARD_LEFT':
             var i=0
             var x_pos = constants.ARENA_SPAWN_MIN_X
             var y_step = (constants.ARENA_SPAWN_MAX_Y - constants.ARENA_SPAWN_MIN_Y) / number_to_spawn
             while (i < number_to_spawn):
-                spawn_enemy_set_position(Vector2(x_pos, constants.ARENA_SPAWN_MIN_Y + (i*y_step)), 'DEFERRED_UNTIL_WALL', Vector2(1,0).normalized())
+                spawn_enemy_set_position(Vector2(x_pos, constants.ARENA_SPAWN_MIN_Y + (i*y_step)), 'DEFERRED_UNTIL_WALL', Vector2(1,0).normalized(), false)
                 i+=1
         'HARD_RIGHT':
             var i=0
             var x_pos = constants.ARENA_SPAWN_MAX_X
             var y_step = (constants.ARENA_SPAWN_MAX_Y - constants.ARENA_SPAWN_MIN_Y) / number_to_spawn
             while (i < number_to_spawn):
-                spawn_enemy_set_position(Vector2(x_pos, constants.ARENA_SPAWN_MIN_Y + (i*y_step)), 'DEFERRED_UNTIL_WALL', Vector2(-1,0).normalized())
+                spawn_enemy_set_position(Vector2(x_pos, constants.ARENA_SPAWN_MIN_Y + (i*y_step)), 'DEFERRED_UNTIL_WALL', Vector2(-1,0).normalized(), false)
                 i+=1
                 
     return spawn_pattern
@@ -508,21 +508,29 @@ func spawn_enemy_random_position():
         
     enemies_on_screen+=1
     
-func spawn_enemy_set_position(enemy_position,ai_mode,initial_direction):
+func spawn_enemy_set_position(enemy_position,ai_mode,initial_direction,instant_spawn):
     enemy_position.x = clamp(enemy_position.x, constants.ARENA_SPAWN_MIN_X, constants.ARENA_SPAWN_MAX_X )        
     enemy_position.y = clamp(enemy_position.y, constants.ARENA_SPAWN_MIN_Y, constants.ARENA_SPAWN_MAX_Y )   
     
     var mob = enemy_scene.instantiate()
     mob.get_node('.').set_position (enemy_position);
     mob.set_ai_mode(ai_mode)
-    mob.set_initial_direction(initial_direction)
+    
+    if initial_direction:
+        mob.set_initial_direction(initial_direction)
+    
     mob.add_to_group('enemyGroup');	
     add_child(mob)  
     
-    if wave_special_type == 'ALL_THE_SAME':
-        mob.spawn_specific(wave_special_data)
+    if instant_spawn:
+        mob.set_instant_spawn(true)
+        mob.set_enemy_is_split(true)
+        mob.spawn_specific('skeleton')
     else:
-        mob.spawn_random()
+        if wave_special_type == 'ALL_THE_SAME':
+            mob.spawn_specific(wave_special_data)
+        else:
+            mob.spawn_random()
         
     enemies_on_screen+=1
         
@@ -609,7 +617,7 @@ func _input(_ev):
                 intro.queue_free()
                 main_menu()
             
-func _on_enemy_update_score(score_to_add,enemy_global_position,death_source):
+func _on_enemy_update_score(score_to_add,enemy_global_position,death_source,enemy_type,enemy_is_split):
     enemies_left_this_wave = enemies_left_this_wave - 1
     enemies_on_screen = enemies_on_screen - 1
     score = score + (score_to_add*score_multiplier);
@@ -623,6 +631,16 @@ func _on_enemy_update_score(score_to_add,enemy_global_position,death_source):
         Storage.Stats.set_value('player','high_score', score)
         
     Storage.increase_stat('player', 'enemies_defeated', 1)
+    
+    print("Enemy_type " + enemy_type + " " + str(enemy_is_split))
+    
+    if enemy_type == 'skeleton' && !enemy_is_split:
+        print ("Skeleton dead: Need to split")
+        spawn_enemy_set_position(enemy_global_position, 'SPAWN_OUTWARDS', Vector2(-1,+1).normalized(), true)
+        spawn_enemy_set_position(enemy_global_position, 'SPAWN_OUTWARDS', Vector2(+1,+1).normalized(), true)
+        spawn_enemy_set_position(enemy_global_position, 'SPAWN_OUTWARDS', Vector2(+1,-1).normalized(), true)
+        spawn_enemy_set_position(enemy_global_position, 'SPAWN_OUTWARDS', Vector2(-1,-1).normalized(), true)
+        enemies_left_this_wave+=4
     
     if enemies_left_this_wave == 0:
         # If last wave enemy is dead, spawn the key.

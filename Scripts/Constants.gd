@@ -46,10 +46,11 @@ const DINOSAUR_SURVIVAL_TIME = 5
 
 # Enemy spawning
 const ENEMY_SPAWN_WAVE_CONFIGURATION = {
-    1:      ['knight','wizard'],
+    1:      ['knight','wizard'],   
     2:      ['knight','knight','wizard','rogue'],
-    3:      ['knight','knight', 'wizard','wizard', 'rogue', 'necromancer'],
-    5:      ['knight','knight', 'wizard','wizard', 'rogue', 'necromancer', 'bee'],
+    3:      ['knight','knight', 'wizard','wizard', 'rogue', 'skeleton'],
+    5:      ['knight','knight', 'wizard','wizard', 'rogue', 'skeleton', 'bee'],
+    7:      ['knight','knight', 'wizard','wizard', 'rogue', 'skeleton', 'bee', 'necromancer']
 }
 
 const ENEMY_SPAWN_WAVE_SPECIAL_MIN_WAVE = 2
@@ -78,6 +79,9 @@ const ENEMY_REINFORCEMENTS_SPAWN_BATCH_SIZE = 10
 const ENEMY_REINFORCEMENTS_SPAWN_BATCH_MULTIPLIER = 1
 const ENEMY_REINFORCEMENTS_SPAWN_MINIMUM_NUMBER = 5
 const ENEMY_REINFORCEMENTS_SPAWN_MULTI_PLACEMENT_PERCENTAGE = 50
+
+const ENEMY_SPLIT_SIZE = Vector2(0.75,0.75)
+const ENEMY_SPLIT_SPEED_MULTIPLIER = 1.0
 
 # Enemy (General)
 
