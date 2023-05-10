@@ -462,7 +462,7 @@ func spawn_enemy(number_to_spawn, previous_spawn_pattern):
                 var offset = Vector2(sin(angle_rad), cos(angle_rad)) * 600;       
                 var enemy_position = $Player.position + offset
                 
-                spawn_enemy_set_position(enemy_position,'DEFAULT',Vector2(0,0).normalized(), false)
+                spawn_enemy_set_position(enemy_position,'',Vector2(0,0).normalized(), false)
                 i+=1
         'HARD_TOP':
             var i=0

@@ -85,23 +85,23 @@ const ENEMY_SPLIT_SPEED_MULTIPLIER = 1.0
 
 # Enemy (General)
 
-const ENEMY_SPEED = 450
-const ENEMY_NECROMANCER_SPEED = 100
-const ENEMY_BEE_SPEED = 600
+const ENEMY_SETTINGS = {
+    # Enemy:        [ Speed, Health, AI, Score, AttackSpeedMin, AttackSpeedMax, AttackType, TrapMin, TrapMax,
+    'knight':       [ 450,  5,  'CHASE',    10, 0,  0,  '',         0,  0],
+    'wizard':       [ 450,  1,  'WANDER',   10, 3,  5,  'STANDARD', 0,  0],
+    'rogue':        [ 450,  1,  'WANDER',   10, 0,  0,  '',         4,  10],
+    'necromancer':  [ 100,  10, 'FISH',     30, 5,  10, 'SPIRAL',   0,  0 ],
+    'bee':          [ 600,  1,  'CHASE',    10, 0,  0,  '',         0,  0   ],
+    'skeleton':     [ 450,  1,  'WANDER',   10, 0,  0,  '',         0,  0  ]
+}
+
 const ENEMY_SPEED_WAVE_PERCENTAGE_MULTIPLIER = 10
 const ENEMY_SPEED_DEFERRED_AI_MULTIPLIER = 1.5
 const ENEMY_SPEED_POPULATION_LOW_MULTIPLIER = 1.5
 
 const ENEMY_ALLOW_DAMAGE_WHEN_SPAWNING = false
-const ENEMY_HEALTH = 1
-const ENEMY_KNIGHT_HEALTH = 5
-const ENEMY_NECROMANCER_HEALTH = 10
 
-const ENEMY_ATTACK_MINIMUM_SECONDS = 3;
-const ENEMY_ATTACK_MAXIMUM_SECONDS = 5;
 const ENEMY_ATTACK_ARC_DEGREES = 20;
-const ENEMY_NECROMANCER_ATTACK_MINIMUM_SECONDS = 5;
-const ENEMY_NECROMANCER_ATTACK_MAXIMUM_SECONDS = 10;
 
 const ENEMY_CHASE_REORIENT_MINIMUM_SECONDS = 0.5;
 const ENEMY_CHASE_REORIENT_MAXIMUM_SECONDS = 1.0;
@@ -110,12 +110,7 @@ const ENEMY_DEFAULT_CHANGE_DIRECTION_MAXIMUM_SECONDS = 3;
 
 const ENEMY_ALL_CHASE_WHEN_POPULATION_LOW = 10
 
-const ENEMY_TRAP_MINIMUM_SECONDS = 4;
-const ENEMY_TRAP_MAXIMUM_SECONDS = 10;
 const ENEMY_TRAP_HEALTH = 10
-
-const KILL_ENEMY_SCORE = 10;
-const KILL_ENEMY_NECROMANCER_SCORE = 30;
 
 # Fish
 const FISH_TO_SPAWN_ARCADE = 20;
