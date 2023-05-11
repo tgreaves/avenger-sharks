@@ -13,6 +13,9 @@ func _ready():
     $CanvasLayer/MainMenuContainer/StartGame.grab_focus()
     $CanvasLayer/VersionLabel.text = "Version " + constants.GAME_VERSION
     
+    if OS.has_feature('steam'):
+        $CanvasLayer/VersionLabel.text += " (Steam)"
+    
     # Disable Statistics and Exit Game for web version.
     if OS.has_feature('web'):
         $CanvasLayer/MainMenuContainer/Statistics.visible = false

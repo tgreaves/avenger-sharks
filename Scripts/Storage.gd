@@ -32,8 +32,8 @@ func save_config():
 func load_stats():
     Stats = ConfigFile.new()
     
-    var err = Stats.load("user://stats.ini")
-        
+    var err = Stats.load("user://cloud-stats.ini")
+       
     if err != OK:
         # Could not load stats.  That's OK, might be first run.
         Stats.set_value('player','high_score',0)
@@ -46,8 +46,8 @@ func load_stats():
 func save_stats():
     if OS.has_feature('web'):
         return
-    
-    var err = Stats.save("user://stats.ini")
+        
+    var err = Stats.save("user://cloud-stats.ini")
     
     if err != OK:
         print("save_stats(): Fail")

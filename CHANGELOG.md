@@ -28,7 +28,9 @@
     * Credits screen re-jigged.
     * Pacifist Mode: Hide power-up bar.
     * Windowed Mode: Use 1920x1080 as a default (User can re-size)
+* Platform:
     * HTML5: Disable storage, Statistics and Exit Game.
+    * Steam: Steam Cloud sync for Statistics (cross-platform)
 * Bug fixes
     * Player projectiles would not pass through spawning enemies.
     * Magnet: Make a bit stronger to avoid items chasing the player(!)
