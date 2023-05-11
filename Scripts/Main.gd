@@ -632,10 +632,7 @@ func _on_enemy_update_score(score_to_add,enemy_global_position,death_source,enem
         
     Storage.increase_stat('player', 'enemies_defeated', 1)
     
-    print("Enemy_type " + enemy_type + " " + str(enemy_is_split))
-    
     if enemy_type == 'skeleton' && !enemy_is_split:
-        print ("Skeleton dead: Need to split")
         spawn_enemy_set_position(enemy_global_position, 'SPAWN_OUTWARDS', Vector2(-1,+1).normalized(), true)
         spawn_enemy_set_position(enemy_global_position, 'SPAWN_OUTWARDS', Vector2(+1,+1).normalized(), true)
         spawn_enemy_set_position(enemy_global_position, 'SPAWN_OUTWARDS', Vector2(+1,-1).normalized(), true)

@@ -85,10 +85,10 @@ offset_top = -26.0
 grow_horizontal = 0
 grow_vertical = 0
 
-[node name="SpeedUpContainer" type="VBoxContainer" parent="CanvasLayer/PowerUpContainer"]
+[node name="SPEED UP" type="VBoxContainer" parent="CanvasLayer/PowerUpContainer"]
 layout_mode = 2
 
-[node name="SpeedUp" type="Label" parent="CanvasLayer/PowerUpContainer/SpeedUpContainer"]
+[node name="Label" type="Label" parent="CanvasLayer/PowerUpContainer/SPEED UP"]
 z_index = 1
 custom_minimum_size = Vector2(2.08165e-12, 2.08165e-12)
 layout_mode = 2
@@ -99,7 +99,7 @@ text = "SPEED-UP
 "
 horizontal_alignment = 1
 
-[node name="ProgressBar" type="ProgressBar" parent="CanvasLayer/PowerUpContainer/SpeedUpContainer/SpeedUp"]
+[node name="ProgressBar" type="ProgressBar" parent="CanvasLayer/PowerUpContainer/SPEED UP/Label"]
 z_as_relative = false
 layout_mode = 1
 anchors_preset = 15
@@ -112,11 +112,11 @@ theme_override_styles/fill = SubResource("StyleBoxFlat_bf8k5")
 value = 50.0
 show_percentage = false
 
-[node name="FastSprayContainer" type="VBoxContainer" parent="CanvasLayer/PowerUpContainer"]
+[node name="FAST SPRAY" type="VBoxContainer" parent="CanvasLayer/PowerUpContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="FastSpray" type="Label" parent="CanvasLayer/PowerUpContainer/FastSprayContainer"]
+[node name="Label" type="Label" parent="CanvasLayer/PowerUpContainer/FAST SPRAY"]
 z_index = 1
 layout_mode = 2
 size_flags_horizontal = 3
@@ -125,7 +125,7 @@ theme_override_font_sizes/font_size = 24
 text = "FAST SPRAY"
 horizontal_alignment = 1
 
-[node name="ProgressBar" type="ProgressBar" parent="CanvasLayer/PowerUpContainer/FastSprayContainer/FastSpray"]
+[node name="ProgressBar" type="ProgressBar" parent="CanvasLayer/PowerUpContainer/FAST SPRAY/Label"]
 z_as_relative = false
 layout_mode = 1
 anchors_preset = 15
@@ -138,11 +138,11 @@ theme_override_styles/fill = SubResource("StyleBoxFlat_bf8k5")
 value = 50.0
 show_percentage = false
 
-[node name="BigSprayContainer" type="VBoxContainer" parent="CanvasLayer/PowerUpContainer"]
+[node name="BIG SPRAY" type="VBoxContainer" parent="CanvasLayer/PowerUpContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="BigSpray" type="Label" parent="CanvasLayer/PowerUpContainer/BigSprayContainer"]
+[node name="Label" type="Label" parent="CanvasLayer/PowerUpContainer/BIG SPRAY"]
 z_index = 1
 layout_mode = 2
 size_flags_horizontal = 3
@@ -151,7 +151,7 @@ theme_override_font_sizes/font_size = 24
 text = "BIG SPRAY"
 horizontal_alignment = 1
 
-[node name="ProgressBar" type="ProgressBar" parent="CanvasLayer/PowerUpContainer/BigSprayContainer/BigSpray"]
+[node name="ProgressBar" type="ProgressBar" parent="CanvasLayer/PowerUpContainer/BIG SPRAY/Label"]
 z_as_relative = false
 layout_mode = 1
 anchors_preset = 15
@@ -164,11 +164,11 @@ theme_override_styles/fill = SubResource("StyleBoxFlat_bf8k5")
 value = 50.0
 show_percentage = false
 
-[node name="GrenadeContainer" type="VBoxContainer" parent="CanvasLayer/PowerUpContainer"]
+[node name="GRENADE" type="VBoxContainer" parent="CanvasLayer/PowerUpContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Grenade" type="Label" parent="CanvasLayer/PowerUpContainer/GrenadeContainer"]
+[node name="Label" type="Label" parent="CanvasLayer/PowerUpContainer/GRENADE"]
 z_index = 1
 layout_mode = 2
 size_flags_horizontal = 3
@@ -177,7 +177,7 @@ theme_override_font_sizes/font_size = 24
 text = "GRENADE"
 horizontal_alignment = 1
 
-[node name="ProgressBar" type="ProgressBar" parent="CanvasLayer/PowerUpContainer/GrenadeContainer/Grenade"]
+[node name="ProgressBar" type="ProgressBar" parent="CanvasLayer/PowerUpContainer/GRENADE/Label"]
 z_as_relative = false
 layout_mode = 1
 anchors_preset = 15
@@ -190,11 +190,11 @@ theme_override_styles/fill = SubResource("StyleBoxFlat_bf8k5")
 value = 50.0
 show_percentage = false
 
-[node name="MiniSharkContainer" type="VBoxContainer" parent="CanvasLayer/PowerUpContainer"]
+[node name="MINI SHARK" type="VBoxContainer" parent="CanvasLayer/PowerUpContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="MiniShark" type="Label" parent="CanvasLayer/PowerUpContainer/MiniSharkContainer"]
+[node name="Label" type="Label" parent="CanvasLayer/PowerUpContainer/MINI SHARK"]
 z_index = 1
 layout_mode = 2
 size_flags_horizontal = 3
@@ -203,7 +203,7 @@ theme_override_font_sizes/font_size = 24
 text = "MINI SHARK"
 horizontal_alignment = 1
 
-[node name="ProgressBar" type="ProgressBar" parent="CanvasLayer/PowerUpContainer/MiniSharkContainer/MiniShark"]
+[node name="ProgressBar" type="ProgressBar" parent="CanvasLayer/PowerUpContainer/MINI SHARK/Label"]
 z_as_relative = false
 layout_mode = 1
 anchors_preset = 15

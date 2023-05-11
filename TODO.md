@@ -26,12 +26,7 @@
 
 # Bugs
 
-* Big spray doesn't work when player close to a wall.
-
 # THINGS FOR 0.4-alpha
-
-* CONFIGURATION
-    * Particles on / off
 
 * STATISTICS
     * Ability for user to reset

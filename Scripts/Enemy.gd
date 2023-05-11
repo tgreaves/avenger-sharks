@@ -139,11 +139,9 @@ func _physics_process(delta):
                         
                     # (For mini skeletons) - Spawns outwards. Then will switch to CHASE after timer expires.
                     'SPAWN_OUTWARDS':
-                        print("Spawning outwards")
                         velocity = initial_direction * (enemy_speed * constants.ENEMY_SPEED_DEFERRED_AI_MULTIPLIER)
                         
                         if $SpawnOutwardsTimer.time_left==0:
-                            print("AI mode set to chase")
                             ai_mode='CHASE'
                         
                     # Pursue the player.

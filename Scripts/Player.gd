@@ -53,7 +53,7 @@ func _ready():
         
     # Initiate maximum levels for each power-up
     max_powerup_levels = {
-        'SPEEDUP':      constants.POWERUP_SPEEDUP_MAX_LEVEL,
+        'SPEED UP':     constants.POWERUP_SPEEDUP_MAX_LEVEL,
         'FAST SPRAY':   constants.POWERUP_FASTSPRAY_MAX_LEVEL,
         'BIG SPRAY':    constants.POWERUP_BIGSPRAY_MAX_LEVEL,
         'GRENADE':      constants.POWERUP_GRENADE_MAX_LEVEL,
@@ -275,7 +275,7 @@ func _physics_process(_delta):
                             collided_with.get_node('.').despawn()
                             
                         "chest":
-                            var powerup_options = ['SPEEDUP','FAST SPRAY','BIG SPRAY','GRENADE','MINI SHARK']
+                            var powerup_options = ['SPEED UP','FAST SPRAY','BIG SPRAY','GRENADE','MINI SHARK']
                             var powerup_selected = powerup_options[randi() % powerup_options.size()]
                             
                             # Uncomment to test.
@@ -287,18 +287,14 @@ func _physics_process(_delta):
                                 current_powerup_levels[powerup_selected] = max_powerup_levels[powerup_selected]
                         
                             match powerup_selected:
-                                'SPEEDUP':
+                                'SPEED UP':
                                     speed = constants.PLAYER_SPEED + (constants.PLAYER_SPEED_POWERUP_INCREASE * current_powerup_levels[powerup_selected])
-                                    powerup_label_animation('SPEED UP!')
                                 'FAST SPRAY':
                                     fire_delay = constants.PLAYER_FIRE_DELAY - (constants.PLAYER_FIRE_DELAY_POWERUP_DECREASE * current_powerup_levels[powerup_selected])
-                                    powerup_label_animation('FAST SPRAY!') 
                                 'BIG SPRAY':
                                     spray_size = 0.5 + (constants.PLAYER_FIRE_SIZE_POWERUP_INCREASE * current_powerup_levels[powerup_selected])
-                                    powerup_label_animation('BIG SPRAY!')
                                 'GRENADE':
                                     grenade_delay = constants.PLAYER_GRENADE_DELAY - (constants.PLAYER_GRENADE_DELAY_POWERUP_DECREASE * current_powerup_levels[powerup_selected])  
-                                    powerup_label_animation('GRENADE!')
                                 'MINI SHARK':       
                                     if get_tree().get_nodes_in_group('miniSharkGroup').size() < max_powerup_levels[powerup_selected]:
                                             
@@ -309,9 +305,8 @@ func _physics_process(_delta):
                                         # Reset circular position of the mini sharks when we spawn a new one, to ensure
                                         # everything stays evenly spaced.
                                         recalculate_mini_shark_spacing()
-                                        
-                                    powerup_label_animation('MINI SHARK!')
                                     
+                            powerup_label_animation(powerup_selected + "!")
                             get_parent().get_node('HUD').activate_powerup(powerup_selected)
                             get_parent().get_node('HUD').set_powerup_level(powerup_selected, current_powerup_levels[powerup_selected])
                             $AudioStreamPowerUp.play()
@@ -644,60 +639,29 @@ func power_up_tick():
     for powerup in max_powerup_levels:
         if current_powerup_levels[powerup] >= 1:
             
-            match powerup:
-                'SPEEDUP':
-                    var value = get_parent().get_node('HUD/CanvasLayer/PowerUpContainer/SpeedUpContainer/SpeedUp/ProgressBar').value
-                    if value:    
-                        value -= 1
-                        get_parent().get_node('HUD/CanvasLayer/PowerUpContainer/SpeedUpContainer/SpeedUp/ProgressBar').value = value
+            var single_powerup = get_parent().get_node('HUD/CanvasLayer/PowerUpContainer').get_node(powerup)
+            var value = single_powerup.get_node('Label/ProgressBar').value
+            if value:
+                value -= 1
+                single_powerup.get_node('Label/ProgressBar').value = value
+                
+                if value <= 0:
+                    decrease_powerup_level(powerup)
                     
-                        if value <= 0:
-                            decrease_powerup_level(powerup)
+                    match powerup:
+                        'SPEED UP':
                             speed = constants.PLAYER_SPEED + (constants.PLAYER_SPEED_POWERUP_INCREASE * current_powerup_levels[powerup])
-                'FAST SPRAY':
-                    var value = get_parent().get_node('HUD/CanvasLayer/PowerUpContainer/FastSprayContainer/FastSpray/ProgressBar').value
-                    
-                    if value:
-                        value -= 1
-                        get_parent().get_node('HUD/CanvasLayer/PowerUpContainer/FastSprayContainer/FastSpray/ProgressBar').value = value
-                        
-                        if value <= 0:
-                            decrease_powerup_level(powerup)
+                        'FAST SPRAY':
                             fire_delay = constants.PLAYER_FIRE_DELAY - (constants.PLAYER_FIRE_DELAY_POWERUP_DECREASE * current_powerup_levels[powerup])  
-                'BIG SPRAY':
-                    var value = get_parent().get_node('HUD/CanvasLayer/PowerUpContainer/BigSprayContainer/BigSpray/ProgressBar').value
-                    
-                    if value:
-                        value -= 1
-                        get_parent().get_node('HUD/CanvasLayer/PowerUpContainer/BigSprayContainer/BigSpray/ProgressBar').value = value
-                        
-                        if value <= 0:
-                            decrease_powerup_level(powerup)
+                        'BIG SPRAY':
                             spray_size = 0.5 + (constants.PLAYER_FIRE_SIZE_POWERUP_INCREASE * current_powerup_levels[powerup])  
-                'GRENADE':
-                    var value = get_parent().get_node('HUD/CanvasLayer/PowerUpContainer/GrenadeContainer/Grenade/ProgressBar').value
-                    
-                    if value:
-                        value -= 1
-                        get_parent().get_node('HUD/CanvasLayer/PowerUpContainer/GrenadeContainer/Grenade/ProgressBar').value = value
-                        
-                        if value <= 0:
-                            decrease_powerup_level(powerup)
-                            grenade_delay = constants.PLAYER_GRENADE_DELAY - (constants.PLAYER_GRENADE_DELAY_POWERUP_DECREASE * current_powerup_levels[powerup])  
-                                     
-                'MINI SHARK':
-                    var value = get_parent().get_node('HUD/CanvasLayer/PowerUpContainer/MiniSharkContainer/MiniShark/ProgressBar').value
-                    if value:
-                        
-                        value -= 1
-                        get_parent().get_node('HUD/CanvasLayer/PowerUpContainer/MiniSharkContainer/MiniShark/ProgressBar').value = value
-                        
-                        if value <= 0:
-                            decrease_powerup_level(powerup)
+                        'GRENADE':
+                            grenade_delay = constants.PLAYER_GRENADE_DELAY - (constants.PLAYER_GRENADE_DELAY_POWERUP_DECREASE * current_powerup_levels[powerup])                   
+                        'MINI SHARK':
                             for single_shark in get_tree().get_nodes_in_group('miniSharkGroup'):
                                 single_shark.queue_free()
                                 break
-                            
+                                    
                             recalculate_mini_shark_spacing()
 
 func decrease_powerup_level(powerup):
