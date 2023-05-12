@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://bxw6akrvsd84v"]
+[gd_scene load_steps=19 format=3 uid="uid://bxw6akrvsd84v"]
 
 [ext_resource type="Script" path="res://Scripts/Main.gd" id="1_yyejc"]
 [ext_resource type="PackedScene" uid="uid://dde3f2uantk5b" path="res://Scenes/Intro.tscn" id="2_vh1q3"]
@@ -15,6 +15,7 @@
 [ext_resource type="PackedScene" uid="uid://dc60erflcrf6" path="res://Scenes/MainMenu.tscn" id="13_u3xax"]
 [ext_resource type="PackedScene" uid="uid://dfksl6get6jnk" path="res://Scenes/PauseMenu.tscn" id="14_fssl1"]
 [ext_resource type="PackedScene" uid="uid://5yp4e43ckdrj" path="res://Scenes/Player.tscn" id="15_3wn6m"]
+[ext_resource type="PackedScene" uid="uid://ci0jxmpdr3ue5" path="res://Scenes/Options.tscn" id="15_ai8du"]
 [ext_resource type="PackedScene" uid="uid://c61dmtdssq0mw" path="res://Scenes/Key.tscn" id="16_0rume"]
 [ext_resource type="AudioStream" uid="uid://b65dtuu73n480" path="res://Sound/80s Synthpop Experiment - Steven O'Brien (Must Credit, CC-BY, www.steven-obrien.net).mp3" id="17_mh5cd"]
 
@@ -59,7 +60,13 @@ offset_bottom = 93.0
 process_mode = 3
 visible = false
 
+[node name="Credits" parent="." instance=ExtResource("6_epeem")]
+visible = false
+
 [node name="Statistics" parent="." instance=ExtResource("8_jsswd")]
+visible = false
+
+[node name="Options" parent="." instance=ExtResource("15_ai8du")]
 visible = false
 
 [node name="Player" parent="." instance=ExtResource("15_3wn6m")]
@@ -88,6 +95,7 @@ one_shot = true
 
 [node name="AudioStreamPlayerMusic" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("17_mh5cd")
+bus = &"Music"
 
 [connection signal="player_enable_fish_frenzy" from="." to="Player" method="_on_main_player_enable_fish_frenzy"]
 [connection signal="player_hunt_key" from="." to="Player" method="_on_main_player_hunt_key"]
@@ -99,11 +107,14 @@ stream = ExtResource("17_mh5cd")
 [connection signal="credits_pressed" from="MainMenu" to="." method="_on_main_menu_credits_pressed"]
 [connection signal="exit_game_pressed" from="MainMenu" to="." method="_on_main_menu_exit_game_pressed"]
 [connection signal="game_mode_pressed" from="MainMenu" to="." method="_on_main_menu_game_mode_pressed"]
+[connection signal="options_pressed" from="MainMenu" to="." method="_on_main_menu_options_pressed"]
 [connection signal="start_game_pressed" from="MainMenu" to="." method="_on_main_menu_start_game_pressed"]
 [connection signal="statistics_pressed" from="MainMenu" to="." method="_on_main_menu_statistics_pressed"]
 [connection signal="abandon_game_pressed" from="PauseMenu" to="." method="_on_pause_menu_abandon_game_pressed"]
 [connection signal="unpause_game_pressed" from="PauseMenu" to="." method="_on_pause_menu_unpause_game_pressed"]
+[connection signal="credits_return_button_pressed" from="Credits" to="." method="_on_credits_credits_return_button_pressed"]
 [connection signal="statistics_return_button_pressed" from="Statistics" to="." method="_on_statistics_statistics_return_button_pressed"]
+[connection signal="options_return_button_pressed" from="Options" to="." method="_on_options_options_return_button_pressed"]
 [connection signal="player_died" from="Player" to="." method="_on_player_player_died"]
 [connection signal="player_found_exit" from="Player" to="." method="_on_player_player_found_exit"]
 [connection signal="player_found_exit_stop_key_movement" from="Player" to="Key" method="_on_player_player_found_exit_stop_key_movement"]

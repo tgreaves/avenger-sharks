@@ -1,4 +1,4 @@
-[gd_scene load_steps=86 format=3 uid="uid://bkmx1mvtb8dxr"]
+[gd_scene load_steps=102 format=3 uid="uid://bkmx1mvtb8dxr"]
 
 [ext_resource type="Script" path="res://Scripts/Enemy.gd" id="1_6udno"]
 [ext_resource type="Texture2D" uid="uid://ps2dg61ty76w" path="res://Sprites/knight-run-sheet.png" id="2_7pnuj"]
@@ -11,6 +11,8 @@
 [ext_resource type="Texture2D" uid="uid://b3oxns30ei64v" path="res://Sprites/wizard-death-sheet.png" id="4_mvkr8"]
 [ext_resource type="Texture2D" uid="uid://1wf8llk48bgj" path="res://Sprites/rogue-run-sheet.png" id="5_kkmra"]
 [ext_resource type="AudioStream" uid="uid://vioqdrtdy1x3" path="res://Sound/086398_game-die-81356.mp3" id="8_wxbp6"]
+[ext_resource type="Texture2D" uid="uid://dq57saw2rnqp4" path="res://Sprites/skeleton-death-sheet.png" id="9_bol6a"]
+[ext_resource type="Texture2D" uid="uid://cgfdp5afcmk7x" path="res://Sprites/skeleton-run-sheet.png" id="10_lwsou"]
 [ext_resource type="AudioStream" uid="uid://dmmjjx68g3x6e" path="res://Sound/090035_splatwav-91604.mp3" id="10_o51ug"]
 [ext_resource type="Texture2D" uid="uid://blmls1u06ubt2" path="res://Particles/flare_01.png" id="11_irhtg"]
 [ext_resource type="Texture2D" uid="uid://bu65b2r4jrqy7" path="res://Particles/smoke_01.png" id="12_5k78v"]
@@ -238,6 +240,62 @@ region = Rect2(256, 32, 64, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_oy34x"]
 atlas = ExtResource("5_kkmra")
+region = Rect2(320, 32, 64, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tjmbe"]
+atlas = ExtResource("9_bol6a")
+region = Rect2(0, 16, 96, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3jc14"]
+atlas = ExtResource("9_bol6a")
+region = Rect2(96, 16, 96, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fu0bd"]
+atlas = ExtResource("9_bol6a")
+region = Rect2(192, 16, 96, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_o57ie"]
+atlas = ExtResource("9_bol6a")
+region = Rect2(288, 16, 96, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_d1kbn"]
+atlas = ExtResource("9_bol6a")
+region = Rect2(384, 16, 96, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_34kby"]
+atlas = ExtResource("9_bol6a")
+region = Rect2(480, 16, 96, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ydrgf"]
+atlas = ExtResource("9_bol6a")
+region = Rect2(576, 16, 96, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_e516m"]
+atlas = ExtResource("9_bol6a")
+region = Rect2(672, 16, 96, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_m15bj"]
+atlas = ExtResource("10_lwsou")
+region = Rect2(0, 32, 64, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6030q"]
+atlas = ExtResource("10_lwsou")
+region = Rect2(64, 32, 64, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_i1lpl"]
+atlas = ExtResource("10_lwsou")
+region = Rect2(128, 32, 64, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_t5hs8"]
+atlas = ExtResource("10_lwsou")
+region = Rect2(192, 32, 64, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_l87rn"]
+atlas = ExtResource("10_lwsou")
+region = Rect2(256, 32, 64, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fov3h"]
+atlas = ExtResource("10_lwsou")
 region = Rect2(320, 32, 64, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_o1kss"]
@@ -505,6 +563,58 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
+"texture": SubResource("AtlasTexture_tjmbe")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3jc14")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fu0bd")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_o57ie")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_d1kbn")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_34kby")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ydrgf")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_e516m")
+}],
+"loop": false,
+"name": &"skeleton-death",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_m15bj")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6030q")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_i1lpl")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_t5hs8")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_l87rn")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fov3h")
+}],
+"loop": true,
+"name": &"skeleton-run",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
 "texture": SubResource("AtlasTexture_o1kss")
 }, {
 "duration": 1.0,
@@ -556,7 +666,7 @@ colors = PackedColorArray(1, 1, 0, 1, 1, 0.0392157, 0.996078, 1)
 
 [node name="Enemy" type="CharacterBody2D"]
 z_index = 1
-collision_layer = 4
+collision_layer = 0
 collision_mask = 16
 motion_mode = 1
 script = ExtResource("1_6udno")
@@ -569,7 +679,7 @@ shape = SubResource("CapsuleShape2D_brpyb")
 texture_filter = 1
 scale = Vector2(4, 4)
 sprite_frames = SubResource("SpriteFrames_4gmcv")
-animation = &"knight-run"
+animation = &"rogue-death"
 metadata/_aseprite_wizard_config_ = {
 "layer": "",
 "o_ex_p": "",
@@ -610,6 +720,10 @@ scale_amount_max = 0.5
 wait_time = 1.5
 one_shot = true
 
+[node name="SpawnOutwardsTimer" type="Timer" parent="."]
+wait_time = 0.25
+one_shot = true
+
 [node name="DeathParticlesTimer" type="Timer" parent="."]
 wait_time = 0.2
 one_shot = true
@@ -628,9 +742,11 @@ one_shot = true
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("8_wxbp6")
+bus = &"Effects"
 
 [node name="AudioStreamPlayerFishSplat" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("10_o51ug")
+bus = &"Effects"
 
 [node name="ScoreLabel" type="Label" parent="."]
 visible = false

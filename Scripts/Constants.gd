@@ -1,11 +1,14 @@
 extends Node
 
-const GAME_VERSION = "0.3-alpha"
+const GAME_VERSION = "0.4-alpha"
 
 # Developer settings.
 const DEV_SKIP_INTRO = false
 const DEV_START_GAME_IMMEDIATELY = false
-const MUSIC_ENABLED = true
+
+# Hardware settings
+const WINDOW_TITLE = "Avenger Sharks " + GAME_VERSION
+const WINDOW_SIZE = Vector2(1920,1080)
 
 # Game settings
 const START_WAVE = 1
@@ -23,10 +26,13 @@ const PLAYER_SPEED = 800
 const PLAYER_SPEED_POWERUP_INCREASE = 25
 const PLAYER_SPEED_ESCAPING = 1200;
 
-const PLAYER_FIRE_DELAY = 0.35
-const PLAYER_FIRE_DELAY_POWERUP_DECREASE = 0.05
+const PLAYER_FIRE_DELAY = 0.15
+const PLAYER_FIRE_DELAY_POWERUP_DECREASE = 0.01
 const PLAYER_FIRE_SPEED = 1600;
 const PLAYER_FIRE_SIZE_POWERUP_INCREASE = 0.25
+
+const PLAYER_GRENADE_DELAY = 0.6
+const PLAYER_GRENADE_DELAY_POWERUP_DECREASE = 0.1
 
 const PLAYER_HIT_BY_ENEMY_DAMAGE = 10;
 
@@ -40,10 +46,11 @@ const DINOSAUR_SURVIVAL_TIME = 5
 
 # Enemy spawning
 const ENEMY_SPAWN_WAVE_CONFIGURATION = {
-    1:      ['knight','wizard'],
+    1:      ['knight','wizard'],   
     2:      ['knight','knight','wizard','rogue'],
-    3:      ['knight','knight', 'wizard','wizard', 'rogue', 'necromancer'],
-    5:      ['knight','knight', 'wizard','wizard', 'rogue', 'necromancer', 'bee'],
+    4:      ['knight','knight', 'wizard','wizard', 'rogue', 'skeleton'],
+    6:      ['knight','knight', 'wizard','wizard', 'rogue', 'skeleton', 'bee'],
+    8:      ['knight','knight', 'wizard','wizard', 'rogue', 'skeleton', 'bee', 'necromancer']
 }
 
 const ENEMY_SPAWN_WAVE_SPECIAL_MIN_WAVE = 2
@@ -68,27 +75,33 @@ const ENEMY_MULTIPLIER_AT_WAVE_START = 10
 const ENEMY_MULTIPLIER_DURING_WAVE = 15
 
 const ENEMY_REINFORCEMENTS_SPAWN_BASE_SECONDS = 5
-const ENEMY_REINFORCEMENTS_SPAWN_BATCH_SIZE = 5
+const ENEMY_REINFORCEMENTS_SPAWN_BATCH_SIZE = 10
 const ENEMY_REINFORCEMENTS_SPAWN_BATCH_MULTIPLIER = 1
 const ENEMY_REINFORCEMENTS_SPAWN_MINIMUM_NUMBER = 5
+const ENEMY_REINFORCEMENTS_SPAWN_MULTI_PLACEMENT_PERCENTAGE = 50
+
+const ENEMY_SPLIT_SIZE = Vector2(0.75,0.75)
+const ENEMY_SPLIT_SPEED_MULTIPLIER = 1.0
 
 # Enemy (General)
 
-const ENEMY_SPEED = 450
-const ENEMY_NECROMANCER_SPEED = 100
-const ENEMY_BEE_SPEED = 600
+const ENEMY_SETTINGS = {
+    # Enemy:        [ Speed, Health, AI, Score, AttackSpeedMin, AttackSpeedMax, AttackType, TrapMin, TrapMax,
+    'knight':       [ 450,  4,  'CHASE',    10, 0,  0,  '',         0,  0],
+    'wizard':       [ 450,  1,  'WANDER',   10, 3,  5,  'STANDARD', 0,  0],
+    'rogue':        [ 450,  1,  'WANDER',   10, 0,  0,  '',         4,  10],
+    'necromancer':  [ 100,  10, 'FISH',     30, 5,  10, 'SPIRAL',   0,  0 ],
+    'bee':          [ 600,  1,  'CHASE',    10, 0,  0,  '',         0,  0   ],
+    'skeleton':     [ 450,  1,  'WANDER',   10, 0,  0,  '',         0,  0  ]
+}
+
 const ENEMY_SPEED_WAVE_PERCENTAGE_MULTIPLIER = 10
 const ENEMY_SPEED_DEFERRED_AI_MULTIPLIER = 1.5
 const ENEMY_SPEED_POPULATION_LOW_MULTIPLIER = 1.5
 
-const ENEMY_HEALTH = 1
-const ENEMY_NECROMANCER_HEALTH = 3
+const ENEMY_ALLOW_DAMAGE_WHEN_SPAWNING = false
 
-const ENEMY_ATTACK_MINIMUM_SECONDS = 3;
-const ENEMY_ATTACK_MAXIMUM_SECONDS = 5;
 const ENEMY_ATTACK_ARC_DEGREES = 20;
-const ENEMY_NECROMANCER_ATTACK_MINIMUM_SECONDS = 5;
-const ENEMY_NECROMANCER_ATTACK_MAXIMUM_SECONDS = 10;
 
 const ENEMY_CHASE_REORIENT_MINIMUM_SECONDS = 0.5;
 const ENEMY_CHASE_REORIENT_MAXIMUM_SECONDS = 1.0;
@@ -97,12 +110,7 @@ const ENEMY_DEFAULT_CHANGE_DIRECTION_MAXIMUM_SECONDS = 3;
 
 const ENEMY_ALL_CHASE_WHEN_POPULATION_LOW = 10
 
-const ENEMY_TRAP_MINIMUM_SECONDS = 4;
-const ENEMY_TRAP_MAXIMUM_SECONDS = 10;
-const ENEMY_TRAP_HEALTH = 5
-
-const KILL_ENEMY_SCORE = 10;
-const KILL_ENEMY_NECROMANCER_SCORE = 30;
+const ENEMY_TRAP_HEALTH = 10
 
 # Fish
 const FISH_TO_SPAWN_ARCADE = 20;
@@ -121,12 +129,14 @@ const ENEMY_LEAVE_BEHIND_ITEM_PERCENTAGE = 15
 const ITEM_DESPAWN_TIME = 10
 const ARCADE_MAXIMUM_DROPPED_ITEMS_ON_SCREEN = 5
 
-const HEALTH_POTION_BONUS = 20;
+const HEALTH_POTION_BONUS = 20
+const GRENADE_SPEED = 400
 
 # Power up levels
 const POWERUP_SPEEDUP_MAX_LEVEL = 3
 const POWERUP_FASTSPRAY_MAX_LEVEL = 3
 const POWERUP_BIGSPRAY_MAX_LEVEL = 3
+const POWERUP_GRENADE_MAX_LEVEL = 3
 const POWERUP_MINISHARK_MAX_LEVEL = 3
 
 const POWERUP_ACTIVE_DURATION = 10

@@ -74,30 +74,32 @@ theme_override_font_sizes/font_size = 64
 text = "ENEMIES"
 horizontal_alignment = 2
 
-[node name="PowerUpContainer" type="HBoxContainer" parent="CanvasLayer"]
-anchors_preset = 12
+[node name="PowerUpContainer" type="VBoxContainer" parent="CanvasLayer"]
+anchors_preset = 3
+anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -90.0
-grow_horizontal = 2
+offset_left = -480.0
+offset_top = -26.0
+grow_horizontal = 0
 grow_vertical = 0
 
-[node name="SpeedUpContainer" type="VBoxContainer" parent="CanvasLayer/PowerUpContainer"]
+[node name="SPEED UP" type="VBoxContainer" parent="CanvasLayer/PowerUpContainer"]
 layout_mode = 2
-size_flags_horizontal = 3
 
-[node name="SpeedUp" type="Label" parent="CanvasLayer/PowerUpContainer/SpeedUpContainer"]
+[node name="Label" type="Label" parent="CanvasLayer/PowerUpContainer/SPEED UP"]
 z_index = 1
 custom_minimum_size = Vector2(2.08165e-12, 2.08165e-12)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_fonts/font = ExtResource("1_4l55f")
-theme_override_font_sizes/font_size = 48
-text = "SPEED-UP"
+theme_override_font_sizes/font_size = 32
+text = "SPEED-UP
+"
 horizontal_alignment = 1
 
-[node name="ProgressBar" type="ProgressBar" parent="CanvasLayer/PowerUpContainer/SpeedUpContainer/SpeedUp"]
+[node name="ProgressBar" type="ProgressBar" parent="CanvasLayer/PowerUpContainer/SPEED UP/Label"]
 z_as_relative = false
 layout_mode = 1
 anchors_preset = 15
@@ -110,27 +112,20 @@ theme_override_styles/fill = SubResource("StyleBoxFlat_bf8k5")
 value = 50.0
 show_percentage = false
 
-[node name="Label" type="Label" parent="CanvasLayer/PowerUpContainer/SpeedUpContainer"]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("1_4l55f")
-theme_override_font_sizes/font_size = 32
-text = "LEVEL 1"
-horizontal_alignment = 1
-
-[node name="FastSprayContainer" type="VBoxContainer" parent="CanvasLayer/PowerUpContainer"]
+[node name="FAST SPRAY" type="VBoxContainer" parent="CanvasLayer/PowerUpContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="FastSpray" type="Label" parent="CanvasLayer/PowerUpContainer/FastSprayContainer"]
+[node name="Label" type="Label" parent="CanvasLayer/PowerUpContainer/FAST SPRAY"]
 z_index = 1
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_fonts/font = ExtResource("1_4l55f")
-theme_override_font_sizes/font_size = 48
+theme_override_font_sizes/font_size = 32
 text = "FAST SPRAY"
 horizontal_alignment = 1
 
-[node name="ProgressBar" type="ProgressBar" parent="CanvasLayer/PowerUpContainer/FastSprayContainer/FastSpray"]
+[node name="ProgressBar" type="ProgressBar" parent="CanvasLayer/PowerUpContainer/FAST SPRAY/Label"]
 z_as_relative = false
 layout_mode = 1
 anchors_preset = 15
@@ -143,27 +138,20 @@ theme_override_styles/fill = SubResource("StyleBoxFlat_bf8k5")
 value = 50.0
 show_percentage = false
 
-[node name="Label" type="Label" parent="CanvasLayer/PowerUpContainer/FastSprayContainer"]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("1_4l55f")
-theme_override_font_sizes/font_size = 32
-text = "LEVEL 1"
-horizontal_alignment = 1
-
-[node name="BigSprayContainer" type="VBoxContainer" parent="CanvasLayer/PowerUpContainer"]
+[node name="BIG SPRAY" type="VBoxContainer" parent="CanvasLayer/PowerUpContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="BigSpray" type="Label" parent="CanvasLayer/PowerUpContainer/BigSprayContainer"]
+[node name="Label" type="Label" parent="CanvasLayer/PowerUpContainer/BIG SPRAY"]
 z_index = 1
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_fonts/font = ExtResource("1_4l55f")
-theme_override_font_sizes/font_size = 48
+theme_override_font_sizes/font_size = 32
 text = "BIG SPRAY"
 horizontal_alignment = 1
 
-[node name="ProgressBar" type="ProgressBar" parent="CanvasLayer/PowerUpContainer/BigSprayContainer/BigSpray"]
+[node name="ProgressBar" type="ProgressBar" parent="CanvasLayer/PowerUpContainer/BIG SPRAY/Label"]
 z_as_relative = false
 layout_mode = 1
 anchors_preset = 15
@@ -176,27 +164,20 @@ theme_override_styles/fill = SubResource("StyleBoxFlat_bf8k5")
 value = 50.0
 show_percentage = false
 
-[node name="Label" type="Label" parent="CanvasLayer/PowerUpContainer/BigSprayContainer"]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("1_4l55f")
-theme_override_font_sizes/font_size = 32
-text = "LEVEL 1"
-horizontal_alignment = 1
-
-[node name="MiniSharkContainer" type="VBoxContainer" parent="CanvasLayer/PowerUpContainer"]
+[node name="GRENADE" type="VBoxContainer" parent="CanvasLayer/PowerUpContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="MiniShark" type="Label" parent="CanvasLayer/PowerUpContainer/MiniSharkContainer"]
+[node name="Label" type="Label" parent="CanvasLayer/PowerUpContainer/GRENADE"]
 z_index = 1
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_fonts/font = ExtResource("1_4l55f")
-theme_override_font_sizes/font_size = 48
-text = "MINI SHARK"
+theme_override_font_sizes/font_size = 32
+text = "GRENADE"
 horizontal_alignment = 1
 
-[node name="ProgressBar" type="ProgressBar" parent="CanvasLayer/PowerUpContainer/MiniSharkContainer/MiniShark"]
+[node name="ProgressBar" type="ProgressBar" parent="CanvasLayer/PowerUpContainer/GRENADE/Label"]
 z_as_relative = false
 layout_mode = 1
 anchors_preset = 15
@@ -209,12 +190,31 @@ theme_override_styles/fill = SubResource("StyleBoxFlat_bf8k5")
 value = 50.0
 show_percentage = false
 
-[node name="Label" type="Label" parent="CanvasLayer/PowerUpContainer/MiniSharkContainer"]
+[node name="MINI SHARK" type="VBoxContainer" parent="CanvasLayer/PowerUpContainer"]
 layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="CanvasLayer/PowerUpContainer/MINI SHARK"]
+z_index = 1
+layout_mode = 2
+size_flags_horizontal = 3
 theme_override_fonts/font = ExtResource("1_4l55f")
 theme_override_font_sizes/font_size = 32
-text = "LEVEL 1"
+text = "MINI SHARK"
 horizontal_alignment = 1
+
+[node name="ProgressBar" type="ProgressBar" parent="CanvasLayer/PowerUpContainer/MINI SHARK/Label"]
+z_as_relative = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_aujmq")
+theme_override_styles/fill = SubResource("StyleBoxFlat_bf8k5")
+value = 50.0
+show_percentage = false
 
 [node name="UpgradeChoiceContainer" type="HBoxContainer" parent="CanvasLayer"]
 anchors_preset = 14
@@ -298,12 +298,12 @@ anchors_preset = 4
 anchor_top = 0.5
 anchor_bottom = 0.5
 offset_left = 6.0
-offset_top = 216.0
+offset_top = 341.0
 offset_right = 658.0
-offset_bottom = 589.0
+offset_bottom = 714.0
 grow_vertical = 2
 theme_override_fonts/font = ExtResource("1_4l55f")
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 32
 vertical_alignment = 2
 
 [connection signal="pressed" from="CanvasLayer/UpgradeChoiceContainer/Choice1/Button" to="." method="_on_upgrade_button_pressed" binds= [1]]

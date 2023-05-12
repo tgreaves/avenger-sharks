@@ -1,7 +1,13 @@
-[gd_scene load_steps=3 format=3 uid="uid://cy3emhfwvf1gj"]
+[gd_scene load_steps=5 format=3 uid="uid://cy3emhfwvf1gj"]
 
 [ext_resource type="Script" path="res://Scripts/Credits.gd" id="1_sq6qr"]
 [ext_resource type="FontFile" uid="uid://dclfn1fjcq5i7" path="res://Fonts/PressStart2P-Regular.ttf" id="2_22yya"]
+
+[sub_resource type="InputEventAction" id="InputEventAction_0knlb"]
+action = &"back"
+
+[sub_resource type="Shortcut" id="Shortcut_ke7hp"]
+events = [SubResource("InputEventAction_0knlb")]
 
 [node name="Credits" type="Control"]
 layout_mode = 3
@@ -14,18 +20,47 @@ script = ExtResource("1_sq6qr")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
-[node name="Label" type="Label" parent="CanvasLayer"]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -2.0
-offset_top = 1462.0
-offset_right = -2.0
-offset_bottom = 4887.0
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -1279.0
+offset_top = -549.0
+offset_right = 1278.0
+offset_bottom = 552.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="TitleLabel" type="Label" parent="CanvasLayer/VBoxContainer"]
+layout_mode = 2
 theme_override_fonts/font = ExtResource("2_22yya")
-theme_override_font_sizes/font_size = 32
-text = "Credits loaded from resource go here"
+theme_override_font_sizes/font_size = 72
+text = "CREDITS"
 horizontal_alignment = 1
-autowrap_mode = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="CanvasLayer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+vertical_scroll_mode = 3
+
+[node name="Label" type="Label" parent="CanvasLayer/VBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("2_22yya")
+theme_override_font_sizes/font_size = 24
+text = "THIS IS THE CREDITS TEXT"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="ReturnButton" type="Button" parent="CanvasLayer/VBoxContainer"]
+custom_minimum_size = Vector2(600, 2.08165e-12)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_fonts/font = ExtResource("2_22yya")
+theme_override_font_sizes/font_size = 64
+shortcut = SubResource("Shortcut_ke7hp")
+text = "RETURN"
+
+[connection signal="pressed" from="CanvasLayer/VBoxContainer/ReturnButton" to="." method="_on_return_button_pressed"]

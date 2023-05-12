@@ -246,6 +246,16 @@ sprite_frames = SubResource("SpriteFrames_bvem5")
 frame = 5
 frame_progress = 1.0
 
+[node name="AimingLine" type="Line2D" parent="."]
+points = PackedVector2Array(0, 0)
+width = 2.0
+default_color = Color(1, 0, 0, 1)
+
+[node name="RayCast2D" type="RayCast2D" parent="."]
+target_position = Vector2(2.08165e-12, 2.08165e-12)
+collision_mask = 20
+collide_with_areas = true
+
 [node name="PowerUpLabel" type="Label" parent="."]
 visible = false
 offset_left = -348.0
@@ -301,6 +311,9 @@ autostart = true
 wait_time = 5.0
 one_shot = true
 
+[node name="GrenadeRateTimer" type="Timer" parent="."]
+one_shot = true
+
 [node name="DoorOpenTimer" type="Timer" parent="."]
 wait_time = 0.5
 one_shot = true
@@ -316,26 +329,34 @@ autostart = true
 
 [node name="AudioStreamPlayerSpray" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("10_v8evc")
+bus = &"Effects"
 
 [node name="AudioStreamPlayerHit" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("11_g4ac8")
 volume_db = 2.811
+bus = &"Effects"
 
 [node name="AudioStreamPlayerExplosionReverse" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("44_dvals")
+bus = &"Effects"
 
 [node name="AudioStreamPlayerExplosion" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("37_g7u1l")
+bus = &"Effects"
 
 [node name="AudioStreamHealth" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("38_86qdg")
+bus = &"Effects"
 
 [node name="AudioStreamPowerUp" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("39_sydp1")
+bus = &"Effects"
 
 [node name="AudioStreamPlayerGotFish" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("45_fj125")
 volume_db = 6.558
+bus = &"Effects"
 
 [node name="AudioStreamPlayerSelectedUpgrade" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("47_1ngf2")
+bus = &"Effects"

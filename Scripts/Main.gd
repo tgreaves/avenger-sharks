@@ -36,6 +36,7 @@ enum {
     MAIN_MENU,
     CREDITS,
     STATISTICS,
+    OPTIONS,
     WAVE_START,
     GAME_RUNNING,
     GAME_PAUSED,
@@ -55,19 +56,39 @@ signal player_update_fish
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+    randomize()
+    
+    Storage.load_config()
+    
+    # Set screen mode based on config.
+    if Storage.Config.get_value('config','screen_mode','FULL_SCREEN') == 'FULL_SCREEN':
+        DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+    else:
+        DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+        get_window().size = constants.WINDOW_SIZE
+    
+    get_window().title = constants.WINDOW_TITLE
+    
+    # Set volume levels from config.
+    AudioServer.set_bus_volume_db(AudioServer.get_bus_index('Master'), linear_to_db(Storage.Config.get_value('config','master_volume',1.0)))
+    AudioServer.set_bus_volume_db(AudioServer.get_bus_index('Music'), linear_to_db(Storage.Config.get_value('config','music_volume',1.0)))
+    AudioServer.set_bus_volume_db(AudioServer.get_bus_index('Effects'), linear_to_db(Storage.Config.get_value('config','effects_volume',1.0)))
+    
     Storage.load_stats()
     
     game_status = INTRO_SEQUENCE;
     
     $Arena.visible = false;
     $HUD/CanvasLayer.visible = false
-    $MainMenu.get_node('CanvasLayer').visible = false;
-    $PauseMenu.get_node('CanvasLayer').visible = false;
+    $MainMenu.get_node('CanvasLayer').visible = false
+    $PauseMenu.get_node('CanvasLayer').visible = false
     $Statistics.get_node('CanvasLayer').visible = false
+    $Credits.get_node('CanvasLayer').visible = false
+    $Options.get_node('CanvasLayer').visible = false
     $Player.set_process(false);
     $Player.set_physics_process(false);
     $Player.visible = false;
-    $Player.get_node("CollisionShape2D").disabled = false;
+    $Player.get_node("CollisionShape2D").disabled = false
     
     # Ensure we update high score as this may have been located from storage.
     _on_enemy_update_score_display()
@@ -77,8 +98,7 @@ func _ready():
     else:
         intro = intro_scene.instantiate()
         add_child(intro)
-    
-    
+       
 func main_menu():
     game_status=MAIN_MENU
     score=0
@@ -88,7 +108,7 @@ func main_menu():
     wave_number= constants.START_WAVE - 1
     enemies_on_screen = 0
     
-    if $AudioStreamPlayerMusic.playing == false and constants.MUSIC_ENABLED:
+    if $AudioStreamPlayerMusic.playing == false:
         $AudioStreamPlayerMusic.play(0.6);
  
     $Player/Camera2D.enabled = false
@@ -182,7 +202,9 @@ func prepare_for_wave():
     $HUD.get_node("CanvasLayer/Score").visible = true;
     $HUD.get_node("CanvasLayer/Label").visible = false;
     $HUD.get_node("CanvasLayer/EnemiesLeft").visible = true;
-    $HUD.show_powerup_bar()
+    
+    if game_mode == 'ARCADE':
+        $HUD.show_powerup_bar()
     
     $UnderwaterFar.visible = false
     $UnderwaterNear.visible = false
@@ -267,7 +289,7 @@ func start_wave():
     $EnemySpawnTimer.start(constants.ENEMY_REINFORCEMENTS_SPAWN_BASE_SECONDS);
     
     enemies_left_this_wave = (wave_number * constants.ENEMY_MULTIPLIER_AT_WAVE_START) + (wave_number * constants.ENEMY_MULTIPLIER_DURING_WAVE);
-    spawn_enemy(wave_number * constants.ENEMY_MULTIPLIER_AT_WAVE_START)   
+    spawn_enemy(wave_number * constants.ENEMY_MULTIPLIER_AT_WAVE_START, '')   
 
     # Fish spawning
     if game_mode == 'ARCADE':
@@ -394,24 +416,31 @@ func despawn_all_items():
     for item in get_tree().get_nodes_in_group('itemGroup'):
         item.queue_free()
 
-func spawn_enemy(number_to_spawn):
+func spawn_enemy(number_to_spawn, previous_spawn_pattern):
         
-    var spawn_choice = randi_range(1,100)
-    var spawn_pattern
+    var spawn_choice = 0
+    var spawn_pattern = ''
     
-    for spawn_key in constants.ENEMY_SPAWN_PLACEMENT_CONFIGURATION:
-        if spawn_choice <= spawn_key:
-            spawn_pattern = constants.ENEMY_SPAWN_PLACEMENT_CONFIGURATION[spawn_key]
-            break
+    var acceptable_choice = false
+    
+    # If we have been passed the previous_spawn_pattern, do not allow the same pattern to be used
+    # again.
+    while (!acceptable_choice):
+        spawn_choice = randi_range(1,100)
+            
+        for spawn_key in constants.ENEMY_SPAWN_PLACEMENT_CONFIGURATION:
+            if spawn_choice <= spawn_key:
+                spawn_pattern = constants.ENEMY_SPAWN_PLACEMENT_CONFIGURATION[spawn_key]
+                break
+                
+        if spawn_pattern != previous_spawn_pattern:
+            acceptable_choice=true
     
     # If this is the final spawn this wave, AND it is considered a 'low population' spawn, surround the player.
     # Why? Stops the end of the wave being boring with the player having to wait to find the enemies.
     if (enemies_on_screen+number_to_spawn <= constants.ENEMY_ALL_CHASE_WHEN_POPULATION_LOW) && (enemies_left_this_wave <= constants.ENEMY_ALL_CHASE_WHEN_POPULATION_LOW):
         spawn_pattern = 'CIRCLE_SURROUND_PLAYER'
 
-    #if (number_to_spawn == (enemies_left_this_wave - enemies_on_screen)) && (number_to_spawn <= constants.ENEMY_ALL_CHASE_WHEN_POPULATION_LOW):
-        
-        
     # Uncomment this to force a spawn pattern for testing.
     #spawn_pattern='RANDOM'
     
@@ -429,36 +458,38 @@ func spawn_enemy(number_to_spawn):
                 var offset = Vector2(sin(angle_rad), cos(angle_rad)) * 600;       
                 var enemy_position = $Player.position + offset
                 
-                spawn_enemy_set_position(enemy_position,'DEFAULT',Vector2(0,0).normalized())
+                spawn_enemy_set_position(enemy_position,'',Vector2(0,0).normalized(), false)
                 i+=1
         'HARD_TOP':
             var i=0
             var y_pos = constants.ARENA_SPAWN_MIN_Y
             var x_step = (constants.ARENA_SPAWN_MAX_X - constants.ARENA_SPAWN_MIN_X) / number_to_spawn
             while (i < number_to_spawn):
-                spawn_enemy_set_position(Vector2(constants.ARENA_SPAWN_MIN_X + (i*x_step), y_pos), 'DEFERRED_UNTIL_WALL', Vector2(0,1).normalized())
+                spawn_enemy_set_position(Vector2(constants.ARENA_SPAWN_MIN_X + (i*x_step), y_pos), 'DEFERRED_UNTIL_WALL', Vector2(0,1).normalized(), false)
                 i+=1
         'HARD_BOTTOM':
             var i=0
             var y_pos = constants.ARENA_SPAWN_MAX_Y
             var x_step = (constants.ARENA_SPAWN_MAX_X - constants.ARENA_SPAWN_MIN_X) / number_to_spawn
             while (i < number_to_spawn):
-                spawn_enemy_set_position(Vector2(constants.ARENA_SPAWN_MIN_X + (i*x_step), y_pos), 'DEFERRED_UNTIL_WALL', Vector2(0,-1).normalized())
+                spawn_enemy_set_position(Vector2(constants.ARENA_SPAWN_MIN_X + (i*x_step), y_pos), 'DEFERRED_UNTIL_WALL', Vector2(0,-1).normalized(), false)
                 i+=1
         'HARD_LEFT':
             var i=0
             var x_pos = constants.ARENA_SPAWN_MIN_X
             var y_step = (constants.ARENA_SPAWN_MAX_Y - constants.ARENA_SPAWN_MIN_Y) / number_to_spawn
             while (i < number_to_spawn):
-                spawn_enemy_set_position(Vector2(x_pos, constants.ARENA_SPAWN_MIN_Y + (i*y_step)), 'DEFERRED_UNTIL_WALL', Vector2(1,0).normalized())
+                spawn_enemy_set_position(Vector2(x_pos, constants.ARENA_SPAWN_MIN_Y + (i*y_step)), 'DEFERRED_UNTIL_WALL', Vector2(1,0).normalized(), false)
                 i+=1
         'HARD_RIGHT':
             var i=0
             var x_pos = constants.ARENA_SPAWN_MAX_X
             var y_step = (constants.ARENA_SPAWN_MAX_Y - constants.ARENA_SPAWN_MIN_Y) / number_to_spawn
             while (i < number_to_spawn):
-                spawn_enemy_set_position(Vector2(x_pos, constants.ARENA_SPAWN_MIN_Y + (i*y_step)), 'DEFERRED_UNTIL_WALL', Vector2(-1,0).normalized())
+                spawn_enemy_set_position(Vector2(x_pos, constants.ARENA_SPAWN_MIN_Y + (i*y_step)), 'DEFERRED_UNTIL_WALL', Vector2(-1,0).normalized(), false)
                 i+=1
+                
+    return spawn_pattern
       
 func spawn_enemy_random_position():
     var mob = enemy_scene.instantiate()
@@ -473,21 +504,29 @@ func spawn_enemy_random_position():
         
     enemies_on_screen+=1
     
-func spawn_enemy_set_position(enemy_position,ai_mode,initial_direction):
+func spawn_enemy_set_position(enemy_position,ai_mode,initial_direction,instant_spawn):
     enemy_position.x = clamp(enemy_position.x, constants.ARENA_SPAWN_MIN_X, constants.ARENA_SPAWN_MAX_X )        
     enemy_position.y = clamp(enemy_position.y, constants.ARENA_SPAWN_MIN_Y, constants.ARENA_SPAWN_MAX_Y )   
     
     var mob = enemy_scene.instantiate()
     mob.get_node('.').set_position (enemy_position);
     mob.set_ai_mode(ai_mode)
-    mob.set_initial_direction(initial_direction)
+    
+    if initial_direction:
+        mob.set_initial_direction(initial_direction)
+    
     mob.add_to_group('enemyGroup');	
     add_child(mob)  
     
-    if wave_special_type == 'ALL_THE_SAME':
-        mob.spawn_specific(wave_special_data)
+    if instant_spawn:
+        mob.set_instant_spawn(true)
+        mob.set_enemy_is_split(true)
+        mob.spawn_specific('skeleton')
     else:
-        mob.spawn_random()
+        if wave_special_type == 'ALL_THE_SAME':
+            mob.spawn_specific(wave_special_data)
+        else:
+            mob.spawn_random()
         
     enemies_on_screen+=1
         
@@ -538,7 +577,16 @@ func _process(_delta):
                 if how_many_left_to_spawn < constants.ENEMY_REINFORCEMENTS_SPAWN_MINIMUM_NUMBER:
                     enemies_to_spawn += how_many_left_to_spawn
     
-                spawn_enemy(enemies_to_spawn)
+                # Multi-wave spawn at the same time?
+                if ( randi_range(1,100) <= constants.ENEMY_REINFORCEMENTS_SPAWN_MULTI_PLACEMENT_PERCENTAGE):
+                    var spawn_a = int(enemies_to_spawn/2)
+                    var spawn_b = enemies_to_spawn - spawn_a
+                    
+                    var first_spawn_result = spawn_enemy(spawn_a,'')
+                    spawn_enemy(spawn_b, first_spawn_result)
+                    
+                else:
+                    spawn_enemy(enemies_to_spawn,'')
                 
             $EnemySpawnTimer.start(constants.ENEMY_REINFORCEMENTS_SPAWN_BASE_SECONDS);
             
@@ -561,14 +609,8 @@ func _input(_ev):
             INTRO_SEQUENCE:
                 intro.queue_free()
                 main_menu()
-            CREDITS:
-                credits.queue_free()
-                $MainMenu/CanvasLayer/MainMenuContainer/Credits.grab_focus()
-                main_menu()
-            STATISTICS:
-                _on_statistics_statistics_return_button_pressed()
             
-func _on_enemy_update_score(score_to_add,enemy_global_position,death_source):
+func _on_enemy_update_score(score_to_add,enemy_global_position,death_source,enemy_type,enemy_is_split):
     enemies_left_this_wave = enemies_left_this_wave - 1
     enemies_on_screen = enemies_on_screen - 1
     score = score + (score_to_add*score_multiplier);
@@ -582,6 +624,13 @@ func _on_enemy_update_score(score_to_add,enemy_global_position,death_source):
         Storage.Stats.set_value('player','high_score', score)
         
     Storage.increase_stat('player', 'enemies_defeated', 1)
+    
+    if enemy_type == 'skeleton' && !enemy_is_split:
+        spawn_enemy_set_position(enemy_global_position, 'SPAWN_OUTWARDS', Vector2(-1,+1).normalized(), true)
+        spawn_enemy_set_position(enemy_global_position, 'SPAWN_OUTWARDS', Vector2(+1,+1).normalized(), true)
+        spawn_enemy_set_position(enemy_global_position, 'SPAWN_OUTWARDS', Vector2(+1,-1).normalized(), true)
+        spawn_enemy_set_position(enemy_global_position, 'SPAWN_OUTWARDS', Vector2(-1,-1).normalized(), true)
+        enemies_left_this_wave+=4
     
     if enemies_left_this_wave == 0:
         # If last wave enemy is dead, spawn the key.
@@ -661,10 +710,10 @@ func _on_pause_menu_abandon_game_pressed():
 func _on_main_menu_credits_pressed():
     game_status = CREDITS;
     $MainMenu.get_node("CanvasLayer").visible = false
+    $Credits/CanvasLayer/VBoxContainer/ReturnButton.grab_focus()
     $HUD/CanvasLayer/HighScore.visible = false;
-    credits = credits_scene.instantiate();
-    credits.visible = true
-    add_child(credits)
+    $Credits/CanvasLayer.visible = true
+    $Credits.commence_scroll()
 
 func intro_has_finished():
     intro.queue_free()
@@ -750,3 +799,26 @@ func _on_statistics_statistics_return_button_pressed():
     $MainMenu/CanvasLayer/MainMenuContainer/Statistics.grab_focus()
     $HUD/CanvasLayer/HighScore.visible = true
     $Statistics/CanvasLayer.visible = false
+
+func _on_credits_credits_return_button_pressed():
+    game_status = MAIN_MENU
+    $MainMenu.get_node("CanvasLayer").visible = true
+    $MainMenu/CanvasLayer/MainMenuContainer/Credits.grab_focus()
+    $HUD/CanvasLayer/HighScore.visible = true
+    $Credits/CanvasLayer.visible = false
+
+func _on_main_menu_options_pressed():
+    game_status = OPTIONS
+    $MainMenu.get_node("CanvasLayer").visible = false
+    $HUD/CanvasLayer/HighScore.visible = false;
+    $Options.build_options_screen()
+    $Options/CanvasLayer.visible = true
+
+func _on_options_options_return_button_pressed():
+    Storage.save_config()
+    
+    game_status = MAIN_MENU
+    $MainMenu.get_node("CanvasLayer").visible = true
+    $MainMenu/CanvasLayer/MainMenuContainer/Options.grab_focus()
+    $HUD/CanvasLayer/HighScore.visible = true
+    $Options/CanvasLayer.visible = false

@@ -1,6 +1,7 @@
 extends CharacterBody2D
 
 const SharkSprayScene = preload("res://Scenes/SharkSpray.tscn")
+const GrenadeScene = preload("res://Scenes/Grenade.tscn")
 const MiniSharkScene = preload("res://Scenes/MiniShark.tscn")
 
 enum {
@@ -40,6 +41,7 @@ var fish_frenzy_colour
 var item_magnet_enabled = false
 var blink_status = false
 var fire_delay = constants.PLAYER_FIRE_DELAY
+var grenade_delay = constants.PLAYER_GRENADE_DELAY
 
 func _ready():
     shark_status = ALIVE;
@@ -51,9 +53,10 @@ func _ready():
         
     # Initiate maximum levels for each power-up
     max_powerup_levels = {
-        'SPEEDUP':      constants.POWERUP_SPEEDUP_MAX_LEVEL,
+        'SPEED UP':     constants.POWERUP_SPEEDUP_MAX_LEVEL,
         'FAST SPRAY':   constants.POWERUP_FASTSPRAY_MAX_LEVEL,
         'BIG SPRAY':    constants.POWERUP_BIGSPRAY_MAX_LEVEL,
+        'GRENADE':      constants.POWERUP_GRENADE_MAX_LEVEL,
         'MINI SHARK':   constants.POWERUP_MINISHARK_MAX_LEVEL
     }
     
@@ -95,6 +98,7 @@ func prepare_for_new_wave():
         $FishProgressBar.visible = true
     
     set_fire_rate_delay_timer()
+    set_grenade_rate_delay_timer()
 
 func get_input():
     
@@ -105,33 +109,37 @@ func get_input():
     velocity = input_direction * speed
     
     if $FireRateTimer.time_left == 0 && get_parent().game_mode == 'ARCADE':
+        # Keyboard
         if input_direction && Input.is_action_pressed('shark_fire'):
             var shark_spray = SharkSprayScene.instantiate();
             get_parent().add_child(shark_spray);
             shark_spray.global_position = position;
-            shark_spray.velocity = input_direction * constants.PLAYER_FIRE_SPEED;
+            shark_spray.velocity = velocity+(input_direction * constants.PLAYER_FIRE_SPEED)
             Storage.increase_stat('player','shots_fired',1)
             
             mini_shark_fire(input_direction)
+            grenade_fire(input_direction)
             
             $AudioStreamPlayerSpray.play()
             set_fire_rate_delay_timer()
             
+        # Mouse aiming
         if Input.is_action_pressed('shark_fire_mouse'):
             var shark_spray = SharkSprayScene.instantiate();
             get_parent().add_child(shark_spray);
             var target_direction = (get_global_mouse_position() - global_position).normalized()
             shark_spray.global_position = position;
-            shark_spray.velocity = target_direction * constants.PLAYER_FIRE_SPEED
+            shark_spray.velocity = velocity + (target_direction * constants.PLAYER_FIRE_SPEED)
             Storage.increase_stat('player','shots_fired',1)
             
             mini_shark_fire(target_direction)
+            grenade_fire(target_direction)
             
             $AudioStreamPlayerSpray.play()
             set_fire_rate_delay_timer()
-            
+        
+        # Controller (Twin stick)
         var shoot_direction = Input.get_vector("shoot_left", "shoot_right", "shoot_up", "shoot_down");
-            
         if shoot_direction:
             var shark_spray = SharkSprayScene.instantiate();
             get_parent().add_child(shark_spray);
@@ -142,13 +150,41 @@ func get_input():
             shoot_input.y = Input.get_action_strength("shoot_down") - Input.get_action_strength("shoot_up");
             shoot_direction = shoot_direction.normalized();
             
-            shark_spray.velocity = shoot_direction * constants.PLAYER_FIRE_SPEED;
+            shark_spray.velocity = velocity+(shoot_direction * constants.PLAYER_FIRE_SPEED)
             Storage.increase_stat('player','shots_fired',1)
-            
+             
             mini_shark_fire(shoot_direction)
+            grenade_fire(shoot_direction)
             
             $AudioStreamPlayerSpray.play()
             set_fire_rate_delay_timer()
+            
+    # Aiming line support (Controller only)
+    if get_parent().game_mode == 'ARCADE':
+        var shoot_direction = Input.get_vector("shoot_left", "shoot_right", "shoot_up", "shoot_down")
+        
+        if shoot_direction:
+            var shoot_input = Vector2.ZERO;
+            shoot_input.x = Input.get_action_strength("shoot_right") - Input.get_action_strength("shoot_left");
+            shoot_input.y = Input.get_action_strength("shoot_down") - Input.get_action_strength("shoot_up");
+            shoot_direction = shoot_direction.normalized();
+                
+            $RayCast2D.target_position = shoot_direction*10000
+            if $RayCast2D.is_colliding():
+                var line_end_position = $RayCast2D.get_collider().position 
+                
+                # Tilemaps default to (0,0) hit location unless we do something special...
+                if $RayCast2D.get_collider().name == 'Arena':
+                    line_end_position = $RayCast2D.get_collision_point()
+                
+                # Remove existing target.
+                remove_aiming_line()
+                
+                $AimingLine.add_point(to_local(line_end_position) )
+            
+        else:
+            # Remove targetting line when stick not being used.
+            remove_aiming_line()
             
     if Input.is_action_pressed('fish_frenzy') && fish_frenzy_enabled == true:
         fish_frenzy_enabled = false
@@ -179,7 +215,7 @@ func _physics_process(_delta):
 
         $ProgressBarBlinkTimer.start()
     
-    if $PowerUpTickTimer.time_left == 0:
+    if $PowerUpTickTimer.time_left == 0 && shark_status == ALIVE:
         power_up_tick()
         $PowerUpTickTimer.start()
     
@@ -239,10 +275,11 @@ func _physics_process(_delta):
                             collided_with.get_node('.').despawn()
                             
                         "chest":
-                            #get_parent().get_node('HUD').chest_collected()
-                            #$AudioStreamPlayerGotChest.play()
-                            var powerup_options = ['SPEEDUP','FAST SPRAY','BIG SPRAY','MINI SHARK']
+                            var powerup_options = ['SPEED UP','FAST SPRAY','BIG SPRAY','GRENADE','MINI SHARK']
                             var powerup_selected = powerup_options[randi() % powerup_options.size()]
+                            
+                            # Uncomment to test.
+                            #powerup_selected = 'GRENADE'
                             
                             # Increase powerup level (but not over its maximum allowed)
                             current_powerup_levels[powerup_selected] += 1
@@ -250,15 +287,14 @@ func _physics_process(_delta):
                                 current_powerup_levels[powerup_selected] = max_powerup_levels[powerup_selected]
                         
                             match powerup_selected:
-                                'SPEEDUP':
+                                'SPEED UP':
                                     speed = constants.PLAYER_SPEED + (constants.PLAYER_SPEED_POWERUP_INCREASE * current_powerup_levels[powerup_selected])
-                                    powerup_label_animation('SPEED UP!')
                                 'FAST SPRAY':
                                     fire_delay = constants.PLAYER_FIRE_DELAY - (constants.PLAYER_FIRE_DELAY_POWERUP_DECREASE * current_powerup_levels[powerup_selected])
-                                    powerup_label_animation('FAST SPRAY!') 
                                 'BIG SPRAY':
                                     spray_size = 0.5 + (constants.PLAYER_FIRE_SIZE_POWERUP_INCREASE * current_powerup_levels[powerup_selected])
-                                    powerup_label_animation('BIG SPRAY!')
+                                'GRENADE':
+                                    grenade_delay = constants.PLAYER_GRENADE_DELAY - (constants.PLAYER_GRENADE_DELAY_POWERUP_DECREASE * current_powerup_levels[powerup_selected])  
                                 'MINI SHARK':       
                                     if get_tree().get_nodes_in_group('miniSharkGroup').size() < max_powerup_levels[powerup_selected]:
                                             
@@ -269,9 +305,8 @@ func _physics_process(_delta):
                                         # Reset circular position of the mini sharks when we spawn a new one, to ensure
                                         # everything stays evenly spaced.
                                         recalculate_mini_shark_spacing()
-                                        
-                                    powerup_label_animation('MINI SHARK!')
                                     
+                            powerup_label_animation(powerup_selected + "!")
                             get_parent().get_node('HUD').activate_powerup(powerup_selected)
                             get_parent().get_node('HUD').set_powerup_level(powerup_selected, current_powerup_levels[powerup_selected])
                             $AudioStreamPowerUp.play()
@@ -321,8 +356,7 @@ func _physics_process(_delta):
                                  
         EXPLODING:
             if $PlayerExplosionTimer.time_left == 0:
-                # TODO: Hook in CHEAT DEATH here.
-                
+
                 # Can the player cheat death?
                 if upgrades['CHEAT DEATH'][0]:
                     upgrades['CHEAT DEATH'][0] = 0
@@ -469,6 +503,7 @@ func _player_hit():
             shark_status=EXPLODING;
             $PlayerExplosionTimer.start();
             despawn_mini_sharks()
+            remove_aiming_line()
         else:
             $AnimatedSprite2DDamaged.visible = true;
             $AnimatedSprite2DDamaged.play();
@@ -482,6 +517,8 @@ func _player_hit():
 func _on_main_player_hunt_key(passed_key_global_position):
     if shark_status == FISH_FRENZY:
         stop_fish_frenzy()
+    
+    remove_aiming_line()
     
     shark_status = HUNTING_KEY
     key_global_position = passed_key_global_position;
@@ -523,6 +560,9 @@ func powerup_label_animation(powerup_name):
 func set_fire_rate_delay_timer():
     $FireRateTimer.start(fire_delay)    
         
+func set_grenade_rate_delay_timer():
+    $GrenadeRateTimer.start(grenade_delay)         
+        
 func mini_shark_fire(shark_fire_direction):
     for mini_shark in get_tree().get_nodes_in_group("miniSharkGroup"):
         var mini_shark_spray = SharkSprayScene.instantiate()
@@ -541,6 +581,33 @@ func despawn_mini_sharks():
     for single_shark in get_tree().get_nodes_in_group('miniSharkGroup'):
         single_shark.queue_free()
 
+func grenade_fire(_fire_direction):
+    if $GrenadeRateTimer.time_left == 0 and current_powerup_levels['GRENADE']:
+        var grenade = GrenadeScene.instantiate()
+        get_parent().add_child(grenade)
+        grenade.add_to_group('grenadeGroup')
+        grenade.global_position = position
+        
+        var enemy_distance = 10000
+        var closest_enemy
+       
+        if get_tree().get_nodes_in_group('enemyGroup').size():
+             # Find nearest enemy that is alive.
+        
+            for enemy in get_tree().get_nodes_in_group('enemyGroup'):
+                if enemy.is_enemy_alive():
+                    var distance = position.distance_to(enemy.position)
+                    if distance < enemy_distance:
+                        enemy_distance=distance
+                        closest_enemy=enemy
+            
+        if enemy_distance != 10000:
+            grenade.velocity = position.direction_to(closest_enemy.position) * constants.GRENADE_SPEED
+        else:
+            grenade.velocity = Vector2(0,0)
+    
+        $GrenadeRateTimer.start(grenade_delay)
+    
 func _on_main_player_enable_fish_frenzy():
     powerup_label_animation('FRENZY READY!')
     fish_frenzy_enabled = true
@@ -572,49 +639,29 @@ func power_up_tick():
     for powerup in max_powerup_levels:
         if current_powerup_levels[powerup] >= 1:
             
-            match powerup:
-                'SPEEDUP':
-                    var value = get_parent().get_node('HUD/CanvasLayer/PowerUpContainer/SpeedUpContainer/SpeedUp/ProgressBar').value
-                    if value:    
-                        value -= 1
-                        get_parent().get_node('HUD/CanvasLayer/PowerUpContainer/SpeedUpContainer/SpeedUp/ProgressBar').value = value
+            var single_powerup = get_parent().get_node('HUD/CanvasLayer/PowerUpContainer').get_node(powerup)
+            var value = single_powerup.get_node('Label/ProgressBar').value
+            if value:
+                value -= 1
+                single_powerup.get_node('Label/ProgressBar').value = value
+                
+                if value <= 0:
+                    decrease_powerup_level(powerup)
                     
-                        if value <= 0:
-                            decrease_powerup_level(powerup)
+                    match powerup:
+                        'SPEED UP':
                             speed = constants.PLAYER_SPEED + (constants.PLAYER_SPEED_POWERUP_INCREASE * current_powerup_levels[powerup])
-                'FAST SPRAY':
-                    var value = get_parent().get_node('HUD/CanvasLayer/PowerUpContainer/FastSprayContainer/FastSpray/ProgressBar').value
-                    
-                    if value:
-                        value -= 1
-                        get_parent().get_node('HUD/CanvasLayer/PowerUpContainer/FastSprayContainer/FastSpray/ProgressBar').value = value
-                        
-                        if value <= 0:
-                            decrease_powerup_level(powerup)
+                        'FAST SPRAY':
                             fire_delay = constants.PLAYER_FIRE_DELAY - (constants.PLAYER_FIRE_DELAY_POWERUP_DECREASE * current_powerup_levels[powerup])  
-                'BIG SPRAY':
-                    var value = get_parent().get_node('HUD/CanvasLayer/PowerUpContainer/BigSprayContainer/BigSpray/ProgressBar').value
-                    
-                    if value:
-                        value -= 1
-                        get_parent().get_node('HUD/CanvasLayer/PowerUpContainer/BigSprayContainer/BigSpray/ProgressBar').value = value
-                        
-                        if value <= 0:
-                            decrease_powerup_level(powerup)
-                            spray_size = 0.5 + (constants.PLAYER_FIRE_SIZE_POWERUP_INCREASE * current_powerup_levels[powerup])            
-                'MINI SHARK':
-                    var value = get_parent().get_node('HUD/CanvasLayer/PowerUpContainer/MiniSharkContainer/MiniShark/ProgressBar').value
-                    if value:
-                        
-                        value -= 1
-                        get_parent().get_node('HUD/CanvasLayer/PowerUpContainer/MiniSharkContainer/MiniShark/ProgressBar').value = value
-                        
-                        if value <= 0:
-                            decrease_powerup_level(powerup)
+                        'BIG SPRAY':
+                            spray_size = 0.5 + (constants.PLAYER_FIRE_SIZE_POWERUP_INCREASE * current_powerup_levels[powerup])  
+                        'GRENADE':
+                            grenade_delay = constants.PLAYER_GRENADE_DELAY - (constants.PLAYER_GRENADE_DELAY_POWERUP_DECREASE * current_powerup_levels[powerup])                   
+                        'MINI SHARK':
                             for single_shark in get_tree().get_nodes_in_group('miniSharkGroup'):
                                 single_shark.queue_free()
                                 break
-                            
+                                    
                             recalculate_mini_shark_spacing()
 
 func decrease_powerup_level(powerup):
@@ -665,3 +712,7 @@ func is_player_alive():
         return true
     else:
         return false
+        
+func remove_aiming_line():
+    if $AimingLine.get_point_count() > 1:
+        $AimingLine.remove_point(1)

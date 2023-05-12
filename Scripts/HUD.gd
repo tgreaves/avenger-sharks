@@ -1,8 +1,9 @@
 extends Control
 
-var PowerUpBarSequence = [  'SPEEDUP',
+var PowerUpBarSequence = [  'SPEED UP',
                             'FAST SPRAY',
                             'BIG SPRAY',
+                            'GRENADE',
                             'MINI SHARK']
 
 var PowerUpIndex = 0;
@@ -18,41 +19,19 @@ func _process(_delta):
     pass
 
 func activate_powerup(powerup):
-    match powerup:
-        'SPEEDUP':
-            $CanvasLayer/PowerUpContainer/SpeedUpContainer/SpeedUp/ProgressBar.value = $CanvasLayer/PowerUpContainer/SpeedUpContainer/SpeedUp/ProgressBar.max_value
-            $CanvasLayer/PowerUpContainer/SpeedUpContainer/SpeedUp/ProgressBar.visible = true
-        'FAST SPRAY':
-            $CanvasLayer/PowerUpContainer/FastSprayContainer/FastSpray/ProgressBar.value = $CanvasLayer/PowerUpContainer/FastSprayContainer/FastSpray/ProgressBar.max_value
-            $CanvasLayer/PowerUpContainer/FastSprayContainer/FastSpray/ProgressBar.visible = true
-        'BIG SPRAY':
-            $CanvasLayer/PowerUpContainer/BigSprayContainer/BigSpray/ProgressBar.value = $CanvasLayer/PowerUpContainer/BigSprayContainer/BigSpray/ProgressBar.max_value 
-            $CanvasLayer/PowerUpContainer/BigSprayContainer/BigSpray/ProgressBar.visible = true
-        'MINI SHARK':
-            $CanvasLayer/PowerUpContainer/MiniSharkContainer/MiniShark/ProgressBar.value =   $CanvasLayer/PowerUpContainer/MiniSharkContainer/MiniShark/ProgressBar.max_value
-            $CanvasLayer/PowerUpContainer/MiniSharkContainer/MiniShark/ProgressBar.visible = true
+    var single_powerup = $CanvasLayer/PowerUpContainer.get_node(powerup)
+
+    single_powerup.get_node('Label/ProgressBar').value = single_powerup.get_node('Label/ProgressBar').max_value
+    single_powerup.get_node('Label/ProgressBar').visible = true
+    single_powerup.visible = true
 
 func deactivate_powerup(powerup):
-    match powerup:
-        'SPEEDUP':
-            $CanvasLayer/PowerUpContainer/SpeedUpContainer/SpeedUp/ProgressBar.value = $CanvasLayer/PowerUpContainer/SpeedUpContainer/SpeedUp/ProgressBar.max_value
-            $CanvasLayer/PowerUpContainer/SpeedUpContainer/SpeedUp/ProgressBar.visible = false
-        'FAST SPRAY':
-            $CanvasLayer/PowerUpContainer/FastSprayContainer/FastSpray/ProgressBar.value = $CanvasLayer/PowerUpContainer/FastSprayContainer/FastSpray/ProgressBar.max_value
-            $CanvasLayer/PowerUpContainer/FastSprayContainer/FastSpray/ProgressBar.visible = false
-        'BIG SPRAY':
-            $CanvasLayer/PowerUpContainer/BigSprayContainer/BigSpray/ProgressBar.value = $CanvasLayer/PowerUpContainer/BigSprayContainer/BigSpray/ProgressBar.max_value 
-            $CanvasLayer/PowerUpContainer/BigSprayContainer/BigSpray/ProgressBar.visible = false
-        'MINI SHARK':
-            $CanvasLayer/PowerUpContainer/MiniSharkContainer/MiniShark/ProgressBar.value =   $CanvasLayer/PowerUpContainer/MiniSharkContainer/MiniShark/ProgressBar.max_value
-            $CanvasLayer/PowerUpContainer/MiniSharkContainer/MiniShark/ProgressBar.visible = false    
+    var single_powerup = $CanvasLayer/PowerUpContainer.get_node(powerup)
+    
+    single_powerup.get_node('Label/ProgressBar').value = single_powerup.get_node('Label/ProgressBar').max_value
+    single_powerup.get_node('Label/ProgressBar').visible = false
+    single_powerup.visible = false
        
-func get_selected_powerup():
-    if PowerUpIndex == 0:
-        return 'NIL'
-        
-    return PowerUpBarSequence[ PowerUpIndex-1 ]
-
 func show_powerup_bar():
     $CanvasLayer/PowerUpContainer.visible = true
 
@@ -62,50 +41,33 @@ func hide_powerup_bar():
 func reset_powerup_bar():
     PowerUpIndex = 0
     
-    $CanvasLayer/PowerUpContainer/SpeedUpContainer/SpeedUp/ProgressBar.visible = false
-    $CanvasLayer/PowerUpContainer/FastSprayContainer/FastSpray/ProgressBar.visible = false
-    $CanvasLayer/PowerUpContainer/BigSprayContainer/BigSpray/ProgressBar.visible = false
-    $CanvasLayer/PowerUpContainer/MiniSharkContainer/MiniShark/ProgressBar.visible = false
-    
-    $CanvasLayer/PowerUpContainer/SpeedUpContainer/SpeedUp/ProgressBar.max_value = constants.POWERUP_ACTIVE_DURATION
-    $CanvasLayer/PowerUpContainer/FastSprayContainer/FastSpray/ProgressBar.max_value = constants.POWERUP_ACTIVE_DURATION
-    $CanvasLayer/PowerUpContainer/BigSprayContainer/BigSpray/ProgressBar.max_value = constants.POWERUP_ACTIVE_DURATION
-    $CanvasLayer/PowerUpContainer/MiniSharkContainer/MiniShark/ProgressBar.max_value = constants.POWERUP_ACTIVE_DURATION
-
+    for single_powerup in $CanvasLayer/PowerUpContainer.get_children():
+        single_powerup.visible = false
+        single_powerup.get_node('Label/ProgressBar').max_value = constants.POWERUP_ACTIVE_DURATION
+        
 func reset_powerup_bar_text():
+    for single_powerup in $CanvasLayer/PowerUpContainer.get_children():
+        single_powerup.get_node('Label').text = single_powerup.name
     
-    $CanvasLayer/PowerUpContainer/SpeedUpContainer/Label.text = ""
-    $CanvasLayer/PowerUpContainer/FastSprayContainer/Label.text = ""
-    $CanvasLayer/PowerUpContainer/BigSprayContainer/Label.text = ""
-    $CanvasLayer/PowerUpContainer/MiniSharkContainer/Label.text = ""
-
 func reset_powerup_bar_durations():
     var duration_percentage = get_parent().get_node('Player').upgrades['MORE POWER'][0] * 20
     var duration = int(constants.POWERUP_ACTIVE_DURATION + ((duration_percentage / 100.0) * constants.POWERUP_ACTIVE_DURATION))
-                            
-    $CanvasLayer/PowerUpContainer/SpeedUpContainer/SpeedUp/ProgressBar.max_value = duration
-    $CanvasLayer/PowerUpContainer/FastSprayContainer/FastSpray/ProgressBar.max_value = duration
-    $CanvasLayer/PowerUpContainer/BigSprayContainer/BigSpray/ProgressBar.max_value = duration
-    $CanvasLayer/PowerUpContainer/MiniSharkContainer/MiniShark/ProgressBar.max_value = duration
+                    
+    for single_powerup in $CanvasLayer/PowerUpContainer.get_children():
+        single_powerup.visible = false
+        single_powerup.get_node('Label/ProgressBar').max_value = duration  
 
 func set_powerup_level(powerup, level):
-    var text = "LEVEL " + str(level)
+    var text = " " + str(level)
     
     if level == 0:
         text=""
     
     if level == get_parent().get_node('Player').max_powerup_levels[powerup]:
-        text = "LEVEL MAX"
+        text = " MAX"
     
-    match powerup:
-        'SPEEDUP':
-            $CanvasLayer/PowerUpContainer/SpeedUpContainer/Label.text = text
-        'FAST SPRAY':
-            $CanvasLayer/PowerUpContainer/FastSprayContainer/Label.text = text
-        'BIG SPRAY':
-            $CanvasLayer/PowerUpContainer/BigSprayContainer/Label.text = text
-        'MINI SHARK':
-            $CanvasLayer/PowerUpContainer/MiniSharkContainer/Label.text = text
+    var single_powerup = $CanvasLayer/PowerUpContainer.get_node(powerup)
+    single_powerup.get_node('Label').text = powerup + text
     
 func set_all_powerup_levels():
     for powerup in PowerUpBarSequence:

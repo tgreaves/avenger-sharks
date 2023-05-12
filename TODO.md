@@ -26,14 +26,14 @@
 
 # Bugs
 
-* Big spray doesn't work when player close to a wall.
-
 # THINGS FOR 0.4-alpha
 
-* SURVIVAL MODE
-    * Remove power-ups from HUD
-    
+* STATISTICS
+    * Ability for user to reset
+
 * ENEMY TYPES
+    * An enemy that leaves a trail that can damage player (Or some form of snake?)
+    * An enemy that charges the player
     * Static turret - probably new Scene to support
         * Rotate during physics.
         * After random timer, charge animation + second timer
@@ -45,35 +45,33 @@
             * CHARGING
             * FIRING
         * Turret could fire a homing missile instead.
+        
+* POWER UPS
+    * Add flame thrower!
+    * Cursed power-ups :D
 
 * WAVE PROGRESSION
     * Boss level?
     * Choice of which level
     * Palette swaps (different areas) - could use shaders here.
-
-* SPAWN PATTERNS
-    * Spawn from multiple walls simultaneously?
+    * Dialogues ?!!! (Try not to boil the ocean)
     
 * GRAPHICS
     * Shaders for water effects
+    * More vibrant shader for enemy death
     
 * PERSISTENT STORAGE
     * Implement encryption
     
 * STEAM
-    * Cloud saving (but of what?)
-        * Statistics!
-            * Games played
-            * Shots fired
-            * Chests collected
-            * Max wave reached
-            * ... etc...
-            * Enemies killed
     * Achievements
         * Beat a wave
         * Beat 5 waves
         * Beat 10 waves
     * Leaderboard support (High scores)
+    
+* GENERAL DEVELOPMENT
+    * CI/CD pipeline
     
 * JACK'S IDEAS
     * Hammerhead shark
