@@ -94,7 +94,7 @@ custom_minimum_size = Vector2(2.08165e-12, 2.08165e-12)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_fonts/font = ExtResource("1_4l55f")
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 32
 text = "SPEED-UP
 "
 horizontal_alignment = 1
@@ -121,7 +121,7 @@ z_index = 1
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_fonts/font = ExtResource("1_4l55f")
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 32
 text = "FAST SPRAY"
 horizontal_alignment = 1
 
@@ -147,7 +147,7 @@ z_index = 1
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_fonts/font = ExtResource("1_4l55f")
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 32
 text = "BIG SPRAY"
 horizontal_alignment = 1
 
@@ -173,7 +173,7 @@ z_index = 1
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_fonts/font = ExtResource("1_4l55f")
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 32
 text = "GRENADE"
 horizontal_alignment = 1
 
@@ -199,7 +199,7 @@ z_index = 1
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_fonts/font = ExtResource("1_4l55f")
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 32
 text = "MINI SHARK"
 horizontal_alignment = 1
 
@@ -303,7 +303,7 @@ offset_right = 658.0
 offset_bottom = 714.0
 grow_vertical = 2
 theme_override_fonts/font = ExtResource("1_4l55f")
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 32
 vertical_alignment = 2
 
 [connection signal="pressed" from="CanvasLayer/UpgradeChoiceContainer/Choice1/Button" to="." method="_on_upgrade_button_pressed" binds= [1]]

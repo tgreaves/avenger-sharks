@@ -1,13 +1,20 @@
 # Changelog
 
-# 0.4-alpha
+# 0.4-alpha (2023-05-12)
+
+In this release, the gameplay has been sped up to make it more frenetic, combined
+with the addition of skeletons and GRENADES!  The HUD has been streamlined, and the player has a 
+targeting laser when playing with a controller. 
+
+Away from the core game, we now also have an Options screen and Steam Cloud
+support.
 
 * Gameplay:
     * Increase player fire rate and re-balance FAST SPRAY
     * Enemies can no longer take damage while they are spawning.
     * Increase enemy spawn numbers.
     * % chance of multiple spawns happening at the same time (Will be different types)
-    * Increase knight health to 5 (was: 1)
+    * Increase knight health to 4 (was: 1)
     * Increase necromancer health to 10 (was: 3)
     * Increase trap health to 10 (was: 5)
 * Enemies:
@@ -17,6 +24,7 @@
     * Power-ups no longer 'tick' unless the player is actively controlling the shark.
 * Controls:
     * Controller: Player now has a targetting laser! 
+    * Controller: 'B' button to back out of menus.
 * Graphics:
     * Power up bar moved to RHS.  Non-activated power-ups are not shown.
 * Sound:
@@ -38,7 +46,7 @@
     * Steam Deck: STATISTICS not consistently working when selected with controller.
     * Steam Deck: CREDITS not consistently working when selected with controller.
 
-# 0.3-alpha
+# 0.3-alpha (2023-05-03)
 
 This release introduces the upgrade system, a new Pacifist game mode, more interesting wave /
 spawning mechanics and much more!
@@ -99,7 +107,7 @@ spawning mechanics and much more!
     * Improve arena spawn co-ordinates range to prevent insta-collisions.
     * Fixed shonky calculations for enemy spawn numbers within a wave.
 
-# 0.2-alpha
+# 0.2-alpha (2023-04-16)
 
 This is primarily a bug fix / 'quality of life' release.
 
@@ -114,6 +122,6 @@ This is primarily a bug fix / 'quality of life' release.
 * Bug fix: Make 'Enemies Left' behaviour consistent between games.
 * Bug fix: Tidy up projectiles getting stuck around exit locations in transitions.
 
-# 0.1-alpha
+# 0.1-alpha (2023-04-06)
 
 First release.

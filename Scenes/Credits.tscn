@@ -1,7 +1,13 @@
-[gd_scene load_steps=3 format=3 uid="uid://cy3emhfwvf1gj"]
+[gd_scene load_steps=5 format=3 uid="uid://cy3emhfwvf1gj"]
 
 [ext_resource type="Script" path="res://Scripts/Credits.gd" id="1_sq6qr"]
 [ext_resource type="FontFile" uid="uid://dclfn1fjcq5i7" path="res://Fonts/PressStart2P-Regular.ttf" id="2_22yya"]
+
+[sub_resource type="InputEventAction" id="InputEventAction_0knlb"]
+action = &"back"
+
+[sub_resource type="Shortcut" id="Shortcut_ke7hp"]
+events = [SubResource("InputEventAction_0knlb")]
 
 [node name="Credits" type="Control"]
 layout_mode = 3
@@ -54,6 +60,7 @@ layout_mode = 2
 size_flags_horizontal = 4
 theme_override_fonts/font = ExtResource("2_22yya")
 theme_override_font_sizes/font_size = 64
+shortcut = SubResource("Shortcut_ke7hp")
 text = "RETURN"
 
 [connection signal="pressed" from="CanvasLayer/VBoxContainer/ReturnButton" to="." method="_on_return_button_pressed"]

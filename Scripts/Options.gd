@@ -18,6 +18,8 @@ func build_options_screen():
     else:
         $CanvasLayer/OptionsContainer/ScreenModeContainer/ScreenModeSetting.text = 'WINDOWED'
 
+    $CanvasLayer/OptionsContainer/ScreenModeContainer/ScreenModeSetting.grab_focus()
+
     $CanvasLayer/OptionsContainer/MasterVolumeContainer/MasterVolumeSetting.value = db_to_linear(AudioServer.get_bus_volume_db(AudioServer.get_bus_index('Master')))
     $CanvasLayer/OptionsContainer/MusicVolumeContainer/MusicVolumeSetting.value = db_to_linear(AudioServer.get_bus_volume_db(AudioServer.get_bus_index('Music')))
     $CanvasLayer/OptionsContainer/EffectsVolumeContainer/EffectsVolumeSetting.value = db_to_linear(AudioServer.get_bus_volume_db(AudioServer.get_bus_index('Effects')))

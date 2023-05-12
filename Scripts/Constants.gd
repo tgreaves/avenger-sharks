@@ -3,7 +3,7 @@ extends Node
 const GAME_VERSION = "0.4-alpha"
 
 # Developer settings.
-const DEV_SKIP_INTRO = true
+const DEV_SKIP_INTRO = false
 const DEV_START_GAME_IMMEDIATELY = false
 
 # Hardware settings
@@ -48,9 +48,9 @@ const DINOSAUR_SURVIVAL_TIME = 5
 const ENEMY_SPAWN_WAVE_CONFIGURATION = {
     1:      ['knight','wizard'],   
     2:      ['knight','knight','wizard','rogue'],
-    3:      ['knight','knight', 'wizard','wizard', 'rogue', 'skeleton'],
-    5:      ['knight','knight', 'wizard','wizard', 'rogue', 'skeleton', 'bee'],
-    7:      ['knight','knight', 'wizard','wizard', 'rogue', 'skeleton', 'bee', 'necromancer']
+    4:      ['knight','knight', 'wizard','wizard', 'rogue', 'skeleton'],
+    6:      ['knight','knight', 'wizard','wizard', 'rogue', 'skeleton', 'bee'],
+    8:      ['knight','knight', 'wizard','wizard', 'rogue', 'skeleton', 'bee', 'necromancer']
 }
 
 const ENEMY_SPAWN_WAVE_SPECIAL_MIN_WAVE = 2
@@ -87,7 +87,7 @@ const ENEMY_SPLIT_SPEED_MULTIPLIER = 1.0
 
 const ENEMY_SETTINGS = {
     # Enemy:        [ Speed, Health, AI, Score, AttackSpeedMin, AttackSpeedMax, AttackType, TrapMin, TrapMax,
-    'knight':       [ 450,  5,  'CHASE',    10, 0,  0,  '',         0,  0],
+    'knight':       [ 450,  4,  'CHASE',    10, 0,  0,  '',         0,  0],
     'wizard':       [ 450,  1,  'WANDER',   10, 3,  5,  'STANDARD', 0,  0],
     'rogue':        [ 450,  1,  'WANDER',   10, 0,  0,  '',         4,  10],
     'necromancer':  [ 100,  10, 'FISH',     30, 5,  10, 'SPIRAL',   0,  0 ],

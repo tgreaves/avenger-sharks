@@ -56,6 +56,8 @@ signal player_update_fish
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+    randomize()
+    
     Storage.load_config()
     
     # Set screen mode based on config.
@@ -421,8 +423,6 @@ func spawn_enemy(number_to_spawn, previous_spawn_pattern):
     
     var acceptable_choice = false
     
-    print("spawn_enemy() called with " + str(number_to_spawn) + " and " + str(previous_spawn_pattern))
-    
     # If we have been passed the previous_spawn_pattern, do not allow the same pattern to be used
     # again.
     while (!acceptable_choice):
@@ -432,8 +432,6 @@ func spawn_enemy(number_to_spawn, previous_spawn_pattern):
             if spawn_choice <= spawn_key:
                 spawn_pattern = constants.ENEMY_SPAWN_PLACEMENT_CONFIGURATION[spawn_key]
                 break
-        
-        print("Spawn pattern suggsted: " + str(spawn_pattern))
                 
         if spawn_pattern != previous_spawn_pattern:
             acceptable_choice=true
@@ -445,8 +443,6 @@ func spawn_enemy(number_to_spawn, previous_spawn_pattern):
 
     # Uncomment this to force a spawn pattern for testing.
     #spawn_pattern='RANDOM'
-    
-    print("SPAWN: Using pattern " + str(spawn_pattern))
     
     match spawn_pattern:
         'RANDOM':
@@ -581,13 +577,10 @@ func _process(_delta):
                 if how_many_left_to_spawn < constants.ENEMY_REINFORCEMENTS_SPAWN_MINIMUM_NUMBER:
                     enemies_to_spawn += how_many_left_to_spawn
     
-                print("REINFORCEMENTS - I want to spawn " + str(enemies_to_spawn))
-    
                 # Multi-wave spawn at the same time?
                 if ( randi_range(1,100) <= constants.ENEMY_REINFORCEMENTS_SPAWN_MULTI_PLACEMENT_PERCENTAGE):
                     var spawn_a = int(enemies_to_spawn/2)
                     var spawn_b = enemies_to_spawn - spawn_a
-                    print("MULTI-SPAWN: Using " + str(spawn_a) + " and " + str(spawn_b))
                     
                     var first_spawn_result = spawn_enemy(spawn_a,'')
                     spawn_enemy(spawn_b, first_spawn_result)

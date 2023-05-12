@@ -32,6 +32,7 @@
     * Ability for user to reset
 
 * ENEMY TYPES
+    * An enemy that leaves a trail that can damage player (Or some form of snake?)
     * An enemy that charges the player
     * Static turret - probably new Scene to support
         * Rotate during physics.
@@ -63,8 +64,6 @@
     * Implement encryption
     
 * STEAM
-    * Cloud saving (but of what?)
-        * Statistics!
     * Achievements
         * Beat a wave
         * Beat 5 waves

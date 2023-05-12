@@ -1,7 +1,13 @@
-[gd_scene load_steps=3 format=3 uid="uid://ci0jxmpdr3ue5"]
+[gd_scene load_steps=5 format=3 uid="uid://ci0jxmpdr3ue5"]
 
 [ext_resource type="Script" path="res://Scripts/Options.gd" id="1_c8165"]
 [ext_resource type="FontFile" uid="uid://dclfn1fjcq5i7" path="res://Fonts/PressStart2P-Regular.ttf" id="2_2d14t"]
+
+[sub_resource type="InputEventAction" id="InputEventAction_6ibh5"]
+action = &"back"
+
+[sub_resource type="Shortcut" id="Shortcut_4bbha"]
+events = [SubResource("InputEventAction_6ibh5")]
 
 [node name="Options" type="Control"]
 layout_mode = 3
@@ -122,6 +128,7 @@ layout_mode = 2
 size_flags_horizontal = 4
 theme_override_fonts/font = ExtResource("2_2d14t")
 theme_override_font_sizes/font_size = 64
+shortcut = SubResource("Shortcut_4bbha")
 text = "RETURN"
 
 [connection signal="pressed" from="CanvasLayer/OptionsContainer/ScreenModeContainer/ScreenModeSetting" to="." method="_on_screen_mode_button_pressed"]
