@@ -1,5 +1,12 @@
 # Changelog
 
+# 0.5-alpha
+
+* Platform:
+    * Steam: Client is now formally Steam enabled, including Steam Overlay.
+* Bug fixes:
+    * Music: Would get stuck at 'low health' speed if game abandoned in that state.
+
 # 0.4-alpha (2023-05-12)
 
 In this release, the gameplay has been sped up to make it more frenetic, combined

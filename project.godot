@@ -20,6 +20,7 @@ config/icon="res://icon.svg"
 
 constants="*res://Scripts/Constants.gd"
 Storage="*res://Scripts/Storage.gd"
+SteamClient="*res://Scripts/SteamClient.gd"
 
 [display]
 
@@ -182,5 +183,4 @@ back={
 
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
-textures/vram_compression/import_s3tc_bptc=true
 environment/defaults/default_clear_color=Color(0, 0, 0, 1)

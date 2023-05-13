@@ -1,10 +1,11 @@
 extends Node
 
-const GAME_VERSION = "0.4-alpha"
+const GAME_VERSION = "0.5-alpha"
 
 # Developer settings.
 const DEV_SKIP_INTRO = false
 const DEV_START_GAME_IMMEDIATELY = false
+const DEV_STEAM_TESTING = true
 
 # Hardware settings
 const WINDOW_TITLE = "Avenger Sharks " + GAME_VERSION

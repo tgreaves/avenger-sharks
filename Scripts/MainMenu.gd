@@ -16,6 +16,9 @@ func _ready():
     if OS.has_feature('steam'):
         $CanvasLayer/VersionLabel.text += " (Steam)"
     
+    if constants.DEV_STEAM_TESTING:
+        $CanvasLayer/VersionLabel.text += " (Steam Dev Test)"
+    
     # Disable Statistics and Exit Game for web version.
     if OS.has_feature('web'):
         $CanvasLayer/MainMenuContainer/Statistics.visible = false

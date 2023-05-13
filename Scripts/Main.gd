@@ -58,6 +58,9 @@ signal player_update_fish
 func _ready():
     randomize()
     
+    if Engine.has_singleton("Steam") && (OS.has_feature('steam') or constants.DEV_STEAM_TESTING):
+        SteamClient.SteamSetup()
+            
     Storage.load_config()
     
     # Set screen mode based on config.
@@ -111,6 +114,9 @@ func main_menu():
     if $AudioStreamPlayerMusic.playing == false:
         $AudioStreamPlayerMusic.play(0.6);
  
+    # Ensure music speed is always at normal.
+    _on_player_player_no_longer_low_energy()
+
     $Player/Camera2D.enabled = false
     $Player.set_process(false);
     $Player.set_physics_process(false);

@@ -58,4 +58,3 @@ func _physics_process(_delta):
                     break;
                 
                 collision.get_collider().get_node('.')._death('PLAYER-SHOT');
-                #$CollisionShape2DExplosion.disabled = true;
