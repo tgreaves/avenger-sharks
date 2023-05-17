@@ -409,6 +409,10 @@ func _physics_process(_delta):
                     get_parent().get_node('Arena').get_node('ExitDoor').get_node('CollisionShape2D').disabled = false;
                     emit_signal('player_got_key')
         HUNTING_EXIT:
+            #var target_direction = (get_parent().get_node('Arena').get_node('ExitDoor').global_position - global_position).normalized();
+            #velocity = target_direction * constants.PLAYER_SPEED_ESCAPING;
+            var did_collide = false
+            
             if velocity.x > 0:
                 $AnimatedSprite2D.set_flip_h(true);
             
@@ -418,29 +422,30 @@ func _physics_process(_delta):
             for i in get_slide_collision_count():
                 var collision = get_slide_collision(i)
                 
+                print("Collision: " + collision.get_collider().name)
+                
+                if collision.get_collider().name == 'Arena':
+                    did_collide=true
+                    velocity = velocity.slide(collision.get_normal())
+                
                 if collision.get_collider().name == 'ExitDoor':  
+                    did_collide=true
                     shark_status = FOUND_EXIT;
                     velocity = Vector2i(0,0)
                     
                     # Open door.
-                    get_parent().get_node('Arena').set_cell(
-                        2,
-                        Vector2(31,2),
-                        -1,
-                        Vector2i(9,7))
-                    
-                    get_parent().get_node('Arena').set_cell(
-                        2,
-                        Vector2(32,2),
-                        -1,
-                        Vector2i(9,7))
-                    
+                    get_parent().get_node('Arena').open_top_door()
                     get_parent().get_node('Arena').get_node('ExitDoor').get_node('CollisionShape2D').disabled = true;
                     
                     emit_signal('player_found_exit_stop_key_movement');
                     shark_status=GOING_THROUGH_DOOR;
                    
-                    $DoorOpenTimer.start()            
+                    $DoorOpenTimer.start()   
+                    
+            if !did_collide:
+                var target_direction = (get_parent().get_node('Arena').get_node('ExitDoor').global_position - global_position).normalized();
+                velocity = target_direction * constants.PLAYER_SPEED_ESCAPING;
+                         
         GOING_THROUGH_DOOR:
                 if $DoorOpenTimer.time_left == 0:
                     var target_direction = (get_parent().get_node('Arena').get_node('ExitLocation').global_position - global_position).normalized();
@@ -457,17 +462,7 @@ func _physics_process(_delta):
         MOVING_TO_START_POSITION:
                 if $DoorCloseTimer.time_left == 0:
                         # Close bottom door.
-                            get_parent().get_node('Arena').set_cell(
-                                2,
-                                Vector2(31,33),
-                                0,
-                                Vector2i(6,6))
-                            
-                            get_parent().get_node('Arena').set_cell(
-                                2,
-                                Vector2(32,33),
-                                0,
-                                Vector2i(7,6))
+                            get_parent().get_node('Arena').close_bottom_door()
             
                 for i in get_slide_collision_count():
                     var collision = get_slide_collision(i)

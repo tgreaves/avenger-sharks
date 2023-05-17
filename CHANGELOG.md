@@ -2,6 +2,8 @@
 
 # 0.5-alpha
 
+* Gameplay:
+    * Random obstacles can appear within a wave.
 * Platform:
     * Steam: Client is now formally Steam enabled, including Steam Overlay.
 * Bug fixes:

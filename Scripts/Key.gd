@@ -15,9 +15,10 @@ func _physics_process(_delta):
         IDLE:
             velocity = Vector2i(0,0);
         FOLLOWING_PLAYER:
-            move_and_slide()
-            var target_direction = (get_parent().get_node("Player").global_position - global_position).normalized();
-            velocity = target_direction * (constants.PLAYER_SPEED_ESCAPING);
+            #move_and_slide()
+            #var target_direction = (get_parent().get_node("Player").global_position - global_position).normalized();
+            #velocity = target_direction * (constants.PLAYER_SPEED_ESCAPING);
+            global_position = get_parent().get_node("Player").global_position + Vector2(0,50)
 
 
 func _on_player_player_got_key():

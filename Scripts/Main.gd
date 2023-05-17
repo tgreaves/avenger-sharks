@@ -179,31 +179,8 @@ func start_game():
 func prepare_for_wave():
     wave_number=wave_number+1;
     
-    # Close top door.
-    $Arena.set_cell(
-        2,
-        Vector2(31,2),
-        0,
-        Vector2i(6,6))
-    
-    $Arena.set_cell(
-        2,
-        Vector2(32,2),
-        0,
-        Vector2i(7,6))
-        
-    # Open bottom door.
-    $Arena.set_cell(
-        2,
-        Vector2(31,33),
-        -1,
-        Vector2i(6,6))
-    
-    $Arena.set_cell(
-        2,
-        Vector2(32,33),
-        -1,
-        Vector2i(7,6))
+    $Arena.close_top_door()
+    $Arena.open_bottom_door()
     
     $HUD.get_node("CanvasLayer/Score").visible = true;
     $HUD.get_node("CanvasLayer/Label").visible = false;
@@ -216,7 +193,13 @@ func prepare_for_wave():
     $UnderwaterNear.visible = false
     $MainMenu.get_node('CanvasLayer').visible = false
     $MainMenu.set_process_input(false)
-    $Arena.visible = true;
+    $Arena.visible = true
+    
+    $Arena.reset_arena_floor()
+    
+    for i in range(1, randi_range(constants.ARENA_OBSTACLE_MINIMUM, constants.ARENA_OBSTACLE_MAXIMUM)):
+        $Arena.add_obstacle()
+    
     $Player.set_process(true);
     $Player.set_physics_process(true);
     $Player.prepare_for_new_wave()
@@ -293,9 +276,13 @@ func start_wave():
     
     $ItemSpawnTimer.start(randf_range(constants.ITEM_SPAWN_MINIMUM_SECONDS,constants.ITEM_SPAWN_MAXIMUM_SECONDS));
     $EnemySpawnTimer.start(constants.ENEMY_REINFORCEMENTS_SPAWN_BASE_SECONDS);
-    
-    enemies_left_this_wave = (wave_number * constants.ENEMY_MULTIPLIER_AT_WAVE_START) + (wave_number * constants.ENEMY_MULTIPLIER_DURING_WAVE);
-    spawn_enemy(wave_number * constants.ENEMY_MULTIPLIER_AT_WAVE_START, '')   
+
+    if constants.DEV_SPAWN_ONE_ENEMY:
+        enemies_left_this_wave = 1
+        spawn_enemy(1,'')
+    else:
+        enemies_left_this_wave = (wave_number * constants.ENEMY_MULTIPLIER_AT_WAVE_START) + (wave_number * constants.ENEMY_MULTIPLIER_DURING_WAVE);
+        spawn_enemy(wave_number * constants.ENEMY_MULTIPLIER_AT_WAVE_START, '')   
 
     # Fish spawning
     if game_mode == 'ARCADE':
@@ -499,7 +486,16 @@ func spawn_enemy(number_to_spawn, previous_spawn_pattern):
       
 func spawn_enemy_random_position():
     var mob = enemy_scene.instantiate()
-    mob.get_node('.').set_position (Vector2(randf_range(constants.ARENA_SPAWN_MIN_X,constants.ARENA_SPAWN_MAX_X),randf_range(constants.ARENA_SPAWN_MIN_Y,constants.ARENA_SPAWN_MAX_Y)));
+    
+    var spawn_position
+    var valid_spawn = false
+    
+    while !valid_spawn:
+        spawn_position = Vector2(randf_range(constants.ARENA_SPAWN_MIN_X,constants.ARENA_SPAWN_MAX_X),randf_range(constants.ARENA_SPAWN_MIN_Y,constants.ARENA_SPAWN_MAX_Y))
+        if !$Arena.conflict_with_obstacle(spawn_position):
+            valid_spawn=true
+
+    mob.get_node('.').set_position(spawn_position)
     mob.add_to_group('enemyGroup');	
     add_child(mob); 
 
@@ -513,6 +509,16 @@ func spawn_enemy_random_position():
 func spawn_enemy_set_position(enemy_position,ai_mode,initial_direction,instant_spawn):
     enemy_position.x = clamp(enemy_position.x, constants.ARENA_SPAWN_MIN_X, constants.ARENA_SPAWN_MAX_X )        
     enemy_position.y = clamp(enemy_position.y, constants.ARENA_SPAWN_MIN_Y, constants.ARENA_SPAWN_MAX_Y )   
+    
+    var spawn_position
+    var valid_spawn = false
+    
+    while !valid_spawn:
+        if !$Arena.conflict_with_obstacle(enemy_position):
+            valid_spawn=true
+            
+        # Fuzz enemy_position
+        enemy_position = enemy_position + Vector2(50,50)
     
     var mob = enemy_scene.instantiate()
     mob.get_node('.').set_position (enemy_position);
@@ -538,7 +544,16 @@ func spawn_enemy_set_position(enemy_position,ai_mode,initial_direction,instant_s
         
 func spawn_fish():
     var mob = fish_scene.instantiate();
-    mob.get_node('.').set_position (Vector2(randf_range(constants.ARENA_SPAWN_MIN_X,constants.ARENA_SPAWN_MAX_X),randf_range(constants.ARENA_SPAWN_MIN_Y,constants.ARENA_SPAWN_MAX_Y)));
+    
+    var spawn_position
+    var valid_spawn = false
+    
+    while !valid_spawn:
+        spawn_position = Vector2(randf_range(constants.ARENA_SPAWN_MIN_X,constants.ARENA_SPAWN_MAX_X),randf_range(constants.ARENA_SPAWN_MIN_Y,constants.ARENA_SPAWN_MAX_Y))
+        if !$Arena.conflict_with_obstacle(spawn_position):
+            valid_spawn=true
+    
+    mob.get_node('.').set_position (spawn_position);
     mob.add_to_group('fishGroup');	
     add_child(mob);
 

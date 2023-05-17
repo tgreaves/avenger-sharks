@@ -5,7 +5,8 @@ const GAME_VERSION = "0.5-alpha"
 # Developer settings.
 const DEV_SKIP_INTRO = false
 const DEV_START_GAME_IMMEDIATELY = false
-const DEV_STEAM_TESTING = true
+const DEV_STEAM_TESTING = false
+const DEV_SPAWN_ONE_ENEMY = false
 
 # Hardware settings
 const WINDOW_TITLE = "Avenger Sharks " + GAME_VERSION
@@ -15,9 +16,14 @@ const WINDOW_SIZE = Vector2(1920,1080)
 const START_WAVE = 1
 
 const ARENA_SPAWN_MIN_X = 170
-const ARENA_SPAWN_MAX_X = 2600 * 2
+const ARENA_SPAWN_MAX_X = 2500 * 2
 const ARENA_SPAWN_MIN_Y = 320
 const ARENA_SPAWN_MAX_Y = 1250 * 2
+
+const ARENA_OBSTACLE_MINIMUM = 0
+const ARENA_OBSTACLE_MAXIMUM = 5
+const ARENA_OBSTACLE_SIZE_MINIMUM = 3
+const ARENA_OBSTACLE_SIZE_MAXIMUM = 8
 
 const PLAYER_START_GAME_ENERGY = 100
 const PLAYER_START_GAME_ENERGY_CHEATING = 99999

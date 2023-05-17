@@ -22,18 +22,24 @@
 # User Experience
 
 * How to play
-* Basic options (e.g. full screen and windowed selection)
 
 # Bugs
 
-# THINGS FOR 0.4-alpha
+# THINGS FOR 0.5-alpha
+
+
+* BOSS WAVE
+    * Randomly determine boss characteristics.
+    * Energy bar (which zoooooms up to max when it first appears on HUD)
 
 * STATISTICS
     * Ability for user to reset
 
 * ENEMY TYPES
     * An enemy that leaves a trail that can damage player (Or some form of snake?)
+        * Snake could be multiple segments joined together that follow.
     * An enemy that charges the player
+    * An enemy that lays an egg or drops acid or something else bad.
     * Static turret - probably new Scene to support
         * Rotate during physics.
         * After random timer, charge animation + second timer
@@ -46,12 +52,14 @@
             * FIRING
         * Turret could fire a homing missile instead.
         
+* AI
+    * Could look into a breadcrumb approach     
+    
 * POWER UPS
     * Add flame thrower!
     * Cursed power-ups :D
 
 * WAVE PROGRESSION
-    * Boss level?
     * Choice of which level
     * Palette swaps (different areas) - could use shaders here.
     * Dialogues ?!!! (Try not to boil the ocean)
@@ -59,6 +67,7 @@
 * GRAPHICS
     * Shaders for water effects
     * More vibrant shader for enemy death
+    * Shadows - take another look.
     
 * PERSISTENT STORAGE
     * Implement encryption

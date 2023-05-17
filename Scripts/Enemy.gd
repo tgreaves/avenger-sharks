@@ -264,8 +264,14 @@ func _physics_process(delta):
                 _death('PLAYER-BODY')
             else:
                 # Hit a wall? Ensure AI mode is standard.
-                velocity = velocity.bounce(collision.get_normal())
-                ai_mode=ai_mode_setting
+                if ai_mode == 'CHASE':
+                    # Slide around the wall to get to player.
+                    print ("[Enemy] Sliding round wall - Chase")
+                    velocity = velocity.slide(collision.get_normal())
+                else: 
+                    # Boing!
+                    velocity = velocity.bounce(collision.get_normal())
+                    ai_mode=ai_mode_setting
     
 func _death(death_source):
     if state == SPAWNING && !constants.ENEMY_ALLOW_DAMAGE_WHEN_SPAWNING:
