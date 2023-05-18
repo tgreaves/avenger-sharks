@@ -108,21 +108,10 @@ func get_input():
     var input_direction = Input.get_vector("left", "right", "up", "down")
     velocity = input_direction * speed
     
-    if $FireRateTimer.time_left == 0 && get_parent().game_mode == 'ARCADE':
-        # Keyboard
-        if input_direction && Input.is_action_pressed('shark_fire'):
-            var shark_spray = SharkSprayScene.instantiate();
-            get_parent().add_child(shark_spray);
-            shark_spray.global_position = position;
-            shark_spray.velocity = velocity+(input_direction * constants.PLAYER_FIRE_SPEED)
-            Storage.increase_stat('player','shots_fired',1)
-            
-            mini_shark_fire(input_direction)
-            grenade_fire(input_direction)
-            
-            $AudioStreamPlayerSpray.play()
-            set_fire_rate_delay_timer()
-            
+    #$AnimatedSprite2D.look_at(get_global_mouse_position())
+    #$AnimatedSprite2D.rotation_degrees += 180
+    
+    if $FireRateTimer.time_left == 0 && get_parent().game_mode == 'ARCADE':    
         # Mouse aiming
         if Input.is_action_pressed('shark_fire_mouse'):
             var shark_spray = SharkSprayScene.instantiate();

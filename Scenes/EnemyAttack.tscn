@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://0fiq0n7khi4q"]
+[gd_scene load_steps=10 format=3 uid="uid://0fiq0n7khi4q"]
 
 [ext_resource type="Script" path="res://Scripts/EnemyAttack.gd" id="1_bat7h"]
 [ext_resource type="Texture2D" uid="uid://bcecqvxy2vhr7" path="res://Sprites/EnemyAttack/FB500-1.png" id="2_jwdju"]
@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://dxyxtrpwer2x7" path="res://Sprites/EnemyAttack/FB500-3.png" id="4_koych"]
 [ext_resource type="Texture2D" uid="uid://c04fcose35e45" path="res://Sprites/EnemyAttack/FB500-4.png" id="5_6mf5t"]
 [ext_resource type="Texture2D" uid="uid://bk1rlhhhmsmm1" path="res://Sprites/EnemyAttack/FB500-5.png" id="6_6hioo"]
+[ext_resource type="Texture2D" uid="uid://cd3uri86u07f" path="res://Textures/2d_lights_and_shadows_neutral_point_light.webp" id="7_j38vt"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_lwg83"]
 radius = 30.0
@@ -47,3 +48,9 @@ shape = SubResource("CircleShape2D_lwg83")
 scale = Vector2(0.15, 0.15)
 sprite_frames = SubResource("SpriteFrames_btn6d")
 frame_progress = 0.685948
+
+[node name="PointLight2D" type="PointLight2D" parent="."]
+energy = 2.0
+shadow_enabled = true
+texture = ExtResource("7_j38vt")
+height = 50.0

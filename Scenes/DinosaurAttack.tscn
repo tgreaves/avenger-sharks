@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://ch08b0kbbu3je"]
+[gd_scene load_steps=12 format=3 uid="uid://ch08b0kbbu3je"]
 
 [ext_resource type="Script" path="res://Scripts/DinosaurAttack.gd" id="1_w8br7"]
 [ext_resource type="Texture2D" uid="uid://ig2s00164uhd" path="res://Sprites/SharkSpray/Water__01.png" id="2_1wwod"]
@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://brtia1eocoama" path="res://Sprites/SharkSpray/Water__04.png" id="5_kxy63"]
 [ext_resource type="Texture2D" uid="uid://da60t2goyisif" path="res://Sprites/SharkSpray/Water__05.png" id="6_x5k5a"]
 [ext_resource type="Texture2D" uid="uid://ci5knfcfxqxqr" path="res://Particles/dirt_01.png" id="7_v3xt3"]
+[ext_resource type="Texture2D" uid="uid://cd3uri86u07f" path="res://Textures/2d_lights_and_shadows_neutral_point_light.webp" id="8_nq21h"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_lwg83"]
 radius = 40.0
@@ -70,3 +71,9 @@ angle_max = 68.2
 scale_amount_min = 0.1
 scale_amount_max = 0.1
 color_ramp = SubResource("Gradient_0e304")
+
+[node name="PointLight2D" type="PointLight2D" parent="."]
+energy = 2.0
+shadow_enabled = true
+texture = ExtResource("8_nq21h")
+height = 50.0

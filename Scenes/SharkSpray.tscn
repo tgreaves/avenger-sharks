@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://dc1eectou7p5h"]
+[gd_scene load_steps=13 format=3 uid="uid://dc1eectou7p5h"]
 
 [ext_resource type="Script" path="res://Scripts/SharkSpray.gd" id="1_5rkhy"]
 [ext_resource type="Texture2D" uid="uid://ig2s00164uhd" path="res://Sprites/SharkSpray/Water__01.png" id="2_udl16"]
@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://brtia1eocoama" path="res://Sprites/SharkSpray/Water__04.png" id="5_yyo61"]
 [ext_resource type="Texture2D" uid="uid://da60t2goyisif" path="res://Sprites/SharkSpray/Water__05.png" id="6_jjhck"]
 [ext_resource type="Texture2D" uid="uid://ci5knfcfxqxqr" path="res://Particles/dirt_01.png" id="7_e67jq"]
+[ext_resource type="Texture2D" uid="uid://cd3uri86u07f" path="res://Textures/2d_lights_and_shadows_neutral_point_light.webp" id="8_eutac"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_lwg83"]
 radius = 40.0
@@ -44,6 +45,9 @@ animations = [{
 offsets = PackedFloat32Array(0, 0.683333)
 colors = PackedColorArray(0, 0, 1, 1, 0.4, 0.827451, 1, 1)
 
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_wl5ro"]
+blend_mode = 1
+
 [node name="SharkSpray" type="CharacterBody2D"]
 scale = Vector2(0.5, 0.5)
 collision_layer = 2
@@ -70,3 +74,15 @@ angle_max = 68.2
 scale_amount_min = 0.1
 scale_amount_max = 0.1
 color_ramp = SubResource("Gradient_2herj")
+
+[node name="PointLight2D" type="PointLight2D" parent="."]
+light_mask = 2
+energy = 2.0
+shadow_enabled = true
+texture = ExtResource("8_eutac")
+height = 50.0
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+visible = false
+material = SubResource("CanvasItemMaterial_wl5ro")
+texture = ExtResource("8_eutac")

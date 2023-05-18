@@ -1,4 +1,4 @@
-[gd_scene load_steps=56 format=3 uid="uid://5yp4e43ckdrj"]
+[gd_scene load_steps=57 format=3 uid="uid://5yp4e43ckdrj"]
 
 [ext_resource type="Script" path="res://Scripts/Player.gd" id="1_m4brx"]
 [ext_resource type="Texture2D" uid="uid://ikcchi1bmyrs" path="res://Sprites/Shark/Shark1.png" id="2_px875"]
@@ -43,6 +43,7 @@
 [ext_resource type="AudioStream" uid="uid://dee567wkg1cj" path="res://Sound/hq-explosion-6288-reverse.mp3" id="44_dvals"]
 [ext_resource type="AudioStream" uid="uid://dl3w6ch8pux8d" path="res://Sound/yay-6120.mp3" id="45_fj125"]
 [ext_resource type="AudioStream" uid="uid://dwquinjikuv4o" path="res://Sound/notification-for-game-scenes-132473.mp3" id="47_1ngf2"]
+[ext_resource type="Texture2D" uid="uid://cd3uri86u07f" path="res://Textures/2d_lights_and_shadows_neutral_point_light.webp" id="49_nsf5y"]
 [ext_resource type="Texture2D" uid="uid://be1l4stvjmcog" path="res://Sprites/Blood/bloodfx001_01.png" id="71_f4bva"]
 [ext_resource type="Texture2D" uid="uid://cynsah81npsn3" path="res://Sprites/Blood/bloodfx001_02.png" id="72_657n3"]
 [ext_resource type="Texture2D" uid="uid://d3tdosv5031k" path="res://Sprites/Blood/bloodfx001_03.png" id="73_olu8i"]
@@ -204,6 +205,7 @@ bg_color = Color(0, 0, 0, 1)
 bg_color = Color(0.972549, 0.321569, 0.580392, 1)
 
 [node name="Player" type="CharacterBody2D"]
+light_mask = 2
 z_index = 1
 position = Vector2(1253, 666)
 collision_mask = 112
@@ -226,6 +228,7 @@ scale = Vector2(0.75, 0.75)
 shape = SubResource("CapsuleShape2D_1hb8q")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+light_mask = 2
 texture_filter = 1
 scale = Vector2(4, 4)
 sprite_frames = SubResource("SpriteFrames_wa15s")
@@ -360,3 +363,10 @@ bus = &"Effects"
 [node name="AudioStreamPlayerSelectedUpgrade" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("47_1ngf2")
 bus = &"Effects"
+
+[node name="PointLight2D" type="PointLight2D" parent="."]
+visible = false
+shadow_enabled = true
+texture = ExtResource("49_nsf5y")
+texture_scale = 10.12
+height = 50.0

@@ -67,7 +67,6 @@
 * GRAPHICS
     * Shaders for water effects
     * More vibrant shader for enemy death
-    * Shadows - take another look.
     
 * PERSISTENT STORAGE
     * Implement encryption

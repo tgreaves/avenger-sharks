@@ -510,7 +510,6 @@ func spawn_enemy_set_position(enemy_position,ai_mode,initial_direction,instant_s
     enemy_position.x = clamp(enemy_position.x, constants.ARENA_SPAWN_MIN_X, constants.ARENA_SPAWN_MAX_X )        
     enemy_position.y = clamp(enemy_position.y, constants.ARENA_SPAWN_MIN_Y, constants.ARENA_SPAWN_MAX_Y )   
     
-    var spawn_position
     var valid_spawn = false
     
     while !valid_spawn:
@@ -600,6 +599,7 @@ func _process(_delta):
     
                 # Multi-wave spawn at the same time?
                 if ( randi_range(1,100) <= constants.ENEMY_REINFORCEMENTS_SPAWN_MULTI_PLACEMENT_PERCENTAGE):
+                    @warning_ignore("integer_division")
                     var spawn_a = int(enemies_to_spawn/2)
                     var spawn_b = enemies_to_spawn - spawn_a
                     
