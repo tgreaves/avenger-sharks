@@ -18,6 +18,7 @@ extends Node
 @export var wave_special_type = 'STANDARD'
 @export var wave_special_data = ''
 @export var dropped_items_on_screen = 0
+@export var grouped_enemy_id = 0
 
 var score = 0;
 var score_multiplier = 1
@@ -166,6 +167,7 @@ func start_game():
     $HUD/CanvasLayer/UpgradeSummary.visible = true
     
     enemies_left_this_wave = 0
+    grouped_enemy_id = 0
     
     if game_mode == 'ARCADE':
         update_enemies_left_display()
@@ -277,9 +279,9 @@ func start_wave():
     $ItemSpawnTimer.start(randf_range(constants.ITEM_SPAWN_MINIMUM_SECONDS,constants.ITEM_SPAWN_MAXIMUM_SECONDS));
     $EnemySpawnTimer.start(constants.ENEMY_REINFORCEMENTS_SPAWN_BASE_SECONDS);
 
-    if constants.DEV_SPAWN_ONE_ENEMY:
-        enemies_left_this_wave = 1
-        spawn_enemy(1,'')
+    if constants.DEV_SPAWN_ENEMY_COUNT:
+        enemies_left_this_wave = constants.DEV_SPAWN_ENEMY_COUNT
+        spawn_enemy(constants.DEV_SPAWN_ENEMY_COUNT,'')
     else:
         enemies_left_this_wave = (wave_number * constants.ENEMY_MULTIPLIER_AT_WAVE_START) + (wave_number * constants.ENEMY_MULTIPLIER_DURING_WAVE);
         spawn_enemy(wave_number * constants.ENEMY_MULTIPLIER_AT_WAVE_START, '')   
@@ -383,6 +385,13 @@ func return_to_main_screen():
 func spawn_item():	
     
     var ITEMS
+    var spawn_position
+    var valid_spawn = false
+    
+    while !valid_spawn:
+        spawn_position = Vector2(randf_range(constants.ARENA_SPAWN_MIN_X,constants.ARENA_SPAWN_MAX_X),randf_range(constants.ARENA_SPAWN_MIN_Y,constants.ARENA_SPAWN_MAX_Y))
+        if !$Arena.conflict_with_obstacle(spawn_position):
+            valid_spawn=true
     
     if game_mode == 'ARCADE':
         ITEMS = constants.ARCADE_SPAWNING_ITEMS
@@ -392,14 +401,14 @@ func spawn_item():
     var spawned_item = ITEMS[randi() % ITEMS.size()]
     
     if spawned_item == 'dinosaur':
-        var dinosaur = dinosaur_scene.instantiate();
-        dinosaur.get_node('.').set_position (Vector2(randf_range(constants.ARENA_SPAWN_MIN_X,constants.ARENA_SPAWN_MAX_X),randf_range(constants.ARENA_SPAWN_MIN_Y,constants.ARENA_SPAWN_MAX_Y)));
+        var dinosaur = dinosaur_scene.instantiate()
+        dinosaur.get_node('.').set_position (spawn_position);
         dinosaur.add_to_group('dinosaurGroup');
         add_child(dinosaur)
     else:
         var item = item_scene.instantiate()
         item.spawn_specific(spawned_item, false)
-        item.get_node('.').set_position (Vector2(randf_range(constants.ARENA_SPAWN_MIN_X,constants.ARENA_SPAWN_MAX_X),randf_range(constants.ARENA_SPAWN_MIN_Y,constants.ARENA_SPAWN_MAX_Y)));
+        item.get_node('.').set_position (spawn_position);
         item.add_to_group('itemGroup')
         add_child(item)
         
@@ -631,9 +640,12 @@ func _input(_ev):
                 intro.queue_free()
                 main_menu()
             
-func _on_enemy_update_score(score_to_add,enemy_global_position,death_source,enemy_type,enemy_is_split):
-    enemies_left_this_wave = enemies_left_this_wave - 1
-    enemies_on_screen = enemies_on_screen - 1
+func _on_enemy_update_score(score_to_add,enemy_global_position,death_source,enemy_type,enemy_is_split,grouped_enemy_has_died):
+   
+    if grouped_enemy_has_died:
+        enemies_left_this_wave = enemies_left_this_wave - 1
+        enemies_on_screen = enemies_on_screen - 1
+        
     score = score + (score_to_add*score_multiplier);
     var score_to_return = score_to_add*score_multiplier
     

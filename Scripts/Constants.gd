@@ -3,10 +3,11 @@ extends Node
 const GAME_VERSION = "0.5-alpha"
 
 # Developer settings.
-const DEV_SKIP_INTRO = false
-const DEV_START_GAME_IMMEDIATELY = false
+const DEV_SKIP_INTRO = true
+const DEV_START_GAME_IMMEDIATELY = true
 const DEV_STEAM_TESTING = false
-const DEV_SPAWN_ONE_ENEMY = false
+const DEV_SPAWN_ENEMY_COUNT = 0
+const DEV_SPAWN_ONE_ENEMY_TYPE = ''
 
 # Hardware settings
 const WINDOW_TITLE = "Avenger Sharks " + GAME_VERSION
@@ -53,8 +54,8 @@ const DINOSAUR_SURVIVAL_TIME = 5
 
 # Enemy spawning
 const ENEMY_SPAWN_WAVE_CONFIGURATION = {
-    1:      ['knight','wizard'],   
-    2:      ['knight','knight','wizard','rogue'],
+    1:      ['snake', 'knight','wizard'],   
+    2:      ['snake', 'knight','knight','wizard','rogue'],
     4:      ['knight','knight', 'wizard','wizard', 'rogue', 'skeleton'],
     6:      ['knight','knight', 'wizard','wizard', 'rogue', 'skeleton', 'bee'],
     8:      ['knight','knight', 'wizard','wizard', 'rogue', 'skeleton', 'bee', 'necromancer']
@@ -91,15 +92,16 @@ const ENEMY_SPLIT_SIZE = Vector2(0.75,0.75)
 const ENEMY_SPLIT_SPEED_MULTIPLIER = 1.0
 
 # Enemy (General)
-
+# TODO: This is getting too complex now.  Convert to JSON handling.
 const ENEMY_SETTINGS = {
-    # Enemy:        [ Speed, Health, AI, Score, AttackSpeedMin, AttackSpeedMax, AttackType, TrapMin, TrapMax,
-    'knight':       [ 450,  4,  'CHASE',    10, 0,  0,  '',         0,  0],
-    'wizard':       [ 450,  1,  'WANDER',   10, 3,  5,  'STANDARD', 0,  0],
-    'rogue':        [ 450,  1,  'WANDER',   10, 0,  0,  '',         4,  10],
-    'necromancer':  [ 100,  10, 'FISH',     30, 5,  10, 'SPIRAL',   0,  0 ],
-    'bee':          [ 600,  1,  'CHASE',    10, 0,  0,  '',         0,  0   ],
-    'skeleton':     [ 450,  1,  'WANDER',   10, 0,  0,  '',         0,  0  ]
+    # Enemy:        [ Speed, Health, AI, Score, AttackSpeedMin, AttackSpeedMax, AttackType, TrapMin, TrapMax, Group
+    'knight':       [ 450,  4,  'CHASE',    10, 0,  0,  '',         0,  0,  false],
+    'wizard':       [ 450,  1,  'WANDER',   10, 3,  5,  'STANDARD', 0,  0,  false],
+    'rogue':        [ 450,  1,  'WANDER',   10, 0,  0,  '',         4,  10, false],
+    'necromancer':  [ 100,  10, 'FISH',     30, 5,  10, 'SPIRAL',   0,  0,  false ],
+    'bee':          [ 600,  1,  'CHASE',    10, 0,  0,  '',         0,  0 , false  ],
+    'skeleton':     [ 450,  1,  'WANDER',   10, 0,  0,  '',         0,  0,  false   ],
+    'snake':        [ 450,  4,  'GROUP',    10, 0,  0,  '',         0,  0,  true]
 }
 
 const ENEMY_SPEED_WAVE_PERCENTAGE_MULTIPLIER = 10

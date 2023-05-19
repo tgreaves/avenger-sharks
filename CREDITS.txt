@@ -27,6 +27,9 @@ https://arks.itch.io/dino-characters
 Enemy sprites: Anokolisa's Pixel Crawler pack 
 https://anokolisa.itch.io/dungeon-crawler-pixel-art-asset-pack
 
+Blob sprite: Game-Endeavor
+https://game-endeavor.itch.io/mystic-woods
+
 Necromancer sprite: CreativeKind
 https://creativekind.itch.io/necromancer-free
 

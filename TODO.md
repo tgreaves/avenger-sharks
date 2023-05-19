@@ -86,4 +86,7 @@
         * Hits one time to lose one life
         * If it loses two more, then it is done but can take three lives one hit.
         
+* SNAKE IMPLEMENTATION
+    * [DONE] ove overall enemy definitions to JSON.
+    
 

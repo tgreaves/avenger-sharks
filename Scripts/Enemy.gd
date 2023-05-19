@@ -3,13 +3,14 @@ extends CharacterBody2D
 const EnemyAttackScene = preload("res://Scenes/EnemyAttack.tscn");
 const EnemyTrapScene = preload("res://Scenes/EnemyTrap.tscn");
 
+@export var state = SPAWNING
+
 enum {
     SPAWNING,
     WANDER,
     DYING
 }
 
-var state = SPAWNING
 var enemy_type
 var enemy_speed
 var enemy_health
@@ -26,6 +27,12 @@ var ai_mode_setting = ''
 var initial_direction = 0
 var enemy_is_split = false
 var instant_spawn = false
+var grouped_enemy = false
+var child_of_enemy = false
+var child_number
+var desired_velocity
+var parent_node
+var enemy_group_id
 
 func _ready():
     pass
@@ -44,9 +51,15 @@ func spawn_random():
 func spawn_specific(enemy_type_in):
     enemy_type = enemy_type_in
     
+    if constants.DEV_SPAWN_ONE_ENEMY_TYPE and !child_of_enemy:
+        print("[spawn_specific] Forcibly spawning: " + str(constants.DEV_SPAWN_ONE_ENEMY_TYPE))
+        enemy_type = constants.DEV_SPAWN_ONE_ENEMY_TYPE
+    
     $AnimatedSprite2D.animation = enemy_type + str('-run')
     
-    var enemy_settings = constants.ENEMY_SETTINGS[enemy_type_in]
+    # TODO: Change this to use JSON as complexity is too much now.
+    
+    var enemy_settings = constants.ENEMY_SETTINGS[enemy_type]
     enemy_speed = enemy_settings[0]
     enemy_health = enemy_settings[1]
     ai_mode_setting = enemy_settings[2]
@@ -56,6 +69,7 @@ func spawn_specific(enemy_type_in):
     attack_type = enemy_settings[6]
     trap_timer_min = enemy_settings[7]
     trap_timer_max = enemy_settings[8]
+    grouped_enemy = enemy_settings[9]
     
     # Special settings for necromancer.
     match enemy_type:
@@ -63,6 +77,8 @@ func spawn_specific(enemy_type_in):
             $AnimatedSprite2D.offset = Vector2(0,-25)
             $CollisionShape2D.scale = Vector2(1.5, 1.5)
             set_collision_mask_value(7,true)
+        'snake':
+            $AnimatedSprite2D.scale = Vector2(6,6)
     
     # Increase enemy speed as waves progress.
     var i=1
@@ -83,6 +99,34 @@ func spawn_specific(enemy_type_in):
         scale = constants.ENEMY_SPLIT_SIZE
         enemy_speed = enemy_speed * constants.ENEMY_SPLIT_SPEED_MULTIPLIER
     
+    # 'Grouped' enemy (i.e. snake) handling code.
+    if grouped_enemy:
+        if child_of_enemy:
+            # TO GO HERE: Spawning of child components. 
+            print("[Enemy] This is a child.")
+            print("[Enemy] My parent is: " + str(parent_node))
+        else:
+            # Parent / Head spawning code.
+            print("[Enemy] This is the head.")
+            get_parent().grouped_enemy_id = get_parent().grouped_enemy_id + 1
+            enemy_group_id = get_parent().grouped_enemy_id
+            add_to_group("groupedEnemy-" + str( enemy_group_id ))
+            for grouped_count in range(1,6):
+                var mob = get_parent().enemy_scene.instantiate()
+                
+                mob.get_node('.').set_position(position)
+                mob.add_to_group('enemyGroup')
+                mob.add_to_group("groupedEnemy-" + str( enemy_group_id ))
+                mob.set_enemy_group_id(enemy_group_id)
+                mob.set_child_of_enemy(true)
+                mob.set_child_number(grouped_count)
+                mob.set_parent_node(self)
+                get_parent().add_child(mob)
+                mob.spawn_specific(enemy_type)
+                
+                print("[Enemy] Group ID: " + str(get_parent().grouped_enemy_id) + " - Child spawned at: " + str(position))
+                
+    
     set_modulate(Color(0,0,0,0));
     hit_to_be_processed = false
     $SpawnParticles.emitting = true
@@ -101,6 +145,18 @@ func set_instant_spawn(spawn):
     
 func set_enemy_is_split(is_split):
     enemy_is_split = is_split
+    
+func set_child_of_enemy(is_child_of_enemy):
+    child_of_enemy = is_child_of_enemy
+    
+func set_parent_node(in_parent_node):
+    parent_node = in_parent_node
+
+func set_child_number(in_child_number):
+    child_number = in_child_number
+    
+func set_enemy_group_id(in_enemy_group_id):
+    enemy_group_id = in_enemy_group_id
 
 func _physics_process(delta):
     set_modulate(lerp(get_modulate(), Color(1,1,1,1), 0.02));
@@ -177,11 +233,19 @@ func _physics_process(delta):
                             velocity = Vector2(randf_range(-1,1), randf_range(-1,1)).normalized() * enemy_speed;
                             
                     'WANDER':        
-                            # Wander around a bit randomly.
-                            $StateTimer.start(randf_range(constants.ENEMY_DEFAULT_CHANGE_DIRECTION_MINIMUM_SECONDS,
-                                                        constants.ENEMY_DEFAULT_CHANGE_DIRECTION_MAXIMUM_SECONDS));
-                            velocity = Vector2(randf_range(-1,1), randf_range(-1,1)).normalized() * enemy_speed;
-                            
+                        # Wander around a bit randomly.
+                        $StateTimer.start(randf_range(constants.ENEMY_DEFAULT_CHANGE_DIRECTION_MINIMUM_SECONDS,
+                                                    constants.ENEMY_DEFAULT_CHANGE_DIRECTION_MAXIMUM_SECONDS));
+                        velocity = Vector2(randf_range(-1,1), randf_range(-1,1)).normalized() * enemy_speed;
+                           
+                    'GROUP':
+                        # Used for a snake sort of enemy.
+                        # The head sets the direction.  Children follow the head.                        
+                        if !child_of_enemy:
+                            # I set the direction.
+                            # Wander.
+                            $StateTimer.start(randf_range(1,3));
+                            desired_velocity = Vector2(randf_range(-1,1), randf_range(-1,1)).normalized() * enemy_speed;
                 
                 # OVERRIDE AI - Always chase the player when wave population is low.   
                 if get_parent().enemies_left_this_wave <= constants.ENEMY_ALL_CHASE_WHEN_POPULATION_LOW:
@@ -204,7 +268,16 @@ func _physics_process(delta):
                 
             if $StateTimer.time_left == 0:
                 self.queue_free();
-            
+
+    
+    if desired_velocity and !child_of_enemy:
+        velocity = velocity.lerp(desired_velocity, 0.01)
+    
+    if child_of_enemy and state != DYING:
+        # Always move towards my parent, keeping a set distance.
+        var target = parent_node.global_position + ((child_number-1)*50) * parent_node.global_position.direction_to(global_position)
+        global_position = global_position.move_toward(target, 2000 * delta)
+        
     var collision = move_and_collide(velocity * delta);	
     
     if velocity.x > 0:
@@ -212,47 +285,47 @@ func _physics_process(delta):
     
     if velocity.x < 0:
         $AnimatedSprite2D.set_flip_h(true);	
-            
+ 
     if $AttackTimer.time_left == 0 && state == WANDER && attack_timer_min:
         match attack_type:
             'STANDARD':
-                var enemy_attack = EnemyAttackScene.instantiate();
-                get_parent().add_child(enemy_attack);
-                enemy_attack.add_to_group('enemyAttack');
+                var enemy_attack = EnemyAttackScene.instantiate()
+                get_parent().add_child(enemy_attack)
+                enemy_attack.add_to_group('enemyAttack')
                 
-                var target_direction = (get_parent().get_node("Player").global_position - global_position).normalized();
+                var target_direction = (get_parent().get_node("Player").global_position - global_position).normalized()
                 
                 # We don't want enemies to always be a perfect shot.
-                target_direction = target_direction.rotated( deg_to_rad(randf_range(0,constants.ENEMY_ATTACK_ARC_DEGREES)));
+                target_direction = target_direction.rotated( deg_to_rad(randf_range(0,constants.ENEMY_ATTACK_ARC_DEGREES)))
                 
-                enemy_attack.global_position = position;
+                enemy_attack.global_position = position
 
-                enemy_attack.velocity = target_direction * enemy_attack.enemy_attack_speed;
+                enemy_attack.velocity = target_direction * enemy_attack.enemy_attack_speed
             
             'SPIRAL':
                 # Spiral attack pattern.
-                var i = 1;
+                var i = 1
                 while (i <= 16):
                     var enemy_attack = EnemyAttackScene.instantiate()
                     get_parent().add_child(enemy_attack);
                     enemy_attack.add_to_group('enemyAttack')
                     var target_direction = Vector2(1,1).normalized();
                     target_direction = target_direction.rotated ( deg_to_rad(360.0/16.0) * i)
-                    enemy_attack.global_position = position;
+                    enemy_attack.global_position = position
                     enemy_attack.velocity = target_direction * enemy_attack.enemy_attack_speed
-                    i = i + 1;
+                    i+=1
             
         $AttackTimer.start(randf_range(attack_timer_min, attack_timer_max))
                   
     if $TrapTimer.time_left == 0 && state == WANDER && trap_timer_min:
         var enemy_trap = EnemyTrapScene.instantiate();
-        get_parent().add_child(enemy_trap);
-        enemy_trap.add_to_group('enemyTrap');
-        enemy_trap.global_position = position;
+        get_parent().add_child(enemy_trap)
+        enemy_trap.add_to_group('enemyTrap')
+        enemy_trap.global_position = position
         
         $TrapTimer.start(randf_range(trap_timer_min, trap_timer_max))
         
-    if collision:
+    if collision and !child_of_enemy:
         if enemy_type == 'necromancer' && collision.get_collider().name.contains('Fish') && get_parent().game_mode == 'ARCADE':
             var collided_with = collision.get_collider()
             collided_with.get_node('.')._death(1)
@@ -266,11 +339,12 @@ func _physics_process(delta):
                 # Hit a wall? Ensure AI mode is standard.
                 if ai_mode == 'CHASE':
                     # Slide around the wall to get to player.
-                    print ("[Enemy] Sliding round wall - Chase")
                     velocity = velocity.slide(collision.get_normal())
                 else: 
                     # Boing!
                     velocity = velocity.bounce(collision.get_normal())
+                    if desired_velocity:
+                        desired_velocity = desired_velocity.bounce(collision.get_normal())
                     ai_mode=ai_mode_setting
     
 func _death(death_source):
@@ -294,17 +368,80 @@ func _death(death_source):
             $DeathParticlesTimer.start()
             state = DYING;
             
-            var actual_scored = get_parent()._on_enemy_update_score(enemy_score,global_position,death_source,enemy_type,enemy_is_split)
+            var grouped_enemy_has_died = true
+            
+            if grouped_enemy:
+                grouped_enemy_has_died = grouped_enemy_death()
+            
+            var actual_scored = get_parent()._on_enemy_update_score(enemy_score,global_position,death_source,enemy_type,enemy_is_split,grouped_enemy_has_died)
             
             score_label_animation(str(actual_scored))
             
             if get_parent().game_mode == 'ARCADE' && (get_parent().dropped_items_on_screen < constants.ARCADE_MAXIMUM_DROPPED_ITEMS_ON_SCREEN):
-                leave_behind_item()
+                if !(grouped_enemy and !grouped_enemy_has_died):        
+                    leave_behind_item()
         else:
             stored_modulate = get_modulate()
             set_modulate(Color(10,10,10,10));
             $FlashHitTimer.start()
+     
+# Handle grouped enemy death.
+# Basically, keep the group (snake!) together properly.  
+func grouped_enemy_death():
+        var remember_the_parent
+    
+        print("[Death] Enemy group ID: " + str(enemy_group_id))
+    
+        # What was destroyed?
+        if child_of_enemy:
+            print("[Death] Child.")
+            # I am a child.
+            # We just need to recompute child numbers for everything except the parent.
+            var i = 0
+            for single_enemy in get_tree().get_nodes_in_group("groupedEnemy-" + str( enemy_group_id )):
+                if single_enemy.name == name:
+                    print("[Death] Skip: It's me.")
+                    continue
+                    
+                if single_enemy.state == DYING:
+                    print("[Death] Skip: Dying")
+                    continue
+                    
+                i+=1
+                single_enemy.set_child_number(i)
+                print("[Death] New child number: " + str(i))
+        else:
+            # I am the parent.
+            print("[Death] Parent")
+            var i = 0
+             
+            for single_enemy in get_tree().get_nodes_in_group("groupedEnemy-" + str( enemy_group_id)):
+                if single_enemy.name == name:
+                    print("[Death] Skip: It's me.")
+                    continue
             
+                if single_enemy.state == DYING:
+                    print("[Death] Skip: Dying.")
+                    continue  
+                        
+                i+=1
+                if i == 1:
+                    # Congratulations.  You are the new parent.
+                    print("[Death] NEW PARENT WOOOO")
+                    single_enemy.set_child_of_enemy(false)
+                    remember_the_parent = single_enemy
+                else:
+                    # You are a child.
+                    print("[Death] Child: Set to " + str(i-1))
+                    single_enemy.set_child_number(i-1)
+                    single_enemy.set_parent_node(remember_the_parent)
+                            
+            if !i:
+                # If we didn't count anything - we must have been the last piece.
+                return true
+                        
+        return false
+                        
 func leave_behind_item():
     var percentage_calc  = (get_parent().get_node('Player').upgrades['LOOT LOVER'][0] * 10.0) / 100.0
     var leave_percentage = constants.ENEMY_LEAVE_BEHIND_ITEM_PERCENTAGE + (percentage_calc * constants.ENEMY_LEAVE_BEHIND_ITEM_PERCENTAGE)

@@ -134,7 +134,7 @@ func conflict_with_obstacle(coords):
     var map_coords = local_to_map(to_local(coords))
     
     if ObstacleDict.get(Vector2i(map_coords.x, map_coords.y)):
-        print("[conflict_with_obstacle] Conflict found with: " + str(map_coords))
+        #print("[conflict_with_obstacle] Conflict found with: " + str(map_coords))
         return true
     else:
         return false

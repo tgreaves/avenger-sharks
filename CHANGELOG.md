@@ -3,6 +3,7 @@
 # 0.5-alpha
 
 * Gameplay:
+    * New enemy: Snake / Blob: A multi-segment denizen of the dungeons!
     * Random obstacles can appear within a wave.
 * Graphics:
     * Lighting and Shadow effects.
