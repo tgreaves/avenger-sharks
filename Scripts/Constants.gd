@@ -92,16 +92,62 @@ const ENEMY_SPLIT_SIZE = Vector2(0.75,0.75)
 const ENEMY_SPLIT_SPEED_MULTIPLIER = 1.0
 
 # Enemy (General)
-# TODO: This is getting too complex now.  Convert to JSON handling.
 const ENEMY_SETTINGS = {
-    # Enemy:        [ Speed, Health, AI, Score, AttackSpeedMin, AttackSpeedMax, AttackType, TrapMin, TrapMax, Group
-    'knight':       [ 450,  4,  'CHASE',    10, 0,  0,  '',         0,  0,  false],
-    'wizard':       [ 450,  1,  'WANDER',   10, 3,  5,  'STANDARD', 0,  0,  false],
-    'rogue':        [ 450,  1,  'WANDER',   10, 0,  0,  '',         4,  10, false],
-    'necromancer':  [ 100,  10, 'FISH',     30, 5,  10, 'SPIRAL',   0,  0,  false ],
-    'bee':          [ 600,  1,  'CHASE',    10, 0,  0,  '',         0,  0 , false  ],
-    'skeleton':     [ 450,  1,  'WANDER',   10, 0,  0,  '',         0,  0,  false   ],
-    'snake':        [ 450,  4,  'GROUP',    10, 0,  0,  '',         0,  0,  true]
+    'knight':   {
+        'speed':    450,
+        'health':   4,
+        'AI':       'CHASE',
+        'score':    10,
+    },
+    'wizard':   {
+        'speed':    450,
+        'health':   1,
+        'AI':       'WANDER',
+        'score':    10,
+        'attack_timer_min': 3,
+        'attack_timer_max': 5,
+        'attack_type':  'STANDARD'
+    },
+    'rogue':   {
+        'speed':    450,
+        'health':   1,
+        'AI':       'WANDER',
+        'score':    10,
+        'trap_timer_min': 4,
+        'trap_timer_max': 10,
+    },
+    'necromancer':  {
+        'speed':    100,
+        'health':   10,
+        'AI':       'FISH',
+        'score':    30,
+        'attack_timer_min': 5,
+        'attack_timer_max': 10,
+        'attack_type':  'SPIRAL',
+        'sprite_offset':    Vector2(0,-25),
+        'collision_scale':  Vector2(1.5,1.5),
+        'collision_mask_enable':    7
+    },
+    'bee':   {
+        'speed':    600,
+        'health':   1,
+        'AI':       'CHASE',
+        'score':    10,
+    },
+    'skeleton': {
+        'speed':    450,
+        'health':   1,
+        'AI':       'WANDER',
+        'score':    10,
+    },
+    'snake': {
+        'speed':    450,
+        'health':   4,
+        'AI':       'GROUP',
+        'score':    10,
+        'grouped_enemy':  true,
+        'sprite_scale': Vector2(6,6)
+    }
 }
 
 const ENEMY_SPEED_WAVE_PERCENTAGE_MULTIPLIER = 10

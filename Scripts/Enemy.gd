@@ -57,28 +57,34 @@ func spawn_specific(enemy_type_in):
     
     $AnimatedSprite2D.animation = enemy_type + str('-run')
     
-    # TODO: Change this to use JSON as complexity is too much now.
-    
     var enemy_settings = constants.ENEMY_SETTINGS[enemy_type]
-    enemy_speed = enemy_settings[0]
-    enemy_health = enemy_settings[1]
-    ai_mode_setting = enemy_settings[2]
-    enemy_score = enemy_settings[3]
-    attack_timer_min = enemy_settings[4]
-    attack_timer_max = enemy_settings[5]
-    attack_type = enemy_settings[6]
-    trap_timer_min = enemy_settings[7]
-    trap_timer_max = enemy_settings[8]
-    grouped_enemy = enemy_settings[9]
+    enemy_speed = enemy_settings.get('speed')
+    enemy_health = enemy_settings.get('health')
+    ai_mode_setting = enemy_settings.get('AI')
+    enemy_score = enemy_settings.get('score')
+    attack_timer_min = enemy_settings.get('attack_timer_min', 0)
+    attack_timer_max = enemy_settings.get('attack_timer_max', 0)
+    attack_type = enemy_settings.get('attack_type', null)
+    trap_timer_min = enemy_settings.get('trap_timer_min', 0)
+    trap_timer_max = enemy_settings.get('trap_timer_max', 0)
+    grouped_enemy = enemy_settings.get('grouped_enemy', false)
     
-    # Special settings for necromancer.
-    match enemy_type:
-        'necromancer':
-            $AnimatedSprite2D.offset = Vector2(0,-25)
-            $CollisionShape2D.scale = Vector2(1.5, 1.5)
-            set_collision_mask_value(7,true)
-        'snake':
-            $AnimatedSprite2D.scale = Vector2(6,6)
+    var sprite_offset = enemy_settings.get('sprite_offset', null)
+    var sprite_scale = enemy_settings.get('sprite_scale', null)
+    var collision_scale = enemy_settings.get('collision_scale', null)
+    var collision_mask_enable = enemy_settings.get('collision_mask_enable', null)
+    
+    if sprite_offset:
+        $AnimatedSprite2D.offset = sprite_offset
+        
+    if sprite_scale:
+        $AnimatedSprite2D.scale = sprite_scale
+    
+    if collision_scale:
+        $CollisionShape2D.scale = collision_scale
+    
+    if collision_mask_enable:
+        set_collision_mask_value(collision_mask_enable, true)
     
     # Increase enemy speed as waves progress.
     var i=1
