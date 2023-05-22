@@ -21,6 +21,8 @@ config/icon="res://icon.svg"
 constants="*res://Scripts/Constants.gd"
 Storage="*res://Scripts/Storage.gd"
 SteamClient="*res://Scripts/SteamClient.gd"
+Logging="*res://Scripts/Logging.gd"
+TheDirector="*res://Scripts/TheDirector.gd"
 
 [display]
 

@@ -74,8 +74,6 @@ func add_obstacle():
         
         obstacle_size_x = randi_range(constants.ARENA_OBSTACLE_SIZE_MINIMUM, constants.ARENA_OBSTACLE_SIZE_MAXIMUM)
         obstacle_size_y = randi_range(constants.ARENA_OBSTACLE_SIZE_MINIMUM, constants.ARENA_OBSTACLE_SIZE_MAXIMUM)
-
-        print("[OBSTACLE] pos: " + str(obstacle_start_x) + "," + str(obstacle_start_y) + " -- size: " + str(obstacle_size_x) + "," + str(obstacle_size_y))
  
         if !overlapping_obstacle(Vector2i(obstacle_start_x,obstacle_start_y), Vector2i(obstacle_size_x,obstacle_size_y)):
             valid_placement=true
@@ -125,7 +123,6 @@ func overlapping_obstacle(obstacle_pos, obstacle_size):
     for x in range(obstacle_pos.x, obstacle_pos.x+obstacle_size.x):
         for y in range(obstacle_pos.y, obstacle_pos.y+obstacle_size.y): 
             if ObstacleDict.get( Vector2i(x,y), false):
-                print("[OBSTACLE] Overlap detected.")
                 return true
     
     return false
@@ -134,7 +131,6 @@ func conflict_with_obstacle(coords):
     var map_coords = local_to_map(to_local(coords))
     
     if ObstacleDict.get(Vector2i(map_coords.x, map_coords.y)):
-        #print("[conflict_with_obstacle] Conflict found with: " + str(map_coords))
         return true
     else:
         return false

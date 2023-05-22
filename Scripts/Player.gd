@@ -411,8 +411,6 @@ func _physics_process(_delta):
             for i in get_slide_collision_count():
                 var collision = get_slide_collision(i)
                 
-                print("Collision: " + collision.get_collider().name)
-                
                 if collision.get_collider().name == 'Arena':
                     did_collide=true
                     velocity = velocity.slide(collision.get_normal())
@@ -470,6 +468,8 @@ func _player_hit():
         $AudioStreamPlayerHit.play();
         
         get_parent()._reset_score_multiplier()
+
+        get_parent().get_node('HUD').flash_screen_red()
         
         var damage_reduction_percentage = upgrades['ARMOUR'][0] * constants.ARMOUR_DAMAGE_REDUCTION_PERCENTAGE
         var damage_to_perform = constants.PLAYER_HIT_BY_ENEMY_DAMAGE - (( damage_reduction_percentage / 100.0) * constants.PLAYER_HIT_BY_ENEMY_DAMAGE)

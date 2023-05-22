@@ -15,8 +15,6 @@ extends Node
 @export var fish_collected = 0;
 @export var fish_left_this_wave = 0
 @export var game_mode = 'ARCADE'
-@export var wave_special_type = 'STANDARD'
-@export var wave_special_data = ''
 @export var dropped_items_on_screen = 0
 @export var grouped_enemy_id = 0
 
@@ -179,7 +177,9 @@ func start_game():
     prepare_for_wave()     
 
 func prepare_for_wave():
-    wave_number=wave_number+1;
+    wave_number += 1
+    
+    TheDirector.design_wave(wave_number)
     
     $Arena.close_top_door()
     $Arena.open_bottom_door()
@@ -199,7 +199,7 @@ func prepare_for_wave():
     
     $Arena.reset_arena_floor()
     
-    for i in range(1, randi_range(constants.ARENA_OBSTACLE_MINIMUM, constants.ARENA_OBSTACLE_MAXIMUM)):
+    for i in range(1, TheDirector.WaveDesign.get('obstacle_number')):
         $Arena.add_obstacle()
     
     $Player.set_process(true);
@@ -239,22 +239,8 @@ func wave_intro():
     else:
         wave_text = "WAVE " + str(wave_number)
     
-    var spawn_text = ''
-    
-    # Determine if this is a 'special' wave as this will influece things....
-    if wave_number >= constants.ENEMY_SPAWN_WAVE_SPECIAL_MIN_WAVE:
-        var spawn_choice = randi_range(1,100)
-    
-        for spawn_key in constants.ENEMY_SPAWN_WAVE_SPECIAL_CONFIGURATION:
-            if spawn_choice <= spawn_key:
-                wave_special_type = constants.ENEMY_SPAWN_WAVE_SPECIAL_CONFIGURATION[spawn_key][0]
-                wave_special_data = constants.ENEMY_SPAWN_WAVE_SPECIAL_CONFIGURATION[spawn_key][1]
-                spawn_text = constants.ENEMY_SPAWN_WAVE_SPECIAL_CONFIGURATION[spawn_key][2]
+    var spawn_text = TheDirector.WaveDesign.get('spawn_text', '')
                 
-                break
-    else:
-        wave_special_type = 'STANDARD'
-            
     $HUD.get_node("CanvasLayer/Label").text = wave_text
 
     if spawn_text:
@@ -277,7 +263,7 @@ func start_wave():
     dropped_items_on_screen = 0
     
     $ItemSpawnTimer.start(randf_range(constants.ITEM_SPAWN_MINIMUM_SECONDS,constants.ITEM_SPAWN_MAXIMUM_SECONDS));
-    $EnemySpawnTimer.start(constants.ENEMY_REINFORCEMENTS_SPAWN_BASE_SECONDS);
+    $EnemySpawnTimer.start(TheDirector.WaveDesign.get('reinforcements_timer'));
 
     if constants.DEV_SPAWN_ENEMY_COUNT:
         enemies_left_this_wave = constants.DEV_SPAWN_ENEMY_COUNT
@@ -508,8 +494,8 @@ func spawn_enemy_random_position():
     mob.add_to_group('enemyGroup');	
     add_child(mob); 
 
-    if wave_special_type == 'ALL_THE_SAME':
-        mob.spawn_specific(wave_special_data)
+    if TheDirector.WaveDesign.get('wave_special_type') == 'ALL_THE_SAME':
+        mob.spawn_specific(TheDirector.WaveDesign.get('wave_special_data'))
     else:
         mob.spawn_random()
         
@@ -543,8 +529,8 @@ func spawn_enemy_set_position(enemy_position,ai_mode,initial_direction,instant_s
         mob.set_enemy_is_split(true)
         mob.spawn_specific('skeleton')
     else:
-        if wave_special_type == 'ALL_THE_SAME':
-            mob.spawn_specific(wave_special_data)
+        if TheDirector.WaveDesign.get('wave_special_type') == 'ALL_THE_SAME':
+            mob.spawn_specific(TheDirector.WaveDesign.get('wave_special_data'))
         else:
             mob.spawn_random()
         
@@ -618,7 +604,7 @@ func _process(_delta):
                 else:
                     spawn_enemy(enemies_to_spawn,'')
                 
-            $EnemySpawnTimer.start(constants.ENEMY_REINFORCEMENTS_SPAWN_BASE_SECONDS);
+            $EnemySpawnTimer.start(TheDirector.WaveDesign.get('reinforcements_timer'))
             
     if game_status == GAME_OVER:
         if $GameOverTimer.time_left == 0:
@@ -658,7 +644,9 @@ func _on_enemy_update_score(score_to_add,enemy_global_position,death_source,enem
         
     Storage.increase_stat('player', 'enemies_defeated', 1)
     
-    if enemy_type == 'skeleton' && !enemy_is_split:
+    var enemy_details = constants.ENEMY_SETTINGS[enemy_type]
+    
+    if enemy_details.get('spawns_others', false) && !enemy_is_split:
         spawn_enemy_set_position(enemy_global_position, 'SPAWN_OUTWARDS', Vector2(-1,+1).normalized(), true)
         spawn_enemy_set_position(enemy_global_position, 'SPAWN_OUTWARDS', Vector2(+1,+1).normalized(), true)
         spawn_enemy_set_position(enemy_global_position, 'SPAWN_OUTWARDS', Vector2(+1,-1).normalized(), true)

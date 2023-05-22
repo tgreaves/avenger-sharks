@@ -37,22 +37,17 @@ var enemy_group_id
 func _ready():
     pass
     
-func spawn_random():
-    var mob_types
+func spawn_random():    
+    # TODO: This will change to follow the pre-determined patterns in TheDirector.   
+    var dict = TheDirector.WaveDesign['eligible_enemies']
+    enemy_type = dict.keys()[ randi() % dict.size() ]
     
-    # Determine spawn list for this wave.
-    for local_wave_number in constants.ENEMY_SPAWN_WAVE_CONFIGURATION:
-        if get_parent().wave_number >= local_wave_number: 
-            mob_types = constants.ENEMY_SPAWN_WAVE_CONFIGURATION[local_wave_number] 
-
-    enemy_type = mob_types[randi() % mob_types.size()]
     spawn_specific(enemy_type)
 
 func spawn_specific(enemy_type_in):
     enemy_type = enemy_type_in
     
     if constants.DEV_SPAWN_ONE_ENEMY_TYPE and !child_of_enemy:
-        print("[spawn_specific] Forcibly spawning: " + str(constants.DEV_SPAWN_ONE_ENEMY_TYPE))
         enemy_type = constants.DEV_SPAWN_ONE_ENEMY_TYPE
     
     $AnimatedSprite2D.animation = enemy_type + str('-run')
@@ -102,18 +97,15 @@ func spawn_specific(enemy_type_in):
         $SpawnOutwardsTimer.start()
     
     if enemy_is_split:
-        scale = constants.ENEMY_SPLIT_SIZE
-        enemy_speed = enemy_speed * constants.ENEMY_SPLIT_SPEED_MULTIPLIER
+        scale = enemy_settings.get('split_size', Vector2(1.0,1.0))
     
     # 'Grouped' enemy (i.e. snake) handling code.
     if grouped_enemy:
         if child_of_enemy:
             # TO GO HERE: Spawning of child components. 
-            print("[Enemy] This is a child.")
-            print("[Enemy] My parent is: " + str(parent_node))
+            pass
         else:
             # Parent / Head spawning code.
-            print("[Enemy] This is the head.")
             get_parent().grouped_enemy_id = get_parent().grouped_enemy_id + 1
             enemy_group_id = get_parent().grouped_enemy_id
             add_to_group("groupedEnemy-" + str( enemy_group_id ))
@@ -130,9 +122,6 @@ func spawn_specific(enemy_type_in):
                 get_parent().add_child(mob)
                 mob.spawn_specific(enemy_type)
                 
-                print("[Enemy] Group ID: " + str(get_parent().grouped_enemy_id) + " - Child spawned at: " + str(position))
-                
-    
     set_modulate(Color(0,0,0,0));
     hit_to_be_processed = false
     $SpawnParticles.emitting = true
@@ -254,10 +243,12 @@ func _physics_process(delta):
                             desired_velocity = Vector2(randf_range(-1,1), randf_range(-1,1)).normalized() * enemy_speed;
                 
                 # OVERRIDE AI - Always chase the player when wave population is low.   
-                if get_parent().enemies_left_this_wave <= constants.ENEMY_ALL_CHASE_WHEN_POPULATION_LOW:
+                if (    get_parent().enemies_left_this_wave <= constants.ENEMY_ALL_CHASE_WHEN_POPULATION_LOW and 
+                        (!child_of_enemy) and 
+                        constants.ENEMY_SETTINGS[enemy_type].get('chase_at_low_population',true)):
                     var target_direction = (get_parent().get_node("Player").global_position - global_position).normalized();
                     
-                    if (get_parent().enemies_left_this_wave <= constants.ENEMY_ALL_CHASE_WHEN_POPULATION_LOW):
+                    if get_parent().enemies_left_this_wave <= constants.ENEMY_ALL_CHASE_WHEN_POPULATION_LOW:
                         velocity = target_direction * (enemy_speed * constants.ENEMY_SPEED_POPULATION_LOW_MULTIPLIER)
                     else:
                         velocity = target_direction * enemy_speed;
@@ -275,14 +266,14 @@ func _physics_process(delta):
             if $StateTimer.time_left == 0:
                 self.queue_free();
 
+    if state != DYING:
+        if desired_velocity and !child_of_enemy:
+            velocity = velocity.lerp(desired_velocity, 0.01)
     
-    if desired_velocity and !child_of_enemy:
-        velocity = velocity.lerp(desired_velocity, 0.01)
-    
-    if child_of_enemy and state != DYING:
-        # Always move towards my parent, keeping a set distance.
-        var target = parent_node.global_position + ((child_number-1)*50) * parent_node.global_position.direction_to(global_position)
-        global_position = global_position.move_toward(target, 2000 * delta)
+        if child_of_enemy:
+            # Always move towards my parent, keeping a set distance.
+            var target = parent_node.global_position + ((child_number-1)*50) * parent_node.global_position.direction_to(global_position)
+            global_position = global_position.move_toward(target, 2000 * delta)
         
     var collision = move_and_collide(velocity * delta);	
     
@@ -396,49 +387,38 @@ func _death(death_source):
 func grouped_enemy_death():
         var remember_the_parent
     
-        print("[Death] Enemy group ID: " + str(enemy_group_id))
-    
         # What was destroyed?
         if child_of_enemy:
-            print("[Death] Child.")
             # I am a child.
             # We just need to recompute child numbers for everything except the parent.
             var i = 0
             for single_enemy in get_tree().get_nodes_in_group("groupedEnemy-" + str( enemy_group_id )):
                 if single_enemy.name == name:
-                    print("[Death] Skip: It's me.")
                     continue
                     
                 if single_enemy.state == DYING:
-                    print("[Death] Skip: Dying")
                     continue
                     
                 i+=1
                 single_enemy.set_child_number(i)
-                print("[Death] New child number: " + str(i))
         else:
             # I am the parent.
-            print("[Death] Parent")
             var i = 0
              
             for single_enemy in get_tree().get_nodes_in_group("groupedEnemy-" + str( enemy_group_id)):
                 if single_enemy.name == name:
-                    print("[Death] Skip: It's me.")
                     continue
             
                 if single_enemy.state == DYING:
-                    print("[Death] Skip: Dying.")
                     continue  
                         
                 i+=1
                 if i == 1:
                     # Congratulations.  You are the new parent.
-                    print("[Death] NEW PARENT WOOOO")
                     single_enemy.set_child_of_enemy(false)
                     remember_the_parent = single_enemy
                 else:
                     # You are a child.
-                    print("[Death] Child: Set to " + str(i-1))
                     single_enemy.set_child_number(i-1)
                     single_enemy.set_parent_node(remember_the_parent)
                             

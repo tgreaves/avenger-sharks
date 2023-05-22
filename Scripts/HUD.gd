@@ -95,3 +95,10 @@ func update_upgrade_summary():
             sidebar_text += "\n"
         
     $CanvasLayer/UpgradeSummary.text = sidebar_text
+    
+func flash_screen_red():
+    var tween = get_tree().create_tween()
+    tween.tween_property($CanvasLayer/DamageRect, 'visible', true, 0)
+    tween.tween_property($CanvasLayer/DamageRect, "modulate", Color(1,1,1,1), 0.10)
+    tween.tween_property($CanvasLayer/DamageRect, "modulate", Color(0,0,0,0), 0.10)
+    tween.tween_property($CanvasLayer/DamageRect, 'visible', false, 0)

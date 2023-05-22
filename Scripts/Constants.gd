@@ -88,18 +88,19 @@ const ENEMY_REINFORCEMENTS_SPAWN_BATCH_MULTIPLIER = 1
 const ENEMY_REINFORCEMENTS_SPAWN_MINIMUM_NUMBER = 5
 const ENEMY_REINFORCEMENTS_SPAWN_MULTI_PLACEMENT_PERCENTAGE = 50
 
-const ENEMY_SPLIT_SIZE = Vector2(0.75,0.75)
-const ENEMY_SPLIT_SPEED_MULTIPLIER = 1.0
-
 # Enemy (General)
 const ENEMY_SETTINGS = {
     'knight':   {
+        'minimum_wave': 1,
+        'spawn_chance': 1.0,
         'speed':    450,
         'health':   4,
         'AI':       'CHASE',
-        'score':    10,
+        'score':    10
     },
     'wizard':   {
+        'minimum_wave': 1,
+        'spawn_chance': 1.0,
         'speed':    450,
         'health':   1,
         'AI':       'WANDER',
@@ -109,6 +110,8 @@ const ENEMY_SETTINGS = {
         'attack_type':  'STANDARD'
     },
     'rogue':   {
+        'minimum_wave':  2,
+        'spawn_chance': 0.5,
         'speed':    450,
         'health':   1,
         'AI':       'WANDER',
@@ -117,6 +120,8 @@ const ENEMY_SETTINGS = {
         'trap_timer_max': 10,
     },
     'necromancer':  {
+        'minimum_wave': 8,
+        'spawn_chance': 0.1,
         'speed':    100,
         'health':   10,
         'AI':       'FISH',
@@ -129,23 +134,32 @@ const ENEMY_SETTINGS = {
         'collision_mask_enable':    7
     },
     'bee':   {
+        'minimum_wave': 4,
+        'spawn_chance': 0.35,
         'speed':    600,
         'health':   1,
         'AI':       'CHASE',
         'score':    10,
     },
     'skeleton': {
+        'minimum_wave': 3,
+        'spawn_chance': 0.25,
         'speed':    450,
         'health':   1,
         'AI':       'WANDER',
         'score':    10,
+        'spawns_others':    true,
+        'split_size':  Vector2(0.75,0.75) 
     },
     'snake': {
+        'minimum_wave': 7,
+        'spawn_chance': 0.15,
         'speed':    450,
-        'health':   4,
+        'health':   2,
         'AI':       'GROUP',
         'score':    10,
         'grouped_enemy':  true,
+        'chase_at_low_population':  false,
         'sprite_scale': Vector2(6,6)
     }
 }
@@ -163,7 +177,7 @@ const ENEMY_CHASE_REORIENT_MAXIMUM_SECONDS = 1.0;
 const ENEMY_DEFAULT_CHANGE_DIRECTION_MINIMUM_SECONDS = 1;
 const ENEMY_DEFAULT_CHANGE_DIRECTION_MAXIMUM_SECONDS = 3;
 
-const ENEMY_ALL_CHASE_WHEN_POPULATION_LOW = 10
+const ENEMY_ALL_CHASE_WHEN_POPULATION_LOW = -1000   # 10
 
 const ENEMY_TRAP_HEALTH = 10
 

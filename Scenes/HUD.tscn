@@ -306,5 +306,15 @@ theme_override_fonts/font = ExtResource("1_4l55f")
 theme_override_font_sizes/font_size = 32
 vertical_alignment = 2
 
+[node name="DamageRect" type="ColorRect" parent="CanvasLayer"]
+visible = false
+modulate = Color(0, 0, 0, 0)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.411765, 0, 0, 0.686275)
+
 [connection signal="pressed" from="CanvasLayer/UpgradeChoiceContainer/Choice1/Button" to="." method="_on_upgrade_button_pressed" binds= [1]]
 [connection signal="pressed" from="CanvasLayer/UpgradeChoiceContainer/Choice2/Button" to="." method="_on_upgrade_button_pressed" binds= [2]]

@@ -7,6 +7,7 @@
     * Random obstacles can appear within a wave.
 * Graphics:
     * Lighting and Shadow effects.
+    * Red screen flash when player takes damage.
 * Platform:
     * Steam: Client is now formally Steam enabled, including Steam Overlay.
 * Bug fixes:
