@@ -5,6 +5,7 @@
 * Gameplay:
     * New enemy: Snake / Blob: A multi-segment denizen of the dungeons!
     * Random obstacles can appear within a wave.
+    * TheDirector AI implemented for wave / spawn design (much refactoring)
 * Graphics:
     * Lighting and Shadow effects.
     * Red screen flash when player takes damage.

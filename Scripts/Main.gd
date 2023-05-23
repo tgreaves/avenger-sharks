@@ -20,6 +20,7 @@ extends Node
 
 var score = 0;
 var score_multiplier = 1
+var spawn_number = 0
 
 var spawned_items_this_wave = []
 var intro
@@ -265,12 +266,9 @@ func start_wave():
     $ItemSpawnTimer.start(randf_range(constants.ITEM_SPAWN_MINIMUM_SECONDS,constants.ITEM_SPAWN_MAXIMUM_SECONDS));
     $EnemySpawnTimer.start(TheDirector.WaveDesign.get('reinforcements_timer'));
 
-    if constants.DEV_SPAWN_ENEMY_COUNT:
-        enemies_left_this_wave = constants.DEV_SPAWN_ENEMY_COUNT
-        spawn_enemy(constants.DEV_SPAWN_ENEMY_COUNT,'')
-    else:
-        enemies_left_this_wave = (wave_number * constants.ENEMY_MULTIPLIER_AT_WAVE_START) + (wave_number * constants.ENEMY_MULTIPLIER_DURING_WAVE);
-        spawn_enemy(wave_number * constants.ENEMY_MULTIPLIER_AT_WAVE_START, '')   
+    spawn_number=0
+    enemies_left_this_wave = TheDirector.WaveDesign.get('total_enemies')
+    spawn_enemy('start_spawn','spawn_pattern',false)   
 
     # Fish spawning
     if game_mode == 'ARCADE':
@@ -404,30 +402,32 @@ func despawn_all_items():
     for item in get_tree().get_nodes_in_group('itemGroup'):
         item.queue_free()
 
-func spawn_enemy(number_to_spawn, previous_spawn_pattern):
+func spawn_enemy(spawn_to_use,spawn_pattern_to_use,half_spawn_boolean):  
+    var spawn_pattern = TheDirector.WaveDesign.get(spawn_to_use).get(spawn_pattern_to_use)
+    var spawn_array = TheDirector.WaveDesign.get(spawn_to_use).get('spawn_array')
+    var number_to_spawn = spawn_array.size()
+    
+    Logging.log_entry("Spawn pattern lookup to use: " + str(spawn_pattern_to_use))
+    
+    if half_spawn_boolean:
+        Logging.log_entry("half_spawn_boolean detected.")
+        @warning_ignore("integer_division")
+        var spawn_a = int(number_to_spawn/2)
+        var spawn_b = number_to_spawn - spawn_a
         
-    var spawn_choice = 0
-    var spawn_pattern = ''
-    
-    var acceptable_choice = false
-    
-    # If we have been passed the previous_spawn_pattern, do not allow the same pattern to be used
-    # again.
-    while (!acceptable_choice):
-        spawn_choice = randi_range(1,100)
+        if spawn_pattern_to_use == 'spawn_pattern':
+            spawn_array = spawn_array.slice(0, spawn_a)
+        else:
+            spawn_array = spawn_array.slice(spawn_a, spawn_a+spawn_b)
             
-        for spawn_key in constants.ENEMY_SPAWN_PLACEMENT_CONFIGURATION:
-            if spawn_choice <= spawn_key:
-                spawn_pattern = constants.ENEMY_SPAWN_PLACEMENT_CONFIGURATION[spawn_key]
-                break
-                
-        if spawn_pattern != previous_spawn_pattern:
-            acceptable_choice=true
+        number_to_spawn = spawn_array.size()
     
     # If this is the final spawn this wave, AND it is considered a 'low population' spawn, surround the player.
     # Why? Stops the end of the wave being boring with the player having to wait to find the enemies.
     if (enemies_on_screen+number_to_spawn <= constants.ENEMY_ALL_CHASE_WHEN_POPULATION_LOW) && (enemies_left_this_wave <= constants.ENEMY_ALL_CHASE_WHEN_POPULATION_LOW):
         spawn_pattern = 'CIRCLE_SURROUND_PLAYER'
+
+    Logging.log_entry("Pattern: " + str(spawn_pattern))
 
     # Uncomment this to force a spawn pattern for testing.
     #spawn_pattern='RANDOM'
@@ -436,7 +436,7 @@ func spawn_enemy(number_to_spawn, previous_spawn_pattern):
         'RANDOM':
             var i=0
             while (i < number_to_spawn):
-                spawn_enemy_random_position()
+                spawn_enemy_random_position(spawn_array[i])
                 i+=1
         'CIRCLE_SURROUND_PLAYER':
             var i=0
@@ -446,40 +446,40 @@ func spawn_enemy(number_to_spawn, previous_spawn_pattern):
                 var offset = Vector2(sin(angle_rad), cos(angle_rad)) * 600;       
                 var enemy_position = $Player.position + offset
                 
-                spawn_enemy_set_position(enemy_position,'',Vector2(0,0).normalized(), false)
+                spawn_enemy_set_position(spawn_array[i], enemy_position,'',Vector2(0,0).normalized(), false)
                 i+=1
         'HARD_TOP':
             var i=0
             var y_pos = constants.ARENA_SPAWN_MIN_Y
             var x_step = (constants.ARENA_SPAWN_MAX_X - constants.ARENA_SPAWN_MIN_X) / number_to_spawn
             while (i < number_to_spawn):
-                spawn_enemy_set_position(Vector2(constants.ARENA_SPAWN_MIN_X + (i*x_step), y_pos), 'DEFERRED_UNTIL_WALL', Vector2(0,1).normalized(), false)
+                spawn_enemy_set_position(spawn_array[i], Vector2(constants.ARENA_SPAWN_MIN_X + (i*x_step), y_pos), 'DEFERRED_UNTIL_WALL', Vector2(0,1).normalized(), false)
                 i+=1
         'HARD_BOTTOM':
             var i=0
             var y_pos = constants.ARENA_SPAWN_MAX_Y
             var x_step = (constants.ARENA_SPAWN_MAX_X - constants.ARENA_SPAWN_MIN_X) / number_to_spawn
             while (i < number_to_spawn):
-                spawn_enemy_set_position(Vector2(constants.ARENA_SPAWN_MIN_X + (i*x_step), y_pos), 'DEFERRED_UNTIL_WALL', Vector2(0,-1).normalized(), false)
+                spawn_enemy_set_position(spawn_array[i], Vector2(constants.ARENA_SPAWN_MIN_X + (i*x_step), y_pos), 'DEFERRED_UNTIL_WALL', Vector2(0,-1).normalized(), false)
                 i+=1
         'HARD_LEFT':
             var i=0
             var x_pos = constants.ARENA_SPAWN_MIN_X
             var y_step = (constants.ARENA_SPAWN_MAX_Y - constants.ARENA_SPAWN_MIN_Y) / number_to_spawn
             while (i < number_to_spawn):
-                spawn_enemy_set_position(Vector2(x_pos, constants.ARENA_SPAWN_MIN_Y + (i*y_step)), 'DEFERRED_UNTIL_WALL', Vector2(1,0).normalized(), false)
+                spawn_enemy_set_position(spawn_array[i], Vector2(x_pos, constants.ARENA_SPAWN_MIN_Y + (i*y_step)), 'DEFERRED_UNTIL_WALL', Vector2(1,0).normalized(), false)
                 i+=1
         'HARD_RIGHT':
             var i=0
             var x_pos = constants.ARENA_SPAWN_MAX_X
             var y_step = (constants.ARENA_SPAWN_MAX_Y - constants.ARENA_SPAWN_MIN_Y) / number_to_spawn
             while (i < number_to_spawn):
-                spawn_enemy_set_position(Vector2(x_pos, constants.ARENA_SPAWN_MIN_Y + (i*y_step)), 'DEFERRED_UNTIL_WALL', Vector2(-1,0).normalized(), false)
+                spawn_enemy_set_position(spawn_array[i], Vector2(x_pos, constants.ARENA_SPAWN_MIN_Y + (i*y_step)), 'DEFERRED_UNTIL_WALL', Vector2(-1,0).normalized(), false)
                 i+=1
                 
     return spawn_pattern
       
-func spawn_enemy_random_position():
+func spawn_enemy_random_position(enemy_type):
     var mob = enemy_scene.instantiate()
     
     var spawn_position
@@ -494,14 +494,11 @@ func spawn_enemy_random_position():
     mob.add_to_group('enemyGroup');	
     add_child(mob); 
 
-    if TheDirector.WaveDesign.get('wave_special_type') == 'ALL_THE_SAME':
-        mob.spawn_specific(TheDirector.WaveDesign.get('wave_special_data'))
-    else:
-        mob.spawn_random()
+    mob.spawn_specific(enemy_type)
         
     enemies_on_screen+=1
     
-func spawn_enemy_set_position(enemy_position,ai_mode,initial_direction,instant_spawn):
+func spawn_enemy_set_position(enemy_type,enemy_position,ai_mode,initial_direction,instant_spawn):
     enemy_position.x = clamp(enemy_position.x, constants.ARENA_SPAWN_MIN_X, constants.ARENA_SPAWN_MAX_X )        
     enemy_position.y = clamp(enemy_position.y, constants.ARENA_SPAWN_MIN_Y, constants.ARENA_SPAWN_MAX_Y )   
     
@@ -527,12 +524,9 @@ func spawn_enemy_set_position(enemy_position,ai_mode,initial_direction,instant_s
     if instant_spawn:
         mob.set_instant_spawn(true)
         mob.set_enemy_is_split(true)
-        mob.spawn_specific('skeleton')
+        mob.spawn_specific(enemy_type)
     else:
-        if TheDirector.WaveDesign.get('wave_special_type') == 'ALL_THE_SAME':
-            mob.spawn_specific(TheDirector.WaveDesign.get('wave_special_data'))
-        else:
-            mob.spawn_random()
+        mob.spawn_specific(enemy_type)
         
     enemies_on_screen+=1
         
@@ -581,30 +575,21 @@ func _process(_delta):
             spawn_item();
             
         if $EnemySpawnTimer.time_left == 0:
-            if enemies_left_this_wave > enemies_on_screen:
+            if spawn_number < TheDirector.WaveDesign.get('total_spawns'):
+                spawn_number+=1
                 
-                var enemies_to_spawn = constants.ENEMY_REINFORCEMENTS_SPAWN_BATCH_SIZE + (wave_number * constants.ENEMY_REINFORCEMENTS_SPAWN_BATCH_MULTIPLIER)
-                if enemies_to_spawn > enemies_left_this_wave - enemies_on_screen:
-                    enemies_to_spawn = enemies_left_this_wave - enemies_on_screen
-                    
-                var how_many_left_to_spawn = enemies_left_this_wave - (enemies_to_spawn + enemies_on_screen)
+                Logging.log_entry("Reinforcements: Spawn number " + str(spawn_number))
+                var spawn_label = "spawn_" + str(spawn_number)
                 
-                if how_many_left_to_spawn < constants.ENEMY_REINFORCEMENTS_SPAWN_MINIMUM_NUMBER:
-                    enemies_to_spawn += how_many_left_to_spawn
-    
-                # Multi-wave spawn at the same time?
-                if ( randi_range(1,100) <= constants.ENEMY_REINFORCEMENTS_SPAWN_MULTI_PLACEMENT_PERCENTAGE):
-                    @warning_ignore("integer_division")
-                    var spawn_a = int(enemies_to_spawn/2)
-                    var spawn_b = enemies_to_spawn - spawn_a
+                if TheDirector.WaveDesign.get(spawn_label).get('spawn_pattern_b'):
+                    Logging.log_entry("Spawn Pattern B has been detected.")
                     
-                    var first_spawn_result = spawn_enemy(spawn_a,'')
-                    spawn_enemy(spawn_b, first_spawn_result)
-                    
+                    spawn_enemy(spawn_label, 'spawn_pattern', true)
+                    spawn_enemy(spawn_label, 'spawn_pattern_b', true)
                 else:
-                    spawn_enemy(enemies_to_spawn,'')
-                
-            $EnemySpawnTimer.start(TheDirector.WaveDesign.get('reinforcements_timer'))
+                    spawn_enemy(spawn_label, 'spawn_pattern', false)
+                    
+                $EnemySpawnTimer.start(TheDirector.WaveDesign.get('reinforcements_timer'))
             
     if game_status == GAME_OVER:
         if $GameOverTimer.time_left == 0:
@@ -647,10 +632,10 @@ func _on_enemy_update_score(score_to_add,enemy_global_position,death_source,enem
     var enemy_details = constants.ENEMY_SETTINGS[enemy_type]
     
     if enemy_details.get('spawns_others', false) && !enemy_is_split:
-        spawn_enemy_set_position(enemy_global_position, 'SPAWN_OUTWARDS', Vector2(-1,+1).normalized(), true)
-        spawn_enemy_set_position(enemy_global_position, 'SPAWN_OUTWARDS', Vector2(+1,+1).normalized(), true)
-        spawn_enemy_set_position(enemy_global_position, 'SPAWN_OUTWARDS', Vector2(+1,-1).normalized(), true)
-        spawn_enemy_set_position(enemy_global_position, 'SPAWN_OUTWARDS', Vector2(-1,-1).normalized(), true)
+        spawn_enemy_set_position(enemy_type,enemy_global_position, 'SPAWN_OUTWARDS', Vector2(-1,+1).normalized(), true)
+        spawn_enemy_set_position(enemy_type,enemy_global_position, 'SPAWN_OUTWARDS', Vector2(+1,+1).normalized(), true)
+        spawn_enemy_set_position(enemy_type,enemy_global_position, 'SPAWN_OUTWARDS', Vector2(+1,-1).normalized(), true)
+        spawn_enemy_set_position(enemy_type,enemy_global_position, 'SPAWN_OUTWARDS', Vector2(-1,-1).normalized(), true)
         enemies_left_this_wave+=4
     
     if enemies_left_this_wave == 0:

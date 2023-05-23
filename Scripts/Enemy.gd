@@ -37,13 +37,6 @@ var enemy_group_id
 func _ready():
     pass
     
-func spawn_random():    
-    # TODO: This will change to follow the pre-determined patterns in TheDirector.   
-    var dict = TheDirector.WaveDesign['eligible_enemies']
-    enemy_type = dict.keys()[ randi() % dict.size() ]
-    
-    spawn_specific(enemy_type)
-
 func spawn_specific(enemy_type_in):
     enemy_type = enemy_type_in
     
