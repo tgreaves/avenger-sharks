@@ -138,6 +138,7 @@ func main_menu():
     $HUD/CanvasLayer.visible = true
     $HUD/CanvasLayer/UpgradeChoiceContainer.visible = false
     $HUD/CanvasLayer/UpgradeSummary.visible = false
+    $HUD/CanvasLayer/BossHealthBar.visible = false
     $HUD.get_node("CanvasLayer/Score").visible = false;
     $HUD.get_node("CanvasLayer/Label").visible = true;
     $HUD.get_node("CanvasLayer/Label").text = "";
@@ -200,7 +201,7 @@ func prepare_for_wave():
     
     $Arena.reset_arena_floor()
     
-    for i in range(1, TheDirector.WaveDesign.get('obstacle_number')):
+    for i in range(1, TheDirector.WaveDesign.get('obstacle_number', 0)):
         $Arena.add_obstacle()
     
     $Player.set_process(true);
@@ -264,11 +265,15 @@ func start_wave():
     dropped_items_on_screen = 0
     
     $ItemSpawnTimer.start(randf_range(constants.ITEM_SPAWN_MINIMUM_SECONDS,constants.ITEM_SPAWN_MAXIMUM_SECONDS));
-    $EnemySpawnTimer.start(TheDirector.WaveDesign.get('reinforcements_timer'));
+    $EnemySpawnTimer.start(TheDirector.WaveDesign.get('reinforcements_timer', 0));
 
     spawn_number=0
     enemies_left_this_wave = TheDirector.WaveDesign.get('total_enemies')
-    spawn_enemy('start_spawn','spawn_pattern',false)   
+    
+    if TheDirector.WaveDesign.get('boss_wave', false):
+        $HUD.boss_health_reveal()
+    else:
+        spawn_enemy('start_spawn','spawn_pattern',false)   
 
     # Fish spawning
     if game_mode == 'ARCADE':
@@ -575,7 +580,7 @@ func _process(_delta):
             spawn_item();
             
         if $EnemySpawnTimer.time_left == 0:
-            if spawn_number < TheDirector.WaveDesign.get('total_spawns'):
+            if spawn_number < TheDirector.WaveDesign.get('total_spawns', 0):
                 spawn_number+=1
                 
                 Logging.log_entry("Reinforcements: Spawn number " + str(spawn_number))

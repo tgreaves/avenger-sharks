@@ -221,21 +221,23 @@ func _physics_process(_delta):
             for i in get_slide_collision_count():
                 var collision = get_slide_collision(i)
                 var collided_with = collision.get_collider();
+                
+                Logging.log_entry("Player collided..." + str(collision.get_collider().name))
                    
                 if collision.get_collider().name == 'Arena':
-                    break  
+                    break
                     
-                if collision.get_collider().name.contains('Fish'):
-                    collided_with.get_node('.')._death(0);
+                if collision.get_collider().is_in_group('fishGroup'):
+                    collided_with.get_node('.')._death(false);
                     $AudioStreamPlayerGotFish.play();
                     emit_signal('player_got_fish');
                     break
                 
-                if collision.get_collider().name.contains('Dinosaur'):
+                if collision.get_collider().is_in_group('dinosaurGroup'):
                     collided_with.get_node('.')._go_on_a_rampage();
                     break
                 
-                if collision.get_collider().name.contains('Item'):
+                if collision.get_collider().is_in_group('itemGroup'):
                     if collided_with.get_node('.').source == 'DROPPED':
                         get_parent().dropped_items_on_screen = get_parent().dropped_items_on_screen - 1
                     

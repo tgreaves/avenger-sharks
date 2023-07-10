@@ -4,7 +4,7 @@ const GAME_VERSION = "0.5-alpha"
 
 # Developer settings.
 const DEV_SKIP_INTRO = true
-const DEV_START_GAME_IMMEDIATELY = true
+const DEV_START_GAME_IMMEDIATELY = false
 const DEV_STEAM_TESTING = false
 const DEV_SPAWN_ENEMY_COUNT = 0
 const DEV_SPAWN_ONE_ENEMY_TYPE = ''
@@ -53,21 +53,12 @@ const DINOSAUR_ATTACK_SPEED = 800
 const DINOSAUR_SURVIVAL_TIME = 5
 
 # Enemy spawning
-const ENEMY_SPAWN_WAVE_CONFIGURATION = {
-    1:      ['snake', 'knight','wizard'],   
-    2:      ['snake', 'knight','knight','wizard','rogue'],
-    4:      ['knight','knight', 'wizard','wizard', 'rogue', 'skeleton'],
-    6:      ['knight','knight', 'wizard','wizard', 'rogue', 'skeleton', 'bee'],
-    8:      ['knight','knight', 'wizard','wizard', 'rogue', 'skeleton', 'bee', 'necromancer']
-}
-
 const ENEMY_SPAWN_WAVE_SPECIAL_MIN_WAVE = 2
 
 const ENEMY_SPAWN_WAVE_SPECIAL_CONFIGURATION = {
     90:      ['STANDARD', '', ''],
     95:      ['ALL_THE_SAME', 'bee', 'Feel the buzz!'],
-    100:     ['ALL_THE_SAME', 'necromancer', 'The fish become fearful!'],
-    
+    100:     ['ALL_THE_SAME', 'necromancer', 'The fish become fearful!'] 
 }
 
 const ENEMY_SPAWN_PLACEMENT_CONFIGURATION = {
@@ -180,6 +171,9 @@ const ENEMY_DEFAULT_CHANGE_DIRECTION_MAXIMUM_SECONDS = 3;
 const ENEMY_ALL_CHASE_WHEN_POPULATION_LOW = 10
 
 const ENEMY_TRAP_HEALTH = 10
+
+# Boss waves
+const BOSS_WAVE_MULTIPLIER = 1000000
 
 # Fish
 const FISH_TO_SPAWN_ARCADE = 20;

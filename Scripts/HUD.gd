@@ -102,3 +102,12 @@ func flash_screen_red():
     tween.tween_property($CanvasLayer/DamageRect, "modulate", Color(1,1,1,1), 0.10)
     tween.tween_property($CanvasLayer/DamageRect, "modulate", Color(0,0,0,0), 0.10)
     tween.tween_property($CanvasLayer/DamageRect, 'visible', false, 0)
+    
+func boss_health_reveal():
+    $CanvasLayer/BossHealthBar.max_value = TheDirector.WaveDesign.get('boss_health')
+    $CanvasLayer/BossHealthBar.value = 0
+    
+    var tween = get_tree().create_tween()
+    tween.tween_property($CanvasLayer/BossHealthBar, 'value', TheDirector.WaveDesign.get('boss_health'), 2.0)
+    
+    $CanvasLayer/BossHealthBar.visible = true

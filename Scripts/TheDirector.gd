@@ -13,6 +13,11 @@ func design_wave(wave_number):
     spawn_ratios.clear()
     running_chance=0.0
     
+    if wave_number % constants.BOSS_WAVE_MULTIPLIER == 0:
+        Logging.log_entry("Boss wave qualifier.")
+        design_boss_wave(wave_number)
+        return
+        
     # Wave obstacle design.
     WaveDesign['obstacle_number'] = randi_range(constants.ARENA_OBSTACLE_MINIMUM, constants.ARENA_OBSTACLE_MAXIMUM)
     
@@ -156,3 +161,8 @@ func get_spawn_pattern(previous_spawn_pattern):
             acceptable_choice=true
 
     return spawn_pattern
+
+func design_boss_wave(_wave_number):
+    WaveDesign['boss_wave'] = true
+    WaveDesign['boss_health'] = 1000
+    WaveDesign['spawn_text'] = "ALERT! BOSS DETECTED!"

@@ -14,7 +14,7 @@
 * Bug fixes:
     * Music: Would get stuck at 'low health' speed if game abandoned in that state.
 * Misc:
-    * Engine upgrade to Godot 4.0.3.stable.
+    * Engine upgrade to Godot 4.1.stable.
 
 # 0.4-alpha (2023-05-12)
 
