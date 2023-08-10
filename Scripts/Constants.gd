@@ -3,7 +3,7 @@ extends Node
 const GAME_VERSION = "0.5-alpha"
 
 # Developer settings.
-const DEV_SKIP_INTRO = true
+const DEV_SKIP_INTRO = false
 const DEV_START_GAME_IMMEDIATELY = false
 const DEV_STEAM_TESTING = false
 const DEV_SPAWN_ENEMY_COUNT = 0
