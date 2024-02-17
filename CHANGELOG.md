@@ -6,12 +6,14 @@
     * New enemy: Snake / Blob: A multi-segment denizen of the dungeons!
     * Random obstacles can appear within a wave.
     * TheDirector AI implemented for wave / spawn design (much refactoring)
+    * Removed 'The fish become fearful!' Necromancer wave type -- added fresh ones!
 * Graphics:
     * Lighting and Shadow effects.
     * Red screen flash when player takes damage.
 * Platform:
     * Steam: Client is now formally Steam enabled, including Steam Overlay.
 * Bug fixes:
+    * Crash: Fixed a crash when there was a combo of targetting laser / trap / collision.
     * Music: Would get stuck at 'low health' speed if game abandoned in that state.
 * Misc:
     * Godot upgrade to 4.2.1.stable.

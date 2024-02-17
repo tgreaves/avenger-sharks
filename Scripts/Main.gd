@@ -763,9 +763,9 @@ func upgrade_screen():
             if $Player.upgrades[upgrade_one_index][0] < $Player.upgrades[upgrade_one_index][1] and $Player.upgrades[upgrade_two_index][0] < $Player.upgrades[upgrade_two_index][1]:
                 deadlock_solved = true
          
-    # Uncomment to force a certain upgrade to be offered (Testing)       
-    #upgrade_one_index = 'LOOT LOVER'
-       
+    if constants.DEV_FORCE_UPGRADE:
+        upgrade_one_index = constants.DEV_FORCE_UPGRADE
+        
     $HUD/CanvasLayer/UpgradeChoiceContainer/Choice1/TextureRect.texture = load($Player.upgrades[upgrade_one_index][2])
     $HUD/CanvasLayer/UpgradeChoiceContainer/Choice2/TextureRect.texture = load($Player.upgrades[upgrade_two_index][2])
     

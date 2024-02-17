@@ -160,16 +160,19 @@ func get_input():
                 
             $RayCast2D.target_position = shoot_direction*10000
             if $RayCast2D.is_colliding():
-                var line_end_position = $RayCast2D.get_collider().position 
-                
-                # Tilemaps default to (0,0) hit location unless we do something special...
-                if $RayCast2D.get_collider().name == 'Arena':
-                    line_end_position = $RayCast2D.get_collision_point()
-                
-                # Remove existing target.
-                remove_aiming_line()
-                
-                $AimingLine.add_point(to_local(line_end_position) )
+                # Need to do this check as rogue traps were causing invalid index position errors.
+                if $RayCast2D.get_collider():
+                    
+                    var line_end_position = $RayCast2D.get_collider().position 
+                    
+                    # Tilemaps default to (0,0) hit location unless we do something special...
+                    if $RayCast2D.get_collider().name == 'Arena':
+                        line_end_position = $RayCast2D.get_collision_point()
+                    
+                    # Remove existing target.
+                    remove_aiming_line()
+                    
+                    $AimingLine.add_point(to_local(line_end_position) )
             
         else:
             # Remove targetting line when stick not being used.
@@ -389,7 +392,12 @@ func _physics_process(_delta):
             
             if velocity.x < 0:
                 $AnimatedSprite2D.set_flip_h(false);
-              
+            
+            if $HuntingKeyTimer.time_left == 0:
+                Logging.log_entry("HuntingKeyTimer expired.  Assume stuck looking for key.  Force moving.")
+                # FOOBAR
+                position = get_parent().get_node('Key').global_position
+            
             for i in get_slide_collision_count():
                 var collision = get_slide_collision(i)
                 
@@ -399,9 +407,9 @@ func _physics_process(_delta):
                     velocity = target_direction * constants.PLAYER_SPEED_ESCAPING;
                     get_parent().get_node('Arena').get_node('ExitDoor').get_node('CollisionShape2D').disabled = false;
                     emit_signal('player_got_key')
+                    $HuntingDoorTimer.start()
+                    Logging.log_entry("Starting door hunting timer")
         HUNTING_EXIT:
-            #var target_direction = (get_parent().get_node('Arena').get_node('ExitDoor').global_position - global_position).normalized();
-            #velocity = target_direction * constants.PLAYER_SPEED_ESCAPING;
             var did_collide = false
             
             if velocity.x > 0:
@@ -410,6 +418,11 @@ func _physics_process(_delta):
             if velocity.x < 0:
                 $AnimatedSprite2D.set_flip_h(false);
               
+            if $HuntingDoorTimer.time_left == 0:
+                Logging.log_entry("HuntingDoorTimer expired.  Assume stuck looking for exit.  Force moving.")
+                position.x = 2632
+                position.y = 286
+            
             for i in get_slide_collision_count():
                 var collision = get_slide_collision(i)
                 
@@ -421,6 +434,8 @@ func _physics_process(_delta):
                     did_collide=true
                     shark_status = FOUND_EXIT;
                     velocity = Vector2i(0,0)
+                    
+                    Logging.log_entry("DOOR FOUND - position " + str(position.x) + " " + str(position.y))
                     
                     # Open door.
                     get_parent().get_node('Arena').open_top_door()
@@ -507,9 +522,11 @@ func _on_main_player_hunt_key(passed_key_global_position):
     remove_aiming_line()
     
     shark_status = HUNTING_KEY
-    key_global_position = passed_key_global_position;
-    var target_direction = (key_global_position - global_position).normalized();
-    velocity = target_direction * constants.PLAYER_SPEED_ESCAPING;
+    key_global_position = passed_key_global_position
+    var target_direction = (key_global_position - global_position).normalized()
+    velocity = target_direction * constants.PLAYER_SPEED_ESCAPING
+    
+    $HuntingKeyTimer.start()
 
 func _on_main_player_move_to_starting_position():
     shark_status = MOVING_TO_START_POSITION

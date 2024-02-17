@@ -102,8 +102,8 @@ func add_obstacle():
     set_cell(2, Vector2(obstacle_start_x+(obstacle_size_x-1), obstacle_start_y+(obstacle_size_y-1)), 1, Vector2(3,12))
     
     # Set obstacles in ObstacleDict
-    for x in range(obstacle_start_x,obstacle_start_x+obstacle_size_x):
-        for y in range(obstacle_start_y,obstacle_start_y+obstacle_size_y):
+    for x in range(obstacle_start_x-1,obstacle_start_x+obstacle_size_x+1):
+        for y in range(obstacle_start_y-1,obstacle_start_y+obstacle_size_y+1):
             ObstacleDict[Vector2i(x,y)] = true
 
 func reset_arena_floor():
@@ -120,8 +120,8 @@ func reset_obstacle_dictionary():
         ObstacleDict[Vector2i(32,y)] = true
     
 func overlapping_obstacle(obstacle_pos, obstacle_size):
-    for x in range(obstacle_pos.x, obstacle_pos.x+obstacle_size.x):
-        for y in range(obstacle_pos.y, obstacle_pos.y+obstacle_size.y): 
+    for x in range(obstacle_pos.x-1, obstacle_pos.x+obstacle_size.x+1):
+        for y in range(obstacle_pos.y-1, obstacle_pos.y+obstacle_size.y+1): 
             if ObstacleDict.get( Vector2i(x,y), false):
                 return true
     

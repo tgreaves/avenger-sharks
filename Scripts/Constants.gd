@@ -3,11 +3,13 @@ extends Node
 const GAME_VERSION = "0.5-alpha"
 
 # Developer settings.
+const DEV_LOGGING = true
 const DEV_SKIP_INTRO = false
 const DEV_START_GAME_IMMEDIATELY = false
 const DEV_STEAM_TESTING = false
 const DEV_SPAWN_ENEMY_COUNT = 0
 const DEV_SPAWN_ONE_ENEMY_TYPE = ''
+const DEV_FORCE_UPGRADE = ''
 
 # Hardware settings
 const WINDOW_TITLE = "Avenger Sharks " + GAME_VERSION
@@ -21,8 +23,8 @@ const ARENA_SPAWN_MAX_X = 2500 * 2
 const ARENA_SPAWN_MIN_Y = 320
 const ARENA_SPAWN_MAX_Y = 1250 * 2
 
-const ARENA_OBSTACLE_MINIMUM = 5
-const ARENA_OBSTACLE_MAXIMUM = 10
+const ARENA_OBSTACLE_MINIMUM = 3
+const ARENA_OBSTACLE_MAXIMUM = 7
 const ARENA_OBSTACLE_SIZE_MINIMUM = 3
 const ARENA_OBSTACLE_SIZE_MAXIMUM = 5
 
@@ -57,8 +59,10 @@ const ENEMY_SPAWN_WAVE_SPECIAL_MIN_WAVE = 2
 
 const ENEMY_SPAWN_WAVE_SPECIAL_CONFIGURATION = {
     90:      ['STANDARD', '', ''],
-    95:      ['ALL_THE_SAME', 'bee', 'Feel the buzz!'],
-    100:     ['ALL_THE_SAME', 'necromancer', 'The fish become fearful!'] 
+    93:      ['ALL_THE_SAME', 'bee', 'Feel the buzz!'],
+    96:      ['ALL_THE_SAME', 'skeleton', 'Rattling bones approach!'],
+    100:     ['ALL_THE_SAME', 'snake', 'Boing! Boing! Boing!']
+    #100:     ['ALL_THE_SAME', 'necromancer', 'The fish become fearful!'] 
 }
 
 const ENEMY_SPAWN_PLACEMENT_CONFIGURATION = {
@@ -143,7 +147,7 @@ const ENEMY_SETTINGS = {
         'split_size':  Vector2(0.75,0.75) 
     },
     'snake': {
-        'minimum_wave': 7,
+        'minimum_wave': 5,
         'spawn_chance': 0.15,
         'speed':    450,
         'health':   2,
