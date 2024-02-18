@@ -12,12 +12,15 @@
     * Red screen flash when player takes damage.
 * Platform:
     * Steam: Client is now formally Steam enabled, including Steam Overlay.
+    * Steam: Revised store assets to new graphical design.
+    * Itch: Revised store assets to new graphical design.
 * Bug fixes:
     * Crash: Fixed a crash when there was a combo of targetting laser / trap / collision.
     * Music: Would get stuck at 'low health' speed if game abandoned in that state.
 * Misc:
     * Godot upgrade to 4.2.1.stable.
     * GodotSteam upgrade to GDExtension 4.2.
+    * Exclude Store_Assets directory from main Godot project.
 
 # 0.4-alpha (2023-05-12)
 
