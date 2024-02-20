@@ -14,6 +14,7 @@
     * Steam: Client is now formally Steam enabled, including Steam Overlay.
     * Steam: Revised store assets to new graphical design.
     * Itch: Revised store assets to new graphical design.
+    * Itch: Removed web project due to Godot 4 / Mac browser challenges.
 * Bug fixes:
     * Crash: Fixed a crash when there was a combo of targetting laser / trap / collision.
     * Music: Would get stuck at 'low health' speed if game abandoned in that state.

@@ -28,9 +28,9 @@
 # THINGS FOR 0.5-alpha
 
 * LOGO / ASSETS REFRESH
-    * Prompt: "build me a logo for my game called AVENGER SHARKS which should feature a shark that is avenging its friends. It should be of a cartoon style. The shark should not have weapons. It should have an underwater theme. It should have a blue background suitable for chromakey."
-    * Gradient: blue 11
     * Trailer creation and upload
+        * THEY ARE GOING TO NEED A BIGGER BOAT
+        * EPIC MUSIC
     * New screenshots?
     * SOUND: Turn down grenade.
     * POWER UPS LABELS: Handle more than one at a time without overlap.

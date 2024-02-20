@@ -96,6 +96,9 @@ func _ready():
     # Ensure we update high score as this may have been located from storage.
     _on_enemy_update_score_display()
     
+    if constants.DEV_DELAY_ON_START:
+        await get_tree().create_timer(5.0).timeout
+    
     if constants.DEV_SKIP_INTRO:
         main_menu()
     else:
