@@ -29,7 +29,7 @@ func _ready():
     
     $MusicBoxSong.play()
     
-    $StateTimer.start(9.7)
+    $StateTimer.start(9.5)
     $IntroLabelTimer.start(5)
     
     necro_start_position = $Necromancer/NecroSprite.global_position

@@ -34,12 +34,13 @@ signal player_low_energy
 signal player_no_longer_low_energy
 signal player_made_upgrade_choice
 
-var key_global_position;
-var initial_player_position;
+var key_global_position
+var initial_player_position
 var fish_frenzy_enabled = false
 var fish_frenzy_colour
 var item_magnet_enabled = false
 var blink_status = false
+var powerup_labels_being_displayed = 0
 var fire_delay = constants.PLAYER_FIRE_DELAY
 var grenade_delay = constants.PLAYER_GRENADE_DELAY
 
@@ -224,8 +225,6 @@ func _physics_process(_delta):
             for i in get_slide_collision_count():
                 var collision = get_slide_collision(i)
                 var collided_with = collision.get_collider();
-                
-                Logging.log_entry("Player collided..." + str(collision.get_collider().name))
                    
                 if collision.get_collider().name == 'Arena':
                     break
@@ -395,7 +394,6 @@ func _physics_process(_delta):
             
             if $HuntingKeyTimer.time_left == 0:
                 Logging.log_entry("HuntingKeyTimer expired.  Assume stuck looking for key.  Force moving.")
-                # FOOBAR
                 position = get_parent().get_node('Key').global_position
             
             for i in get_slide_collision_count():
@@ -546,6 +544,14 @@ func powerup_label_animation(powerup_name):
     var new_label = $PowerUpLabel.duplicate()
     add_child(new_label)
     
+    powerup_labels_being_displayed += 1
+
+    # Initial position bump if there are multiple animations happening.
+    if powerup_labels_being_displayed > 1:
+        new_label.position.y += -50 * (powerup_labels_being_displayed-1)
+
+    print("NO LABELS = " +str(powerup_labels_being_displayed) + " - position: " + str(new_label.position.y))
+    
     new_label.set_modulate(Color(1,1,1,1));
     new_label.text = powerup_name
     new_label.visible = true
@@ -558,8 +564,17 @@ func powerup_label_animation(powerup_name):
     tween.set_parallel()
     tween.tween_property(new_label, "modulate", Color(0,0,0,0), 2)
     tween.tween_property(new_label, "position", target_position, 2)
+    tween.tween_callback(self.powerup_label_animation_decrease_count).set_delay(1.5)
     tween.tween_callback(new_label.queue_free).set_delay(2)
+ 
+func powerup_label_animation_decrease_count():
+    powerup_labels_being_displayed += -1
     
+    if powerup_labels_being_displayed < 0:
+        powerup_labels_being_displayed = 0
+        
+    print("DECREASE")
+   
 func set_fire_rate_delay_timer():
     $FireRateTimer.start(fire_delay)    
         

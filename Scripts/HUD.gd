@@ -54,7 +54,6 @@ func reset_powerup_bar_durations():
     var duration = int(constants.POWERUP_ACTIVE_DURATION + ((duration_percentage / 100.0) * constants.POWERUP_ACTIVE_DURATION))
                     
     for single_powerup in $CanvasLayer/PowerUpContainer.get_children():
-        single_powerup.visible = false
         single_powerup.get_node('Label/ProgressBar').max_value = duration  
 
 func set_powerup_level(powerup, level):

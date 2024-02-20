@@ -1,5 +1,6 @@
 extends Node
 
+@export var dedication_scene: PackedScene
 @export var intro_scene: PackedScene
 @export var enemy_scene: PackedScene
 @export var fish_scene: PackedScene
@@ -24,6 +25,7 @@ var spawn_number = 0
 
 var spawned_items_this_wave = []
 var intro
+var dedication
 var credits
 var statistics
 var first_game_played = false
@@ -32,6 +34,7 @@ var upgrade_one_index
 var upgrade_two_index
 
 enum {
+    DEDICATION,
     INTRO_SEQUENCE,
     MAIN_MENU,
     CREDITS,
@@ -79,7 +82,7 @@ func _ready():
     
     Storage.load_stats()
     
-    game_status = INTRO_SEQUENCE;
+    game_status = DEDICATION
     
     $Arena.visible = false;
     $HUD/CanvasLayer.visible = false
@@ -102,8 +105,10 @@ func _ready():
     if constants.DEV_SKIP_INTRO:
         main_menu()
     else:
-        intro = intro_scene.instantiate()
-        add_child(intro)
+        #intro = intro_scene.instantiate()
+        #add_child(intro)
+        dedication = dedication_scene.instantiate()
+        add_child(dedication)
        
 func main_menu():
     game_status=MAIN_MENU
@@ -615,6 +620,11 @@ func _input(_ev):
                             
     if Input.is_action_just_released('shark_fire') or Input.is_action_just_released('shark_fire_mouse') or Input.is_action_just_released('quit'):
         match game_status:
+            DEDICATION:
+                dedication.queue_free()
+                intro = intro_scene.instantiate()
+                add_child(intro)
+                game_status = INTRO_SEQUENCE
             INTRO_SEQUENCE:
                 intro.queue_free()
                 main_menu()
@@ -728,6 +738,12 @@ func _on_main_menu_credits_pressed():
     $HUD/CanvasLayer/HighScore.visible = false;
     $Credits/CanvasLayer.visible = true
     $Credits.commence_scroll()
+
+func dedication_has_finished():
+    dedication.queue_free()
+    game_status = INTRO_SEQUENCE
+    intro = intro_scene.instantiate()
+    add_child(intro)
 
 func intro_has_finished():
     intro.queue_free()

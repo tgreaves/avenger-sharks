@@ -27,16 +27,7 @@
 
 # THINGS FOR 0.5-alpha
 
-* LOGO / ASSETS REFRESH
-    * Trailer creation and upload
-        * THEY ARE GOING TO NEED A BIGGER BOAT
-        * EPIC MUSIC
-    * New screenshots?
-    * SOUND: Turn down grenade.
-    * POWER UPS LABELS: Handle more than one at a time without overlap.
-
 * BUG FIXES:
-    * Multiple power-ups same time, stop text overlaying.
 
 * BOSS WAVE
     * Randomly determine boss characteristics.

@@ -30,7 +30,7 @@ func _process(_delta):
     pass
 
 func _input(_ev):
-    if Input.is_action_just_pressed('cheat'):
+    if Input.is_action_just_pressed('cheat') and constants.DEV_ALLOW_CHEATS:
         $CanvasLayer/MainMenuContainer/TitleLabel.text = "CHEAT SHARKS!\n\nBy Tristan Greaves";
         emit_signal("cheats_pressed")
 

@@ -1,6 +1,7 @@
-[gd_scene load_steps=19 format=3 uid="uid://bxw6akrvsd84v"]
+[gd_scene load_steps=20 format=3 uid="uid://bxw6akrvsd84v"]
 
 [ext_resource type="Script" path="res://Scripts/Main.gd" id="1_yyejc"]
+[ext_resource type="PackedScene" uid="uid://dlyr1neald0e4" path="res://Scenes/Dedication.tscn" id="2_utmp5"]
 [ext_resource type="PackedScene" uid="uid://dde3f2uantk5b" path="res://Scenes/Intro.tscn" id="2_vh1q3"]
 [ext_resource type="PackedScene" uid="uid://bkmx1mvtb8dxr" path="res://Scenes/Enemy.tscn" id="3_br4mh"]
 [ext_resource type="PackedScene" uid="uid://18lymhdawjy7" path="res://Scenes/Fish.tscn" id="4_8oyy1"]
@@ -21,6 +22,7 @@
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_yyejc")
+dedication_scene = ExtResource("2_utmp5")
 intro_scene = ExtResource("2_vh1q3")
 enemy_scene = ExtResource("3_br4mh")
 fish_scene = ExtResource("4_8oyy1")

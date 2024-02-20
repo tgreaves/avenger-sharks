@@ -10,6 +10,7 @@
 * Graphics:
     * Lighting and Shadow effects.
     * Red screen flash when player takes damage.
+    * Added 'For Jack and Emilia' dedication page at start.
 * Platform:
     * Steam: Client is now formally Steam enabled, including Steam Overlay.
     * Steam: Revised store assets to new graphical design.
@@ -17,11 +18,15 @@
     * Itch: Removed web project due to Godot 4 / Mac browser challenges.
 * Bug fixes:
     * Crash: Fixed a crash when there was a combo of targetting laser / trap / collision.
+    * Pathing: If player gets stuck on key or exit hunt, teleport them to safety.
+    * UI: MORE POWER upgrade would hide all the upgrade bars.
+    * UI: Powerup floating text now stacks if player picks up several in a short space of time.
     * Music: Would get stuck at 'low health' speed if game abandoned in that state.
 * Misc:
     * Godot upgrade to 4.2.1.stable.
     * GodotSteam upgrade to GDExtension 4.2.
     * Exclude Store_Assets directory from main Godot project.
+    * Explanation mark from title purged.
 
 # 0.4-alpha (2023-05-12)
 
