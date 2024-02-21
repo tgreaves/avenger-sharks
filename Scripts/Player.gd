@@ -34,12 +34,13 @@ signal player_low_energy
 signal player_no_longer_low_energy
 signal player_made_upgrade_choice
 
-var key_global_position;
-var initial_player_position;
+var key_global_position
+var initial_player_position
 var fish_frenzy_enabled = false
 var fish_frenzy_colour
 var item_magnet_enabled = false
 var blink_status = false
+var powerup_labels_being_displayed = 0
 var fire_delay = constants.PLAYER_FIRE_DELAY
 var grenade_delay = constants.PLAYER_GRENADE_DELAY
 
@@ -108,21 +109,10 @@ func get_input():
     var input_direction = Input.get_vector("left", "right", "up", "down")
     velocity = input_direction * speed
     
-    if $FireRateTimer.time_left == 0 && get_parent().game_mode == 'ARCADE':
-        # Keyboard
-        if input_direction && Input.is_action_pressed('shark_fire'):
-            var shark_spray = SharkSprayScene.instantiate();
-            get_parent().add_child(shark_spray);
-            shark_spray.global_position = position;
-            shark_spray.velocity = velocity+(input_direction * constants.PLAYER_FIRE_SPEED)
-            Storage.increase_stat('player','shots_fired',1)
-            
-            mini_shark_fire(input_direction)
-            grenade_fire(input_direction)
-            
-            $AudioStreamPlayerSpray.play()
-            set_fire_rate_delay_timer()
-            
+    #$AnimatedSprite2D.look_at(get_global_mouse_position())
+    #$AnimatedSprite2D.rotation_degrees += 180
+    
+    if $FireRateTimer.time_left == 0 && get_parent().game_mode == 'ARCADE':    
         # Mouse aiming
         if Input.is_action_pressed('shark_fire_mouse'):
             var shark_spray = SharkSprayScene.instantiate();
@@ -171,16 +161,19 @@ func get_input():
                 
             $RayCast2D.target_position = shoot_direction*10000
             if $RayCast2D.is_colliding():
-                var line_end_position = $RayCast2D.get_collider().position 
-                
-                # Tilemaps default to (0,0) hit location unless we do something special...
-                if $RayCast2D.get_collider().name == 'Arena':
-                    line_end_position = $RayCast2D.get_collision_point()
-                
-                # Remove existing target.
-                remove_aiming_line()
-                
-                $AimingLine.add_point(to_local(line_end_position) )
+                # Need to do this check as rogue traps were causing invalid index position errors.
+                if $RayCast2D.get_collider():
+                    
+                    var line_end_position = $RayCast2D.get_collider().position 
+                    
+                    # Tilemaps default to (0,0) hit location unless we do something special...
+                    if $RayCast2D.get_collider().name == 'Arena':
+                        line_end_position = $RayCast2D.get_collision_point()
+                    
+                    # Remove existing target.
+                    remove_aiming_line()
+                    
+                    $AimingLine.add_point(to_local(line_end_position) )
             
         else:
             # Remove targetting line when stick not being used.
@@ -234,19 +227,19 @@ func _physics_process(_delta):
                 var collided_with = collision.get_collider();
                    
                 if collision.get_collider().name == 'Arena':
-                    break  
+                    break
                     
-                if collision.get_collider().name.contains('Fish'):
-                    collided_with.get_node('.')._death(0);
+                if collision.get_collider().is_in_group('fishGroup'):
+                    collided_with.get_node('.')._death(false);
                     $AudioStreamPlayerGotFish.play();
                     emit_signal('player_got_fish');
                     break
                 
-                if collision.get_collider().name.contains('Dinosaur'):
+                if collision.get_collider().is_in_group('dinosaurGroup'):
                     collided_with.get_node('.')._go_on_a_rampage();
                     break
                 
-                if collision.get_collider().name.contains('Item'):
+                if collision.get_collider().is_in_group('itemGroup'):
                     if collided_with.get_node('.').source == 'DROPPED':
                         get_parent().dropped_items_on_screen = get_parent().dropped_items_on_screen - 1
                     
@@ -398,7 +391,11 @@ func _physics_process(_delta):
             
             if velocity.x < 0:
                 $AnimatedSprite2D.set_flip_h(false);
-              
+            
+            if $HuntingKeyTimer.time_left == 0:
+                Logging.log_entry("HuntingKeyTimer expired.  Assume stuck looking for key.  Force moving.")
+                position = get_parent().get_node('Key').global_position
+            
             for i in get_slide_collision_count():
                 var collision = get_slide_collision(i)
                 
@@ -408,39 +405,49 @@ func _physics_process(_delta):
                     velocity = target_direction * constants.PLAYER_SPEED_ESCAPING;
                     get_parent().get_node('Arena').get_node('ExitDoor').get_node('CollisionShape2D').disabled = false;
                     emit_signal('player_got_key')
+                    $HuntingDoorTimer.start()
+                    Logging.log_entry("Starting door hunting timer")
         HUNTING_EXIT:
+            var did_collide = false
+            
             if velocity.x > 0:
                 $AnimatedSprite2D.set_flip_h(true);
             
             if velocity.x < 0:
                 $AnimatedSprite2D.set_flip_h(false);
               
+            if $HuntingDoorTimer.time_left == 0:
+                Logging.log_entry("HuntingDoorTimer expired.  Assume stuck looking for exit.  Force moving.")
+                position.x = 2632
+                position.y = 286
+            
             for i in get_slide_collision_count():
                 var collision = get_slide_collision(i)
                 
+                if collision.get_collider().name == 'Arena':
+                    did_collide=true
+                    velocity = velocity.slide(collision.get_normal())
+                
                 if collision.get_collider().name == 'ExitDoor':  
+                    did_collide=true
                     shark_status = FOUND_EXIT;
                     velocity = Vector2i(0,0)
                     
+                    Logging.log_entry("DOOR FOUND - position " + str(position.x) + " " + str(position.y))
+                    
                     # Open door.
-                    get_parent().get_node('Arena').set_cell(
-                        2,
-                        Vector2(31,2),
-                        -1,
-                        Vector2i(9,7))
-                    
-                    get_parent().get_node('Arena').set_cell(
-                        2,
-                        Vector2(32,2),
-                        -1,
-                        Vector2i(9,7))
-                    
+                    get_parent().get_node('Arena').open_top_door()
                     get_parent().get_node('Arena').get_node('ExitDoor').get_node('CollisionShape2D').disabled = true;
                     
                     emit_signal('player_found_exit_stop_key_movement');
                     shark_status=GOING_THROUGH_DOOR;
                    
-                    $DoorOpenTimer.start()            
+                    $DoorOpenTimer.start()   
+                    
+            if !did_collide:
+                var target_direction = (get_parent().get_node('Arena').get_node('ExitDoor').global_position - global_position).normalized();
+                velocity = target_direction * constants.PLAYER_SPEED_ESCAPING;
+                         
         GOING_THROUGH_DOOR:
                 if $DoorOpenTimer.time_left == 0:
                     var target_direction = (get_parent().get_node('Arena').get_node('ExitLocation').global_position - global_position).normalized();
@@ -457,17 +464,7 @@ func _physics_process(_delta):
         MOVING_TO_START_POSITION:
                 if $DoorCloseTimer.time_left == 0:
                         # Close bottom door.
-                            get_parent().get_node('Arena').set_cell(
-                                2,
-                                Vector2(31,33),
-                                0,
-                                Vector2i(6,6))
-                            
-                            get_parent().get_node('Arena').set_cell(
-                                2,
-                                Vector2(32,33),
-                                0,
-                                Vector2i(7,6))
+                            get_parent().get_node('Arena').close_bottom_door()
             
                 for i in get_slide_collision_count():
                     var collision = get_slide_collision(i)
@@ -486,6 +483,8 @@ func _player_hit():
         $AudioStreamPlayerHit.play();
         
         get_parent()._reset_score_multiplier()
+
+        get_parent().get_node('HUD').flash_screen_red()
         
         var damage_reduction_percentage = upgrades['ARMOUR'][0] * constants.ARMOUR_DAMAGE_REDUCTION_PERCENTAGE
         var damage_to_perform = constants.PLAYER_HIT_BY_ENEMY_DAMAGE - (( damage_reduction_percentage / 100.0) * constants.PLAYER_HIT_BY_ENEMY_DAMAGE)
@@ -521,9 +520,11 @@ func _on_main_player_hunt_key(passed_key_global_position):
     remove_aiming_line()
     
     shark_status = HUNTING_KEY
-    key_global_position = passed_key_global_position;
-    var target_direction = (key_global_position - global_position).normalized();
-    velocity = target_direction * constants.PLAYER_SPEED_ESCAPING;
+    key_global_position = passed_key_global_position
+    var target_direction = (key_global_position - global_position).normalized()
+    velocity = target_direction * constants.PLAYER_SPEED_ESCAPING
+    
+    $HuntingKeyTimer.start()
 
 func _on_main_player_move_to_starting_position():
     shark_status = MOVING_TO_START_POSITION
@@ -543,6 +544,14 @@ func powerup_label_animation(powerup_name):
     var new_label = $PowerUpLabel.duplicate()
     add_child(new_label)
     
+    powerup_labels_being_displayed += 1
+
+    # Initial position bump if there are multiple animations happening.
+    if powerup_labels_being_displayed > 1:
+        new_label.position.y += -50 * (powerup_labels_being_displayed-1)
+
+    print("NO LABELS = " +str(powerup_labels_being_displayed) + " - position: " + str(new_label.position.y))
+    
     new_label.set_modulate(Color(1,1,1,1));
     new_label.text = powerup_name
     new_label.visible = true
@@ -555,8 +564,17 @@ func powerup_label_animation(powerup_name):
     tween.set_parallel()
     tween.tween_property(new_label, "modulate", Color(0,0,0,0), 2)
     tween.tween_property(new_label, "position", target_position, 2)
+    tween.tween_callback(self.powerup_label_animation_decrease_count).set_delay(1.5)
     tween.tween_callback(new_label.queue_free).set_delay(2)
+ 
+func powerup_label_animation_decrease_count():
+    powerup_labels_being_displayed += -1
     
+    if powerup_labels_being_displayed < 0:
+        powerup_labels_being_displayed = 0
+        
+    print("DECREASE")
+   
 func set_fire_rate_delay_timer():
     $FireRateTimer.start(fire_delay)    
         

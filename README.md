@@ -1,4 +1,4 @@
-# avenger-sharks
+# Avenger Sharks
 
 A fun 2D twin-stick shooter. Featuring sharks. OUT FOR VENGEANCE. Powered by [Godot Engine 4](https://godotengine.org/).
 

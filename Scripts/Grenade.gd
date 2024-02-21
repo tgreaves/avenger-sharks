@@ -45,17 +45,13 @@ func _physics_process(_delta):
             
             # Has explosion caught an enemy?
             # Note: Once damage has occured, disable.
-            
             for i in get_slide_collision_count():
                 var collision = get_slide_collision(i)
                 
                 if collision.get_collider().name == 'Arena':
-                    self.queue_free()
                     break;
                     
                 if collision.get_collider().name == 'ExitDoor':
-                    self.queue_free()
                     break;
                 
                 collision.get_collider().get_node('.')._death('PLAYER-SHOT');
-                #$CollisionShape2DExplosion.disabled = true;

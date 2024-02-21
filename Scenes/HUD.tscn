@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://bcqacic7yj4ds"]
+[gd_scene load_steps=6 format=3 uid="uid://bcqacic7yj4ds"]
 
 [ext_resource type="FontFile" uid="uid://dclfn1fjcq5i7" path="res://Fonts/PressStart2P-Regular.ttf" id="1_4l55f"]
 [ext_resource type="Script" path="res://Scripts/HUD.gd" id="1_bwdok"]
@@ -8,6 +8,9 @@ bg_color = Color(0, 0, 0, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bf8k5"]
 bg_color = Color(0.972549, 0.321569, 0.580392, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7hvoe"]
+bg_color = Color(1, 0, 0, 1)
 
 [node name="HUD" type="Control"]
 layout_mode = 3
@@ -305,6 +308,25 @@ grow_vertical = 2
 theme_override_fonts/font = ExtResource("1_4l55f")
 theme_override_font_sizes/font_size = 32
 vertical_alignment = 2
+
+[node name="DamageRect" type="ColorRect" parent="CanvasLayer"]
+visible = false
+modulate = Color(0, 0, 0, 0)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.411765, 0, 0, 0.686275)
+
+[node name="BossHealthBar" type="ProgressBar" parent="CanvasLayer"]
+offset_left = 1061.0
+offset_top = 170.0
+offset_right = 1484.0
+offset_bottom = 231.0
+theme_override_styles/fill = SubResource("StyleBoxFlat_7hvoe")
+value = 50.0
+show_percentage = false
 
 [connection signal="pressed" from="CanvasLayer/UpgradeChoiceContainer/Choice1/Button" to="." method="_on_upgrade_button_pressed" binds= [1]]
 [connection signal="pressed" from="CanvasLayer/UpgradeChoiceContainer/Choice2/Button" to="." method="_on_upgrade_button_pressed" binds= [2]]

@@ -1,4 +1,4 @@
-[gd_scene load_steps=102 format=3 uid="uid://bkmx1mvtb8dxr"]
+[gd_scene load_steps=115 format=3 uid="uid://bkmx1mvtb8dxr"]
 
 [ext_resource type="Script" path="res://Scripts/Enemy.gd" id="1_6udno"]
 [ext_resource type="Texture2D" uid="uid://ps2dg61ty76w" path="res://Sprites/knight-run-sheet.png" id="2_7pnuj"]
@@ -14,6 +14,7 @@
 [ext_resource type="Texture2D" uid="uid://dq57saw2rnqp4" path="res://Sprites/skeleton-death-sheet.png" id="9_bol6a"]
 [ext_resource type="Texture2D" uid="uid://cgfdp5afcmk7x" path="res://Sprites/skeleton-run-sheet.png" id="10_lwsou"]
 [ext_resource type="AudioStream" uid="uid://dmmjjx68g3x6e" path="res://Sound/090035_splatwav-91604.mp3" id="10_o51ug"]
+[ext_resource type="Texture2D" uid="uid://3lrr1x4460rt" path="res://Sprites/slime.png" id="11_077yy"]
 [ext_resource type="Texture2D" uid="uid://blmls1u06ubt2" path="res://Particles/flare_01.png" id="11_irhtg"]
 [ext_resource type="Texture2D" uid="uid://bu65b2r4jrqy7" path="res://Particles/smoke_01.png" id="12_5k78v"]
 [ext_resource type="FontFile" uid="uid://dclfn1fjcq5i7" path="res://Fonts/PressStart2P-Regular.ttf" id="13_r0p1q"]
@@ -297,6 +298,54 @@ region = Rect2(256, 32, 64, 32)
 [sub_resource type="AtlasTexture" id="AtlasTexture_fov3h"]
 atlas = ExtResource("10_lwsou")
 region = Rect2(320, 32, 64, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_awaxy"]
+atlas = ExtResource("11_077yy")
+region = Rect2(0, 128, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7ajbw"]
+atlas = ExtResource("11_077yy")
+region = Rect2(32, 128, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tnf1t"]
+atlas = ExtResource("11_077yy")
+region = Rect2(64, 128, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_icjsq"]
+atlas = ExtResource("11_077yy")
+region = Rect2(96, 128, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4gjcq"]
+atlas = ExtResource("11_077yy")
+region = Rect2(128, 128, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8xjvi"]
+atlas = ExtResource("11_077yy")
+region = Rect2(160, 128, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_wbjsp"]
+atlas = ExtResource("11_077yy")
+region = Rect2(0, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_vgtak"]
+atlas = ExtResource("11_077yy")
+region = Rect2(32, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ydkqc"]
+atlas = ExtResource("11_077yy")
+region = Rect2(64, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_queni"]
+atlas = ExtResource("11_077yy")
+region = Rect2(96, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_e1uow"]
+atlas = ExtResource("11_077yy")
+region = Rect2(128, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_kuelc"]
+atlas = ExtResource("11_077yy")
+region = Rect2(160, 32, 32, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_o1kss"]
 atlas = ExtResource("4_mvkr8")
@@ -615,6 +664,52 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
+"texture": SubResource("AtlasTexture_awaxy")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7ajbw")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_tnf1t")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_icjsq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_4gjcq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8xjvi")
+}],
+"loop": false,
+"name": &"snake-death",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_wbjsp")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_vgtak")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ydkqc")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_queni")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_e1uow")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_kuelc")
+}],
+"loop": true,
+"name": &"snake-run",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
 "texture": SubResource("AtlasTexture_o1kss")
 }, {
 "duration": 1.0,
@@ -679,7 +774,7 @@ shape = SubResource("CapsuleShape2D_brpyb")
 texture_filter = 1
 scale = Vector2(4, 4)
 sprite_frames = SubResource("SpriteFrames_4gmcv")
-animation = &"rogue-death"
+animation = &"snake-death"
 metadata/_aseprite_wizard_config_ = {
 "layer": "",
 "o_ex_p": "",

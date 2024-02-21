@@ -22,18 +22,41 @@
 # User Experience
 
 * How to play
-* Basic options (e.g. full screen and windowed selection)
 
 # Bugs
 
-# THINGS FOR 0.4-alpha
+# THINGS FOR 0.5-alpha
+
+* BUG FIXES:
+
+* BOSS WAVE
+    * Randomly determine boss characteristics.
+    * Energy bar (which zoooooms up to max when it first appears on HUD)
+    * Klaxon, flashing.
+
+* THE DIRECTOR
+    * Controls how the game works.
+    * What makes up a wave?
+        * What types of enemy are eligible to spawn
+            * Define a 'minimum' wave for mob types (where appropriate)
+        * Balance of enemies / maximum number allowed on screen at a time
+            * Define propensity - e.g. 1.0 = standard weighting, 0.5 = half weighting
+        * How many spawn at a time
+        * How are enemies batched?
+        * Speed between spawns
+        * Speed multiplier for enemies(?)
+ 
+* 2ND PLAYER CHARACTER
+    * Bob the Fish?
+        * Faster move speed.
+        * Unlocks with x total collected fish (currency)       
 
 * STATISTICS
     * Ability for user to reset
 
 * ENEMY TYPES
-    * An enemy that leaves a trail that can damage player (Or some form of snake?)
     * An enemy that charges the player
+    * An enemy that lays an egg or drops acid or something else bad.
     * Static turret - probably new Scene to support
         * Rotate during physics.
         * After random timer, charge animation + second timer
@@ -51,7 +74,6 @@
     * Cursed power-ups :D
 
 * WAVE PROGRESSION
-    * Boss level?
     * Choice of which level
     * Palette swaps (different areas) - could use shaders here.
     * Dialogues ?!!! (Try not to boil the ocean)

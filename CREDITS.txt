@@ -1,4 +1,4 @@
-AVENGER SHARKS!
+AVENGER SHARKS
 
 Game Design and Coding
 TRISTAN GREAVES
@@ -26,6 +26,9 @@ https://arks.itch.io/dino-characters
 
 Enemy sprites: Anokolisa's Pixel Crawler pack 
 https://anokolisa.itch.io/dungeon-crawler-pixel-art-asset-pack
+
+Blob sprite: Game-Endeavor
+https://game-endeavor.itch.io/mystic-woods
 
 Necromancer sprite: CreativeKind
 https://creativekind.itch.io/necromancer-free
@@ -59,8 +62,11 @@ https://kenney-assets.itch.io/crosshair-pack
 
 SOUND
 
-Music:
+Game Music:
 https://www.steven-obrien.net/
+
+Trailer Music:
+https://pixabay.com/music/synthwave-on-the-road-to-the-eighties-59sec-177566/
 
 Shark spray: mparsons99
 https://pixabay.com/

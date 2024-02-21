@@ -52,7 +52,7 @@ func _physics_process(_delta):
             if get_parent().get_node('Player').item_magnet_enabled:
                 if distance < 250:
                     var target_direction = (get_parent().get_node("Player").global_position - global_position).normalized();
-                    velocity = target_direction * ( get_parent().get_node("Player").speed + 1000 )
+                    velocity = target_direction * ( get_parent().get_node("Player").speed + 3000 )
 
 func despawn():
     # TODO: Chest should play a different animation, and then spawn text to match item type.

@@ -1,10 +1,17 @@
 extends Node
 
-const GAME_VERSION = "0.4-alpha"
+const GAME_VERSION = "0.5-alpha"
 
 # Developer settings.
+const DEV_DELAY_ON_START = false
+const DEV_LOGGING = false
+const DEV_ALLOW_CHEATS = false
 const DEV_SKIP_INTRO = false
 const DEV_START_GAME_IMMEDIATELY = false
+const DEV_STEAM_TESTING = false
+const DEV_SPAWN_ENEMY_COUNT = 0
+const DEV_SPAWN_ONE_ENEMY_TYPE = ''
+const DEV_FORCE_UPGRADE = ''
 
 # Hardware settings
 const WINDOW_TITLE = "Avenger Sharks " + GAME_VERSION
@@ -14,9 +21,14 @@ const WINDOW_SIZE = Vector2(1920,1080)
 const START_WAVE = 1
 
 const ARENA_SPAWN_MIN_X = 170
-const ARENA_SPAWN_MAX_X = 2600 * 2
+const ARENA_SPAWN_MAX_X = 2500 * 2
 const ARENA_SPAWN_MIN_Y = 320
 const ARENA_SPAWN_MAX_Y = 1250 * 2
+
+const ARENA_OBSTACLE_MINIMUM = 3
+const ARENA_OBSTACLE_MAXIMUM = 7
+const ARENA_OBSTACLE_SIZE_MINIMUM = 3
+const ARENA_OBSTACLE_SIZE_MAXIMUM = 5
 
 const PLAYER_START_GAME_ENERGY = 100
 const PLAYER_START_GAME_ENERGY_CHEATING = 99999
@@ -45,21 +57,14 @@ const DINOSAUR_ATTACK_SPEED = 800
 const DINOSAUR_SURVIVAL_TIME = 5
 
 # Enemy spawning
-const ENEMY_SPAWN_WAVE_CONFIGURATION = {
-    1:      ['knight','wizard'],   
-    2:      ['knight','knight','wizard','rogue'],
-    4:      ['knight','knight', 'wizard','wizard', 'rogue', 'skeleton'],
-    6:      ['knight','knight', 'wizard','wizard', 'rogue', 'skeleton', 'bee'],
-    8:      ['knight','knight', 'wizard','wizard', 'rogue', 'skeleton', 'bee', 'necromancer']
-}
-
 const ENEMY_SPAWN_WAVE_SPECIAL_MIN_WAVE = 2
 
 const ENEMY_SPAWN_WAVE_SPECIAL_CONFIGURATION = {
     90:      ['STANDARD', '', ''],
-    95:      ['ALL_THE_SAME', 'bee', 'Feel the buzz!'],
-    100:     ['ALL_THE_SAME', 'necromancer', 'The fish become fearful!'],
-    
+    93:      ['ALL_THE_SAME', 'bee', 'Feel the buzz!'],
+    96:      ['ALL_THE_SAME', 'skeleton', 'Rattling bones approach!'],
+    100:     ['ALL_THE_SAME', 'snake', 'Boing! Boing! Boing!']
+    #100:     ['ALL_THE_SAME', 'necromancer', 'The fish become fearful!'] 
 }
 
 const ENEMY_SPAWN_PLACEMENT_CONFIGURATION = {
@@ -80,19 +85,80 @@ const ENEMY_REINFORCEMENTS_SPAWN_BATCH_MULTIPLIER = 1
 const ENEMY_REINFORCEMENTS_SPAWN_MINIMUM_NUMBER = 5
 const ENEMY_REINFORCEMENTS_SPAWN_MULTI_PLACEMENT_PERCENTAGE = 50
 
-const ENEMY_SPLIT_SIZE = Vector2(0.75,0.75)
-const ENEMY_SPLIT_SPEED_MULTIPLIER = 1.0
-
 # Enemy (General)
-
 const ENEMY_SETTINGS = {
-    # Enemy:        [ Speed, Health, AI, Score, AttackSpeedMin, AttackSpeedMax, AttackType, TrapMin, TrapMax,
-    'knight':       [ 450,  4,  'CHASE',    10, 0,  0,  '',         0,  0],
-    'wizard':       [ 450,  1,  'WANDER',   10, 3,  5,  'STANDARD', 0,  0],
-    'rogue':        [ 450,  1,  'WANDER',   10, 0,  0,  '',         4,  10],
-    'necromancer':  [ 100,  10, 'FISH',     30, 5,  10, 'SPIRAL',   0,  0 ],
-    'bee':          [ 600,  1,  'CHASE',    10, 0,  0,  '',         0,  0   ],
-    'skeleton':     [ 450,  1,  'WANDER',   10, 0,  0,  '',         0,  0  ]
+    'knight':   {
+        'minimum_wave': 1,
+        'spawn_chance': 1.0,
+        'speed':    450,
+        'health':   4,
+        'AI':       'CHASE',
+        'score':    10
+    },
+    'wizard':   {
+        'minimum_wave': 1,
+        'spawn_chance': 1.0,
+        'speed':    450,
+        'health':   1,
+        'AI':       'WANDER',
+        'score':    10,
+        'attack_timer_min': 3,
+        'attack_timer_max': 5,
+        'attack_type':  'STANDARD'
+    },
+    'rogue':   {
+        'minimum_wave':  2,
+        'spawn_chance': 0.5,
+        'speed':    450,
+        'health':   1,
+        'AI':       'WANDER',
+        'score':    10,
+        'trap_timer_min': 4,
+        'trap_timer_max': 10,
+    },
+    'necromancer':  {
+        'minimum_wave': 8,
+        'spawn_chance': 0.1,
+        'speed':    100,
+        'health':   10,
+        'AI':       'FISH',
+        'score':    30,
+        'attack_timer_min': 5,
+        'attack_timer_max': 10,
+        'attack_type':  'SPIRAL',
+        'sprite_offset':    Vector2(0,-25),
+        'collision_scale':  Vector2(1.5,1.5),
+        'collision_mask_enable':    7
+    },
+    'bee':   {
+        'minimum_wave': 4,
+        'spawn_chance': 0.35,
+        'speed':    600,
+        'health':   1,
+        'AI':       'CHASE',
+        'score':    10,
+    },
+    'skeleton': {
+        'minimum_wave': 3,
+        'spawn_chance': 0.25,
+        'speed':    450,
+        'health':   1,
+        'AI':       'WANDER',
+        'score':    10,
+        'spawns_others':    true,
+        'split_size':  Vector2(0.75,0.75) 
+    },
+    'snake': {
+        'minimum_wave': 5,
+        'spawn_chance': 0.15,
+        'speed':    450,
+        'health':   2,
+        'AI':       'GROUP',
+        'score':    10,
+        'grouped_enemy':  true,
+        'chase_at_low_population':  false,
+        'sprite_scale': Vector2(6,6)
+    }
 }
 
 const ENEMY_SPEED_WAVE_PERCENTAGE_MULTIPLIER = 10
@@ -111,6 +177,9 @@ const ENEMY_DEFAULT_CHANGE_DIRECTION_MAXIMUM_SECONDS = 3;
 const ENEMY_ALL_CHASE_WHEN_POPULATION_LOW = 10
 
 const ENEMY_TRAP_HEALTH = 10
+
+# Boss waves
+const BOSS_WAVE_MULTIPLIER = 1000000
 
 # Fish
 const FISH_TO_SPAWN_ARCADE = 20;

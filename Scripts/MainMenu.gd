@@ -16,6 +16,9 @@ func _ready():
     if OS.has_feature('steam'):
         $CanvasLayer/VersionLabel.text += " (Steam)"
     
+    if constants.DEV_STEAM_TESTING:
+        $CanvasLayer/VersionLabel.text += " (Steam Dev Test)"
+    
     # Disable Statistics and Exit Game for web version.
     if OS.has_feature('web'):
         $CanvasLayer/MainMenuContainer/Statistics.visible = false
@@ -27,7 +30,7 @@ func _process(_delta):
     pass
 
 func _input(_ev):
-    if Input.is_action_just_pressed('cheat'):
+    if Input.is_action_just_pressed('cheat') and constants.DEV_ALLOW_CHEATS:
         $CanvasLayer/MainMenuContainer/TitleLabel.text = "CHEAT SHARKS!\n\nBy Tristan Greaves";
         emit_signal("cheats_pressed")
 

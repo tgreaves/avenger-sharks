@@ -1,5 +1,35 @@
 # Changelog
 
+# 0.5-alpha (2024-02-21)
+
+* Gameplay:
+    * New enemy: Snake / Blob: A multi-segment denizen of the dungeons!
+    * Random obstacles can appear within a wave.
+    * TheDirector AI implemented for wave / spawn design (much refactoring)
+    * Removed 'The fish become fearful!' Necromancer wave type -- added fresh ones!
+* Graphics:
+    * Lighting and Shadow effects.
+    * Red screen flash when player takes damage.
+    * Added 'For Jack and Emilia' dedication page at start.
+* Platform:
+    * Steam: Client is now formally Steam enabled, including Steam Overlay.
+    * Steam: Revised store assets to new graphical design.
+    * Steam: Hide direct itch.io links on CREDITS (Steam policy requirement)
+    * Itch: Revised store assets to new graphical design.
+    * Itch: Removed web project due to Godot 4 / Mac browser challenges.
+* Bug fixes:
+    * Crash: Fixed a crash when there was a combo of targetting laser / trap / collision.
+    * Pathing: If player gets stuck on key or exit hunt, teleport them to safety.
+    * UI: MORE POWER upgrade would hide all the upgrade bars.
+    * UI: Powerup floating text now stacks if player picks up several in a short space of time.
+    * Music: Would get stuck at 'low health' speed if game abandoned in that state.
+    * Credits: Reset scroll when exiting credits screen.
+* Misc:
+    * Godot upgrade to 4.2.1.stable.
+    * GodotSteam upgrade to GDExtension 4.2.
+    * Exclude Store_Assets directory from main Godot project.
+    * Exclamation mark from title purged.
+
 # 0.4-alpha (2023-05-12)
 
 In this release, the gameplay has been sped up to make it more frenetic, combined
