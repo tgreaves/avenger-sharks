@@ -1,5 +1,7 @@
 # Avenger Sharks
 
+![Avenger Sharks Logo](/Store_Assets/avenger-sharks-logo-512x512.png)
+
 A fun 2D twin-stick shooter. Featuring sharks. OUT FOR VENGEANCE. Powered by [Godot Engine 4](https://godotengine.org/).
 
 [CHANGELOG.md](CHANGELOG.md)
@@ -34,7 +36,13 @@ Additional Design and Inspiration: Jack and Emilia Greaves
 
 # Media
 
-![Avenger Sharks screenshot 1](/Images/screenshot-intro.png)
+Click first image to watch the trailer.
 
-![Avenger Sharks screenshot 2](/Images/screenshot-gameplay.png)
+[![Watch the video](https://img.youtube.com/vi/YWCajQrc2XY/hqdefault.jpg)](https://www.youtube.com/embed/<VIDEO_ID>)
+
+![Avenger Sharks screenshot 2](/Store_Assets/screenshot-frenzy.png)
+
+![Avenger Sharks screenshot 1](/Store_Assets/screenshot-gameplay.png)
+
+
 
