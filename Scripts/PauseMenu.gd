@@ -11,6 +11,12 @@ func _ready():
 func _process(_delta):
     pass
 
+func _input(ev):
+    if ev is InputEventKey:
+        DisplayServer.mouse_set_mode(DisplayServer.MOUSE_MODE_HIDDEN)
+    else:
+        DisplayServer.mouse_set_mode(DisplayServer.MOUSE_MODE_VISIBLE)
+
 func _on_unpause_game_pressed():
     emit_signal('unpause_game_pressed')
 
