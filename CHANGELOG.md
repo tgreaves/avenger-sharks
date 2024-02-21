@@ -1,6 +1,6 @@
 # Changelog
 
-# 0.5-alpha
+# 0.5-alpha (2024-02-21)
 
 * Gameplay:
     * New enemy: Snake / Blob: A multi-segment denizen of the dungeons!
@@ -14,6 +14,7 @@
 * Platform:
     * Steam: Client is now formally Steam enabled, including Steam Overlay.
     * Steam: Revised store assets to new graphical design.
+    * Steam: Hide direct itch.io links on CREDITS (Steam policy requirement)
     * Itch: Revised store assets to new graphical design.
     * Itch: Removed web project due to Godot 4 / Mac browser challenges.
 * Bug fixes:
@@ -22,11 +23,12 @@
     * UI: MORE POWER upgrade would hide all the upgrade bars.
     * UI: Powerup floating text now stacks if player picks up several in a short space of time.
     * Music: Would get stuck at 'low health' speed if game abandoned in that state.
+    * Credits: Reset scroll when exiting credits screen.
 * Misc:
     * Godot upgrade to 4.2.1.stable.
     * GodotSteam upgrade to GDExtension 4.2.
     * Exclude Store_Assets directory from main Godot project.
-    * Explanation mark from title purged.
+    * Exclamation mark from title purged.
 
 # 0.4-alpha (2023-05-12)
 

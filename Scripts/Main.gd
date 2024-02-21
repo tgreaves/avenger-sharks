@@ -105,8 +105,6 @@ func _ready():
     if constants.DEV_SKIP_INTRO:
         main_menu()
     else:
-        #intro = intro_scene.instantiate()
-        #add_child(intro)
         dedication = dedication_scene.instantiate()
         add_child(dedication)
        
@@ -732,7 +730,8 @@ func _on_pause_menu_abandon_game_pressed():
     return_to_main_screen();
 
 func _on_main_menu_credits_pressed():
-    game_status = CREDITS;
+    game_status = CREDITS
+    $Credits.prepare_content()
     $MainMenu.get_node("CanvasLayer").visible = false
     $Credits/CanvasLayer/VBoxContainer/ReturnButton.grab_focus()
     $HUD/CanvasLayer/HighScore.visible = false;
