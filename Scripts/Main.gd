@@ -63,6 +63,7 @@ func _ready():
     
     if Engine.has_singleton("Steam") && (OS.has_feature('steam') or constants.DEV_STEAM_TESTING):
         SteamClient.SteamSetup()
+        Steam.overlay_toggled.connect(_on_steam_overlay_toggled)
             
     Storage.load_config()
     
@@ -851,3 +852,6 @@ func _on_options_options_return_button_pressed():
     $MainMenu/CanvasLayer/MainMenuContainer/Options.grab_focus()
     $HUD/CanvasLayer/HighScore.visible = true
     $Options/CanvasLayer.visible = false
+
+func _on_steam_overlay_toggled():
+    Logging.log_entry('Steam overlay called')

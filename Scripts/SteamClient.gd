@@ -21,6 +21,8 @@ func SteamSetup():
     Logging.log_entry("Your steam name: " + str(STEAM_NAME))
     Logging.log_entry("Subscribed: " + str(STEAM_SUBSCRIBED))
     
+    
+    
     if !STEAM_SUBSCRIBED:
         Logging.log_entry("Game not owned.")
         get_tree().quit()

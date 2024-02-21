@@ -1,14 +1,14 @@
 extends Node
 
-const GAME_VERSION = "0.5-alpha"
+const GAME_VERSION = "1.0.0"
 
 # Developer settings.
 const DEV_DELAY_ON_START = false
-const DEV_LOGGING = false
+const DEV_LOGGING = true
 const DEV_ALLOW_CHEATS = false
-const DEV_SKIP_INTRO = false
+const DEV_SKIP_INTRO = true
 const DEV_START_GAME_IMMEDIATELY = false
-const DEV_STEAM_TESTING = false
+const DEV_STEAM_TESTING = true
 const DEV_SPAWN_ENEMY_COUNT = 0
 const DEV_SPAWN_ONE_ENEMY_TYPE = ''
 const DEV_FORCE_UPGRADE = ''
