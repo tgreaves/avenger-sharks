@@ -63,6 +63,9 @@ func _ready():
     
     if Engine.has_singleton("Steam") && (OS.has_feature('steam') or constants.DEV_STEAM_TESTING):
         SteamClient.SteamSetup()
+        Steam.overlay_toggled.connect(_on_steam_overlay_toggled)
+        Steam.input_device_connected.connect(_on_steam_input_device_connected)
+        Steam.input_device_disconnected.connect(_on_steam_input_device_disconnected)
             
     Storage.load_config()
     
@@ -74,6 +77,7 @@ func _ready():
         get_window().size = constants.WINDOW_SIZE
     
     get_window().title = constants.WINDOW_TITLE
+    DisplayServer.mouse_set_mode(DisplayServer.MOUSE_MODE_HIDDEN)
     
     # Set volume levels from config.
     AudioServer.set_bus_volume_db(AudioServer.get_bus_index('Master'), linear_to_db(Storage.Config.get_value('config','master_volume',1.0)))
@@ -177,7 +181,6 @@ func start_game():
     
     if game_mode == 'ARCADE':
         update_enemies_left_display()
-        #DisplayServer.mouse_set_mode(DisplayServer.MOUSE_MODE_HIDDEN)
     else:
         update_fish_left_display()
         $Player.get_node('FishProgressBar').visible = false
@@ -557,6 +560,9 @@ func spawn_fish():
     add_child(mob);
 
 func _process(_delta):
+    if SteamClient.STEAM_RUNNING:
+        Steam.run_callbacks()
+    
     if game_status == WAVE_START:
         if $WaveIntroTimer.time_left == 0:
             start_wave()
@@ -606,7 +612,12 @@ func _process(_delta):
         if $GameOverTimer.time_left == 0:
             return_to_main_screen();
         
-func _input(_ev):
+func _input(ev):
+    if ev is InputEventMouseMotion:
+        DisplayServer.mouse_set_mode(DisplayServer.MOUSE_MODE_VISIBLE)    
+    else:
+        DisplayServer.mouse_set_mode(DisplayServer.MOUSE_MODE_HIDDEN)
+    
     if Input.is_action_just_pressed('start') or Input.is_action_just_pressed('quit'):
         match game_status:
             GAME_RUNNING:
@@ -627,8 +638,7 @@ func _input(_ev):
                 intro.queue_free()
                 main_menu()
             
-func _on_enemy_update_score(score_to_add,enemy_global_position,death_source,enemy_type,enemy_is_split,grouped_enemy_has_died):
-   
+func _on_enemy_update_score(score_to_add,enemy_global_position,death_source,enemy_type,enemy_is_split,grouped_enemy_has_died): 
     if grouped_enemy_has_died:
         enemies_left_this_wave = enemies_left_this_wave - 1
         enemies_on_screen = enemies_on_screen - 1
@@ -851,3 +861,20 @@ func _on_options_options_return_button_pressed():
     $MainMenu/CanvasLayer/MainMenuContainer/Options.grab_focus()
     $HUD/CanvasLayer/HighScore.visible = true
     $Options/CanvasLayer.visible = false
+
+func _on_steam_overlay_toggled(toggled, _user_activated, _user_id):
+    if toggled:
+        # Overlay activated.  If game is being played, invoke pause menu.
+        match game_status:
+            GAME_RUNNING:
+                game_status = GAME_PAUSED;
+                $PauseMenu.get_node('CanvasLayer').visible = true
+                $PauseMenu.set_process_input(true)
+                $PauseMenu._ready()
+                get_tree().paused = true
+
+func _on_steam_input_device_disconnected(input_handle):
+    Logging.log_entry("Input device disconnected: " + str(input_handle))
+    
+func _on_steam_input_device_connected(input_handle):
+    Logging.log_entry("Input device connected: " + str(input_handle))

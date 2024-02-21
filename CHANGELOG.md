@@ -1,5 +1,13 @@
 # Changelog
 
+# 1.0.0 (2024-xx-xx)
+
+* Platform:
+    * Steam: Bringing up Steam Overlay during game automatically pauses.
+* Misc:
+    * UI: Disable TAB key (avoids Steam Overlay weird behaviour)
+    * UI: Hide mouse pointer when mouse is not being used
+
 # 0.5-alpha (2024-02-21)
 
 * Gameplay:
