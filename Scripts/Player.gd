@@ -549,8 +549,6 @@ func powerup_label_animation(powerup_name):
     # Initial position bump if there are multiple animations happening.
     if powerup_labels_being_displayed > 1:
         new_label.position.y += -50 * (powerup_labels_being_displayed-1)
-
-    print("NO LABELS = " +str(powerup_labels_being_displayed) + " - position: " + str(new_label.position.y))
     
     new_label.set_modulate(Color(1,1,1,1));
     new_label.text = powerup_name
@@ -572,8 +570,6 @@ func powerup_label_animation_decrease_count():
     
     if powerup_labels_being_displayed < 0:
         powerup_labels_being_displayed = 0
-        
-    print("DECREASE")
    
 func set_fire_rate_delay_timer():
     $FireRateTimer.start(fire_delay)    

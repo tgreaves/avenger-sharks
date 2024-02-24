@@ -1,6 +1,20 @@
 # Changelog
 
-# 1.0.0 (2024-xx-xx)
+# 1.1.0 (xx-xx-xx)
+
+* Performance:
+    * Use Forward+ renderer from now on (Was: 'Compatibility')
+    * Particle system now defaults to GPU
+    * Remove PointLight2D effects from projectiles as these were having a significant impact.
+* Bug fixes:
+    * UI: Tightened up mouse showing / hiding as appropriate
+* Misc:
+    * Debug menu to keep an eye on performance (toggle modes with F3)
+    * Removed some spurious debug print() statements
+
+# 1.0.0 (2024-02-21)
+
+This is the first public release of Avenger Sharks on Steam.
 
 * Platform:
     * Steam: Bringing up Steam Overlay during game automatically pauses.

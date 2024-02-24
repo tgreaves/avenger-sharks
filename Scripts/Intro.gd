@@ -40,6 +40,7 @@ func _ready():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
+    DisplayServer.mouse_set_mode(DisplayServer.MOUSE_MODE_HIDDEN)
     match state:
         ALL_IS_FINE:
             # Start happy music and set-up title fade.

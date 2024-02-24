@@ -50,6 +50,7 @@ sprite_frames = SubResource("SpriteFrames_btn6d")
 frame_progress = 0.685948
 
 [node name="PointLight2D" type="PointLight2D" parent="."]
+visible = false
 energy = 2.0
 shadow_enabled = true
 texture = ExtResource("7_j38vt")

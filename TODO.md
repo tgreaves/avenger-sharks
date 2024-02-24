@@ -25,10 +25,6 @@
 
 # Bugs
 
-# THINGS FOR 0.5-alpha
-
-* BUG FIXES:
-
 * BOSS WAVE
     * Randomly determine boss characteristics.
     * Energy bar (which zoooooms up to max when it first appears on HUD)

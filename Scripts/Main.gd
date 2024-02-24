@@ -78,6 +78,7 @@ func _ready():
     
     get_window().title = constants.WINDOW_TITLE
     DisplayServer.mouse_set_mode(DisplayServer.MOUSE_MODE_HIDDEN)
+    #Input.mouse_mode = Input.MOUSE_MODE_HIDDEN
     
     # Set volume levels from config.
     AudioServer.set_bus_volume_db(AudioServer.get_bus_index('Master'), linear_to_db(Storage.Config.get_value('config','master_volume',1.0)))
@@ -613,11 +614,12 @@ func _process(_delta):
             return_to_main_screen();
         
 func _input(ev):
-    if ev is InputEventMouseMotion:
-        DisplayServer.mouse_set_mode(DisplayServer.MOUSE_MODE_VISIBLE)    
-    else:
-        DisplayServer.mouse_set_mode(DisplayServer.MOUSE_MODE_HIDDEN)
-    
+    if game_status != INTRO_SEQUENCE and game_status != DEDICATION:
+        if ev is InputEventJoypadButton or ev is InputEventJoypadMotion:
+            DisplayServer.mouse_set_mode(DisplayServer.MOUSE_MODE_HIDDEN)
+        else:
+            DisplayServer.mouse_set_mode(DisplayServer.MOUSE_MODE_VISIBLE)  
+          
     if Input.is_action_just_pressed('start') or Input.is_action_just_pressed('quit'):
         match game_status:
             GAME_RUNNING:

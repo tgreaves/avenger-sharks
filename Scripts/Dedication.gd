@@ -18,6 +18,8 @@ func _ready():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
+    DisplayServer.mouse_set_mode(DisplayServer.MOUSE_MODE_HIDDEN)
+    
     match state:
         FADE_IN:
             if $StateTimer.time_left == 0:
