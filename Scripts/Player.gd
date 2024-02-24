@@ -189,6 +189,9 @@ func get_input():
         $FishFrenzyTimer.start(constants.PLAYER_FISH_FRENZY_DURATION)
         $FishFrenzyFireTimer.start(constants.PLAYER_FISH_FRENZY_FIRE_DELAY)
         
+        if Storage.Config.get_value('config','enable_haptics'):
+            Input.start_joy_vibration(0, 0.25, 0.25, constants.PLAYER_FISH_FRENZY_DURATION)
+        
 func _physics_process(_delta):
     get_input()
     move_and_slide()
@@ -485,6 +488,9 @@ func _player_hit():
         get_parent()._reset_score_multiplier()
 
         get_parent().get_node('HUD').flash_screen_red()
+        
+        if Storage.Config.get_value('config','enable_haptics'):
+            Input.start_joy_vibration(0, 0.5, 0.5, 0.05)
         
         var damage_reduction_percentage = upgrades['ARMOUR'][0] * constants.ARMOUR_DAMAGE_REDUCTION_PERCENTAGE
         var damage_to_perform = constants.PLAYER_HIT_BY_ENEMY_DAMAGE - (( damage_reduction_percentage / 100.0) * constants.PLAYER_HIT_BY_ENEMY_DAMAGE)

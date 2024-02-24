@@ -5,10 +5,11 @@
 * Performance:
     * Use Forward+ renderer from now on (Was: 'Compatibility')
     * Particle system now defaults to GPU
-    * Remove PointLight2D effects from projectiles as these were having a significant impact.
+    * Replace PointLight2D lighting effects from projectiles with Sprite2D equivalent
 * Bug fixes:
     * UI: Tightened up mouse showing / hiding as appropriate
 * Misc:
+    * Haptic feedback added! Vibrates on player hit + shark frenzy.  Turn on in OPTIONS.
     * Debug menu to keep an eye on performance (toggle modes with F3)
     * Removed some spurious debug print() statements
 

@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://0fiq0n7khi4q"]
+[gd_scene load_steps=11 format=3 uid="uid://0fiq0n7khi4q"]
 
 [ext_resource type="Script" path="res://Scripts/EnemyAttack.gd" id="1_bat7h"]
 [ext_resource type="Texture2D" uid="uid://bcecqvxy2vhr7" path="res://Sprites/EnemyAttack/FB500-1.png" id="2_jwdju"]
@@ -34,6 +34,9 @@ animations = [{
 "speed": 5.0
 }]
 
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_pmxfo"]
+blend_mode = 1
+
 [node name="EnemyAttack" type="CharacterBody2D"]
 z_index = 1
 scale = Vector2(0.5, 0.5)
@@ -55,3 +58,10 @@ energy = 2.0
 shadow_enabled = true
 texture = ExtResource("7_j38vt")
 height = 50.0
+
+[node name="LightSprite2D" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0.360784, 0.360784, 0.360784, 1)
+material = SubResource("CanvasItemMaterial_pmxfo")
+scale = Vector2(0.4, 0.4)
+texture = ExtResource("7_j38vt")

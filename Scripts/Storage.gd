@@ -17,6 +17,7 @@ func load_config():
         Config.set_value('config','master_volume',1.0)
         Config.set_value('config','music_volume',1.0)
         Config.set_value('config','effects_volume',1.0)
+        Config.set_value('config','enable_haptics',false)
 
 func save_config():
     if OS.has_feature('web'):

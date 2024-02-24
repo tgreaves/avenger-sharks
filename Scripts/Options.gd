@@ -24,6 +24,11 @@ func build_options_screen():
     $CanvasLayer/OptionsContainer/MusicVolumeContainer/MusicVolumeSetting.value = db_to_linear(AudioServer.get_bus_volume_db(AudioServer.get_bus_index('Music')))
     $CanvasLayer/OptionsContainer/EffectsVolumeContainer/EffectsVolumeSetting.value = db_to_linear(AudioServer.get_bus_volume_db(AudioServer.get_bus_index('Effects')))
 
+    if Storage.Config.get_value('config','enable_haptics'):
+        $CanvasLayer/OptionsContainer/EnableHapticsContainer/EnableHapticsSetting.text = 'ON'
+    else:
+        $CanvasLayer/OptionsContainer/EnableHapticsContainer/EnableHapticsSetting.text = 'OFF'
+
 func _on_return_button_pressed():
     emit_signal('options_return_button_pressed')
 
@@ -54,3 +59,11 @@ func _on_effects_volume_setting_value_changed(value):
     AudioServer.set_bus_volume_db(AudioServer.get_bus_index('Effects'), linear_to_db(value))
     Storage.Config.set_value('config','effects_volume',value)
     get_parent().get_node('Player/AudioStreamPlayerSpray').play()
+
+func _on_enable_haptics_button_pressed():
+    if $CanvasLayer/OptionsContainer/EnableHapticsContainer/EnableHapticsSetting.text == 'ON':
+        $CanvasLayer/OptionsContainer/EnableHapticsContainer/EnableHapticsSetting.text = 'OFF'
+        Storage.Config.set_value('config','enable_haptics', false)
+    else:
+        $CanvasLayer/OptionsContainer/EnableHapticsContainer/EnableHapticsSetting.text = 'ON'
+        Storage.Config.set_value('config','enable_haptics', true)

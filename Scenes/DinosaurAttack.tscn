@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://ch08b0kbbu3je"]
+[gd_scene load_steps=15 format=3 uid="uid://ch08b0kbbu3je"]
 
 [ext_resource type="Script" path="res://Scripts/DinosaurAttack.gd" id="1_w8br7"]
 [ext_resource type="Texture2D" uid="uid://ig2s00164uhd" path="res://Sprites/SharkSpray/Water__01.png" id="2_1wwod"]
@@ -60,6 +60,9 @@ scale_min = 0.1
 scale_max = 0.1
 color_ramp = SubResource("GradientTexture1D_ys4uo")
 
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_m6lul"]
+blend_mode = 1
+
 [node name="DinosaurAttack" type="CharacterBody2D"]
 scale = Vector2(0.5, 0.5)
 collision_layer = 2
@@ -87,3 +90,9 @@ energy = 2.0
 shadow_enabled = true
 texture = ExtResource("8_nq21h")
 height = 50.0
+
+[node name="LightSprite2D" type="Sprite2D" parent="."]
+modulate = Color(0.521141, 0.521141, 0.52114, 1)
+material = SubResource("CanvasItemMaterial_m6lul")
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("8_nq21h")

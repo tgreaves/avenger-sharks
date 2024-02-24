@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://dc1eectou7p5h"]
+[gd_scene load_steps=17 format=3 uid="uid://dc1eectou7p5h"]
 
 [ext_resource type="Script" path="res://Scripts/SharkSpray.gd" id="1_5rkhy"]
 [ext_resource type="Texture2D" uid="uid://ig2s00164uhd" path="res://Sprites/SharkSpray/Water__01.png" id="2_udl16"]
@@ -8,6 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://da60t2goyisif" path="res://Sprites/SharkSpray/Water__05.png" id="6_jjhck"]
 [ext_resource type="Texture2D" uid="uid://ci5knfcfxqxqr" path="res://Particles/dirt_01.png" id="7_e67jq"]
 [ext_resource type="Texture2D" uid="uid://cd3uri86u07f" path="res://Textures/2d_lights_and_shadows_neutral_point_light.webp" id="8_eutac"]
+[ext_resource type="Texture2D" uid="uid://beasenuhd5c5t" path="res://Particles/light_01.png" id="8_tkla2"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_lwg83"]
 radius = 40.0
@@ -40,6 +41,12 @@ animations = [{
 "name": &"default",
 "speed": 10.0
 }]
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_vp1jr"]
+particle_flag_disable_z = true
+gravity = Vector3(0, 98, 0)
+scale_min = 0.2
+scale_max = 0.2
 
 [sub_resource type="Gradient" id="Gradient_2herj"]
 offsets = PackedFloat32Array(0, 0.683333)
@@ -76,6 +83,14 @@ shape = SubResource("CircleShape2D_lwg83")
 sprite_frames = SubResource("SpriteFrames_3lkrx")
 frame_progress = 0.0241135
 
+[node name="LightParticles" type="GPUParticles2D" parent="."]
+visible = false
+scale = Vector2(0.5, 0.5)
+amount = 3
+process_material = SubResource("ParticleProcessMaterial_vp1jr")
+texture = ExtResource("8_tkla2")
+lifetime = 0.1
+
 [node name="GPUParticles2D" type="GPUParticles2D" parent="."]
 amount = 16
 process_material = SubResource("ParticleProcessMaterial_j3kmo")
@@ -92,7 +107,8 @@ shadow_enabled = true
 texture = ExtResource("8_eutac")
 height = 50.0
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
-visible = false
+[node name="LightSprite2D" type="Sprite2D" parent="."]
+modulate = Color(0.521141, 0.521141, 0.52114, 1)
 material = SubResource("CanvasItemMaterial_wl5ro")
+scale = Vector2(0.6, 0.6)
 texture = ExtResource("8_eutac")
