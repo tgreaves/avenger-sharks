@@ -2,6 +2,8 @@
 
 # 1.1.0 (xx-xx-xx)
 
+* Gameplay:
+    * New power-up: A pill that allows your shark to eat the now very scared enemies!
 * Performance:
     * Use Forward+ renderer from now on (Was: 'Compatibility')
     * Particle system now defaults to GPU

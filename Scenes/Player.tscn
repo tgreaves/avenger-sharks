@@ -301,6 +301,14 @@ one_shot = true
 wait_time = 0.5
 one_shot = true
 
+[node name="PowerPelletTimer" type="Timer" parent="."]
+wait_time = 0.5
+one_shot = true
+
+[node name="PowerPelletWarningTimer" type="Timer" parent="."]
+wait_time = 0.25
+one_shot = true
+
 [node name="PlayerExplosionTimer" type="Timer" parent="."]
 wait_time = 2.0
 one_shot = true

@@ -124,6 +124,8 @@ func main_menu():
     if $AudioStreamPlayerMusic.playing == false:
         $AudioStreamPlayerMusic.play(0.6);
  
+    $SharkAttackMusic.stop()
+
     # Ensure music speed is always at normal.
     _on_player_player_no_longer_low_energy()
 
@@ -309,6 +311,11 @@ func wave_end():
     
     game_status = GETTING_KEY;
     
+    if $Player.power_pellet_enabled:
+        $Player.power_pellet_enabled = false
+        $Player.power_pellet_warning_running = false
+        $Player.end_shark_attack()
+    
     $HUD.get_node("CanvasLayer/Label").text = "WAVE COMPLETE!"
     $HUD.get_node("CanvasLayer/Label").visible = true;
     
@@ -409,6 +416,14 @@ func spawn_item():
         item.get_node('.').set_position (spawn_position);
         item.add_to_group('itemGroup')
         add_child(item)
+        
+        # If a power pellet, due to their blinking nature, reset all pellet animations to be in sync.
+        if spawned_item == 'power-pellet':
+            Logging.log_entry("We spawned a power pellet")
+            for single_item in get_tree().get_nodes_in_group('itemGroup'):
+                if single_item.item_type == 'power_pellet':
+                    single_item.get_node('AnimatedSprite2D').stop()
+                    single_item.get_node('AnimatedSprite2D').start()
         
     $ItemSpawnTimer.start(randf_range(constants.ITEM_SPAWN_MINIMUM_SECONDS,constants.ITEM_SPAWN_MAXIMUM_SECONDS));
 

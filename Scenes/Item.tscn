@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://naxhraby3ng2"]
+[gd_scene load_steps=17 format=3 uid="uid://naxhraby3ng2"]
 
 [ext_resource type="Texture2D" uid="uid://bictya3rvolq1" path="res://Sprites/Chest/chest_1.png" id="1_pgdwj"]
 [ext_resource type="Script" path="res://Scripts/Item.gd" id="1_x2ahu"]
@@ -13,6 +13,7 @@
 [ext_resource type="Texture2D" uid="uid://pu8rn5h5q3dl" path="res://Sprites/HealthPotion/flasks_4_2.png" id="10_hg6cm"]
 [ext_resource type="Texture2D" uid="uid://xoyly2ub44lv" path="res://Sprites/HealthPotion/flasks_4_3.png" id="11_drj8x"]
 [ext_resource type="Texture2D" uid="uid://b4r7ob81t42ni" path="res://Sprites/HealthPotion/flasks_4_4.png" id="12_h77gr"]
+[ext_resource type="Texture2D" uid="uid://n1eduxu3bqg5" path="res://Sprites/power-pellet.png" id="14_6wa7k"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_b47ak"]
 radius = 24.35
@@ -69,6 +70,17 @@ animations = [{
 "loop": true,
 "name": &"health-idle",
 "speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("14_6wa7k")
+}, {
+"duration": 1.0,
+"texture": null
+}],
+"loop": true,
+"name": &"power-pellet-idle",
+"speed": 5.0
 }]
 
 [node name="Item" type="CharacterBody2D"]
@@ -83,7 +95,8 @@ texture_filter = 1
 position = Vector2(1, 0)
 scale = Vector2(5, 5)
 sprite_frames = SubResource("SpriteFrames_4771i")
-animation = &"chest-idle"
+animation = &"power-pellet-idle"
+frame_progress = 0.0699882
 
 [node name="DespawnTimer" type="Timer" parent="."]
 one_shot = true

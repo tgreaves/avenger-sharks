@@ -145,10 +145,13 @@ func set_child_number(in_child_number):
     
 func set_enemy_group_id(in_enemy_group_id):
     enemy_group_id = in_enemy_group_id
+    
+func reset_state_timer():
+    $StateTimer.start(0.1)
 
 func _physics_process(delta):
     set_modulate(lerp(get_modulate(), Color(1,1,1,1), 0.02));
-    
+   
     match state:
         SPAWNING:
             velocity = Vector2(0,0);
@@ -176,7 +179,14 @@ func _physics_process(delta):
                 set_modulate(Color(1,1,1,1));
             
             if $StateTimer.time_left == 0:
-                match ai_mode:
+                var ai_mode_to_use = ai_mode
+                if get_parent().get_node("Player").power_pellet_enabled:
+                    ai_mode_to_use = 'RUN_AWAY'
+                    $ScaredParticles.set_emitting(true)
+                else:
+                    $ScaredParticles.set_emitting(false)
+                
+                match ai_mode_to_use:
                     # Keep running until enemy hits a wall.
                     'DEFERRED_UNTIL_WALL':
                         velocity = initial_direction * (enemy_speed * constants.ENEMY_SPEED_DEFERRED_AI_MULTIPLIER)
@@ -193,7 +203,14 @@ func _physics_process(delta):
                         var target_direction = (get_parent().get_node("Player").global_position - global_position).normalized();
                         velocity = target_direction * enemy_speed;
                         $StateTimer.start(randf_range(constants.ENEMY_CHASE_REORIENT_MINIMUM_SECONDS,
-                                                    constants.ENEMY_CHASE_REORIENT_MAXIMUM_SECONDS));
+                                                    constants.ENEMY_CHASE_REORIENT_MAXIMUM_SECONDS))
+                                                    
+                    # Flee the player.
+                    'RUN_AWAY':
+                        var target_direction = (global_position - get_parent().get_node("Player").global_position).normalized();
+                        velocity = target_direction * (enemy_speed / 2);
+                        $StateTimer.start(randf_range(constants.ENEMY_CHASE_REORIENT_MINIMUM_SECONDS,
+                                                    constants.ENEMY_CHASE_REORIENT_MAXIMUM_SECONDS))
                     
                     # 1. Try and eat fish
                     # 2. Pursue player.                            
@@ -238,6 +255,7 @@ func _physics_process(delta):
                 # OVERRIDE AI - Always chase the player when wave population is low.   
                 if (    get_parent().enemies_left_this_wave <= constants.ENEMY_ALL_CHASE_WHEN_POPULATION_LOW and 
                         (!child_of_enemy) and 
+                        (!get_parent().get_node('Player').power_pellet_enabled) and 
                         constants.ENEMY_SETTINGS[enemy_type].get('chase_at_low_population',true)):
                     var target_direction = (get_parent().get_node("Player").global_position - global_position).normalized();
                     
@@ -276,7 +294,7 @@ func _physics_process(delta):
     if velocity.x < 0:
         $AnimatedSprite2D.set_flip_h(true);	
  
-    if $AttackTimer.time_left == 0 && state == WANDER && attack_timer_min:
+    if $AttackTimer.time_left == 0 && state == WANDER && attack_timer_min && (!get_parent().get_node('Player').power_pellet_enabled):
         match attack_type:
             'STANDARD':
                 var enemy_attack = EnemyAttackScene.instantiate()

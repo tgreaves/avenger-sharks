@@ -6,8 +6,8 @@ const GAME_VERSION = "1.1.0-beta"
 const DEV_DELAY_ON_START = false
 const DEV_LOGGING = true
 const DEV_ALLOW_CHEATS = false
-const DEV_SKIP_INTRO = false
-const DEV_START_GAME_IMMEDIATELY = false
+const DEV_SKIP_INTRO = true
+const DEV_START_GAME_IMMEDIATELY = true
 const DEV_STEAM_TESTING = false
 const DEV_SPAWN_ENEMY_COUNT = 0
 const DEV_SPAWN_ONE_ENEMY_TYPE = ''
@@ -189,7 +189,8 @@ const GET_FISH_SCORE = 50;
 const FISH_TO_TRIGGER_FISH_FRENZY = 15
 
 # Items
-const ARCADE_SPAWNING_ITEMS = ['dinosaur']
+#const ARCADE_SPAWNING_ITEMS = ['dinosaur','dinosaur','dinosaur','power-pellet']
+const ARCADE_SPAWNING_ITEMS = ['power-pellet']
 const PACIFIST_SPAWNING_ITEMS = ['health']
 
 const ITEM_SPAWN_MINIMUM_SECONDS = 10
@@ -209,6 +210,7 @@ const POWERUP_GRENADE_MAX_LEVEL = 3
 const POWERUP_MINISHARK_MAX_LEVEL = 3
 
 const POWERUP_ACTIVE_DURATION = 10
+const POWER_PELLET_ACTIVE_DURATION = 10
 
 # Upgrades
 const ARMOUR_DAMAGE_REDUCTION_PERCENTAGE = 10

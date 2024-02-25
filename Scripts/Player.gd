@@ -40,6 +40,8 @@ var fish_frenzy_enabled = false
 var fish_frenzy_colour
 var item_magnet_enabled = false
 var blink_status = false
+var power_pellet_enabled = false
+var power_pellet_warning_running = false
 var powerup_labels_being_displayed = 0
 var fire_delay = constants.PLAYER_FIRE_DELAY
 var grenade_delay = constants.PLAYER_GRENADE_DELAY
@@ -79,6 +81,8 @@ func prepare_for_new_game():
     fire_delay = constants.PLAYER_FIRE_DELAY
     spray_size = 0.5
     fish_frenzy_enabled = false
+    power_pellet_enabled = false
+    $AnimatedSprite2D.set_modulate(Color(1, 1, 1, 1))
     
     for single_powerup in max_powerup_levels:
         current_powerup_levels[single_powerup] = 0
@@ -217,6 +221,27 @@ func _physics_process(_delta):
     
     match shark_status:
         ALIVE:
+            if power_pellet_enabled:
+                if $PowerPelletTimer.time_left == 0:
+                    power_pellet_enabled = false
+                    power_pellet_warning_running = false
+                    end_shark_attack()
+                else:
+                    # Start 'Running out' blinking timer
+                    if $PowerPelletTimer.time_left < 2 and !power_pellet_warning_running:
+                        Logging.log_entry("Started warning timer")
+                        $PowerPelletWarningTimer.start()
+                        power_pellet_warning_running = true
+            
+                # Alternate normal / red shark colour as timer is running out.
+                if power_pellet_warning_running and $PowerPelletWarningTimer.time_left == 0:
+                    if $AnimatedSprite2D.get_modulate() == Color(1,1,1,1):
+                        $AnimatedSprite2D.set_modulate(Color(1, 0, 0, 1))
+                    else:
+                        $AnimatedSprite2D.set_modulate(Color(1, 1, 1, 1))
+                    
+                    $PowerPelletWarningTimer.start()
+            
             if velocity.x > 0:
                 $AnimatedSprite2D.set_flip_h(true);
             
@@ -306,7 +331,22 @@ func _physics_process(_delta):
                             get_parent().get_node('HUD').activate_powerup(powerup_selected)
                             get_parent().get_node('HUD').set_powerup_level(powerup_selected, current_powerup_levels[powerup_selected])
                             $AudioStreamPowerUp.play()
-                        
+                        "power-pellet":
+                            Logging.log_entry("Collected pellet")
+                            $PowerPelletTimer.start(constants.POWER_PELLET_ACTIVE_DURATION)
+                            powerup_label_animation('TIME FOR DINNER!')
+                            power_pellet_enabled = true
+                            power_pellet_warning_running = false
+                            get_parent().get_node('AudioStreamPlayerMusic').set_stream_paused(true)
+                            get_parent().get_node('SharkAttackMusic').play()
+                            
+                            # BLOOD THIRSTY
+                            $AnimatedSprite2D.set_modulate(Color(1, 0, 0, 1))
+                            
+                            # Force direction change
+                            for single_enemy in get_tree().get_nodes_in_group('enemyGroup'):
+                                single_enemy.reset_state_timer()
+                                                  
                     collided_with.get_node('.').despawn()
                 
                     break
@@ -480,7 +520,7 @@ func _player_hit():
     if shark_status != ALIVE:
         return
     
-    if $PlayerHitGracePeriodTimer.time_left == 0:
+    if (!power_pellet_enabled) and $PlayerHitGracePeriodTimer.time_left == 0:
     
         $PlayerHitGracePeriodTimer.start();
         $AudioStreamPlayerHit.play();
@@ -736,3 +776,12 @@ func is_player_alive():
 func remove_aiming_line():
     if $AimingLine.get_point_count() > 1:
         $AimingLine.remove_point(1)
+        
+func end_shark_attack():
+    $AnimatedSprite2D.set_modulate(Color(1, 1, 1, 1))
+    get_parent().get_node('SharkAttackMusic').stop()
+    get_parent().get_node('AudioStreamPlayerMusic').set_stream_paused(false)
+                
+    for single_enemy in get_tree().get_nodes_in_group('enemyGroup'):
+        single_enemy.reset_state_timer()
+    
