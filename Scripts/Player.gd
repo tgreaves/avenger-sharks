@@ -529,7 +529,7 @@ func _player_hit():
 
         get_parent().get_node('HUD').flash_screen_red()
         
-        if Storage.Config.get_value('config','enable_haptics'):
+        if Storage.Config.get_value('config','enable_haptics',false):
             Input.start_joy_vibration(0, 0.5, 0.5, 0.05)
         
         var damage_reduction_percentage = upgrades['ARMOUR'][0] * constants.ARMOUR_DAMAGE_REDUCTION_PERCENTAGE

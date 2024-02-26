@@ -5,15 +5,17 @@
 * Gameplay:
     * New power-up: A pill that allows your shark to eat the now very scared enemies!
 * Performance:
-    * Use Forward+ renderer from now on (Was: 'Compatibility')
-    * Particle system now defaults to GPU
-    * Replace PointLight2D lighting effects from projectiles with Sprite2D equivalent
+    * FPS generally improved as follows...
+        * Use Forward+ renderer from now on (Was: 'Compatibility').
+        * Particle system now defaults to GPU.
+        * Replace PointLight2D lighting effects from projectiles with Sprite2D equivalent.
 * Bug fixes:
     * UI: Tightened up mouse showing / hiding as appropriate
 * Misc:
     * Haptic feedback added! Vibrates on player hit + shark frenzy.  Turn on in OPTIONS.
-    * Debug menu to keep an eye on performance (toggle modes with F3)
-    * Removed some spurious debug print() statements
+    * Improved alignment of death animations.
+    * Debug menu to keep an eye on performance (toggle modes with F3).
+    * Removed some spurious debug print() statements.
 
 # 1.0.0 (2024-02-21)
 

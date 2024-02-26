@@ -10,7 +10,7 @@ const DEV_SKIP_INTRO = true
 const DEV_START_GAME_IMMEDIATELY = true
 const DEV_STEAM_TESTING = false
 const DEV_SPAWN_ENEMY_COUNT = 0
-const DEV_SPAWN_ONE_ENEMY_TYPE = ''
+const DEV_SPAWN_ONE_ENEMY_TYPE = 'skeleton'
 const DEV_FORCE_UPGRADE = ''
 
 # Hardware settings
@@ -93,7 +93,8 @@ const ENEMY_SETTINGS = {
         'speed':    450,
         'health':   4,
         'AI':       'CHASE',
-        'score':    10
+        'score':    10,
+        'death_sprite_offset':  Vector2(5,0)
     },
     'wizard':   {
         'minimum_wave': 1,
@@ -104,7 +105,8 @@ const ENEMY_SETTINGS = {
         'score':    10,
         'attack_timer_min': 3,
         'attack_timer_max': 5,
-        'attack_type':  'STANDARD'
+        'attack_type':  'STANDARD',
+        'death_sprite_offset':  Vector2(10,0)
     },
     'rogue':   {
         'minimum_wave':  2,
@@ -146,7 +148,9 @@ const ENEMY_SETTINGS = {
         'AI':       'WANDER',
         'score':    10,
         'spawns_others':    true,
-        'split_size':  Vector2(0.75,0.75) 
+        'split_size':  Vector2(0.75,0.75),
+        'death_sprite_offset':  Vector2(0,-5)
+        
     },
     'snake': {
         'minimum_wave': 5,

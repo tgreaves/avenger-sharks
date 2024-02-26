@@ -20,6 +20,7 @@ var attack_timer_max
 var attack_type
 var trap_timer_min
 var trap_timer_max
+var death_sprite_offset
 var stored_modulate;
 var hit_to_be_processed;
 var ai_mode = ''
@@ -61,6 +62,8 @@ func spawn_specific(enemy_type_in):
     var sprite_scale = enemy_settings.get('sprite_scale', null)
     var collision_scale = enemy_settings.get('collision_scale', null)
     var collision_mask_enable = enemy_settings.get('collision_mask_enable', null)
+    
+    death_sprite_offset = enemy_settings.get('death_sprite_offset', null)
     
     if sprite_offset:
         $AnimatedSprite2D.offset = sprite_offset
@@ -368,6 +371,16 @@ func _death(death_source):
             $CollisionShape2D.set_deferred("disabled", true)
             velocity = Vector2(0,0);
             $AnimatedSprite2D.animation = enemy_type + str('-death');
+            
+            if death_sprite_offset:
+                var temp_offset_x = death_sprite_offset.x
+                var temp_offset_y = death_sprite_offset.y
+                    
+                if $AnimatedSprite2D.is_flipped_h():
+                    temp_offset_x = -temp_offset_x
+                    
+                $AnimatedSprite2D.offset = Vector2(temp_offset_x, temp_offset_y)                    
+
             $AnimatedSprite2D.play()
             $AudioStreamPlayer.play();
             $StateTimer.start(2);
