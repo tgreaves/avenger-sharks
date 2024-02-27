@@ -10,8 +10,9 @@ const DEV_SKIP_INTRO = true
 const DEV_START_GAME_IMMEDIATELY = true
 const DEV_STEAM_TESTING = false
 const DEV_SPAWN_ENEMY_COUNT = 0
-const DEV_SPAWN_ONE_ENEMY_TYPE = 'skeleton'
+const DEV_SPAWN_ONE_ENEMY_TYPE = ''
 const DEV_FORCE_UPGRADE = ''
+const DEV_WAVE_LASTS_FOREVER = false
 
 # Hardware settings
 const WINDOW_TITLE = "Avenger Sharks " + GAME_VERSION
@@ -56,6 +57,12 @@ const DINOSAUR_ATTACK_DELAY = 0.5
 const DINOSAUR_ATTACK_SPEED = 800
 const DINOSAUR_SURVIVAL_TIME = 5
 
+const ARTILLERY_MINIMUM_WAVE = 1
+const ARTILLERY_MINIMUM_TIME = 5
+const ARTILLERY_MAXIMUM_TIME = 10
+const ARTILLERY_WARNING_TIME = 5
+const ARTILLERY_CHASE_SPEED = 3
+
 # Enemy spawning
 const ENEMY_SPAWN_WAVE_SPECIAL_MIN_WAVE = 2
 
@@ -65,6 +72,11 @@ const ENEMY_SPAWN_WAVE_SPECIAL_CONFIGURATION = {
     96:      ['ALL_THE_SAME', 'skeleton', 'Rattling bones approach!'],
     100:     ['ALL_THE_SAME', 'snake', 'Boing! Boing! Boing!']
     #100:     ['ALL_THE_SAME', 'necromancer', 'The fish become fearful!'] 
+}
+
+const ENEMY_SPAWN_PLACEMENT_CONFIGURATION_WAVE_START = {
+    50:     'RANDOM',
+    100:    'CIRCLE_SURROUND_PLAYER'
 }
 
 const ENEMY_SPAWN_PLACEMENT_CONFIGURATION = {
@@ -150,7 +162,6 @@ const ENEMY_SETTINGS = {
         'spawns_others':    true,
         'split_size':  Vector2(0.75,0.75),
         'death_sprite_offset':  Vector2(0,-5)
-        
     },
     'snake': {
         'minimum_wave': 5,
@@ -182,6 +193,11 @@ const ENEMY_ALL_CHASE_WHEN_POPULATION_LOW = 10
 
 const ENEMY_TRAP_HEALTH = 10
 
+const ENEMY_CALL_FOR_HELP_MINIMUM_TIME = 2.0
+const ENEMY_CALL_FOR_HELP_MAXIMUM_TIME = 3.0
+const ENEMY_CALL_FOR_HELP_PERCENTAGE = 20
+const ENEMY_CALL_FOR_HELP_PHRASES = [ "HELP!", "DON'T EAT ME!", "NOOOOO!"]
+
 # Boss waves
 const BOSS_WAVE_MULTIPLIER = 1000000
 
@@ -193,8 +209,8 @@ const GET_FISH_SCORE = 50;
 const FISH_TO_TRIGGER_FISH_FRENZY = 15
 
 # Items
-#const ARCADE_SPAWNING_ITEMS = ['dinosaur','dinosaur','dinosaur','power-pellet']
-const ARCADE_SPAWNING_ITEMS = ['power-pellet']
+const ARCADE_SPAWNING_ITEMS = ['dinosaur','dinosaur','power-pellet','power-pellet']
+#const ARCADE_SPAWNING_ITEMS = ['power-pellet']
 const PACIFIST_SPAWNING_ITEMS = ['health']
 
 const ITEM_SPAWN_MINIMUM_SECONDS = 10

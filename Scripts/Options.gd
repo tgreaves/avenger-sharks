@@ -24,7 +24,7 @@ func build_options_screen():
     $CanvasLayer/OptionsContainer/MusicVolumeContainer/MusicVolumeSetting.value = db_to_linear(AudioServer.get_bus_volume_db(AudioServer.get_bus_index('Music')))
     $CanvasLayer/OptionsContainer/EffectsVolumeContainer/EffectsVolumeSetting.value = db_to_linear(AudioServer.get_bus_volume_db(AudioServer.get_bus_index('Effects')))
 
-    if Storage.Config.get_value('config','enable_haptics'):
+    if Storage.Config.get_value('config','enable_haptics', false):
         $CanvasLayer/OptionsContainer/EnableHapticsContainer/EnableHapticsSetting.text = 'ON'
     else:
         $CanvasLayer/OptionsContainer/EnableHapticsContainer/EnableHapticsSetting.text = 'OFF'

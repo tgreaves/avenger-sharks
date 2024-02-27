@@ -8,6 +8,7 @@ extends Node
 @export var credits_scene: PackedScene
 @export var item_scene: PackedScene
 @export var statistics_scene: PackedScene
+@export var artillery_scene: PackedScene
 @export var game_status = INTRO_SEQUENCE
 @export var cheat_mode = false
 @export var wave_number = 1
@@ -60,6 +61,8 @@ signal player_update_fish
 # Called when the node enters the scene tree for the first time.
 func _ready():
     randomize()
+    
+    $ArtilleryTimer.connect('timeout', _on_artillery_timer)
     
     if Engine.has_singleton("Steam") && (OS.has_feature('steam') or constants.DEV_STEAM_TESTING):
         SteamClient.SteamSetup()
@@ -302,6 +305,10 @@ func start_wave():
         update_enemies_left_display()
     else:
         update_fish_left_display()
+        
+    # Artillery
+    if wave_number >= constants.ARTILLERY_MINIMUM_WAVE:
+        $ArtilleryTimer.start(randf_range(constants.ARTILLERY_MINIMUM_TIME, constants.ARTILLERY_MAXIMUM_TIME))
 
 func wave_end():
     
@@ -309,7 +316,7 @@ func wave_end():
     if !$Player.is_player_alive():
         return
     
-    game_status = GETTING_KEY;
+    game_status = GETTING_KEY
     
     if $Player.power_pellet_enabled:
         $Player.power_pellet_enabled = false
@@ -323,6 +330,7 @@ func wave_end():
         enemy_trap.queue_free()
     
     despawn_all_items()
+    $ArtilleryTimer.stop()
     
     # Auto send player to get the key.
     emit_signal('player_hunt_key', $Key.global_position);
@@ -336,6 +344,9 @@ func wave_end():
         
     for dinosaur in get_tree().get_nodes_in_group('dinosaurGroup'):
         dinosaur.queue_free()
+        
+    for artillery in get_tree().get_nodes_in_group('artilleryGroup'):
+        artillery.queue_free()
     
 func wave_end_cleanup():
         
@@ -381,6 +392,10 @@ func return_to_main_screen():
     for dinosaur in get_tree().get_nodes_in_group('dinosaurGroup'):
         dinosaur.queue_free()
         
+    for artillery in get_tree().get_nodes_in_group('artilleryGroup'):
+        artillery.queue_free()
+        
+    $ArtilleryTimer.stop()
     despawn_all_items()
     
     Storage.save_stats()
@@ -591,7 +606,7 @@ func _process(_delta):
             prepare_for_wave()
     
     if game_status == GAME_RUNNING:
-        if enemies_left_this_wave == 0:
+        if enemies_left_this_wave == 0 && !constants.DEV_WAVE_LASTS_FOREVER:
             wave_end();
             
         if fish_left_this_wave == 0 && game_mode == 'PACIFIST':
@@ -894,3 +909,19 @@ func _on_steam_input_device_disconnected(input_handle):
     
 func _on_steam_input_device_connected(input_handle):
     Logging.log_entry("Input device connected: " + str(input_handle))
+    
+func _on_artillery_timer():
+    var mob = artillery_scene.instantiate();
+    
+    var spawn_position
+    
+    #spawn_position = Vector2(randf_range(constants.ARENA_SPAWN_MIN_X,constants.ARENA_SPAWN_MAX_X),randf_range(constants.ARENA_SPAWN_MIN_Y,constants.ARENA_SPAWN_MAX_Y))
+      
+    spawn_position = Vector2(randf_range($Player.position.x-200, $Player.position.x+200), randf_range($Player.position.y-200, $Player.position.y+200))
+    
+    mob.get_node('.').set_position (spawn_position);
+    mob.add_to_group('artilleryGroup');	
+    add_child(mob, true);
+    
+    $ArtilleryTimer.start(randf_range(constants.ARTILLERY_MINIMUM_TIME, constants.ARTILLERY_MAXIMUM_TIME))
+

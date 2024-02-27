@@ -864,6 +864,9 @@ one_shot = true
 wait_time = 0.05
 one_shot = true
 
+[node name="CallForHelpTimer" type="Timer" parent="."]
+wait_time = 2.0
+
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("8_wxbp6")
 bus = &"Effects"
@@ -881,4 +884,15 @@ offset_bottom = -65.0
 theme_override_fonts/font = ExtResource("13_r0p1q")
 theme_override_font_sizes/font_size = 32
 text = "POWER UP!"
+horizontal_alignment = 1
+
+[node name="HelpMeLabel" type="Label" parent="."]
+visible = false
+offset_left = -348.0
+offset_top = -150.0
+offset_right = 361.0
+offset_bottom = -115.0
+theme_override_fonts/font = ExtResource("13_r0p1q")
+theme_override_font_sizes/font_size = 32
+text = "HELP!"
 horizontal_alignment = 1

@@ -49,9 +49,12 @@ func _physics_process(_delta):
                 var collision = get_slide_collision(i)
                 
                 if collision.get_collider().name == 'Arena':
-                    break;
+                    break
                     
                 if collision.get_collider().name == 'ExitDoor':
-                    break;
+                    break
+                    
+                if collision.get_collider().name.contains('Artillery'):
+                    break
                 
                 collision.get_collider().get_node('.')._death('PLAYER-SHOT');

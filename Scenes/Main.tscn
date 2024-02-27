@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://bxw6akrvsd84v"]
+[gd_scene load_steps=22 format=3 uid="uid://bxw6akrvsd84v"]
 
 [ext_resource type="Script" path="res://Scripts/Main.gd" id="1_yyejc"]
 [ext_resource type="PackedScene" uid="uid://dlyr1neald0e4" path="res://Scenes/Dedication.tscn" id="2_utmp5"]
@@ -10,6 +10,7 @@
 [ext_resource type="PackedScene" uid="uid://naxhraby3ng2" path="res://Scenes/Item.tscn" id="7_vsrs7"]
 [ext_resource type="PackedScene" uid="uid://bp6cf18pjw2bc" path="res://Scenes/Statistics.tscn" id="8_jsswd"]
 [ext_resource type="Texture2D" uid="uid://dyxji31lsvmml" path="res://Images/UnderwaterFantasy/far.png" id="9_uabo0"]
+[ext_resource type="PackedScene" uid="uid://dlmd0wgbama0g" path="res://Scenes/Artillery.tscn" id="10_p4xnb"]
 [ext_resource type="Texture2D" uid="uid://b11pog2gr6q20" path="res://Images/UnderwaterFantasy/foregound-merged.png" id="10_p7nrg"]
 [ext_resource type="PackedScene" uid="uid://ds5km1djhril" path="res://Scenes/Arena.tscn" id="11_cdl54"]
 [ext_resource type="PackedScene" uid="uid://bcqacic7yj4ds" path="res://Scenes/HUD.tscn" id="12_ldcme"]
@@ -31,6 +32,7 @@ dinosaur_scene = ExtResource("5_sw27h")
 credits_scene = ExtResource("6_epeem")
 item_scene = ExtResource("7_vsrs7")
 statistics_scene = ExtResource("8_jsswd")
+artillery_scene = ExtResource("10_p4xnb")
 
 [node name="UnderwaterFar" type="TextureRect" parent="."]
 visible = false
@@ -95,6 +97,8 @@ one_shot = true
 
 [node name="EnemySpawnTimer" type="Timer" parent="."]
 one_shot = true
+
+[node name="ArtilleryTimer" type="Timer" parent="."]
 
 [node name="AudioStreamPlayerMusic" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("17_mh5cd")

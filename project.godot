@@ -195,6 +195,7 @@ back={
 2d_physics/layer_6="items"
 2d_physics/layer_7="fish"
 2d_physics/layer_8="dinosaur"
+2d_physics/layer_9="artillery"
 
 [rendering]
 

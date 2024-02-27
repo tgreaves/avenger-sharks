@@ -34,9 +34,10 @@ var child_number
 var desired_velocity
 var parent_node
 var enemy_group_id
+var call_for_help_timer_label
 
 func _ready():
-    pass
+    $CallForHelpTimer.connect('timeout', _on_call_for_help_timer_timeout)
     
 func spawn_specific(enemy_type_in):
     enemy_type = enemy_type_in
@@ -151,6 +152,12 @@ func set_enemy_group_id(in_enemy_group_id):
     
 func reset_state_timer():
     $StateTimer.start(0.1)
+    
+func stop_calling_for_help():    
+    $CallForHelpTimer.stop()
+    
+    if call_for_help_timer_label and is_instance_valid(call_for_help_timer_label):
+        call_for_help_timer_label.hide()
 
 func _physics_process(delta):
     set_modulate(lerp(get_modulate(), Color(1,1,1,1), 0.02));
@@ -483,8 +490,40 @@ func score_label_animation(label_text):
     tween.tween_property(new_label, "position", target_position, 2)
     tween.tween_callback(new_label.queue_free).set_delay(2)
     
+func help_me_label_animation(label_text):
+    var new_label = $HelpMeLabel.duplicate()
+    add_child(new_label)
+    
+    # Keep track so we can quickly remove it upon end of shark attack.
+    call_for_help_timer_label = new_label
+    
+    new_label.set_modulate(Color(1,1,1,1));
+    new_label.text = label_text
+    new_label.visible = true
+    
+    # Text should move upwards slightly.
+    var target_position = new_label.position
+    target_position.y += -50
+    
+    var tween = get_tree().create_tween()
+    tween.set_parallel()
+    tween.tween_property(new_label, "modulate", Color(0,0,0,0), 2)
+    tween.tween_property(new_label, "position", target_position, 2)
+    tween.tween_callback(new_label.queue_free).set_delay(2)
+    
 func is_enemy_alive():
     if state == WANDER:
         return true
     else:
         return false
+
+func consider_calling_for_help():
+    $CallForHelpTimer.set_wait_time( randf_range(0.1, 0.4))
+    $CallForHelpTimer.start()
+    
+func _on_call_for_help_timer_timeout():
+    
+    $CallForHelpTimer.set_wait_time(randf_range(constants.ENEMY_CALL_FOR_HELP_MINIMUM_TIME, constants.ENEMY_CALL_FOR_HELP_MAXIMUM_TIME))
+    
+    if randi_range(0,100) <= constants.ENEMY_CALL_FOR_HELP_PERCENTAGE:
+        help_me_label_animation( constants.ENEMY_CALL_FOR_HELP_PHRASES[randi() % constants.ENEMY_CALL_FOR_HELP_PHRASES.size()] )

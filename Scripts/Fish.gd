@@ -3,6 +3,7 @@ extends CharacterBody2D
 enum {
     ACTIVE,
     DESPAWNING,
+    SWIM_TO_SCORE,
     INTRO_WANDER,
     INTRO_SWIM_TO_NECROMANCER,
     INTRO_AT_NECROMANCER
@@ -35,7 +36,20 @@ func _physics_process(delta):
             
         DESPAWNING:
             if $StateTimer.time_left == 0:
-                queue_free();  
+                queue_free()
+        SWIM_TO_SCORE:
+            if $StateTimer.time_left == 0:
+                queue_free()
+                
+            var target_position = get_parent().get_node('HUD').get_node('CanvasLayer').get_node('Score').global_position
+            
+            if global_position.distance_to(target_position) < 20:
+                queue_free()
+            
+            var target_direction = (target_position - global_position).normalized()
+            velocity = target_direction * 5000
+            var _collision = move_and_collide(velocity * delta)
+            
         INTRO_WANDER:
             if velocity.x > 0:
                 $AnimatedSprite2D.set_flip_h(false);
@@ -62,7 +76,6 @@ func _physics_process(delta):
             
             # Forcibly stop when 'close enough' to target to prevent jitter.
             if global_position.distance_to(target_position) < 2:
-                #state = INTRO_SWIM_TO_NECROMANCER
                 return
             
             var target_direction = (target_position - global_position).normalized()
@@ -75,16 +88,19 @@ func _physics_process(delta):
             pass
 
 func _death(blood):
+    Logging.log_entry("FISH _death")
+    
     $CollisionShape2D.set_deferred("disabled", true)
-    $AnimatedSprite2D.hide();
+    #$AnimatedSprite2D.hide();
     remove_from_group('fishGroup');
+    
+    $StateTimer.start(1)
     
     if blood:
         $AnimatedSprite2DDamaged.play();
         state = DESPAWNING;
-        $StateTimer.start(1)
     else:
-        queue_free()
+        state = SWIM_TO_SCORE
         
 func set_intro_mode():
     state = INTRO_WANDER

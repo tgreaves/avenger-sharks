@@ -193,7 +193,7 @@ func get_input():
         $FishFrenzyTimer.start(constants.PLAYER_FISH_FRENZY_DURATION)
         $FishFrenzyFireTimer.start(constants.PLAYER_FISH_FRENZY_FIRE_DELAY)
         
-        if Storage.Config.get_value('config','enable_haptics'):
+        if Storage.Config.get_value('config','enable_haptics',false):
             Input.start_joy_vibration(0, 0.25, 0.25, constants.PLAYER_FISH_FRENZY_DURATION)
         
 func _physics_process(_delta):
@@ -345,6 +345,7 @@ func _physics_process(_delta):
                             
                             # Force direction change
                             for single_enemy in get_tree().get_nodes_in_group('enemyGroup'):
+                                single_enemy.consider_calling_for_help()
                                 single_enemy.reset_state_timer()
                                                   
                     collided_with.get_node('.').despawn()
@@ -784,4 +785,5 @@ func end_shark_attack():
                 
     for single_enemy in get_tree().get_nodes_in_group('enemyGroup'):
         single_enemy.reset_state_timer()
+        single_enemy.stop_calling_for_help()
     

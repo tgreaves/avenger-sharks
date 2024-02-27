@@ -79,7 +79,7 @@ func design_wave(wave_number):
     Logging.log_entry("Number of enemies to spawn at start: " + str(number_to_spawn_at_start))
     WaveDesign['start_spawn'] = {}
     WaveDesign['start_spawn']['spawn_array'] = get_random_enemies(number_to_spawn_at_start)
-    WaveDesign['start_spawn']['spawn_pattern'] = get_spawn_pattern('')
+    WaveDesign['start_spawn']['spawn_pattern'] = get_spawn_pattern(constants.ENEMY_SPAWN_PLACEMENT_CONFIGURATION_WAVE_START, '')
     
     # Now subsequent waves.
     left_to_spawn = left_to_spawn - number_to_spawn_at_start
@@ -100,11 +100,11 @@ func design_wave(wave_number):
         
         if ( randi_range(1,100) <= constants.ENEMY_REINFORCEMENTS_SPAWN_MULTI_PLACEMENT_PERCENTAGE):
             WaveDesign[spawn_key]['spawn_array'] = get_random_enemies(enemies_to_spawn)
-            WaveDesign[spawn_key]['spawn_pattern'] = get_spawn_pattern('')
-            WaveDesign[spawn_key]['spawn_pattern_b'] = get_spawn_pattern(WaveDesign[spawn_key]['spawn_pattern'])
+            WaveDesign[spawn_key]['spawn_pattern'] = get_spawn_pattern(constants.ENEMY_SPAWN_PLACEMENT_CONFIGURATION, '')
+            WaveDesign[spawn_key]['spawn_pattern_b'] = get_spawn_pattern(constants.ENEMY_SPAWN_PLACEMENT_CONFIGURATION, WaveDesign[spawn_key]['spawn_pattern'])
         else:
             WaveDesign[spawn_key]['spawn_array'] = get_random_enemies(enemies_to_spawn)
-            WaveDesign[spawn_key]['spawn_pattern'] = get_spawn_pattern('')
+            WaveDesign[spawn_key]['spawn_pattern'] = get_spawn_pattern(constants.ENEMY_SPAWN_PLACEMENT_CONFIGURATION,'')
     
         left_to_spawn = left_to_spawn - enemies_to_spawn
         
@@ -143,7 +143,7 @@ func get_random_enemies(number_enemies):
         
     return spawn_array
     
-func get_spawn_pattern(previous_spawn_pattern):
+func get_spawn_pattern(enemy_spawn_placement_configuration, previous_spawn_pattern):
     var acceptable_choice = false
     var spawn_pattern
     
@@ -152,9 +152,9 @@ func get_spawn_pattern(previous_spawn_pattern):
     while (!acceptable_choice):
         var spawn_choice = randi_range(1,100)
             
-        for spawn_key in constants.ENEMY_SPAWN_PLACEMENT_CONFIGURATION:
+        for spawn_key in enemy_spawn_placement_configuration:
             if spawn_choice <= spawn_key:
-                spawn_pattern = constants.ENEMY_SPAWN_PLACEMENT_CONFIGURATION[spawn_key]
+                spawn_pattern = enemy_spawn_placement_configuration[spawn_key]
                 break
                 
         if spawn_pattern != previous_spawn_pattern:

@@ -4,6 +4,8 @@
 
 * Gameplay:
     * New power-up: A pill that allows your shark to eat the now very scared enemies!
+    * Artillery: Watch out for POLLUTION STRIKES from above!
+    * Spawning: Avoid spawn types at beginning of wave that give player too much space.
 * Performance:
     * FPS generally improved as follows...
         * Use Forward+ renderer from now on (Was: 'Compatibility').
@@ -14,6 +16,8 @@
 * Misc:
     * Haptic feedback added! Vibrates on player hit + shark frenzy.  Turn on in OPTIONS.
     * Improved alignment of death animations.
+    * Fish now swim off to freedom once rescued.
+    * Grenade sound effect volume lowered.
     * Debug menu to keep an eye on performance (toggle modes with F3).
     * Removed some spurious debug print() statements.
 
