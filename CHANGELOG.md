@@ -2,22 +2,34 @@
 
 # 1.1.0 (xx-xx-xx)
 
+BETA2 TESTING FEEDBACK:
+* Haptic feedback not working.
+* Pausing on upgrade screen stops interface working (have to quit game)
+* Too many power pills spawning on later waves
+* Artillery sound is too quiet (check with headphones on)
+* Artillery - need to balance - don't just start on Wave 1?
+* Reduce HP of soldiers maybe (general balancing)
+
 * Gameplay:
     * New power-up: A pill that allows your shark to eat the now very scared enemies!
     * Artillery: Watch out for POLLUTION STRIKES from above!
     * Spawning: Avoid spawn types at beginning of wave that give player too much space.
 * Performance:
-    * FPS generally improved as follows...
-        * Use Forward+ renderer from now on (Was: 'Compatibility').
-        * Particle system now defaults to GPU.
+    * FPS improved as follows...
+        * Switched to the Forward+ renderer (Was: 'Compatibility').
+        * Particles now switched to GPU.
         * Replace PointLight2D lighting effects from projectiles with Sprite2D equivalent.
 * Bug fixes:
     * UI: Tightened up mouse showing / hiding as appropriate
 * Misc:
     * Haptic feedback added! Vibrates on player hit + shark frenzy.  Turn on in OPTIONS.
+        * This will not work on MacOS Sonoma just yet, see: https://github.com/godotengine/godot/issues/88674
     * Improved alignment of death animations.
     * Fish now swim off to freedom once rescued.
     * Grenade sound effect volume lowered.
+    * Pause improvements:
+        * ESC can be used to unpause.
+        * Can now pause game during WAVE START, WAVE END and UPGRADE_SCREEN.
     * Debug menu to keep an eye on performance (toggle modes with F3).
     * Removed some spurious debug print() statements.
 

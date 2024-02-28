@@ -20,6 +20,8 @@ extends Node
 @export var dropped_items_on_screen = 0
 @export var grouped_enemy_id = 0
 
+var game_status_before_pause
+
 var score = 0;
 var score_multiplier = 1
 var spawn_number = 0
@@ -33,6 +35,8 @@ var first_game_played = false
 
 var upgrade_one_index
 var upgrade_two_index
+
+var just_come_back_from_pause = false
 
 enum {
     DEDICATION,
@@ -149,6 +153,9 @@ func main_menu():
     $HUD/CanvasLayer/HighScore.visible = true;
     $MainMenu.set_process_input(true);
     $MainMenu._ready();
+    
+    var tween = get_tree().create_tween()
+    tween.tween_property(self, "modulate", Color(1,1,1,1), 0.5)
     
     $HUD/CanvasLayer.visible = true
     $HUD/CanvasLayer/UpgradeChoiceContainer.visible = false
@@ -395,7 +402,7 @@ func return_to_main_screen():
     for artillery in get_tree().get_nodes_in_group('artilleryGroup'):
         artillery.queue_free()
         
-    $ArtilleryTimer.stop()
+    $ArtilleryTimer.stop() 
     despawn_all_items()
     
     Storage.save_stats()
@@ -651,13 +658,24 @@ func _input(ev):
           
     if Input.is_action_just_pressed('start') or Input.is_action_just_pressed('quit'):
         match game_status:
-            GAME_RUNNING:
+            
+            # FIXME: Consolidate these states into just one block.
+            
+            GAME_RUNNING,WAVE_START,GETTING_KEY,WAVE_END,UPGRADE_SCREEN,UPGRADE_WAITING_FOR_CHOICE:
+                Logging.log_entry("Need to pause the game")
+                
+                # Avoid 'double press' if we have just come back from the pause menu
+                if just_come_back_from_pause:
+                    just_come_back_from_pause = false
+                    return
+                
+                game_status_before_pause = game_status
                 game_status = GAME_PAUSED;
                 $PauseMenu.get_node('CanvasLayer').visible = true
                 $PauseMenu.set_process_input(true)
                 $PauseMenu._ready()
                 get_tree().paused = true;
-                            
+                                       
     if Input.is_action_just_released('shark_fire') or Input.is_action_just_released('shark_fire_mouse') or Input.is_action_just_released('quit'):
         match game_status:
             DEDICATION:
@@ -759,9 +777,11 @@ func _on_main_menu_exit_game_pressed():
     get_tree().quit();
 
 func _on_pause_menu_unpause_game_pressed():
-    game_status = GAME_RUNNING;
+    Logging.log_entry('Ending pause')
+    game_status = game_status_before_pause
     $PauseMenu.get_node('CanvasLayer').visible = false;
     $PauseMenu.set_process_input(false);
+    just_come_back_from_pause = true
     get_tree().paused = false;
     
 func _on_pause_menu_abandon_game_pressed():
@@ -898,7 +918,8 @@ func _on_steam_overlay_toggled(toggled, _user_activated, _user_id):
         # Overlay activated.  If game is being played, invoke pause menu.
         match game_status:
             GAME_RUNNING:
-                game_status = GAME_PAUSED;
+                game_status_before_pause = game_status
+                game_status = GAME_PAUSED
                 $PauseMenu.get_node('CanvasLayer').visible = true
                 $PauseMenu.set_process_input(true)
                 $PauseMenu._ready()

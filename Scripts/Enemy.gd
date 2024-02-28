@@ -525,5 +525,6 @@ func _on_call_for_help_timer_timeout():
     
     $CallForHelpTimer.set_wait_time(randf_range(constants.ENEMY_CALL_FOR_HELP_MINIMUM_TIME, constants.ENEMY_CALL_FOR_HELP_MAXIMUM_TIME))
     
-    if randi_range(0,100) <= constants.ENEMY_CALL_FOR_HELP_PERCENTAGE:
-        help_me_label_animation( constants.ENEMY_CALL_FOR_HELP_PHRASES[randi() % constants.ENEMY_CALL_FOR_HELP_PHRASES.size()] )
+    if is_enemy_alive():    
+        if randi_range(0,100) <= constants.ENEMY_CALL_FOR_HELP_PERCENTAGE:
+            help_me_label_animation( constants.ENEMY_CALL_FOR_HELP_PHRASES[randi() % constants.ENEMY_CALL_FOR_HELP_PHRASES.size()] )

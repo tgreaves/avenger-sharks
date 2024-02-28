@@ -232,16 +232,13 @@ motion_mode = 1
 script = ExtResource("1_qxvbe")
 
 [node name="Area2D" type="Area2D" parent="."]
-scale = Vector2(1, 1)
 collision_layer = 256
 monitoring = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
-scale = Vector2(1, 1)
 shape = SubResource("CircleShape2D_4b2pv")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-scale = Vector2(1, 1)
 texture = ExtResource("2_6ouj6")
 
 [node name="StateTimer" type="Timer" parent="."]
