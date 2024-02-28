@@ -27,6 +27,8 @@ var score_multiplier = 1
 var spawn_number = 0
 
 var spawned_items_this_wave = []
+var upgrade_focus_memory_left_button
+var upgrade_focus_memory_right_button
 var intro
 var dedication
 var credits
@@ -36,7 +38,7 @@ var first_game_played = false
 var upgrade_one_index
 var upgrade_two_index
 
-var just_come_back_from_pause = false
+var accept_pause = true
 
 enum {
     DEDICATION,
@@ -90,6 +92,8 @@ func _ready():
     AudioServer.set_bus_volume_db(AudioServer.get_bus_index('Master'), linear_to_db(Storage.Config.get_value('config','master_volume',1.0)))
     AudioServer.set_bus_volume_db(AudioServer.get_bus_index('Music'), linear_to_db(Storage.Config.get_value('config','music_volume',1.0)))
     AudioServer.set_bus_volume_db(AudioServer.get_bus_index('Effects'), linear_to_db(Storage.Config.get_value('config','effects_volume',1.0)))
+    
+    $AcceptPauseTimer.connect('timeout', _on_accept_pause_timer_timeout)
     
     Storage.load_stats()
     
@@ -657,25 +661,8 @@ func _input(ev):
             DisplayServer.mouse_set_mode(DisplayServer.MOUSE_MODE_VISIBLE)  
           
     if Input.is_action_just_pressed('start') or Input.is_action_just_pressed('quit'):
-        match game_status:
-            
-            # FIXME: Consolidate these states into just one block.
-            
-            GAME_RUNNING,WAVE_START,GETTING_KEY,WAVE_END,UPGRADE_SCREEN,UPGRADE_WAITING_FOR_CHOICE:
-                Logging.log_entry("Need to pause the game")
-                
-                # Avoid 'double press' if we have just come back from the pause menu
-                if just_come_back_from_pause:
-                    just_come_back_from_pause = false
-                    return
-                
-                game_status_before_pause = game_status
-                game_status = GAME_PAUSED;
-                $PauseMenu.get_node('CanvasLayer').visible = true
-                $PauseMenu.set_process_input(true)
-                $PauseMenu._ready()
-                get_tree().paused = true;
-                                       
+        handle_pause_input()
+                                      
     if Input.is_action_just_released('shark_fire') or Input.is_action_just_released('shark_fire_mouse') or Input.is_action_just_released('quit'):
         match game_status:
             DEDICATION:
@@ -686,7 +673,31 @@ func _input(ev):
             INTRO_SEQUENCE:
                 intro.queue_free()
                 main_menu()
+
+func handle_pause_input():
+    match game_status:
+        GAME_RUNNING,WAVE_START,GETTING_KEY,WAVE_END,UPGRADE_SCREEN,UPGRADE_WAITING_FOR_CHOICE:
+            Logging.log_entry("Need to pause the game")
+                    
+            # Avoid 'double press' if we have just come back from the pause menu
+            if !accept_pause:
+                Logging.log_entry("NO PAUSING YET")
+                return
             
+            game_status_before_pause = game_status
+            game_status = GAME_PAUSED
+            
+            if game_status_before_pause == UPGRADE_WAITING_FOR_CHOICE:
+                upgrade_focus_memory_left_button = $HUD/CanvasLayer/UpgradeChoiceContainer/Choice1/Button.has_focus()
+                upgrade_focus_memory_right_button = $HUD/CanvasLayer/UpgradeChoiceContainer/Choice2/Button.has_focus()
+                
+                Logging.log_entry("Left: " + str(upgrade_focus_memory_left_button) + " right: " + str(upgrade_focus_memory_right_button))
+            
+            $PauseMenu.get_node('CanvasLayer').visible = true
+            $PauseMenu.set_process_input(true)
+            $PauseMenu.pause()
+            get_tree().paused = true
+   
 func _on_enemy_update_score(score_to_add,enemy_global_position,death_source,enemy_type,enemy_is_split,grouped_enemy_has_died): 
     if grouped_enemy_has_died:
         enemies_left_this_wave = enemies_left_this_wave - 1
@@ -779,10 +790,21 @@ func _on_main_menu_exit_game_pressed():
 func _on_pause_menu_unpause_game_pressed():
     Logging.log_entry('Ending pause')
     game_status = game_status_before_pause
-    $PauseMenu.get_node('CanvasLayer').visible = false;
-    $PauseMenu.set_process_input(false);
-    just_come_back_from_pause = true
-    get_tree().paused = false;
+    $PauseMenu.get_node('CanvasLayer').visible = false
+    
+    if game_status == UPGRADE_WAITING_FOR_CHOICE:
+        if upgrade_focus_memory_left_button:
+            $HUD/CanvasLayer/UpgradeChoiceContainer/Choice1/Button.grab_focus()
+            upgrade_focus_memory_left_button = false
+        
+        if upgrade_focus_memory_right_button:
+            $HUD/CanvasLayer/UpgradeChoiceContainer/Choice2/Button.grab_focus()
+            upgrade_focus_memory_right_button = false
+
+    $PauseMenu.set_process_input(false)
+    accept_pause = false
+    $AcceptPauseTimer.start()
+    get_tree().paused = false
     
 func _on_pause_menu_abandon_game_pressed():
     $PauseMenu.get_node('CanvasLayer').visible = false;
@@ -915,15 +937,7 @@ func _on_options_options_return_button_pressed():
 
 func _on_steam_overlay_toggled(toggled, _user_activated, _user_id):
     if toggled:
-        # Overlay activated.  If game is being played, invoke pause menu.
-        match game_status:
-            GAME_RUNNING:
-                game_status_before_pause = game_status
-                game_status = GAME_PAUSED
-                $PauseMenu.get_node('CanvasLayer').visible = true
-                $PauseMenu.set_process_input(true)
-                $PauseMenu._ready()
-                get_tree().paused = true
+        handle_pause_input()
 
 func _on_steam_input_device_disconnected(input_handle):
     Logging.log_entry("Input device disconnected: " + str(input_handle))
@@ -935,9 +949,7 @@ func _on_artillery_timer():
     var mob = artillery_scene.instantiate();
     
     var spawn_position
-    
-    #spawn_position = Vector2(randf_range(constants.ARENA_SPAWN_MIN_X,constants.ARENA_SPAWN_MAX_X),randf_range(constants.ARENA_SPAWN_MIN_Y,constants.ARENA_SPAWN_MAX_Y))
-      
+          
     spawn_position = Vector2(randf_range($Player.position.x-200, $Player.position.x+200), randf_range($Player.position.y-200, $Player.position.y+200))
     
     mob.get_node('.').set_position (spawn_position);
@@ -946,3 +958,6 @@ func _on_artillery_timer():
     
     $ArtilleryTimer.start(randf_range(constants.ARTILLERY_MINIMUM_TIME, constants.ARTILLERY_MAXIMUM_TIME))
 
+func _on_accept_pause_timer_timeout():
+    accept_pause = true
+    

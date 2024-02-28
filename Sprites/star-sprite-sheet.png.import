@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://n1eduxu3bqg5"
-path="res://.godot/imported/power-pellet.png-9a5b82c7bbe57c5c12be2a4ac64e365f.ctex"
+uid="uid://jt38dxr2inlm"
+path="res://.godot/imported/star-sprite-sheet.png-697cd5b45cdd64f12d891cc3cd5bea4c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Sprites/power-pellet.png"
-dest_files=["res://.godot/imported/power-pellet.png-9a5b82c7bbe57c5c12be2a4ac64e365f.ctex"]
+source_file="res://Sprites/star-sprite-sheet.png"
+dest_files=["res://.godot/imported/star-sprite-sheet.png-697cd5b45cdd64f12d891cc3cd5bea4c.ctex"]
 
 [params]
 

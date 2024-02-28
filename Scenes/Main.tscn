@@ -100,6 +100,9 @@ one_shot = true
 
 [node name="ArtilleryTimer" type="Timer" parent="."]
 
+[node name="AcceptPauseTimer" type="Timer" parent="."]
+wait_time = 0.05
+
 [node name="AudioStreamPlayerMusic" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("17_mh5cd")
 bus = &"Music"

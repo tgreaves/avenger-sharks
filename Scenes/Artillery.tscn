@@ -54,7 +54,7 @@
 [ext_resource type="Texture2D" uid="uid://repwn2o63ys4" path="res://Sprites/Explosions/GasExplosion1/0050.png" id="52_n5wyp"]
 [ext_resource type="Texture2D" uid="uid://oq2vt1ck8pxh" path="res://Sprites/Explosions/GasExplosion1/0051.png" id="53_apxvg"]
 [ext_resource type="Texture2D" uid="uid://crq382rsn85xu" path="res://Sprites/Explosions/GasExplosion1/0052.png" id="54_ahxhf"]
-[ext_resource type="AudioStream" uid="uid://cpeyfbxygtocs" path="res://Sound/large-underwater-explosion-190270.wav" id="55_nfohm"]
+[ext_resource type="AudioStream" uid="uid://c5leefn8upwfs" path="res://Sound/hq-explosion-6288.mp3" id="55_sy5kn"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_4b2pv"]
 radius = 34.91
@@ -241,8 +241,12 @@ shape = SubResource("CircleShape2D_4b2pv")
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("2_6ouj6")
 
-[node name="StateTimer" type="Timer" parent="."]
+[node name="ChargingTimer" type="Timer" parent="."]
 wait_time = 2.0
+one_shot = true
+
+[node name="FlashingTimer" type="Timer" parent="."]
+wait_time = 0.1
 one_shot = true
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
@@ -254,5 +258,5 @@ frame = 51
 frame_progress = 1.0
 
 [node name="ArtillerySound" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("55_nfohm")
+stream = ExtResource("55_sy5kn")
 bus = &"Effects"

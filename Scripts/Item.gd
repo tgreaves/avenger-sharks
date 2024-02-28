@@ -27,6 +27,9 @@ func spawn_specific(item_selection, despawn_mode):
     $CollisionShape2D.disabled = false;
     $AnimatedSprite2D.play()
     
+    if item_selection == 'power-pellet':
+        $AnimatedSprite2D.scale = Vector2(3,3)
+    
     if despawn_mode:
         $DespawnTimer.start(constants.ITEM_DESPAWN_TIME)
     

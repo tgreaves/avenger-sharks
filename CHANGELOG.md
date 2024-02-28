@@ -3,12 +3,9 @@
 # 1.1.0 (xx-xx-xx)
 
 BETA2 TESTING FEEDBACK:
-* Haptic feedback not working.
-* Pausing on upgrade screen stops interface working (have to quit game)
 * Too many power pills spawning on later waves
-* Artillery sound is too quiet (check with headphones on)
-* Artillery - need to balance - don't just start on Wave 1?
 * Reduce HP of soldiers maybe (general balancing)
+    * Consider knockback
 
 * Gameplay:
     * New power-up: A pill that allows your shark to eat the now very scared enemies!
@@ -23,7 +20,8 @@ BETA2 TESTING FEEDBACK:
     * UI: Tightened up mouse showing / hiding as appropriate
 * Misc:
     * Haptic feedback added! Vibrates on player hit + shark frenzy.  Turn on in OPTIONS.
-        * This will not work on MacOS Sonoma just yet, see: https://github.com/godotengine/godot/issues/88674
+        * This will not work on all platforms.
+            * Example for MacOS Sonoma - https://github.com/godotengine/godot/issues/88674
     * Improved alignment of death animations.
     * Fish now swim off to freedom once rescued.
     * Grenade sound effect volume lowered.
