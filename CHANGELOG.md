@@ -21,6 +21,8 @@ BETA2 FEEDBACK:
         * Replace PointLight2D lighting effects from projectiles with Sprite2D equivalent.
 * Bug fixes:
     * UI: Tightened up mouse showing / hiding as appropriate
+* Platform:
+    * Steam : GodotSteam GDExtension upgraded to 4.6.
 * Misc:
     * Haptic feedback added! Vibrates on player hit + shark frenzy.  Turn on in OPTIONS.
         * This will not work on all platforms.
