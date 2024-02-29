@@ -8,7 +8,8 @@ const EnemyTrapScene = preload("res://Scenes/EnemyTrap.tscn");
 enum {
     SPAWNING,
     WANDER,
-    DYING
+    DYING,
+    SWIM_ESCAPE
 }
 
 var enemy_type
@@ -37,6 +38,7 @@ var enemy_group_id
 var call_for_help_timer_label
 var can_be_knocked_back = false
 var knocked_back = false
+var swim_escape_target
 
 func _ready():
     $CallForHelpTimer.connect('timeout', _on_call_for_help_timer_timeout)
@@ -267,19 +269,19 @@ func _physics_process(delta):
                             desired_velocity = Vector2(randf_range(-1,1), randf_range(-1,1)).normalized() * enemy_speed;
                 
                 # OVERRIDE AI - Always chase the player when wave population is low.   
-                if (    get_parent().enemies_left_this_wave <= constants.ENEMY_ALL_CHASE_WHEN_POPULATION_LOW and 
-                        (!child_of_enemy) and 
-                        (!get_parent().get_node('Player').power_pellet_enabled) and 
-                        constants.ENEMY_SETTINGS[enemy_type].get('chase_at_low_population',true)):
-                    var target_direction = (get_parent().get_node("Player").global_position - global_position).normalized();
-                    
-                    if get_parent().enemies_left_this_wave <= constants.ENEMY_ALL_CHASE_WHEN_POPULATION_LOW:
-                        velocity = target_direction * (enemy_speed * constants.ENEMY_SPEED_POPULATION_LOW_MULTIPLIER)
-                    else:
-                        velocity = target_direction * enemy_speed;
-                    
-                    $StateTimer.start(randf_range(constants.ENEMY_CHASE_REORIENT_MINIMUM_SECONDS,
-                                                constants.ENEMY_CHASE_REORIENT_MAXIMUM_SECONDS));
+                #if (    get_parent().enemies_left_this_wave <= constants.ENEMY_ALL_CHASE_WHEN_POPULATION_LOW and 
+                        #(!child_of_enemy) and 
+                        #(!get_parent().get_node('Player').power_pellet_enabled) and 
+                        #constants.ENEMY_SETTINGS[enemy_type].get('chase_at_low_population',true)):
+                    #var target_direction = (get_parent().get_node("Player").global_position - global_position).normalized();
+                    #
+                    #if get_parent().enemies_left_this_wave <= constants.ENEMY_ALL_CHASE_WHEN_POPULATION_LOW:
+                        #velocity = target_direction * (enemy_speed * constants.ENEMY_SPEED_POPULATION_LOW_MULTIPLIER)
+                    #else:
+                        #velocity = target_direction * enemy_speed;
+                    #
+                    #$StateTimer.start(randf_range(constants.ENEMY_CHASE_REORIENT_MINIMUM_SECONDS,
+                                                #constants.ENEMY_CHASE_REORIENT_MAXIMUM_SECONDS));
                                                                                 
         DYING:
             if $FlashHitTimer.time_left == 0:
@@ -290,6 +292,19 @@ func _physics_process(delta):
                 
             if $StateTimer.time_left == 0:
                 self.queue_free();
+        SWIM_ESCAPE:
+            if $StateTimer.time_left == 0:
+                queue_free()
+                
+            #var target_position = swim_escape_target
+            var target_position = get_parent().get_node('Arena').get_node('ExitDoor').global_position
+
+            if global_position.distance_to(target_position) <= 200:
+                queue_free()
+            
+            var target_direction = (target_position - global_position).normalized()
+            velocity = target_direction * 2500
+            #var _collision = move_and_collide(velocity * delta)
 
     if state != DYING:
         if desired_velocity and !child_of_enemy:
@@ -541,3 +556,23 @@ func _on_call_for_help_timer_timeout():
             
 func _on_knockback_timer_timeout():
     knocked_back = false
+    
+func swim_escape():
+    state = SWIM_ESCAPE
+    $CollisionShape2D.set_deferred("disabled", true)
+    $SpawnParticles.emitting = false
+    $ScaredParticles.set_emitting(false)
+    
+    # Pick a quadrant to swim to.
+    # TODO: Remove this if we stick to them escaping through the door.
+    match randi_range(1,4):
+        1:
+            swim_escape_target = Vector2(0,0)
+        2:
+            swim_escape_target = Vector2(5500,0)
+        3:
+            swim_escape_target = Vector2(0,3000)
+        4:
+            swim_escape_target = Vector2(5500,3000)
+    
+    $StateTimer.start(2)

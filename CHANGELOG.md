@@ -2,13 +2,11 @@
 
 # 1.1.0 (xx-xx-xx)
 
-BETA2 FEEDBACK:
-    * Traps not very visible. Alternative?
-
-* New power-up: MEGA SHOTS / Armour-piercing.
-* Freezes
+TODO: Use timer to decide when wave ends instead of number of enemies.
+Could make this more graphica / audio based and easier to keep track of.
 
 * Gameplay:
+    * Waves: Enemies will continuously spawn until the target number of ENEMIES is reduced to zero.
     * New power-up: A magical star that allows your shark to eat the now very scared enemies!
     * Artillery: Watch out for POLLUTION STRIKES from above!
     * Spawning: Avoid spawn types at beginning of wave that give player too much space.

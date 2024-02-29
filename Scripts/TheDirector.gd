@@ -55,7 +55,7 @@ func design_wave(wave_number):
         WaveDesign['total_enemies'] = constants.DEV_SPAWN_ENEMY_COUNT
     
     Logging.log_entry("Total enemies this wave: " + str(WaveDesign['total_enemies']))
-    left_to_spawn = WaveDesign['total_enemies']
+    left_to_spawn = WaveDesign['total_enemies'] + 50   # Padding.
 
     # What enemies are eligible to spawn in this wave?
     var wave_enemies = {}

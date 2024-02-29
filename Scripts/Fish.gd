@@ -87,11 +87,8 @@ func _physics_process(delta):
             set_collision_mask_value(1,false)
             pass
 
-func _death(blood):
-    Logging.log_entry("FISH _death")
-    
+func _death(blood):    
     $CollisionShape2D.set_deferred("disabled", true)
-    #$AnimatedSprite2D.hide();
     remove_from_group('fishGroup');
     
     $StateTimer.start(1)
