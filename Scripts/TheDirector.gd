@@ -37,6 +37,16 @@ func design_wave(wave_number):
     else:
         WaveDesign['wave_special_type'] = 'STANDARD'
     
+    # Artillery
+    if wave_number >= constants.ARTILLERY_MINIMUM_WAVE:
+        Logging.log_entry("Artillery is possible for this wave.")
+        if randi_range(1,100) >= constants.ARTILLERY_FEATURE_PERCENTAGE:
+            Logging.log_entry("Artillery WILL happen.")
+            WaveDesign['artillery'] = true
+        else:
+            Logging.log_entry("Artillery WILL NOT happen.")
+            
+    
     # How many enemies?
     WaveDesign['total_enemies'] = (wave_number * constants.ENEMY_MULTIPLIER_AT_WAVE_START) + (wave_number * constants.ENEMY_MULTIPLIER_DURING_WAVE)
     

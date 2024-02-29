@@ -867,6 +867,9 @@ one_shot = true
 [node name="CallForHelpTimer" type="Timer" parent="."]
 wait_time = 2.0
 
+[node name="KnockbackTimer" type="Timer" parent="."]
+one_shot = true
+
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("8_wxbp6")
 bus = &"Effects"

@@ -35,9 +35,12 @@ var desired_velocity
 var parent_node
 var enemy_group_id
 var call_for_help_timer_label
+var can_be_knocked_back = false
+var knocked_back = false
 
 func _ready():
     $CallForHelpTimer.connect('timeout', _on_call_for_help_timer_timeout)
+    $KnockbackTimer.connect('timeout', _on_knockback_timer_timeout)
     
 func spawn_specific(enemy_type_in):
     enemy_type = enemy_type_in
@@ -58,6 +61,7 @@ func spawn_specific(enemy_type_in):
     trap_timer_min = enemy_settings.get('trap_timer_min', 0)
     trap_timer_max = enemy_settings.get('trap_timer_max', 0)
     grouped_enemy = enemy_settings.get('grouped_enemy', false)
+    can_be_knocked_back = enemy_settings.get('can_be_knocked_back', false)
     
     var sprite_offset = enemy_settings.get('sprite_offset', null)
     var sprite_scale = enemy_settings.get('sprite_scale', null)
@@ -188,7 +192,7 @@ func _physics_process(delta):
             if $FlashHitTimer.time_left == 0:
                 set_modulate(Color(1,1,1,1));
             
-            if $StateTimer.time_left == 0:
+            if $StateTimer.time_left == 0 and !knocked_back:
                 var ai_mode_to_use = ai_mode
                 if get_parent().get_node("Player").power_pellet_enabled:
                     ai_mode_to_use = 'RUN_AWAY'
@@ -392,6 +396,7 @@ func _death(death_source):
             $AudioStreamPlayer.play();
             $StateTimer.start(2);
             $SpawnParticles.emitting = false
+            $ScaredParticles.set_emitting(false)
             $DeathParticles.emitting = true
             $DeathParticlesTimer.start()
             state = DYING;
@@ -412,6 +417,11 @@ func _death(death_source):
             stored_modulate = get_modulate()
             set_modulate(Color(10,10,10,10));
             $FlashHitTimer.start()
+            
+            if can_be_knocked_back and death_source == 'PLAYER-SHOT':
+                velocity = velocity.clamp(-constants.ENEMY_KNOCKBACK_VELOCITY_CLAMP, constants.ENEMY_KNOCKBACK_VELOCITY_CLAMP)
+                knocked_back = true
+                $KnockbackTimer.start(constants.ENEMY_KNOCKBACK_TIMER)
      
 # Handle grouped enemy death.
 # Basically, keep the group (snake!) together properly.  
@@ -528,3 +538,6 @@ func _on_call_for_help_timer_timeout():
     if is_enemy_alive():    
         if randi_range(0,100) <= constants.ENEMY_CALL_FOR_HELP_PERCENTAGE:
             help_me_label_animation( constants.ENEMY_CALL_FOR_HELP_PHRASES[randi() % constants.ENEMY_CALL_FOR_HELP_PHRASES.size()] )
+            
+func _on_knockback_timer_timeout():
+    knocked_back = false

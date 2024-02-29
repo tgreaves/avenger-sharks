@@ -28,7 +28,7 @@ func spawn_specific(item_selection, despawn_mode):
     $AnimatedSprite2D.play()
     
     if item_selection == 'power-pellet':
-        $AnimatedSprite2D.scale = Vector2(3,3)
+        $AnimatedSprite2D.scale = Vector2(4,4)
     
     if despawn_mode:
         $DespawnTimer.start(constants.ITEM_DESPAWN_TIME)

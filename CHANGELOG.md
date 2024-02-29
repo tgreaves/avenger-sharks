@@ -2,15 +2,18 @@
 
 # 1.1.0 (xx-xx-xx)
 
-BETA2 TESTING FEEDBACK:
-* Too many power pills spawning on later waves
-* Reduce HP of soldiers maybe (general balancing)
-    * Consider knockback
+BETA2 FEEDBACK:
+    * Traps not very visible. Alternative?
+
+* New power-up: MEGA SHOTS / Armour-piercing.
+* Freezes
 
 * Gameplay:
-    * New power-up: A pill that allows your shark to eat the now very scared enemies!
+    * New power-up: A magical star that allows your shark to eat the now very scared enemies!
     * Artillery: Watch out for POLLUTION STRIKES from above!
     * Spawning: Avoid spawn types at beginning of wave that give player too much space.
+    * AI: Chasing enemies re-orient more often.
+    * Knockback: Some enemies (typically > 1 health) are now knocked back when hit.
 * Performance:
     * FPS improved as follows...
         * Switched to the Forward+ renderer (Was: 'Compatibility').

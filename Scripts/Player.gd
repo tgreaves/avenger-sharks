@@ -229,7 +229,6 @@ func _physics_process(_delta):
                 else:
                     # Start 'Running out' blinking timer
                     if $PowerPelletTimer.time_left < 2 and !power_pellet_warning_running:
-                        Logging.log_entry("Started warning timer")
                         $PowerPelletWarningTimer.start()
                         power_pellet_warning_running = true
             
@@ -332,7 +331,6 @@ func _physics_process(_delta):
                             get_parent().get_node('HUD').set_powerup_level(powerup_selected, current_powerup_levels[powerup_selected])
                             $AudioStreamPowerUp.play()
                         "power-pellet":
-                            Logging.log_entry("Collected pellet")
                             $PowerPelletTimer.start(constants.POWER_PELLET_ACTIVE_DURATION)
                             powerup_label_animation('TIME FOR DINNER!')
                             power_pellet_enabled = true
@@ -437,7 +435,6 @@ func _physics_process(_delta):
                 $AnimatedSprite2D.set_flip_h(false);
             
             if $HuntingKeyTimer.time_left == 0:
-                Logging.log_entry("HuntingKeyTimer expired.  Assume stuck looking for key.  Force moving.")
                 position = get_parent().get_node('Key').global_position
             
             for i in get_slide_collision_count():
@@ -450,7 +447,6 @@ func _physics_process(_delta):
                     get_parent().get_node('Arena').get_node('ExitDoor').get_node('CollisionShape2D').disabled = false;
                     emit_signal('player_got_key')
                     $HuntingDoorTimer.start()
-                    Logging.log_entry("Starting door hunting timer")
         HUNTING_EXIT:
             var did_collide = false
             
@@ -461,7 +457,6 @@ func _physics_process(_delta):
                 $AnimatedSprite2D.set_flip_h(false);
               
             if $HuntingDoorTimer.time_left == 0:
-                Logging.log_entry("HuntingDoorTimer expired.  Assume stuck looking for exit.  Force moving.")
                 position.x = 2632
                 position.y = 286
             
@@ -476,9 +471,7 @@ func _physics_process(_delta):
                     did_collide=true
                     shark_status = FOUND_EXIT;
                     velocity = Vector2i(0,0)
-                    
-                    Logging.log_entry("DOOR FOUND - position " + str(position.x) + " " + str(position.y))
-                    
+
                     # Open door.
                     get_parent().get_node('Arena').open_top_door()
                     get_parent().get_node('Arena').get_node('ExitDoor').get_node('CollisionShape2D').disabled = true;

@@ -318,7 +318,7 @@ func start_wave():
         update_fish_left_display()
         
     # Artillery
-    if wave_number >= constants.ARTILLERY_MINIMUM_WAVE:
+    if TheDirector.WaveDesign.get('artillery', false):
         $ArtilleryTimer.start(randf_range(constants.ARTILLERY_MINIMUM_TIME, constants.ARTILLERY_MAXIMUM_TIME))
 
 func wave_end():
@@ -547,7 +547,7 @@ func spawn_enemy_random_position(enemy_type):
 
     mob.get_node('.').set_position(spawn_position)
     mob.add_to_group('enemyGroup');	
-    add_child(mob); 
+    add_child(mob, true); 
 
     mob.spawn_specific(enemy_type)
         
@@ -574,7 +574,7 @@ func spawn_enemy_set_position(enemy_type,enemy_position,ai_mode,initial_directio
         mob.set_initial_direction(initial_direction)
     
     mob.add_to_group('enemyGroup');	
-    add_child(mob)  
+    add_child(mob, true)  
     
     if instant_spawn:
         mob.set_instant_spawn(true)
