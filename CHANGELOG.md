@@ -2,11 +2,12 @@
 
 # 1.1.0 (xx-xx-xx)
 
-TODO: Use timer to decide when wave ends instead of number of enemies.
-Could make this more graphica / audio based and easier to keep track of.
+TODO:
+    * Audio / visual queue leading up to wave end.
+    * REMOVE unused music assets (esp if we don't find a decent wave end music)
 
 * Gameplay:
-    * Waves: Enemies will continuously spawn until the target number of ENEMIES is reduced to zero.
+    * Waves: These are now TIME based to keep the action fast, fresh and furious.
     * New power-up: A magical star that allows your shark to eat the now very scared enemies!
     * Artillery: Watch out for POLLUTION STRIKES from above!
     * Spawning: Avoid spawn types at beginning of wave that give player too much space.
@@ -17,6 +18,9 @@ Could make this more graphica / audio based and easier to keep track of.
         * Switched to the Forward+ renderer (Was: 'Compatibility').
         * Particles now switched to GPU.
         * Replace PointLight2D lighting effects from projectiles with Sprite2D equivalent.
+* Sound:
+    * New music tracks for menu and gameplay.  Enjoy!
+    * Grenade volume lowered slightly.
 * Bug fixes:
     * UI: Tightened up mouse showing / hiding as appropriate
 * Platform:
@@ -27,7 +31,6 @@ Could make this more graphica / audio based and easier to keep track of.
             * Example for MacOS Sonoma - https://github.com/godotengine/godot/issues/88674
     * Improved alignment of death animations.
     * Fish now swim off to freedom once rescued.
-    * Grenade sound effect volume lowered.
     * Pause improvements:
         * ESC can be used to unpause.
         * Can now pause game during WAVE START, WAVE END and UPGRADE_SCREEN.

@@ -74,7 +74,7 @@ grow_horizontal = 0
 size_flags_horizontal = 8
 theme_override_fonts/font = ExtResource("1_4l55f")
 theme_override_font_sizes/font_size = 64
-text = "ENEMIES"
+text = "TIME"
 horizontal_alignment = 2
 
 [node name="PowerUpContainer" type="VBoxContainer" parent="CanvasLayer"]

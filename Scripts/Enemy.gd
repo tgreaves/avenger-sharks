@@ -38,7 +38,6 @@ var enemy_group_id
 var call_for_help_timer_label
 var can_be_knocked_back = false
 var knocked_back = false
-var swim_escape_target
 
 func _ready():
     $CallForHelpTimer.connect('timeout', _on_call_for_help_timer_timeout)
@@ -296,7 +295,6 @@ func _physics_process(delta):
             if $StateTimer.time_left == 0:
                 queue_free()
                 
-            #var target_position = swim_escape_target
             var target_position = get_parent().get_node('Arena').get_node('ExitDoor').global_position
 
             if global_position.distance_to(target_position) <= 200:
@@ -304,9 +302,8 @@ func _physics_process(delta):
             
             var target_direction = (target_position - global_position).normalized()
             velocity = target_direction * 2500
-            #var _collision = move_and_collide(velocity * delta)
 
-    if state != DYING:
+    if (state != DYING) && (state != SWIM_ESCAPE):
         if desired_velocity and !child_of_enemy:
             velocity = velocity.lerp(desired_velocity, 0.01)
     
@@ -562,17 +559,4 @@ func swim_escape():
     $CollisionShape2D.set_deferred("disabled", true)
     $SpawnParticles.emitting = false
     $ScaredParticles.set_emitting(false)
-    
-    # Pick a quadrant to swim to.
-    # TODO: Remove this if we stick to them escaping through the door.
-    match randi_range(1,4):
-        1:
-            swim_escape_target = Vector2(0,0)
-        2:
-            swim_escape_target = Vector2(5500,0)
-        3:
-            swim_escape_target = Vector2(0,3000)
-        4:
-            swim_escape_target = Vector2(5500,3000)
-    
     $StateTimer.start(2)

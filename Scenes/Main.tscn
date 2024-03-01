@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://bxw6akrvsd84v"]
+[gd_scene load_steps=23 format=3 uid="uid://bxw6akrvsd84v"]
 
 [ext_resource type="Script" path="res://Scripts/Main.gd" id="1_yyejc"]
 [ext_resource type="PackedScene" uid="uid://dlyr1neald0e4" path="res://Scenes/Dedication.tscn" id="2_utmp5"]
@@ -19,8 +19,9 @@
 [ext_resource type="PackedScene" uid="uid://5yp4e43ckdrj" path="res://Scenes/Player.tscn" id="15_3wn6m"]
 [ext_resource type="PackedScene" uid="uid://ci0jxmpdr3ue5" path="res://Scenes/Options.tscn" id="15_ai8du"]
 [ext_resource type="PackedScene" uid="uid://c61dmtdssq0mw" path="res://Scenes/Key.tscn" id="16_0rume"]
-[ext_resource type="AudioStream" uid="uid://b65dtuu73n480" path="res://Sound/80s Synthpop Experiment - Steven O'Brien (Must Credit, CC-BY, www.steven-obrien.net).mp3" id="17_mh5cd"]
+[ext_resource type="AudioStream" uid="uid://c88vweca03hvy" path="res://Sound/lady-of-the-80x27s-128379.mp3" id="20_exbtf"]
 [ext_resource type="AudioStream" uid="uid://bg0hxy3wpmvun" path="res://Sound/shark-hunt-16191.mp3" id="20_ixctd"]
+[ext_resource type="AudioStream" uid="uid://csu46ibf7e8md" path="res://Sound/romantic-melody-of-the-80s-129224.mp3" id="23_pr0en"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_yyejc")
@@ -83,6 +84,9 @@ position = Vector2(2650, 714)
 wait_time = 2.4
 one_shot = true
 
+[node name="WaveTimeLeftTimer" type="Timer" parent="."]
+one_shot = true
+
 [node name="WaveEndTimer" type="Timer" parent="."]
 wait_time = 0.4
 one_shot = true
@@ -104,11 +108,18 @@ one_shot = true
 wait_time = 0.05
 
 [node name="AudioStreamPlayerMusic" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("17_mh5cd")
+stream = ExtResource("20_exbtf")
 bus = &"Music"
 
 [node name="SharkAttackMusic" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("20_ixctd")
+bus = &"Music"
+
+[node name="WaveEndMusic" type="AudioStreamPlayer" parent="."]
+bus = &"Music"
+
+[node name="MenuMusic" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("23_pr0en")
 bus = &"Music"
 
 [connection signal="player_enable_fish_frenzy" from="." to="Player" method="_on_main_player_enable_fish_frenzy"]

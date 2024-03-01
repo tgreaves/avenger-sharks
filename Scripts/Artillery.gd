@@ -26,9 +26,7 @@ func _physics_process(_delta):
     match state:
         CHASING:
             # Chase the player.
-            var target_direction = (get_parent().get_node("Player").global_position - global_position).normalized();
-          
-            # TODO: Adjust speed here.
+            var target_direction = (get_parent().get_node("Player").global_position - global_position).normalized()
             position += target_direction * constants.ARTILLERY_CHASE_SPEED
         EXPLODING:
             get_parent().get_node('Player').shake(10)

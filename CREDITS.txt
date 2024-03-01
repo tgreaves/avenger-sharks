@@ -67,9 +67,12 @@ https://kenney-assets.itch.io/crosshair-pack
 
 SOUND
 
-Main Game Music:
+Intro & Wave End Music:
 https://www.steven-obrien.net/
 
+Gameplay Music: Grand_Project
+https://pixabay.com/music/synthwave-lady-of-the-80x27s-128379/
+    
 Hungry Shark Music: Gvidon
 https://pixabay.com/music/rock-shark-hunt-16191/
 

@@ -93,6 +93,7 @@ func _ready():
     AudioServer.set_bus_volume_db(AudioServer.get_bus_index('Music'), linear_to_db(Storage.Config.get_value('config','music_volume',1.0)))
     AudioServer.set_bus_volume_db(AudioServer.get_bus_index('Effects'), linear_to_db(Storage.Config.get_value('config','effects_volume',1.0)))
     
+    $WaveTimeLeftTimer.connect('timeout', _on_wave_time_left_timer_timeout)
     $AcceptPauseTimer.connect('timeout', _on_accept_pause_timer_timeout)
     
     Storage.load_stats()
@@ -131,11 +132,12 @@ func main_menu():
     fish_left_this_wave=0
     wave_number= constants.START_WAVE - 1
     enemies_on_screen = 0
-    
-    if $AudioStreamPlayerMusic.playing == false:
-        $AudioStreamPlayerMusic.play(0.6);
- 
+     
     $SharkAttackMusic.stop()
+    $AudioStreamPlayerMusic.stop()
+    
+    if !$MenuMusic.is_playing():
+        $MenuMusic.play()
 
     # Ensure music speed is always at normal.
     _on_player_player_no_longer_low_energy()
@@ -192,11 +194,15 @@ func start_game():
     $HUD/CanvasLayer/UpgradeSummary.text = ""
     $HUD/CanvasLayer/UpgradeSummary.visible = true
     
+    if $MenuMusic.is_playing():
+        $MenuMusic.stop()
+        $AudioStreamPlayerMusic.play()
+    
     enemies_left_this_wave = 0
     grouped_enemy_id = 0
     
     if game_mode == 'ARCADE':
-        update_enemies_left_display()
+        update_time_left_display()
     else:
         update_fish_left_display()
         $Player.get_node('FishProgressBar').visible = false
@@ -205,6 +211,12 @@ func start_game():
 
 func prepare_for_wave():
     wave_number += 1
+    
+    if $WaveEndMusic.is_playing():
+        $WaveEndMusic.stop()
+    
+    if !$AudioStreamPlayerMusic.is_playing():
+        $AudioStreamPlayerMusic.play()
     
     TheDirector.design_wave(wave_number)
     
@@ -260,7 +272,7 @@ func wave_intro():
     if wave_number == 1:
         match game_mode:
             'ARCADE':
-                wave_text = 'CLEAR ALL ENEMIES FOR NEXT WAVE!'
+                wave_text = 'SURVIVE ' + str( TheDirector.WaveDesign.get('wave_time')) + " SECONDS FOR NEXT WAVE!"
             'PACIFIST':
                 wave_text = 'COLLECT ALL FISH FOR NEXT WAVE!' 
     else:
@@ -280,6 +292,9 @@ func start_wave():
     game_status = GAME_RUNNING;
     var i = 0;
     
+    if $SharkAttackMusic.is_playing():
+        $SharkAttackMusic.stop()
+    
     if wave_number > Storage.Stats.get_value('player','furthest_wave',0):
         Storage.increase_stat('player','furthest_wave',1)
     
@@ -288,7 +303,8 @@ func start_wave():
     $HUD.get_node("CanvasLayer/EnemiesLeft").visible = true;
 
     dropped_items_on_screen = 0
-    
+
+    $WaveTimeLeftTimer.start(TheDirector.WaveDesign.get('wave_time'))    
     $ItemSpawnTimer.start(randf_range(constants.ITEM_SPAWN_MINIMUM_SECONDS,constants.ITEM_SPAWN_MAXIMUM_SECONDS));
     $EnemySpawnTimer.start(TheDirector.WaveDesign.get('reinforcements_timer', 0));
 
@@ -313,7 +329,7 @@ func start_wave():
         i=i+1;
     
     if game_mode == 'ARCADE':
-        update_enemies_left_display()
+        update_time_left_display()
     else:
         update_fish_left_display()
         
@@ -329,8 +345,6 @@ func wave_end():
     
     game_status = GETTING_KEY
     
-    # FIXME: Do something more clever with enemies instead of
-    # making them vanish.
     for enemy in get_tree().get_nodes_in_group("enemyGroup"):
         enemy.swim_escape()
     
@@ -342,18 +356,17 @@ func wave_end():
     $HUD.get_node("CanvasLayer/Label").text = "WAVE COMPLETE!"
     $HUD.get_node("CanvasLayer/Label").visible = true;
     
+    if constants.PLAY_WAVE_END_MUSIC:
+        $AudioStreamPlayerMusic.stop()
+        $WaveEndMusic.play()
+    
     for enemy_trap in get_tree().get_nodes_in_group('enemyTrap'):
         enemy_trap.queue_free()
     
     despawn_all_items()
     $ArtilleryTimer.stop()
     
-    # Auto send player to get the key.
     emit_signal('player_hunt_key', $Key.global_position);
-    
-    if game_mode == 'PACIFIST':
-        for enemy in get_tree().get_nodes_in_group('enemyGroup'):
-            enemy.queue_free()
     
     for fish in get_tree().get_nodes_in_group('fishGroup'):
         fish.queue_free()
@@ -389,6 +402,9 @@ func game_over():
     $HUD.get_node("CanvasLayer/Label").visible = true;
     $HUD.get_node("CanvasLayer/Label").text = "GAME OVER";
     $AudioStreamPlayerMusic.pitch_scale = 1.0
+    
+    $AudioStreamPlayerMusic.stop()
+    $MenuMusic.play()
     
     $GameOverTimer.start();
 
@@ -622,9 +638,9 @@ func _process(_delta):
             prepare_for_wave()
     
     if game_status == GAME_RUNNING:
-        if enemies_left_this_wave == 0 && !constants.DEV_WAVE_LASTS_FOREVER:
-            wave_end();
-            
+        if game_mode == 'ARCADE':
+            update_time_left_display()
+        
         if fish_left_this_wave == 0 && game_mode == 'PACIFIST':
             # Spawn key where player is.
             $Key.global_position = $Player.global_position
@@ -728,18 +744,11 @@ func _on_enemy_update_score(score_to_add,enemy_global_position,death_source,enem
         spawn_enemy_set_position(enemy_type,enemy_global_position, 'SPAWN_OUTWARDS', Vector2(+1,-1).normalized(), true)
         spawn_enemy_set_position(enemy_type,enemy_global_position, 'SPAWN_OUTWARDS', Vector2(-1,-1).normalized(), true)
         enemies_left_this_wave+=4
-    
-    if enemies_left_this_wave == 0:
-        # If last wave enemy is dead, spawn the key.
-        $Key.global_position = enemy_global_position
-        $Key.show();
-        $Key/CollisionShape2D.disabled = false;
-        $Key/AnimatedSprite2D.play();
             
     _on_enemy_update_score_display();
     
     if game_mode == 'ARCADE':
-        update_enemies_left_display();
+        update_time_left_display();
 
     return score_to_return
 
@@ -754,6 +763,13 @@ func _on_enemy_update_score_display():
 func _reset_score_multiplier():
     score_multiplier=1
     _on_enemy_update_score_display()
+
+func update_time_left_display():
+        if $WaveTimeLeftTimer.is_stopped():
+            $HUD.get_node('CanvasLayer').get_node('EnemiesLeft').text = "TIME\n0"
+        else:
+            var time_left = int(ceil($WaveTimeLeftTimer.time_left))
+            $HUD.get_node('CanvasLayer').get_node('EnemiesLeft').text = "TIME\n" + str(time_left);
 
 func update_enemies_left_display():
     $HUD.get_node('CanvasLayer').get_node('EnemiesLeft').text = "ENEMIES\n" + str(enemies_left_this_wave);
@@ -966,3 +982,19 @@ func _on_artillery_timer():
 func _on_accept_pause_timer_timeout():
     accept_pause = true
     
+func _on_wave_time_left_timer_timeout():
+    if game_status == GAME_RUNNING:
+        Logging.log_entry("Wave duration timeout hit")
+        
+        # Make sure we update time to 0
+        update_time_left_display() 
+        
+        # Have a random enemy drop the key in fear.
+        var random_enemy_idx = randi_range(0, get_tree().get_nodes_in_group("enemyGroup").size()-1)
+        Logging.log_entry("Random number: " + str(random_enemy_idx))
+        $Key.global_position = get_tree().get_nodes_in_group("enemyGroup")[random_enemy_idx].global_position
+        $Key.show();
+        $Key/CollisionShape2D.disabled = false;
+        $Key/AnimatedSprite2D.play();
+        
+        wave_end()

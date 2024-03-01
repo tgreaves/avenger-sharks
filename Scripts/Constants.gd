@@ -1,13 +1,13 @@
 extends Node
 
-const GAME_VERSION = "1.1.0-beta3"
+const GAME_VERSION = "1.1.0-beta4"
 
 # Developer settings.
 const DEV_DELAY_ON_START = false
 const DEV_LOGGING = true
 const DEV_ALLOW_CHEATS = false
-const DEV_SKIP_INTRO = true
-const DEV_START_GAME_IMMEDIATELY = true
+const DEV_SKIP_INTRO = false
+const DEV_START_GAME_IMMEDIATELY = false
 const DEV_STEAM_TESTING = false
 const DEV_SPAWN_ENEMY_COUNT = 0
 const DEV_SPAWN_ONE_ENEMY_TYPE = ''
@@ -19,7 +19,10 @@ const WINDOW_TITLE = "Avenger Sharks " + GAME_VERSION
 const WINDOW_SIZE = Vector2(1920,1080)
 
 # Game settings
+const PLAY_WAVE_END_MUSIC = false
+
 const START_WAVE = 1
+const WAVE_SURVIVAL_TIME = 30
 
 const ARENA_SPAWN_MIN_X = 170
 const ARENA_SPAWN_MAX_X = 2500 * 2
@@ -214,7 +217,7 @@ const GET_FISH_SCORE = 50;
 const FISH_TO_TRIGGER_FISH_FRENZY = 15
 
 # Items
-const ARCADE_SPAWNING_ITEMS = ['dinosaur','dinosaur','power-pellet','power-pellet']
+const ARCADE_SPAWNING_ITEMS = ['dinosaur','dinosaur','dinosaur','power-pellet']
 #const ARCADE_SPAWNING_ITEMS = ['power-pellet']
 const PACIFIST_SPAWNING_ITEMS = ['health']
 

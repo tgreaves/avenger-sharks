@@ -175,5 +175,5 @@ shape = SubResource("CircleShape2D_4t6x7")
 
 [node name="AudioStreamPlayerExplosion" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("28_3ny8d")
-volume_db = -10.306
+volume_db = -7.0
 bus = &"Effects"

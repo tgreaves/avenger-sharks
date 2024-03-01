@@ -17,7 +17,10 @@ func design_wave(wave_number):
         Logging.log_entry("Boss wave qualifier.")
         design_boss_wave(wave_number)
         return
-        
+
+    # Wave timer.
+    WaveDesign['wave_time'] = constants.WAVE_SURVIVAL_TIME
+
     # Wave obstacle design.
     WaveDesign['obstacle_number'] = randi_range(constants.ARENA_OBSTACLE_MINIMUM, constants.ARENA_OBSTACLE_MAXIMUM)
     
