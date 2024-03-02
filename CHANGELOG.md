@@ -2,26 +2,24 @@
 
 # 1.1.0 (xx-xx-xx)
 
-TODO:
-    * Audio / visual queue leading up to wave end.
-    * REMOVE unused music assets (esp if we don't find a decent wave end music)
-
 * Gameplay:
     * Waves: These are now TIME based to keep the action fast, fresh and furious.
     * New power-up: A magical star that allows your shark to eat the now very scared enemies!
     * Artillery: Watch out for POLLUTION STRIKES from above!
     * Spawning: Avoid spawn types at beginning of wave that give player too much space.
     * AI: Chasing enemies re-orient more often.
-    * Knockback: Some enemies (typically > 1 health) are now knocked back when hit.
+    * Knockback: Some enemies are now knocked back when hit.
 * Performance:
     * FPS improved as follows...
         * Switched to the Forward+ renderer (Was: 'Compatibility').
         * Particles now switched to GPU.
-        * Replace PointLight2D lighting effects from projectiles with Sprite2D equivalent.
+        * Replace PointLight2D lighting effects on projectiles with Sprite2D equivalent.
 * Sound:
     * New music tracks for menu and gameplay.  Enjoy!
+    * Countdown effect towards end of wave.
     * Grenade volume lowered slightly.
 * Bug fixes:
+    * Diet: At some point, Necromancers stopped wanting to eat fish.  Fixed.
     * UI: Tightened up mouse showing / hiding as appropriate
 * Platform:
     * Steam : GodotSteam GDExtension upgraded to 4.6.
@@ -33,7 +31,7 @@ TODO:
     * Fish now swim off to freedom once rescued.
     * Pause improvements:
         * ESC can be used to unpause.
-        * Can now pause game during WAVE START, WAVE END and UPGRADE_SCREEN.
+        * Can now pause game during WAVE START, WAVE END and UPGRADE SCREEN.
     * Debug menu to keep an eye on performance (toggle modes with F3).
     * Removed some spurious debug print() statements.
 

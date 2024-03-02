@@ -94,7 +94,8 @@ func _death(blood):
     $StateTimer.start(1)
     
     if blood:
-        $AnimatedSprite2DDamaged.play();
+        $AnimatedSprite2DDamaged.play()
+        $AnimatedSprite2D.set_visible(false)
         state = DESPAWNING;
     else:
         state = SWIM_TO_SCORE

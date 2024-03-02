@@ -1,6 +1,6 @@
 extends Node
 
-const GAME_VERSION = "1.1.0-beta4"
+const GAME_VERSION = "1.1.0-beta5"
 
 # Developer settings.
 const DEV_DELAY_ON_START = false
@@ -22,7 +22,9 @@ const WINDOW_SIZE = Vector2(1920,1080)
 const PLAY_WAVE_END_MUSIC = false
 
 const START_WAVE = 1
-const WAVE_SURVIVAL_TIME = 30
+const WAVE_SURVIVAL_TIME_BASE = 30
+const WAVE_SURVIVAL_TIME_INCREASE = 5
+const WAVE_SURVIVAL_TIME_MAXIMUM = 60
 
 const ARENA_SPAWN_MIN_X = 170
 const ARENA_SPAWN_MAX_X = 2500 * 2
@@ -145,6 +147,7 @@ const ENEMY_SETTINGS = {
         'attack_timer_min': 5,
         'attack_timer_max': 10,
         'attack_type':  'SPIRAL',
+        'can_be_knocked_back': true,
         'sprite_offset':    Vector2(0,-25),
         'collision_scale':  Vector2(1.5,1.5),
         'collision_mask_enable':    7
@@ -189,8 +192,9 @@ const ENEMY_ALLOW_DAMAGE_WHEN_SPAWNING = false
 
 const ENEMY_ATTACK_ARC_DEGREES = 20;
 
-const ENEMY_CHASE_REORIENT_MINIMUM_SECONDS = 0.2  # 0.5
-const ENEMY_CHASE_REORIENT_MAXIMUM_SECONDS = 0.2   # 1.0
+const ENEMY_CHASE_REORIENT_MINIMUM_SECONDS = 0.2 
+const ENEMY_CHASE_REORIENT_MAXIMUM_SECONDS = 0.2 
+
 const ENEMY_DEFAULT_CHANGE_DIRECTION_MINIMUM_SECONDS = 1;
 const ENEMY_DEFAULT_CHANGE_DIRECTION_MAXIMUM_SECONDS = 3;
 

@@ -19,7 +19,13 @@ func design_wave(wave_number):
         return
 
     # Wave timer.
-    WaveDesign['wave_time'] = constants.WAVE_SURVIVAL_TIME
+    WaveDesign['wave_time'] = constants.WAVE_SURVIVAL_TIME_BASE
+
+    if wave_number > 1:
+        WaveDesign['wave_time'] = WaveDesign['wave_time'] + ( constants.WAVE_SURVIVAL_TIME_INCREASE * (wave_number-1) )
+        
+    if WaveDesign['wave_time'] > constants.WAVE_SURVIVAL_TIME_MAXIMUM:
+        WaveDesign['wave_time'] = constants.WAVE_SURVIVAL_TIME_MAXIMUM
 
     # Wave obstacle design.
     WaveDesign['obstacle_number'] = randi_range(constants.ARENA_OBSTACLE_MINIMUM, constants.ARENA_OBSTACLE_MAXIMUM)
@@ -43,7 +49,7 @@ func design_wave(wave_number):
     # Artillery
     if wave_number >= constants.ARTILLERY_MINIMUM_WAVE:
         Logging.log_entry("Artillery is possible for this wave.")
-        if randi_range(1,100) >= constants.ARTILLERY_FEATURE_PERCENTAGE:
+        if randi_range(1,100) <= constants.ARTILLERY_FEATURE_PERCENTAGE:
             Logging.log_entry("Artillery WILL happen.")
             WaveDesign['artillery'] = true
         else:
@@ -58,7 +64,7 @@ func design_wave(wave_number):
         WaveDesign['total_enemies'] = constants.DEV_SPAWN_ENEMY_COUNT
     
     Logging.log_entry("Total enemies this wave: " + str(WaveDesign['total_enemies']))
-    left_to_spawn = WaveDesign['total_enemies'] + 50   # Padding.
+    left_to_spawn = WaveDesign['total_enemies'] + 5000   # Padding.
 
     # What enemies are eligible to spawn in this wave?
     var wave_enemies = {}

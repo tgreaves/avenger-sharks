@@ -241,6 +241,12 @@ func prepare_for_wave():
     for i in range(1, TheDirector.WaveDesign.get('obstacle_number', 0)):
         $Arena.add_obstacle()
     
+    # Fish spawning
+    if game_mode == 'ARCADE':
+        fish_left_this_wave = constants.FISH_TO_SPAWN_ARCADE
+    else:
+        fish_left_this_wave = constants.FISH_TO_SPAWN_PACIFIST_BASE + ( (wave_number-1) * constants.FISH_TO_SPAWN_PACIFIST_WAVE_MULTIPLIER )
+    
     $Player.set_process(true);
     $Player.set_physics_process(true);
     $Player.prepare_for_new_wave()
@@ -256,6 +262,11 @@ func prepare_for_wave():
     emit_signal("player_move_to_starting_position");
 
     _on_enemy_update_score_display()
+    
+    if game_mode == 'ARCADE':
+        update_time_left_display()
+    else:
+        update_fish_left_display()
     
     emit_signal('player_update_energy')
     emit_signal('player_update_fish')
@@ -276,7 +287,7 @@ func wave_intro():
             'PACIFIST':
                 wave_text = 'COLLECT ALL FISH FOR NEXT WAVE!' 
     else:
-        wave_text = "WAVE " + str(wave_number)
+        wave_text = "[center]WAVE " + str(wave_number) + "\n\nSURVIVE " + str( TheDirector.WaveDesign.get('wave_time')) + " SECONDS!"
     
     var spawn_text = TheDirector.WaveDesign.get('spawn_text', '')
                 
@@ -316,11 +327,7 @@ func start_wave():
     else:
         spawn_enemy('start_spawn','spawn_pattern',false)   
 
-    # Fish spawning
-    if game_mode == 'ARCADE':
-        fish_left_this_wave = constants.FISH_TO_SPAWN_ARCADE
-    else:
-        fish_left_this_wave = constants.FISH_TO_SPAWN_PACIFIST_BASE + ( (wave_number-1) * constants.FISH_TO_SPAWN_PACIFIST_WAVE_MULTIPLIER )
+    
     
     i=0;
 
@@ -328,9 +335,7 @@ func start_wave():
         spawn_fish();
         i=i+1;
     
-    if game_mode == 'ARCADE':
-        update_time_left_display()
-    else:
+    if game_mode == 'PACIFST':
         update_fish_left_display()
         
     # Artillery
@@ -400,7 +405,7 @@ func wave_end_cleanup():
 func game_over():
     game_status = GAME_OVER;
     $HUD.get_node("CanvasLayer/Label").visible = true;
-    $HUD.get_node("CanvasLayer/Label").text = "GAME OVER";
+    $HUD.get_node("CanvasLayer/Label").text = "[center]GAME OVER";
     $AudioStreamPlayerMusic.pitch_scale = 1.0
     
     $AudioStreamPlayerMusic.stop()
@@ -619,7 +624,7 @@ func spawn_fish():
     
     mob.get_node('.').set_position (spawn_position);
     mob.add_to_group('fishGroup');	
-    add_child(mob);
+    add_child(mob, true)
 
 func _process(_delta):
     if SteamClient.STEAM_RUNNING:
@@ -765,19 +770,31 @@ func _reset_score_multiplier():
     _on_enemy_update_score_display()
 
 func update_time_left_display():
-        if $WaveTimeLeftTimer.is_stopped():
-            $HUD.get_node('CanvasLayer').get_node('EnemiesLeft').text = "TIME\n0"
-        else:
-            var time_left = int(ceil($WaveTimeLeftTimer.time_left))
-            $HUD.get_node('CanvasLayer').get_node('EnemiesLeft').text = "TIME\n" + str(time_left);
-
+    
+        var time_left
+        
+        match game_status:
+            GAME_RUNNING,GETTING_KEY,WAVE_END,UPGRADE_SCREEN,UPGRADE_WAITING_FOR_CHOICE:
+                time_left = int(ceil($WaveTimeLeftTimer.time_left))
+            _:
+                time_left = TheDirector.WaveDesign.get('wave_time')
+                 
+        $HUD.get_node('CanvasLayer').get_node('EnemiesLeft').text = "TIME\n" + str(time_left)
+        
+        if time_left == 3 and !$CountdownEffect.is_playing():
+            $CountdownEffect.play()
+            
+        # FOOBAR
+        if time_left and time_left <= 3:
+            $HUD.get_node("CanvasLayer/Label").text = "[center][font_size=128][pulse freq=1.0 color=#ffffff40 ease=-2.0]" + str(time_left)
+            $HUD.get_node("CanvasLayer/Label").visible = true;
+            
 func update_enemies_left_display():
     $HUD.get_node('CanvasLayer').get_node('EnemiesLeft').text = "ENEMIES\n" + str(enemies_left_this_wave);
 
 func update_fish_left_display():
     $HUD.get_node('CanvasLayer').get_node('EnemiesLeft').text = "FISH\n" + str(fish_left_this_wave);
     
-
 func _on_player_player_died():
     game_over();
 
@@ -983,7 +1000,7 @@ func _on_accept_pause_timer_timeout():
     accept_pause = true
     
 func _on_wave_time_left_timer_timeout():
-    if game_status == GAME_RUNNING:
+    if game_mode =='ARCADE' and game_status == GAME_RUNNING:
         Logging.log_entry("Wave duration timeout hit")
         
         # Make sure we update time to 0

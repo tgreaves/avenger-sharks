@@ -67,8 +67,11 @@ https://kenney-assets.itch.io/crosshair-pack
 
 SOUND
 
-Intro & Wave End Music:
+Intro Music:
 https://www.steven-obrien.net/
+
+Menu Music: Grand_Project
+https://pixabay.com/music/pop-romantic-melody-of-the-80s-129224/
 
 Gameplay Music: Grand_Project
 https://pixabay.com/music/synthwave-lady-of-the-80x27s-128379/
@@ -111,6 +114,9 @@ https://pixabay.com/sound-effects/monster-growl-140377/
 
 Artillery explosion: David Dumais
 https://pixabay.com/sound-effects/large-underwater-explosion-190270/
+
+Countdown: Lesiakower
+https://pixabay.com/sound-effects/search/countdown/?pagi=2
 
 THANKS!
 
