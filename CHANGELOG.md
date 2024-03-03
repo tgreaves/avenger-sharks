@@ -1,6 +1,6 @@
 # Changelog
 
-# 1.1.0 (xx-xx-xx)
+# 1.1.0 (2024-03-03)
 
 * Gameplay:
     * Waves: These are now TIME based to keep the action fast, fresh and furious.

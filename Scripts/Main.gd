@@ -433,6 +433,7 @@ func return_to_main_screen():
         artillery.queue_free()
         
     $ArtilleryTimer.stop() 
+    $Key.hide()
     despawn_all_items()
     
     Storage.save_stats()
