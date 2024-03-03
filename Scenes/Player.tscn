@@ -208,7 +208,7 @@ bg_color = Color(0.972549, 0.321569, 0.580392, 1)
 light_mask = 2
 z_index = 1
 position = Vector2(1253, 666)
-collision_mask = 112
+collision_mask = 368
 motion_mode = 1
 script = ExtResource("1_m4brx")
 
@@ -299,6 +299,14 @@ one_shot = true
 
 [node name="FishFrenzyFireTimer" type="Timer" parent="."]
 wait_time = 0.5
+one_shot = true
+
+[node name="PowerPelletTimer" type="Timer" parent="."]
+wait_time = 0.5
+one_shot = true
+
+[node name="PowerPelletWarningTimer" type="Timer" parent="."]
+wait_time = 0.25
 one_shot = true
 
 [node name="PlayerExplosionTimer" type="Timer" parent="."]

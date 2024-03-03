@@ -1,6 +1,43 @@
 # Changelog
 
-# 1.0.0 (2024-xx-xx)
+# 1.1.0 (2024-03-03)
+
+* Gameplay:
+    * Waves: These are now TIME based to keep the action fast, fresh and furious.
+    * New power-up: A magical star that allows your shark to eat the now very scared enemies!
+    * Artillery: Watch out for POLLUTION STRIKES from above!
+    * Spawning: Avoid spawn types at beginning of wave that give player too much space.
+    * AI: Chasing enemies re-orient more often.
+    * Knockback: Some enemies are now knocked back when hit.
+* Performance:
+    * FPS improved as follows...
+        * Switched to the Forward+ renderer (Was: 'Compatibility').
+        * Particles now switched to GPU.
+        * Replace PointLight2D lighting effects on projectiles with Sprite2D equivalent.
+* Sound:
+    * New music tracks for menu and gameplay.  Enjoy!
+    * Countdown effect towards end of wave.
+    * Grenade volume lowered slightly.
+* Bug fixes:
+    * Diet: At some point, Necromancers stopped wanting to eat fish.  Fixed.
+    * UI: Tightened up mouse showing / hiding as appropriate
+* Platform:
+    * Steam : GodotSteam GDExtension upgraded to 4.6.
+* Misc:
+    * Haptic feedback added! Vibrates on player hit + shark frenzy.  Turn on in OPTIONS.
+        * This will not work on all platforms.
+            * Example for MacOS Sonoma - https://github.com/godotengine/godot/issues/88674
+    * Improved alignment of death animations.
+    * Fish now swim off to freedom once rescued.
+    * Pause improvements:
+        * ESC can be used to unpause.
+        * Can now pause game during WAVE START, WAVE END and UPGRADE SCREEN.
+    * Debug menu to keep an eye on performance (toggle modes with F3).
+    * Removed some spurious debug print() statements.
+
+# 1.0.0 (2024-02-21)
+
+This is the first public release of Avenger Sharks on Steam.
 
 * Platform:
     * Steam: Bringing up Steam Overlay during game automatically pauses.

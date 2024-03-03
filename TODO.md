@@ -2,7 +2,6 @@
 
 * Difficulty levels (fish themed, e.g Minnow upwards)+
 * Chill mode
-* Dinosaur mode - Only triggering dinosaurs will kill enemies, but have more of them?
 
 # Power-ups / Progression
 
@@ -10,24 +9,18 @@
   * Bouncing shots?
   * Exploding shots
   * Piercing shots
+  * Add flame thrower!
+  * Cursed power-ups :D
 
 * Keep count of fish rescued - use as currency in pre-game shop...
   * Start with more health.
   * Other characters?
-
-# Game environment
-
-* Scenery / Obstacles in room (Tileset has boxes)
 
 # User Experience
 
 * How to play
 
 # Bugs
-
-# THINGS FOR 0.5-alpha
-
-* BUG FIXES:
 
 * BOSS WAVE
     * Randomly determine boss characteristics.
@@ -68,10 +61,6 @@
             * CHARGING
             * FIRING
         * Turret could fire a homing missile instead.
-        
-* POWER UPS
-    * Add flame thrower!
-    * Cursed power-ups :D
 
 * WAVE PROGRESSION
     * Choice of which level

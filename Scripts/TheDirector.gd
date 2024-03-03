@@ -17,7 +17,16 @@ func design_wave(wave_number):
         Logging.log_entry("Boss wave qualifier.")
         design_boss_wave(wave_number)
         return
+
+    # Wave timer.
+    WaveDesign['wave_time'] = constants.WAVE_SURVIVAL_TIME_BASE
+
+    if wave_number > 1:
+        WaveDesign['wave_time'] = WaveDesign['wave_time'] + ( constants.WAVE_SURVIVAL_TIME_INCREASE * (wave_number-1) )
         
+    if WaveDesign['wave_time'] > constants.WAVE_SURVIVAL_TIME_MAXIMUM:
+        WaveDesign['wave_time'] = constants.WAVE_SURVIVAL_TIME_MAXIMUM
+
     # Wave obstacle design.
     WaveDesign['obstacle_number'] = randi_range(constants.ARENA_OBSTACLE_MINIMUM, constants.ARENA_OBSTACLE_MAXIMUM)
     
@@ -37,6 +46,16 @@ func design_wave(wave_number):
     else:
         WaveDesign['wave_special_type'] = 'STANDARD'
     
+    # Artillery
+    if wave_number >= constants.ARTILLERY_MINIMUM_WAVE:
+        Logging.log_entry("Artillery is possible for this wave.")
+        if randi_range(1,100) <= constants.ARTILLERY_FEATURE_PERCENTAGE:
+            Logging.log_entry("Artillery WILL happen.")
+            WaveDesign['artillery'] = true
+        else:
+            Logging.log_entry("Artillery WILL NOT happen.")
+            
+    
     # How many enemies?
     WaveDesign['total_enemies'] = (wave_number * constants.ENEMY_MULTIPLIER_AT_WAVE_START) + (wave_number * constants.ENEMY_MULTIPLIER_DURING_WAVE)
     
@@ -45,7 +64,7 @@ func design_wave(wave_number):
         WaveDesign['total_enemies'] = constants.DEV_SPAWN_ENEMY_COUNT
     
     Logging.log_entry("Total enemies this wave: " + str(WaveDesign['total_enemies']))
-    left_to_spawn = WaveDesign['total_enemies']
+    left_to_spawn = WaveDesign['total_enemies'] + 5000   # Padding.
 
     # What enemies are eligible to spawn in this wave?
     var wave_enemies = {}
@@ -79,7 +98,7 @@ func design_wave(wave_number):
     Logging.log_entry("Number of enemies to spawn at start: " + str(number_to_spawn_at_start))
     WaveDesign['start_spawn'] = {}
     WaveDesign['start_spawn']['spawn_array'] = get_random_enemies(number_to_spawn_at_start)
-    WaveDesign['start_spawn']['spawn_pattern'] = get_spawn_pattern('')
+    WaveDesign['start_spawn']['spawn_pattern'] = get_spawn_pattern(constants.ENEMY_SPAWN_PLACEMENT_CONFIGURATION_WAVE_START, '')
     
     # Now subsequent waves.
     left_to_spawn = left_to_spawn - number_to_spawn_at_start
@@ -100,11 +119,11 @@ func design_wave(wave_number):
         
         if ( randi_range(1,100) <= constants.ENEMY_REINFORCEMENTS_SPAWN_MULTI_PLACEMENT_PERCENTAGE):
             WaveDesign[spawn_key]['spawn_array'] = get_random_enemies(enemies_to_spawn)
-            WaveDesign[spawn_key]['spawn_pattern'] = get_spawn_pattern('')
-            WaveDesign[spawn_key]['spawn_pattern_b'] = get_spawn_pattern(WaveDesign[spawn_key]['spawn_pattern'])
+            WaveDesign[spawn_key]['spawn_pattern'] = get_spawn_pattern(constants.ENEMY_SPAWN_PLACEMENT_CONFIGURATION, '')
+            WaveDesign[spawn_key]['spawn_pattern_b'] = get_spawn_pattern(constants.ENEMY_SPAWN_PLACEMENT_CONFIGURATION, WaveDesign[spawn_key]['spawn_pattern'])
         else:
             WaveDesign[spawn_key]['spawn_array'] = get_random_enemies(enemies_to_spawn)
-            WaveDesign[spawn_key]['spawn_pattern'] = get_spawn_pattern('')
+            WaveDesign[spawn_key]['spawn_pattern'] = get_spawn_pattern(constants.ENEMY_SPAWN_PLACEMENT_CONFIGURATION,'')
     
         left_to_spawn = left_to_spawn - enemies_to_spawn
         
@@ -143,7 +162,7 @@ func get_random_enemies(number_enemies):
         
     return spawn_array
     
-func get_spawn_pattern(previous_spawn_pattern):
+func get_spawn_pattern(enemy_spawn_placement_configuration, previous_spawn_pattern):
     var acceptable_choice = false
     var spawn_pattern
     
@@ -152,9 +171,9 @@ func get_spawn_pattern(previous_spawn_pattern):
     while (!acceptable_choice):
         var spawn_choice = randi_range(1,100)
             
-        for spawn_key in constants.ENEMY_SPAWN_PLACEMENT_CONFIGURATION:
+        for spawn_key in enemy_spawn_placement_configuration:
             if spawn_choice <= spawn_key:
-                spawn_pattern = constants.ENEMY_SPAWN_PLACEMENT_CONFIGURATION[spawn_key]
+                spawn_pattern = enemy_spawn_placement_configuration[spawn_key]
                 break
                 
         if spawn_pattern != previous_spawn_pattern:

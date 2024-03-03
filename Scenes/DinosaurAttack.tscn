@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://ch08b0kbbu3je"]
+[gd_scene load_steps=15 format=3 uid="uid://ch08b0kbbu3je"]
 
 [ext_resource type="Script" path="res://Scripts/DinosaurAttack.gd" id="1_w8br7"]
 [ext_resource type="Texture2D" uid="uid://ig2s00164uhd" path="res://Sprites/SharkSpray/Water__01.png" id="2_1wwod"]
@@ -45,6 +45,24 @@ animations = [{
 offsets = PackedFloat32Array(0, 0.683333)
 colors = PackedColorArray(0, 0, 1, 1, 0.4, 0.827451, 1, 1)
 
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_ys4uo"]
+gradient = SubResource("Gradient_0e304")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_s3lob"]
+particle_flag_disable_z = true
+emission_shape = 1
+emission_sphere_radius = 11.11
+angle_min = 27.3
+angle_max = 68.2
+direction = Vector3(2.08165e-12, 2.08165e-12, 0)
+gravity = Vector3(2.08165e-12, 2.08165e-12, 0)
+scale_min = 0.1
+scale_max = 0.1
+color_ramp = SubResource("GradientTexture1D_ys4uo")
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_m6lul"]
+blend_mode = 1
+
 [node name="DinosaurAttack" type="CharacterBody2D"]
 scale = Vector2(0.5, 0.5)
 collision_layer = 2
@@ -58,22 +76,23 @@ shape = SubResource("CircleShape2D_lwg83")
 sprite_frames = SubResource("SpriteFrames_3lkrx")
 frame_progress = 0.0241135
 
-[node name="CPUParticles2D" type="CPUParticles2D" parent="."]
+[node name="GPUParticles2D" type="GPUParticles2D" parent="."]
 amount = 16
-lifetime = 0.2
+process_material = SubResource("ParticleProcessMaterial_s3lob")
 texture = ExtResource("7_v3xt3")
-emission_shape = 1
-emission_sphere_radius = 11.11
-direction = Vector2(2.08165e-12, 2.08165e-12)
-gravity = Vector2(2.08165e-12, 2.08165e-12)
-angle_min = 27.3
-angle_max = 68.2
-scale_amount_min = 0.1
-scale_amount_max = 0.1
-color_ramp = SubResource("Gradient_0e304")
+lifetime = 0.2
+fixed_fps = 0
+draw_order = 0
 
 [node name="PointLight2D" type="PointLight2D" parent="."]
+visible = false
 energy = 2.0
 shadow_enabled = true
 texture = ExtResource("8_nq21h")
 height = 50.0
+
+[node name="LightSprite2D" type="Sprite2D" parent="."]
+modulate = Color(0.521141, 0.521141, 0.52114, 1)
+material = SubResource("CanvasItemMaterial_m6lul")
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("8_nq21h")

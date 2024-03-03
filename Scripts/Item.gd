@@ -27,6 +27,9 @@ func spawn_specific(item_selection, despawn_mode):
     $CollisionShape2D.disabled = false;
     $AnimatedSprite2D.play()
     
+    if item_selection == 'power-pellet':
+        $AnimatedSprite2D.scale = Vector2(4,4)
+    
     if despawn_mode:
         $DespawnTimer.start(constants.ITEM_DESPAWN_TIME)
     
@@ -55,5 +58,4 @@ func _physics_process(_delta):
                     velocity = target_direction * ( get_parent().get_node("Player").speed + 3000 )
 
 func despawn():
-    # TODO: Chest should play a different animation, and then spawn text to match item type.
     queue_free()

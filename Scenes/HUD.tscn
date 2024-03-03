@@ -32,7 +32,26 @@ theme_override_fonts/font = ExtResource("1_4l55f")
 theme_override_font_sizes/font_size = 64
 text = "SCORE"
 
-[node name="Label" type="Label" parent="CanvasLayer"]
+[node name="Label" type="RichTextLabel" parent="CanvasLayer"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -478.0
+offset_top = -240.0
+offset_right = 482.0
+offset_bottom = -173.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/normal_font = ExtResource("1_4l55f")
+theme_override_font_sizes/normal_font_size = 64
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+
+[node name="Label2" type="Label" parent="CanvasLayer"]
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -74,7 +93,7 @@ grow_horizontal = 0
 size_flags_horizontal = 8
 theme_override_fonts/font = ExtResource("1_4l55f")
 theme_override_font_sizes/font_size = 64
-text = "ENEMIES"
+text = "TIME"
 horizontal_alignment = 2
 
 [node name="PowerUpContainer" type="VBoxContainer" parent="CanvasLayer"]

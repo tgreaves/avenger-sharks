@@ -23,7 +23,10 @@ func _physics_process(_delta):
         
         if collision.get_collider().name == 'PlayerStartLocation':
             break 
-            
+
+        if collision.get_collider().name.contains('Artillery'):
+            break
+                        
         collision.get_collider().get_node('.')._death('DINOSAUR');
         $CollisionShape2D.disabled = true;
         self.queue_free()

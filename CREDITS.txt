@@ -7,6 +7,8 @@ Additional Design and Inspiration
 JACK GREAVES
 EMILIA GREAVES
 
+Copyright © 2023-present Tristan Greaves
+
 ARTWORK
 
 Underwater Fantasy Pixel Art Environment: ansimuz
@@ -51,6 +53,9 @@ https://vladpenn.itch.io/weapon
 Explosions: Limofeus
 https://limofeus.itch.io/pixel-simulations
 
+Star: Narik
+https://soulofkiran.itch.io/pixel-art-animated-star
+
 Particles: Kenney
 https://www.kenney.nl/assets/particle-pack
 
@@ -62,10 +67,19 @@ https://kenney-assets.itch.io/crosshair-pack
 
 SOUND
 
-Game Music:
+Intro Music:
 https://www.steven-obrien.net/
 
-Trailer Music:
+Menu Music: Grand_Project
+https://pixabay.com/music/pop-romantic-melody-of-the-80s-129224/
+
+Gameplay Music: Grand_Project
+https://pixabay.com/music/synthwave-lady-of-the-80x27s-128379/
+    
+Hungry Shark Music: Gvidon
+https://pixabay.com/music/rock-shark-hunt-16191/
+
+Trailer Music: Grand_Project
 https://pixabay.com/music/synthwave-on-the-road-to-the-eighties-59sec-177566/
 
 Shark spray: mparsons99
@@ -97,6 +111,12 @@ https://pixabay.com/sound-effects/notification-for-game-scenes-132473/
 
 Dinosaur growl: Universfield
 https://pixabay.com/sound-effects/monster-growl-140377/
+
+Artillery explosion: David Dumais
+https://pixabay.com/sound-effects/large-underwater-explosion-190270/
+
+Countdown: Lesiakower
+https://pixabay.com/sound-effects/search/countdown/?pagi=2
 
 THANKS!
 
@@ -142,3 +162,14 @@ Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+
+DEBUG MENU FOR GODOT 4.x
+
+Copyright © 2023-present Hugo Locurcio and contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+

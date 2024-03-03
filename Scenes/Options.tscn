@@ -122,6 +122,25 @@ size_flags_vertical = 1
 max_value = 1.0
 step = 0.05
 
+[node name="EnableHapticsContainer" type="HBoxContainer" parent="CanvasLayer/OptionsContainer"]
+layout_mode = 2
+
+[node name="EnableHapticsLabel" type="Label" parent="CanvasLayer/OptionsContainer/EnableHapticsContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+theme_override_fonts/font = ExtResource("2_2d14t")
+theme_override_font_sizes/font_size = 64
+text = "ENABLE HAPTICS
+"
+
+[node name="EnableHapticsSetting" type="Button" parent="CanvasLayer/OptionsContainer/EnableHapticsContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("2_2d14t")
+theme_override_font_sizes/font_size = 64
+text = "OFF"
+
 [node name="ReturnButton" type="Button" parent="CanvasLayer/OptionsContainer"]
 custom_minimum_size = Vector2(600, 2.08165e-12)
 layout_mode = 2
@@ -135,4 +154,5 @@ text = "RETURN"
 [connection signal="value_changed" from="CanvasLayer/OptionsContainer/MasterVolumeContainer/MasterVolumeSetting" to="." method="_on_master_volume_setting_value_changed"]
 [connection signal="value_changed" from="CanvasLayer/OptionsContainer/MusicVolumeContainer/MusicVolumeSetting" to="." method="_on_music_volume_setting_value_changed"]
 [connection signal="value_changed" from="CanvasLayer/OptionsContainer/EffectsVolumeContainer/EffectsVolumeSetting" to="." method="_on_effects_volume_setting_value_changed"]
+[connection signal="pressed" from="CanvasLayer/OptionsContainer/EnableHapticsContainer/EnableHapticsSetting" to="." method="_on_enable_haptics_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/OptionsContainer/ReturnButton" to="." method="_on_return_button_pressed"]

@@ -15,11 +15,15 @@ func _physics_process(_delta):
         
         if collision.get_collider().name == 'Arena':
             self.queue_free()
-            break;
+            break
             
         if collision.get_collider().name == 'ExitDoor':
             self.queue_free()
-            break;
+            break
+        
+        if collision.get_collider().name.contains('Artillery'):
+            self.queue_free()
+            break
         
         collision.get_collider().get_node('.')._death('PLAYER-SHOT');
         $CollisionShape2D.disabled = true;

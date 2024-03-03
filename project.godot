@@ -23,6 +23,7 @@ Storage="*res://Scripts/Storage.gd"
 SteamClient="*res://Scripts/SteamClient.gd"
 Logging="*res://Scripts/Logging.gd"
 TheDirector="*res://Scripts/TheDirector.gd"
+DebugMenu="*res://addons/debug_menu/debug_menu.tscn"
 
 [display]
 
@@ -42,6 +43,10 @@ project/assembly_name="avenger-sharks"
 
 movie_writer/movie_file="/Users/greavet/src/Godot/movies/test.avi"
 movie_writer/fps=30
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/debug_menu/plugin.cfg")
 
 [filesystem]
 
@@ -190,9 +195,9 @@ back={
 2d_physics/layer_6="items"
 2d_physics/layer_7="fish"
 2d_physics/layer_8="dinosaur"
+2d_physics/layer_9="artillery"
 
 [rendering]
 
-renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
 environment/defaults/default_clear_color=Color(0, 0, 0, 1)

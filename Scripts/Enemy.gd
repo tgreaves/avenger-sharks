@@ -8,7 +8,8 @@ const EnemyTrapScene = preload("res://Scenes/EnemyTrap.tscn");
 enum {
     SPAWNING,
     WANDER,
-    DYING
+    DYING,
+    SWIM_ESCAPE
 }
 
 var enemy_type
@@ -20,6 +21,7 @@ var attack_timer_max
 var attack_type
 var trap_timer_min
 var trap_timer_max
+var death_sprite_offset
 var stored_modulate;
 var hit_to_be_processed;
 var ai_mode = ''
@@ -33,9 +35,13 @@ var child_number
 var desired_velocity
 var parent_node
 var enemy_group_id
+var call_for_help_timer_label
+var can_be_knocked_back = false
+var knocked_back = false
 
 func _ready():
-    pass
+    $CallForHelpTimer.connect('timeout', _on_call_for_help_timer_timeout)
+    $KnockbackTimer.connect('timeout', _on_knockback_timer_timeout)
     
 func spawn_specific(enemy_type_in):
     enemy_type = enemy_type_in
@@ -56,11 +62,14 @@ func spawn_specific(enemy_type_in):
     trap_timer_min = enemy_settings.get('trap_timer_min', 0)
     trap_timer_max = enemy_settings.get('trap_timer_max', 0)
     grouped_enemy = enemy_settings.get('grouped_enemy', false)
+    can_be_knocked_back = enemy_settings.get('can_be_knocked_back', false)
     
     var sprite_offset = enemy_settings.get('sprite_offset', null)
     var sprite_scale = enemy_settings.get('sprite_scale', null)
     var collision_scale = enemy_settings.get('collision_scale', null)
     var collision_mask_enable = enemy_settings.get('collision_mask_enable', null)
+    
+    death_sprite_offset = enemy_settings.get('death_sprite_offset', null)
     
     if sprite_offset:
         $AnimatedSprite2D.offset = sprite_offset
@@ -145,10 +154,19 @@ func set_child_number(in_child_number):
     
 func set_enemy_group_id(in_enemy_group_id):
     enemy_group_id = in_enemy_group_id
+    
+func reset_state_timer():
+    $StateTimer.start(0.1)
+    
+func stop_calling_for_help():    
+    $CallForHelpTimer.stop()
+    
+    if call_for_help_timer_label and is_instance_valid(call_for_help_timer_label):
+        call_for_help_timer_label.hide()
 
 func _physics_process(delta):
     set_modulate(lerp(get_modulate(), Color(1,1,1,1), 0.02));
-    
+   
     match state:
         SPAWNING:
             velocity = Vector2(0,0);
@@ -175,8 +193,15 @@ func _physics_process(delta):
             if $FlashHitTimer.time_left == 0:
                 set_modulate(Color(1,1,1,1));
             
-            if $StateTimer.time_left == 0:
-                match ai_mode:
+            if $StateTimer.time_left == 0 and !knocked_back:
+                var ai_mode_to_use = ai_mode
+                if get_parent().get_node("Player").power_pellet_enabled:
+                    ai_mode_to_use = 'RUN_AWAY'
+                    $ScaredParticles.set_emitting(true)
+                else:
+                    $ScaredParticles.set_emitting(false)
+                
+                match ai_mode_to_use:
                     # Keep running until enemy hits a wall.
                     'DEFERRED_UNTIL_WALL':
                         velocity = initial_direction * (enemy_speed * constants.ENEMY_SPEED_DEFERRED_AI_MULTIPLIER)
@@ -193,7 +218,14 @@ func _physics_process(delta):
                         var target_direction = (get_parent().get_node("Player").global_position - global_position).normalized();
                         velocity = target_direction * enemy_speed;
                         $StateTimer.start(randf_range(constants.ENEMY_CHASE_REORIENT_MINIMUM_SECONDS,
-                                                    constants.ENEMY_CHASE_REORIENT_MAXIMUM_SECONDS));
+                                                    constants.ENEMY_CHASE_REORIENT_MAXIMUM_SECONDS))
+                                                    
+                    # Flee the player.
+                    'RUN_AWAY':
+                        var target_direction = (global_position - get_parent().get_node("Player").global_position).normalized();
+                        velocity = target_direction * (enemy_speed / 2);
+                        $StateTimer.start(randf_range(constants.ENEMY_CHASE_REORIENT_MINIMUM_SECONDS,
+                                                    constants.ENEMY_CHASE_REORIENT_MAXIMUM_SECONDS))
                     
                     # 1. Try and eat fish
                     # 2. Pursue player.                            
@@ -236,18 +268,19 @@ func _physics_process(delta):
                             desired_velocity = Vector2(randf_range(-1,1), randf_range(-1,1)).normalized() * enemy_speed;
                 
                 # OVERRIDE AI - Always chase the player when wave population is low.   
-                if (    get_parent().enemies_left_this_wave <= constants.ENEMY_ALL_CHASE_WHEN_POPULATION_LOW and 
-                        (!child_of_enemy) and 
-                        constants.ENEMY_SETTINGS[enemy_type].get('chase_at_low_population',true)):
-                    var target_direction = (get_parent().get_node("Player").global_position - global_position).normalized();
-                    
-                    if get_parent().enemies_left_this_wave <= constants.ENEMY_ALL_CHASE_WHEN_POPULATION_LOW:
-                        velocity = target_direction * (enemy_speed * constants.ENEMY_SPEED_POPULATION_LOW_MULTIPLIER)
-                    else:
-                        velocity = target_direction * enemy_speed;
-                    
-                    $StateTimer.start(randf_range(constants.ENEMY_CHASE_REORIENT_MINIMUM_SECONDS,
-                                                constants.ENEMY_CHASE_REORIENT_MAXIMUM_SECONDS));
+                #if (    get_parent().enemies_left_this_wave <= constants.ENEMY_ALL_CHASE_WHEN_POPULATION_LOW and 
+                        #(!child_of_enemy) and 
+                        #(!get_parent().get_node('Player').power_pellet_enabled) and 
+                        #constants.ENEMY_SETTINGS[enemy_type].get('chase_at_low_population',true)):
+                    #var target_direction = (get_parent().get_node("Player").global_position - global_position).normalized();
+                    #
+                    #if get_parent().enemies_left_this_wave <= constants.ENEMY_ALL_CHASE_WHEN_POPULATION_LOW:
+                        #velocity = target_direction * (enemy_speed * constants.ENEMY_SPEED_POPULATION_LOW_MULTIPLIER)
+                    #else:
+                        #velocity = target_direction * enemy_speed;
+                    #
+                    #$StateTimer.start(randf_range(constants.ENEMY_CHASE_REORIENT_MINIMUM_SECONDS,
+                                                #constants.ENEMY_CHASE_REORIENT_MAXIMUM_SECONDS));
                                                                                 
         DYING:
             if $FlashHitTimer.time_left == 0:
@@ -258,8 +291,19 @@ func _physics_process(delta):
                 
             if $StateTimer.time_left == 0:
                 self.queue_free();
+        SWIM_ESCAPE:
+            if $StateTimer.time_left == 0:
+                queue_free()
+                
+            var target_position = get_parent().get_node('Arena').get_node('ExitDoor').global_position
 
-    if state != DYING:
+            if global_position.distance_to(target_position) <= 200:
+                queue_free()
+            
+            var target_direction = (target_position - global_position).normalized()
+            velocity = target_direction * 2500
+
+    if (state != DYING) && (state != SWIM_ESCAPE):
         if desired_velocity and !child_of_enemy:
             velocity = velocity.lerp(desired_velocity, 0.01)
     
@@ -276,7 +320,7 @@ func _physics_process(delta):
     if velocity.x < 0:
         $AnimatedSprite2D.set_flip_h(true);	
  
-    if $AttackTimer.time_left == 0 && state == WANDER && attack_timer_min:
+    if $AttackTimer.time_left == 0 && state == WANDER && attack_timer_min && (!get_parent().get_node('Player').power_pellet_enabled):
         match attack_type:
             'STANDARD':
                 var enemy_attack = EnemyAttackScene.instantiate()
@@ -350,10 +394,21 @@ func _death(death_source):
             $CollisionShape2D.set_deferred("disabled", true)
             velocity = Vector2(0,0);
             $AnimatedSprite2D.animation = enemy_type + str('-death');
+            
+            if death_sprite_offset:
+                var temp_offset_x = death_sprite_offset.x
+                var temp_offset_y = death_sprite_offset.y
+                    
+                if $AnimatedSprite2D.is_flipped_h():
+                    temp_offset_x = -temp_offset_x
+                    
+                $AnimatedSprite2D.offset = Vector2(temp_offset_x, temp_offset_y)                    
+
             $AnimatedSprite2D.play()
             $AudioStreamPlayer.play();
             $StateTimer.start(2);
             $SpawnParticles.emitting = false
+            $ScaredParticles.set_emitting(false)
             $DeathParticles.emitting = true
             $DeathParticlesTimer.start()
             state = DYING;
@@ -374,6 +429,11 @@ func _death(death_source):
             stored_modulate = get_modulate()
             set_modulate(Color(10,10,10,10));
             $FlashHitTimer.start()
+            
+            if can_be_knocked_back and death_source == 'PLAYER-SHOT':
+                velocity = velocity.clamp(-constants.ENEMY_KNOCKBACK_VELOCITY_CLAMP, constants.ENEMY_KNOCKBACK_VELOCITY_CLAMP)
+                knocked_back = true
+                $KnockbackTimer.start(constants.ENEMY_KNOCKBACK_TIMER)
      
 # Handle grouped enemy death.
 # Basically, keep the group (snake!) together properly.  
@@ -452,8 +512,51 @@ func score_label_animation(label_text):
     tween.tween_property(new_label, "position", target_position, 2)
     tween.tween_callback(new_label.queue_free).set_delay(2)
     
+func help_me_label_animation(label_text):
+    var new_label = $HelpMeLabel.duplicate()
+    add_child(new_label)
+    
+    # Keep track so we can quickly remove it upon end of shark attack.
+    call_for_help_timer_label = new_label
+    
+    new_label.set_modulate(Color(1,1,1,1));
+    new_label.text = label_text
+    new_label.visible = true
+    
+    # Text should move upwards slightly.
+    var target_position = new_label.position
+    target_position.y += -50
+    
+    var tween = get_tree().create_tween()
+    tween.set_parallel()
+    tween.tween_property(new_label, "modulate", Color(0,0,0,0), 2)
+    tween.tween_property(new_label, "position", target_position, 2)
+    tween.tween_callback(new_label.queue_free).set_delay(2)
+    
 func is_enemy_alive():
     if state == WANDER:
         return true
     else:
         return false
+
+func consider_calling_for_help():
+    $CallForHelpTimer.set_wait_time( randf_range(0.1, 0.4))
+    $CallForHelpTimer.start()
+    
+func _on_call_for_help_timer_timeout():
+    
+    $CallForHelpTimer.set_wait_time(randf_range(constants.ENEMY_CALL_FOR_HELP_MINIMUM_TIME, constants.ENEMY_CALL_FOR_HELP_MAXIMUM_TIME))
+    
+    if is_enemy_alive():    
+        if randi_range(0,100) <= constants.ENEMY_CALL_FOR_HELP_PERCENTAGE:
+            help_me_label_animation( constants.ENEMY_CALL_FOR_HELP_PHRASES[randi() % constants.ENEMY_CALL_FOR_HELP_PHRASES.size()] )
+            
+func _on_knockback_timer_timeout():
+    knocked_back = false
+    
+func swim_escape():
+    state = SWIM_ESCAPE
+    $CollisionShape2D.set_deferred("disabled", true)
+    $SpawnParticles.emitting = false
+    $ScaredParticles.set_emitting(false)
+    $StateTimer.start(2)

@@ -32,13 +32,15 @@ Game Design and Coding: Tristan Greaves
 
 Additional Design and Inspiration: Jack and Emilia Greaves
 
+Copyright © 2023-present Tristan Greaves
+
 [Full credits and Licenses](CREDITS.txt)
 
 # Media
 
 Click first image to watch the trailer.
 
-[![Watch the video](https://img.youtube.com/vi/YWCajQrc2XY/hqdefault.jpg)](https://www.youtube.com/embed/<VIDEO_ID>)
+[![Watch the video](https://img.youtube.com/vi/YWCajQrc2XY/hqdefault.jpg)](https://www.youtube.com/embed/YWCajQrc2XY)
 
 ![Avenger Sharks screenshot 2](/Store_Assets/screenshot-frenzy.png)
 

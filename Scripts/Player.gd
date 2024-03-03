@@ -40,6 +40,8 @@ var fish_frenzy_enabled = false
 var fish_frenzy_colour
 var item_magnet_enabled = false
 var blink_status = false
+var power_pellet_enabled = false
+var power_pellet_warning_running = false
 var powerup_labels_being_displayed = 0
 var fire_delay = constants.PLAYER_FIRE_DELAY
 var grenade_delay = constants.PLAYER_GRENADE_DELAY
@@ -79,6 +81,8 @@ func prepare_for_new_game():
     fire_delay = constants.PLAYER_FIRE_DELAY
     spray_size = 0.5
     fish_frenzy_enabled = false
+    power_pellet_enabled = false
+    $AnimatedSprite2D.set_modulate(Color(1, 1, 1, 1))
     
     for single_powerup in max_powerup_levels:
         current_powerup_levels[single_powerup] = 0
@@ -189,6 +193,9 @@ func get_input():
         $FishFrenzyTimer.start(constants.PLAYER_FISH_FRENZY_DURATION)
         $FishFrenzyFireTimer.start(constants.PLAYER_FISH_FRENZY_FIRE_DELAY)
         
+        if Storage.Config.get_value('config','enable_haptics',false):
+            Input.start_joy_vibration(0, 0.25, 0.25, constants.PLAYER_FISH_FRENZY_DURATION)
+        
 func _physics_process(_delta):
     get_input()
     move_and_slide()
@@ -214,6 +221,26 @@ func _physics_process(_delta):
     
     match shark_status:
         ALIVE:
+            if power_pellet_enabled:
+                if $PowerPelletTimer.time_left == 0:
+                    power_pellet_enabled = false
+                    power_pellet_warning_running = false
+                    end_shark_attack()
+                else:
+                    # Start 'Running out' blinking timer
+                    if $PowerPelletTimer.time_left < 2 and !power_pellet_warning_running:
+                        $PowerPelletWarningTimer.start()
+                        power_pellet_warning_running = true
+            
+                # Alternate normal / red shark colour as timer is running out.
+                if power_pellet_warning_running and $PowerPelletWarningTimer.time_left == 0:
+                    if $AnimatedSprite2D.get_modulate() == Color(1,1,1,1):
+                        $AnimatedSprite2D.set_modulate(Color(1, 0, 0, 1))
+                    else:
+                        $AnimatedSprite2D.set_modulate(Color(1, 1, 1, 1))
+                    
+                    $PowerPelletWarningTimer.start()
+            
             if velocity.x > 0:
                 $AnimatedSprite2D.set_flip_h(true);
             
@@ -303,7 +330,22 @@ func _physics_process(_delta):
                             get_parent().get_node('HUD').activate_powerup(powerup_selected)
                             get_parent().get_node('HUD').set_powerup_level(powerup_selected, current_powerup_levels[powerup_selected])
                             $AudioStreamPowerUp.play()
-                        
+                        "power-pellet":
+                            $PowerPelletTimer.start(constants.POWER_PELLET_ACTIVE_DURATION)
+                            powerup_label_animation('TIME FOR DINNER!')
+                            power_pellet_enabled = true
+                            power_pellet_warning_running = false
+                            get_parent().get_node('AudioStreamPlayerMusic').set_stream_paused(true)
+                            get_parent().get_node('SharkAttackMusic').play()
+                            
+                            # BLOOD THIRSTY
+                            $AnimatedSprite2D.set_modulate(Color(1, 0, 0, 1))
+                            
+                            # Force direction change
+                            for single_enemy in get_tree().get_nodes_in_group('enemyGroup'):
+                                single_enemy.consider_calling_for_help()
+                                single_enemy.reset_state_timer()
+                                                  
                     collided_with.get_node('.').despawn()
                 
                     break
@@ -393,7 +435,6 @@ func _physics_process(_delta):
                 $AnimatedSprite2D.set_flip_h(false);
             
             if $HuntingKeyTimer.time_left == 0:
-                Logging.log_entry("HuntingKeyTimer expired.  Assume stuck looking for key.  Force moving.")
                 position = get_parent().get_node('Key').global_position
             
             for i in get_slide_collision_count():
@@ -406,7 +447,6 @@ func _physics_process(_delta):
                     get_parent().get_node('Arena').get_node('ExitDoor').get_node('CollisionShape2D').disabled = false;
                     emit_signal('player_got_key')
                     $HuntingDoorTimer.start()
-                    Logging.log_entry("Starting door hunting timer")
         HUNTING_EXIT:
             var did_collide = false
             
@@ -417,7 +457,6 @@ func _physics_process(_delta):
                 $AnimatedSprite2D.set_flip_h(false);
               
             if $HuntingDoorTimer.time_left == 0:
-                Logging.log_entry("HuntingDoorTimer expired.  Assume stuck looking for exit.  Force moving.")
                 position.x = 2632
                 position.y = 286
             
@@ -432,9 +471,7 @@ func _physics_process(_delta):
                     did_collide=true
                     shark_status = FOUND_EXIT;
                     velocity = Vector2i(0,0)
-                    
-                    Logging.log_entry("DOOR FOUND - position " + str(position.x) + " " + str(position.y))
-                    
+
                     # Open door.
                     get_parent().get_node('Arena').open_top_door()
                     get_parent().get_node('Arena').get_node('ExitDoor').get_node('CollisionShape2D').disabled = true;
@@ -477,7 +514,7 @@ func _player_hit():
     if shark_status != ALIVE:
         return
     
-    if $PlayerHitGracePeriodTimer.time_left == 0:
+    if (!power_pellet_enabled) and $PlayerHitGracePeriodTimer.time_left == 0:
     
         $PlayerHitGracePeriodTimer.start();
         $AudioStreamPlayerHit.play();
@@ -485,6 +522,9 @@ func _player_hit():
         get_parent()._reset_score_multiplier()
 
         get_parent().get_node('HUD').flash_screen_red()
+        
+        if Storage.Config.get_value('config','enable_haptics',false):
+            Input.start_joy_vibration(0, 0.5, 0.5, 0.05)
         
         var damage_reduction_percentage = upgrades['ARMOUR'][0] * constants.ARMOUR_DAMAGE_REDUCTION_PERCENTAGE
         var damage_to_perform = constants.PLAYER_HIT_BY_ENEMY_DAMAGE - (( damage_reduction_percentage / 100.0) * constants.PLAYER_HIT_BY_ENEMY_DAMAGE)
@@ -549,8 +589,6 @@ func powerup_label_animation(powerup_name):
     # Initial position bump if there are multiple animations happening.
     if powerup_labels_being_displayed > 1:
         new_label.position.y += -50 * (powerup_labels_being_displayed-1)
-
-    print("NO LABELS = " +str(powerup_labels_being_displayed) + " - position: " + str(new_label.position.y))
     
     new_label.set_modulate(Color(1,1,1,1));
     new_label.text = powerup_name
@@ -572,8 +610,6 @@ func powerup_label_animation_decrease_count():
     
     if powerup_labels_being_displayed < 0:
         powerup_labels_being_displayed = 0
-        
-    print("DECREASE")
    
 func set_fire_rate_delay_timer():
     $FireRateTimer.start(fire_delay)    
@@ -734,3 +770,13 @@ func is_player_alive():
 func remove_aiming_line():
     if $AimingLine.get_point_count() > 1:
         $AimingLine.remove_point(1)
+        
+func end_shark_attack():
+    $AnimatedSprite2D.set_modulate(Color(1, 1, 1, 1))
+    get_parent().get_node('SharkAttackMusic').stop()
+    get_parent().get_node('AudioStreamPlayerMusic').set_stream_paused(false)
+                
+    for single_enemy in get_tree().get_nodes_in_group('enemyGroup'):
+        single_enemy.reset_state_timer()
+        single_enemy.stop_calling_for_help()
+    

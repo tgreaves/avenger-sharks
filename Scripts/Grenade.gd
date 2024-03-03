@@ -15,7 +15,6 @@ func _ready():
     $AnimatedSprite2D.play()
     
     # Up in the air... and down again...
-    # TODO: Bake some of these into constants where appropriate.
     var tween = get_tree().create_tween()
     tween.tween_property(self, "scale", Vector2(10,10), 0.25)
     tween.tween_property(self, "scale", Vector2(10,10), 0.10)
@@ -49,9 +48,12 @@ func _physics_process(_delta):
                 var collision = get_slide_collision(i)
                 
                 if collision.get_collider().name == 'Arena':
-                    break;
+                    break
                     
                 if collision.get_collider().name == 'ExitDoor':
-                    break;
+                    break
+                    
+                if collision.get_collider().name.contains('Artillery'):
+                    break
                 
                 collision.get_collider().get_node('.')._death('PLAYER-SHOT');

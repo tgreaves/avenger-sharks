@@ -1,6 +1,6 @@
 extends Node
 
-const GAME_VERSION = "1.0.0"
+const GAME_VERSION = "1.1.0"
 
 # Developer settings.
 const DEV_DELAY_ON_START = false
@@ -12,13 +12,19 @@ const DEV_STEAM_TESTING = false
 const DEV_SPAWN_ENEMY_COUNT = 0
 const DEV_SPAWN_ONE_ENEMY_TYPE = ''
 const DEV_FORCE_UPGRADE = ''
+const DEV_WAVE_LASTS_FOREVER = false
 
 # Hardware settings
 const WINDOW_TITLE = "Avenger Sharks " + GAME_VERSION
 const WINDOW_SIZE = Vector2(1920,1080)
 
 # Game settings
+const PLAY_WAVE_END_MUSIC = false
+
 const START_WAVE = 1
+const WAVE_SURVIVAL_TIME_BASE = 30
+const WAVE_SURVIVAL_TIME_INCREASE = 5
+const WAVE_SURVIVAL_TIME_MAXIMUM = 60
 
 const ARENA_SPAWN_MIN_X = 170
 const ARENA_SPAWN_MAX_X = 2500 * 2
@@ -56,6 +62,13 @@ const DINOSAUR_ATTACK_DELAY = 0.5
 const DINOSAUR_ATTACK_SPEED = 800
 const DINOSAUR_SURVIVAL_TIME = 5
 
+const ARTILLERY_MINIMUM_WAVE = 3
+const ARTILLERY_FEATURE_PERCENTAGE = 50
+const ARTILLERY_MINIMUM_TIME = 5
+const ARTILLERY_MAXIMUM_TIME = 10
+const ARTILLERY_WARNING_TIME = 4
+const ARTILLERY_CHASE_SPEED = 5
+
 # Enemy spawning
 const ENEMY_SPAWN_WAVE_SPECIAL_MIN_WAVE = 2
 
@@ -65,6 +78,11 @@ const ENEMY_SPAWN_WAVE_SPECIAL_CONFIGURATION = {
     96:      ['ALL_THE_SAME', 'skeleton', 'Rattling bones approach!'],
     100:     ['ALL_THE_SAME', 'snake', 'Boing! Boing! Boing!']
     #100:     ['ALL_THE_SAME', 'necromancer', 'The fish become fearful!'] 
+}
+
+const ENEMY_SPAWN_PLACEMENT_CONFIGURATION_WAVE_START = {
+    50:     'RANDOM',
+    100:    'CIRCLE_SURROUND_PLAYER'
 }
 
 const ENEMY_SPAWN_PLACEMENT_CONFIGURATION = {
@@ -93,7 +111,9 @@ const ENEMY_SETTINGS = {
         'speed':    450,
         'health':   4,
         'AI':       'CHASE',
-        'score':    10
+        'score':    10,
+        'can_be_knocked_back':  true,
+        'death_sprite_offset':  Vector2(5,0)
     },
     'wizard':   {
         'minimum_wave': 1,
@@ -104,7 +124,8 @@ const ENEMY_SETTINGS = {
         'score':    10,
         'attack_timer_min': 3,
         'attack_timer_max': 5,
-        'attack_type':  'STANDARD'
+        'attack_type':  'STANDARD',
+        'death_sprite_offset':  Vector2(10,0)
     },
     'rogue':   {
         'minimum_wave':  2,
@@ -126,6 +147,7 @@ const ENEMY_SETTINGS = {
         'attack_timer_min': 5,
         'attack_timer_max': 10,
         'attack_type':  'SPIRAL',
+        'can_be_knocked_back': true,
         'sprite_offset':    Vector2(0,-25),
         'collision_scale':  Vector2(1.5,1.5),
         'collision_mask_enable':    7
@@ -146,7 +168,8 @@ const ENEMY_SETTINGS = {
         'AI':       'WANDER',
         'score':    10,
         'spawns_others':    true,
-        'split_size':  Vector2(0.75,0.75) 
+        'split_size':  Vector2(0.75,0.75),
+        'death_sprite_offset':  Vector2(0,-5)
     },
     'snake': {
         'minimum_wave': 5,
@@ -169,8 +192,9 @@ const ENEMY_ALLOW_DAMAGE_WHEN_SPAWNING = false
 
 const ENEMY_ATTACK_ARC_DEGREES = 20;
 
-const ENEMY_CHASE_REORIENT_MINIMUM_SECONDS = 0.5;
-const ENEMY_CHASE_REORIENT_MAXIMUM_SECONDS = 1.0;
+const ENEMY_CHASE_REORIENT_MINIMUM_SECONDS = 0.2 
+const ENEMY_CHASE_REORIENT_MAXIMUM_SECONDS = 0.2 
+
 const ENEMY_DEFAULT_CHANGE_DIRECTION_MINIMUM_SECONDS = 1;
 const ENEMY_DEFAULT_CHANGE_DIRECTION_MAXIMUM_SECONDS = 3;
 
@@ -178,18 +202,27 @@ const ENEMY_ALL_CHASE_WHEN_POPULATION_LOW = 10
 
 const ENEMY_TRAP_HEALTH = 10
 
+const ENEMY_CALL_FOR_HELP_MINIMUM_TIME = 2.0
+const ENEMY_CALL_FOR_HELP_MAXIMUM_TIME = 3.0
+const ENEMY_CALL_FOR_HELP_PERCENTAGE = 20
+const ENEMY_CALL_FOR_HELP_PHRASES = [ "HELP!", "DON'T EAT ME!", "NOOOOO!"]
+
+const ENEMY_KNOCKBACK_TIMER = 0.3
+const ENEMY_KNOCKBACK_VELOCITY_CLAMP = Vector2(200,200)
+
 # Boss waves
 const BOSS_WAVE_MULTIPLIER = 1000000
 
 # Fish
 const FISH_TO_SPAWN_ARCADE = 20;
-const FISH_TO_SPAWN_PACIFIST_BASE = 5
+const FISH_TO_SPAWN_PACIFIST_BASE = 5 
 const FISH_TO_SPAWN_PACIFIST_WAVE_MULTIPLIER = 2
 const GET_FISH_SCORE = 50;
 const FISH_TO_TRIGGER_FISH_FRENZY = 15
 
 # Items
-const ARCADE_SPAWNING_ITEMS = ['dinosaur']
+const ARCADE_SPAWNING_ITEMS = ['dinosaur','dinosaur','dinosaur','power-pellet']
+#const ARCADE_SPAWNING_ITEMS = ['power-pellet']
 const PACIFIST_SPAWNING_ITEMS = ['health']
 
 const ITEM_SPAWN_MINIMUM_SECONDS = 10
@@ -209,6 +242,7 @@ const POWERUP_GRENADE_MAX_LEVEL = 3
 const POWERUP_MINISHARK_MAX_LEVEL = 3
 
 const POWERUP_ACTIVE_DURATION = 10
+const POWER_PELLET_ACTIVE_DURATION = 10
 
 # Upgrades
 const ARMOUR_DAMAGE_REDUCTION_PERCENTAGE = 10
