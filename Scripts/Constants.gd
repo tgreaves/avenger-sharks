@@ -1,13 +1,14 @@
 extends Node
 
-const GAME_VERSION = "1.1.0"
+const GAME_VERSION = "1.2.0-pathfinder"
 
 # Developer settings.
 const DEV_DELAY_ON_START = false
-const DEV_LOGGING = false
+const DEV_LOGGING = true
+const DEV_LOG_WAVE_DESIGN = false
 const DEV_ALLOW_CHEATS = false
-const DEV_SKIP_INTRO = false
-const DEV_START_GAME_IMMEDIATELY = false
+const DEV_SKIP_INTRO = true
+const DEV_START_GAME_IMMEDIATELY = true
 const DEV_STEAM_TESTING = false
 const DEV_SPAWN_ENEMY_COUNT = 0
 const DEV_SPAWN_ONE_ENEMY_TYPE = ''
@@ -22,7 +23,7 @@ const WINDOW_SIZE = Vector2(1920,1080)
 const PLAY_WAVE_END_MUSIC = false
 
 const START_WAVE = 1
-const WAVE_SURVIVAL_TIME_BASE = 30
+const WAVE_SURVIVAL_TIME_BASE = 2
 const WAVE_SURVIVAL_TIME_INCREASE = 5
 const WAVE_SURVIVAL_TIME_MAXIMUM = 60
 
@@ -31,8 +32,8 @@ const ARENA_SPAWN_MAX_X = 2500 * 2
 const ARENA_SPAWN_MIN_Y = 320
 const ARENA_SPAWN_MAX_Y = 1250 * 2
 
-const ARENA_OBSTACLE_MINIMUM = 3
-const ARENA_OBSTACLE_MAXIMUM = 7
+const ARENA_OBSTACLE_MINIMUM = 8  # 3
+const ARENA_OBSTACLE_MAXIMUM = 1  # 7 
 const ARENA_OBSTACLE_SIZE_MINIMUM = 3
 const ARENA_OBSTACLE_SIZE_MAXIMUM = 5
 

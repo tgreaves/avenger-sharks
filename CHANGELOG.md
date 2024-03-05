@@ -1,5 +1,19 @@
 # Changelog
 
+# 1.2.0 (xxxx-xx-xx)
+
+Proper obstacle avoidance pathing using AStarGrid2D.
+
+* Done:
+    * Player uses astar to get key
+    * Player uses astar to get to exit
+* TO DO:
+    * Use this path finding for CHASE enemies for better behaviour
+        * How often to recalculate?
+        * Remember necros and fish.
+    * General code tidy-up and refactoring of this.
+    * Possible removal of break glass timers?
+
 # 1.1.0 (2024-03-03)
 
 * Gameplay:
