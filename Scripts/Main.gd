@@ -252,12 +252,18 @@ func prepare_for_wave():
     $Player.prepare_for_new_wave()
     $Player/Camera2D.enabled = true
     $Player.visible = true
-    $Player.position = Vector2(2650, 2500);
+    #$Player.position = Vector2(2650, 2500)
+    $Player.position = Vector2(2650, 2600)
     $Player.get_node("AnimatedSprite2D").animation = 'default';
     $Player.get_node("AnimatedSprite2D").play()
     
     var tween = get_tree().create_tween()
     tween.tween_property(self, "modulate", Color(1,1,1,1), 0.5)
+    
+    if constants.CAMERA_ZOOM_EFFECTS and wave_number == 1:
+        $Player/Camera2D.set_zoom(Vector2(4.0,4.0))
+        var tween_camera = get_tree().create_tween()   
+        tween_camera.tween_property($Player/Camera2D, "zoom", Vector2(1.0,1.0), 2.5).set_trans(tween_camera.EASE_OUT)
     
     emit_signal("player_move_to_starting_position");
 
@@ -414,6 +420,12 @@ func game_over():
     $GameOverTimer.start();
 
 func return_to_main_screen():
+    for shark_spray in get_tree().get_nodes_in_group("sharkSprayGroup"):
+        shark_spray.queue_free()
+    
+    for mini_shark_spray in get_tree().get_nodes_in_group("miniSharkSprayGroup"):
+        mini_shark_spray.queue_free()
+    
     for enemy in get_tree().get_nodes_in_group("enemyGroup"):
         enemy.queue_free()
         
@@ -435,6 +447,7 @@ func return_to_main_screen():
     $ArtilleryTimer.stop() 
     $Key.hide()
     despawn_all_items()
+    $Player.stop_fish_frenzy()
     
     Storage.save_stats()
     

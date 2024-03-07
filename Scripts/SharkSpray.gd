@@ -25,6 +25,8 @@ func _physics_process(_delta):
             self.queue_free()
             break
         
+        Logging.log_entry("Shark spray collider: " + collision.get_collider().name)
+        
         collision.get_collider().get_node('.')._death('PLAYER-SHOT');
         $CollisionShape2D.disabled = true;
         self.queue_free()

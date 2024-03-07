@@ -38,6 +38,7 @@ var enemy_group_id
 var call_for_help_timer_label
 var can_be_knocked_back = false
 var knocked_back = false
+var astar_pathing_grid
 
 func _ready():
     $CallForHelpTimer.connect('timeout', _on_call_for_help_timer_timeout)
@@ -215,11 +216,21 @@ func _physics_process(delta):
                         
                     # Pursue the player.
                     'CHASE':
-                        var target_direction = (get_parent().get_node("Player").global_position - global_position).normalized();
-                        velocity = target_direction * enemy_speed;
+                        # Re-compute astar grid each cycle (player has most likely moved)
+                        astar_pathing_grid = get_parent().get_node('Arena').get_astar_route_from_positions(global_position, get_parent().get_node("Player").global_position)
+                        astar_pathing_grid.pop_front()
+                        
+                        if astar_pathing_grid.size():
+                            var target_direction = (get_parent().get_node('Arena').get_position_from_tilemap(astar_pathing_grid[0]) - global_position).normalized()
+                            velocity = target_direction * enemy_speed
+                        
+                        #var target_direction = (get_parent().get_node("Player").global_position - global_position).normalized();
+                        #velocity = target_direction * enemy_speed;
+                        
                         $StateTimer.start(randf_range(constants.ENEMY_CHASE_REORIENT_MINIMUM_SECONDS,
                                                     constants.ENEMY_CHASE_REORIENT_MAXIMUM_SECONDS))
                                                     
+                                            
                     # Flee the player.
                     'RUN_AWAY':
                         var target_direction = (global_position - get_parent().get_node("Player").global_position).normalized();
@@ -242,8 +253,13 @@ func _physics_process(delta):
                                 if single_fish.global_position.distance_to(global_position) < nearest_fish.global_position.distance_to(global_position):
                                         nearest_fish = single_fish
                             
-                            target_direction = (nearest_fish.global_position - global_position).normalized();
-                            velocity = target_direction * enemy_speed;
+                            astar_pathing_grid = get_parent().get_node('Arena').get_astar_route_from_positions(global_position, nearest_fish.global_position)
+                            astar_pathing_grid.pop_front()
+                        
+                            if astar_pathing_grid.size():
+                                target_direction = (get_parent().get_node('Arena').get_position_from_tilemap(astar_pathing_grid[0]) - global_position).normalized()
+                                velocity = target_direction * enemy_speed
+                            
                             $StateTimer.start(randf_range(constants.ENEMY_CHASE_REORIENT_MINIMUM_SECONDS,
                                                         constants.ENEMY_CHASE_REORIENT_MAXIMUM_SECONDS));
                         else:
@@ -264,23 +280,8 @@ func _physics_process(delta):
                         if !child_of_enemy:
                             # I set the direction.
                             # Wander.
-                            $StateTimer.start(randf_range(1,3));
-                            desired_velocity = Vector2(randf_range(-1,1), randf_range(-1,1)).normalized() * enemy_speed;
-                
-                # OVERRIDE AI - Always chase the player when wave population is low.   
-                #if (    get_parent().enemies_left_this_wave <= constants.ENEMY_ALL_CHASE_WHEN_POPULATION_LOW and 
-                        #(!child_of_enemy) and 
-                        #(!get_parent().get_node('Player').power_pellet_enabled) and 
-                        #constants.ENEMY_SETTINGS[enemy_type].get('chase_at_low_population',true)):
-                    #var target_direction = (get_parent().get_node("Player").global_position - global_position).normalized();
-                    #
-                    #if get_parent().enemies_left_this_wave <= constants.ENEMY_ALL_CHASE_WHEN_POPULATION_LOW:
-                        #velocity = target_direction * (enemy_speed * constants.ENEMY_SPEED_POPULATION_LOW_MULTIPLIER)
-                    #else:
-                        #velocity = target_direction * enemy_speed;
-                    #
-                    #$StateTimer.start(randf_range(constants.ENEMY_CHASE_REORIENT_MINIMUM_SECONDS,
-                                                #constants.ENEMY_CHASE_REORIENT_MAXIMUM_SECONDS));
+                            $StateTimer.start(randf_range(1,3))
+                            desired_velocity = Vector2(randf_range(-1,1), randf_range(-1,1)).normalized() * enemy_speed
                                                                                 
         DYING:
             if $FlashHitTimer.time_left == 0:
@@ -300,8 +301,18 @@ func _physics_process(delta):
             if global_position.distance_to(target_position) <= 200:
                 queue_free()
             
-            var target_direction = (target_position - global_position).normalized()
-            velocity = target_direction * 2500
+            #var target_direction = (target_position - global_position).normalized()
+            #velocity = target_direction * 2500
+            
+            # Have we reached the next node on the astar pathing grid?
+            var tilemap_coords = get_parent().get_node('Arena').get_tilemap_coords(global_position)
+            
+            if tilemap_coords == astar_pathing_grid[0]:
+                astar_pathing_grid.pop_front()
+                
+                if astar_pathing_grid.size():
+                    var target_direction = (get_parent().get_node('Arena').get_position_from_tilemap(astar_pathing_grid[0]) - global_position).normalized()
+                    velocity = target_direction * 2500
 
     if (state != DYING) && (state != SWIM_ESCAPE):
         if desired_velocity and !child_of_enemy:
@@ -559,4 +570,11 @@ func swim_escape():
     $CollisionShape2D.set_deferred("disabled", true)
     $SpawnParticles.emitting = false
     $ScaredParticles.set_emitting(false)
+    
+    # What's our best route out of here?
+    astar_pathing_grid = get_parent().get_node('Arena').get_astar_route_from_positions(global_position, get_parent().get_node('Arena').get_node('ExitDoor').global_position)
+    
+    var target_direction = (get_parent().get_node('Arena').get_position_from_tilemap(astar_pathing_grid[0]) - global_position).normalized()
+    velocity = target_direction * 2500
+    
     $StateTimer.start(2)

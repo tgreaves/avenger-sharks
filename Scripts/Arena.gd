@@ -132,7 +132,7 @@ func reset_obstacle_dictionary():
 func reset_astar_grid():
     astar = AStarGrid2D.new()
     #astar.size = Vector2i(60,42)
-    astar.region = Rect2i(0, 0, 60, 42)
+    astar.region = Rect2i(0, 0, 65, 42)
     astar.cell_size = Vector2(16,16)
     astar.update()
     
@@ -164,3 +164,9 @@ func get_tilemap_coords(coords):
 func get_position_from_tilemap(coords):
     return to_global(map_to_local(coords))
 
+func get_astar_route_from_positions(source, target):    
+    var source_map_coords = get_tilemap_coords(source)
+    var destination_map_coords = get_tilemap_coords(target)
+    
+    return astar_route(source_map_coords, destination_map_coords)
+    

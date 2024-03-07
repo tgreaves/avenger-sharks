@@ -113,15 +113,13 @@ func get_input():
         
     var input_direction = Input.get_vector("left", "right", "up", "down")
     velocity = input_direction * speed
-    
-    #$AnimatedSprite2D.look_at(get_global_mouse_position())
-    #$AnimatedSprite2D.rotation_degrees += 180
-    
+        
     if $FireRateTimer.time_left == 0 && get_parent().game_mode == 'ARCADE':    
         # Mouse aiming
         if Input.is_action_pressed('shark_fire_mouse'):
-            var shark_spray = SharkSprayScene.instantiate();
-            get_parent().add_child(shark_spray);
+            var shark_spray = SharkSprayScene.instantiate()
+            get_parent().add_child(shark_spray)
+            shark_spray.add_to_group('sharkSprayGroup')
             var target_direction = (get_global_mouse_position() - global_position).normalized()
             shark_spray.global_position = position;
             shark_spray.velocity = velocity + (target_direction * constants.PLAYER_FIRE_SPEED)
@@ -136,9 +134,10 @@ func get_input():
         # Controller (Twin stick)
         var shoot_direction = Input.get_vector("shoot_left", "shoot_right", "shoot_up", "shoot_down");
         if shoot_direction:
-            var shark_spray = SharkSprayScene.instantiate();
-            get_parent().add_child(shark_spray);
-            shark_spray.global_position = position;
+            var shark_spray = SharkSprayScene.instantiate()
+            get_parent().add_child(shark_spray)
+            shark_spray.add_to_group('sharkSprayGroup')
+            shark_spray.global_position = position
             
             var shoot_input = Vector2.ZERO;
             shoot_input.x = Input.get_action_strength("shoot_right") - Input.get_action_strength("shoot_left");
@@ -374,12 +373,13 @@ func _physics_process(_delta):
                     var i=0
                     
                     while i <= 32:  
-                        var target_direction = Vector2(1,1).normalized();
-                        target_direction = target_direction.rotated ( deg_to_rad(360.0/32.0) * i);
-                        var shark_spray = SharkSprayScene.instantiate();
-                        get_parent().add_child(shark_spray);
-                        shark_spray.global_position = position;
-                        shark_spray.velocity = target_direction * constants.PLAYER_FIRE_SPEED;
+                        var target_direction = Vector2(1,1).normalized()
+                        target_direction = target_direction.rotated ( deg_to_rad(360.0/32.0) * i)
+                        var shark_spray = SharkSprayScene.instantiate()
+                        get_parent().add_child(shark_spray)
+                        shark_spray.add_to_group('sharkSprayGroup')
+                        shark_spray.global_position = position
+                        shark_spray.velocity = target_direction * constants.PLAYER_FIRE_SPEED
                         
                         if fish_frenzy_colour == 'BLUE':
                             fish_frenzy_colour = 'GREEN'
@@ -440,11 +440,9 @@ func _physics_process(_delta):
             
             # Have we reached the next node on the astar pathing grid?
             var tilemap_coords = get_parent().get_node('Arena').get_tilemap_coords(global_position)
-            Logging.log_entry("WE ARE AT: " + str(tilemap_coords))
             
             if astar_pathing_grid.size():
                 if tilemap_coords == astar_pathing_grid[0]:
-                    Logging.log_entry("We are at our destination.  Go to next.")
                     astar_pathing_grid.pop_front()
                     
                     if astar_pathing_grid.size():
@@ -456,26 +454,13 @@ func _physics_process(_delta):
                 
                 if collision.get_collider().name == 'Key':  
                     shark_status = HUNTING_EXIT;
-                    #var target_direction = (get_parent().get_node('Arena').get_node('ExitDoor').global_position - global_position).normalized();
-                    #velocity = target_direction * constants.PLAYER_SPEED_ESCAPING;
                     get_parent().get_node('Arena').get_node('ExitDoor').get_node('CollisionShape2D').disabled = false;
                     emit_signal('player_got_key')
                     
-                    var exit_door_global = get_parent().get_node('Arena').get_node('ExitDoor').global_position
-                    var exit_map_coords = get_parent().get_node('Arena').get_tilemap_coords(exit_door_global)
-                    Logging.log_entry("Exit seems to be at: " + str(exit_map_coords))
-                    
-                    var player_map_coords = get_parent().get_node('Arena').get_tilemap_coords(global_position)
-                    Logging.log_entry("Player seems to be at: " + str(player_map_coords))
-                    
-                    # SHOW ME THE WAY TO GET TO THE CHOPPER / EXIT
-                    astar_pathing_grid = get_parent().get_node('Arena').astar_route(player_map_coords, exit_map_coords)
-                    Logging.log_entry("ROUTE IS: " + str(astar_pathing_grid))
-                    
-                    # Start heading towards the first one.
-                    Logging.log_entry("First one would be: " + str(astar_pathing_grid[0]))
-                    Logging.log_entry("Actual coords: " + str(get_parent().get_node('Arena').get_position_from_tilemap(astar_pathing_grid[0])))
-                    
+                    var exit_door_global = get_parent().get_node('Arena').get_node('ExitDoor').global_position            
+                    astar_pathing_grid = get_parent().get_node('Arena').get_astar_route_from_positions(global_position, exit_door_global)
+                  
+                    # Start heading towards the first one. 
                     var target_direction = (get_parent().get_node('Arena').get_position_from_tilemap(astar_pathing_grid[0]) - global_position).normalized()
                     velocity = target_direction * constants.PLAYER_SPEED_ESCAPING
                     
@@ -485,16 +470,14 @@ func _physics_process(_delta):
             
             # Have we reached the next node on the astar pathing grid?
             var tilemap_coords = get_parent().get_node('Arena').get_tilemap_coords(global_position)
-            Logging.log_entry("WE ARE AT: " + str(tilemap_coords))
             
             if tilemap_coords == astar_pathing_grid[0]:
-                Logging.log_entry("We are at our destination.  Go to next.")
                 astar_pathing_grid.pop_front()
                 
                 if astar_pathing_grid.size():
                     var target_direction = (get_parent().get_node('Arena').get_position_from_tilemap(astar_pathing_grid[0]) - global_position).normalized()
                     velocity = target_direction * constants.PLAYER_SPEED_ESCAPING
-            
+                        
             if velocity.x > 0:
                 $AnimatedSprite2D.set_flip_h(true);
             
@@ -521,9 +504,12 @@ func _physics_process(_delta):
                     get_parent().get_node('Arena').open_top_door()
                     get_parent().get_node('Arena').get_node('ExitDoor').get_node('CollisionShape2D').disabled = true;
                     
-                    emit_signal('player_found_exit_stop_key_movement');
-                    shark_status=GOING_THROUGH_DOOR;
-                   
+                    emit_signal('player_found_exit_stop_key_movement')
+                    shark_status=GOING_THROUGH_DOOR
+                    
+                    #var tween_camera = get_tree().create_tween()   
+                    #tween_camera.tween_property($Camera2D, "zoom", Vector2(3.0,3.0), 0.2)
+                
                     $DoorOpenTimer.start()   
                     
             if !did_collide:
@@ -607,18 +593,7 @@ func _on_main_player_hunt_key(passed_key_global_position):
     shark_status = HUNTING_KEY
     key_global_position = passed_key_global_position
     
-    Logging.log_entry("Hunting key mode")
-    Logging.log_entry("Key global position: " + str(key_global_position))
-    
-    # Where is everything?
-    var key_map_coords = get_parent().get_node('Arena').get_tilemap_coords(passed_key_global_position)
-    Logging.log_entry("Key seems to be at: " + str(key_map_coords))
-    
-    var player_map_coords = get_parent().get_node('Arena').get_tilemap_coords(global_position)
-    Logging.log_entry("Player seems to be at: " + str(player_map_coords))
-    
-    # SHOW ME THE WAY TO GET THE KEY
-    astar_pathing_grid = get_parent().get_node('Arena').astar_route(player_map_coords, key_map_coords)
+    astar_pathing_grid = get_parent().get_node('Arena').get_astar_route_from_positions(global_position, key_global_position)
     Logging.log_entry("ROUTE IS: " + str(astar_pathing_grid))
     
     # Start heading towards the first one.
@@ -686,6 +661,7 @@ func mini_shark_fire(shark_fire_direction):
     for mini_shark in get_tree().get_nodes_in_group("miniSharkGroup"):
         var mini_shark_spray = SharkSprayScene.instantiate()
         get_parent().add_child(mini_shark_spray)
+        mini_shark_spray.add_to_group('miniSharkSprayGroup')
         mini_shark_spray.global_position = mini_shark.global_position
         mini_shark_spray.velocity = shark_fire_direction * constants.PLAYER_FIRE_SPEED;
         
