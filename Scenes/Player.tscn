@@ -334,11 +334,11 @@ wait_time = 0.25
 one_shot = true
 
 [node name="HuntingKeyTimer" type="Timer" parent="."]
-wait_time = 30.0
+wait_time = 4.0
 one_shot = true
 
 [node name="HuntingDoorTimer" type="Timer" parent="."]
-wait_time = 3.0
+wait_time = 4.0
 one_shot = true
 
 [node name="PlayerHitGracePeriodTimer" type="Timer" parent="."]
