@@ -66,6 +66,7 @@ func _ready():
     
     upgrades = {
         # Code          [ Current Level, Max Level, Image path, Description
+        # If Max Level is 0 then it is a health-style purchase (Purchase once, instand result, doesn't stick)
         # If Max Level is 1 then it can only ever be purchased once (Binary item)
         'MAGNET':           [ 0, 1, 'res://Images/crosshair184.png', 'A powerful magnet which does magnet things.'],
         'ARMOUR':           [ 0, 3, 'res://Images/crosshair184.png', 'Decrease incoming damage by 10%'],
@@ -74,7 +75,8 @@ func _ready():
         'DOMINANT DINO':    [ 0, 3, 'res://Images/crosshair184.png', 'Increase Mr Dinosaur attack time by 20%'],
         'MORE POWER':       [ 0, 3, 'res://Images/crosshair184.png', 'Increase Power Up duration by 20%'],
         'LOOT LOVER':       [ 0, 3, 'res://Images/crosshair184.png', 'Increase item drop rate by 10%'],
-        'CHEAT DEATH':      [ 0, 1, 'res://Images/crosshair184.png', 'Regain 50% health upon death - Once!']
+        'CHEAT DEATH':      [ 0, 1, 'res://Images/crosshair184.png', 'Regain 50% health upon death - Once!'],
+        'HEAL ME':          [ -1, -1, 'res://Images/crosshair184.png', 'Instantly regain all health']
     }
     
 func prepare_for_new_game():
@@ -781,9 +783,11 @@ func _on_hud_upgrade_button_pressed(button_number):
     
     # Mark upgrade as in use by increasing its level.
     # Ensure level does not exceed the maximum allowed.
-    upgrades[selected_upgrade][0] = upgrades[selected_upgrade][0] + 1
-    if upgrades[selected_upgrade][0] > upgrades[selected_upgrade][1]:
-        upgrades[selected_upgrade][0] = upgrades[selected_upgrade][1]
+    
+    if upgrades[selected_upgrade][0] != -1:
+        upgrades[selected_upgrade][0] = upgrades[selected_upgrade][0] + 1
+        if upgrades[selected_upgrade][0] > upgrades[selected_upgrade][1]:
+            upgrades[selected_upgrade][0] = upgrades[selected_upgrade][1]
     
     match selected_upgrade:
         'MAGNET':
@@ -796,6 +800,14 @@ func _on_hud_upgrade_button_pressed(button_number):
             $FishProgressBar.max_value = fish_needed
         'MORE POWER':
             get_parent().get_node('HUD').reset_powerup_bar_durations()
+        'HEAL ME':
+            var original_energy = player_energy
+            player_energy = constants.PLAYER_START_GAME_ENERGY
+            _on_main_player_update_energy()
+                            
+            if (original_energy <= constants.PLAYER_LOW_ENERGY_BLINK) && (player_energy > constants.PLAYER_LOW_ENERGY_BLINK):
+                emit_signal('player_no_longer_low_energy')
+            
     
     get_parent().get_node('HUD').update_upgrade_summary()
     

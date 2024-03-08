@@ -901,21 +901,30 @@ func upgrade_screen():
     upgrade_one_index = 0
     upgrade_two_index = 0
     
-    var deadlock_solved = false
+    # Form an array of upgrades that are eligible for inclusion.
+    var eligible_upgrades:Array
     
-    while (!deadlock_solved):
-        upgrade_one_index = $Player.upgrades.keys()[ randi() % $Player.upgrades.size() ]
-        upgrade_two_index = $Player.upgrades.keys()[ randi() % $Player.upgrades.size() ]
-        
-        # 1st check: Don't suggest identical upgrades.
-        if upgrade_one_index != upgrade_two_index:
-            
-            # 2nd check: Don't suggest upgrades that are at max level already
-            # (Option for future: Ability to swap out upgrades?)
-            
-            if $Player.upgrades[upgrade_one_index][0] < $Player.upgrades[upgrade_one_index][1] and $Player.upgrades[upgrade_two_index][0] < $Player.upgrades[upgrade_two_index][1]:
-                deadlock_solved = true
-         
+    for single_upgrade in $Player.upgrades:
+        var single_upgrade_detail = $Player.upgrades.get(single_upgrade)
+        #Logging.log_entry("Considering: " + str(single_upgrade_detail))
+        if single_upgrade_detail[0] < single_upgrade_detail[1]:
+            #Logging.log_entry("PUSHING")
+            # This can be included as we have not exceeded max level of the upgrade.
+            eligible_upgrades.append(single_upgrade)
+    
+    Logging.log_entry("Eligible upgrades count: " + str(eligible_upgrades.size()))
+    Logging.log_entry("Upgrades list: " + str(eligible_upgrades))
+    
+    while eligible_upgrades.size() < 2:
+        Logging.log_entry("Not enough upgrades.  Adding default HEAL ME as a fall-back.")
+        eligible_upgrades.append('HEAL ME')
+    
+    # Now select the two upgrades to present to the player.
+    eligible_upgrades.shuffle()
+    Logging.log_entry("Shuffled list: " + str(eligible_upgrades))
+    upgrade_one_index = eligible_upgrades.pop_front()
+    upgrade_two_index = eligible_upgrades.pop_front()
+                
     if constants.DEV_FORCE_UPGRADE:
         upgrade_one_index = constants.DEV_FORCE_UPGRADE
         
