@@ -3,16 +3,19 @@
 # 1.2.0 (xxxx-xx-xx)
 
 * Gameplay:
-    * Upgrade: HEAL ME - Restore all health ahead of the next wave.
-    * Chasing enemies now use proper navigation instead of hoping for the best.  Beware!  
-* Misc:
-    * [MAYBE] Zoom camera effects for wave start and end.
-    * Adjusted player movement at wave start to commence at the entrance door.
+    * Upgrades:
+        * Player now has a choice of 3 between waves (was: 2)
+        * NEW: HEAL ME - Restore all health ahead of the next wave.
+    * Chasing enemies now use proper navigation instead of hoping for the best.  Beware! 
 * Bug fixes:
     * Player could get stuck hunting for key or exit.  Proper navigation implemented to avoid this.
     * Game ending when in FISH FRENZY would result in player stuck at a weird angle.
     * Player and Mini Shark projectiles now despawn on game ending.
-    * Deadlock could occur on upgrade screen if there weren't enough eligible upgrades.
+    * Deadlock could occur on upgrade screen if there weren't enough eligible upgrades. 
+* Misc:
+    * [MAYBE] Zoom camera effects for wave start and end.
+    * Adjusted player movement at wave start to commence at the entrance door.
+    * [INTERNAL] Added godot-git-plugin.
 
 # 1.1.0 (2024-03-03)
 

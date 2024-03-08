@@ -76,7 +76,7 @@ func _ready():
         'MORE POWER':       [ 0, 3, 'res://Images/crosshair184.png', 'Increase Power Up duration by 20%'],
         'LOOT LOVER':       [ 0, 3, 'res://Images/crosshair184.png', 'Increase item drop rate by 10%'],
         'CHEAT DEATH':      [ 0, 1, 'res://Images/crosshair184.png', 'Regain 50% health upon death - Once!'],
-        'HEAL ME':          [ -1, -1, 'res://Images/crosshair184.png', 'Instantly regain all health']
+        'HEAL ME':          [ -1, 0, 'res://Images/crosshair184.png', 'Instantly regain all health']
     }
     
 func prepare_for_new_game():
@@ -774,10 +774,14 @@ func decrease_powerup_level(powerup):
 func _on_hud_upgrade_button_pressed(button_number):
 
     var selected_upgrade
-    if button_number == 1:
-        selected_upgrade = get_parent().upgrade_one_index
-    else:
-        selected_upgrade = get_parent().upgrade_two_index
+    
+    match button_number:
+        1:
+            selected_upgrade = get_parent().upgrade_one_index
+        2:
+            selected_upgrade = get_parent().upgrade_two_index
+        3:
+            selected_upgrade = get_parent().upgrade_three_index
     
     $AudioStreamPlayerSelectedUpgrade.play()
     
