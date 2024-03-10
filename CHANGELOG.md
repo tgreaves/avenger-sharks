@@ -8,10 +8,11 @@
         * NEW: HEAL ME - Restore all health ahead of the next wave.
     * Chasing enemies now use proper navigation instead of hoping for the best.  Beware! 
 * Bug fixes:
+    * Deadlock could occur on upgrade screen if there weren't enough eligible upgrades. 
     * Player could get stuck hunting for key or exit.  Proper navigation implemented to avoid this.
+    * Enemies vanishing too early when wave ending during SHARK ATTACK.
     * Game ending when in FISH FRENZY would result in player stuck at a weird angle.
     * Player and Mini Shark projectiles now despawn on game ending.
-    * Deadlock could occur on upgrade screen if there weren't enough eligible upgrades. 
 * Misc:
     * [MAYBE] Zoom camera effects for wave start and end.
     * Adjusted player movement at wave start to commence at the entrance door.

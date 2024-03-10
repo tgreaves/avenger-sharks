@@ -358,14 +358,14 @@ func wave_end():
     
     game_status = GETTING_KEY
     
-    for enemy in get_tree().get_nodes_in_group("enemyGroup"):
-        enemy.swim_escape()
-    
     if $Player.power_pellet_enabled:
         $Player.power_pellet_enabled = false
         $Player.power_pellet_warning_running = false
         $Player.end_shark_attack()
     
+    for enemy in get_tree().get_nodes_in_group("enemyGroup"):
+        enemy.swim_escape()
+        
     $HUD.get_node("CanvasLayer/Label").text = "WAVE COMPLETE!"
     $HUD.get_node("CanvasLayer/Label").visible = true;
     
