@@ -243,9 +243,9 @@ anchors_preset = 14
 anchor_top = 0.5
 anchor_right = 1.0
 anchor_bottom = 0.5
-offset_left = 600.0
+offset_left = 238.0
 offset_top = -20.0
-offset_right = -594.0
+offset_right = -250.0
 offset_bottom = 346.0
 grow_horizontal = 2
 grow_vertical = 2
@@ -275,6 +275,7 @@ theme_override_fonts/font = ExtResource("1_4l55f")
 theme_override_font_sizes/font_size = 36
 text = "Dummy description"
 horizontal_alignment = 1
+vertical_alignment = 1
 autowrap_mode = 2
 
 [node name="Button" type="Button" parent="CanvasLayer/UpgradeChoiceContainer/Choice1"]
@@ -307,9 +308,43 @@ theme_override_fonts/font = ExtResource("1_4l55f")
 theme_override_font_sizes/font_size = 36
 text = "Dummy description"
 horizontal_alignment = 1
+vertical_alignment = 1
 autowrap_mode = 2
 
 [node name="Button" type="Button" parent="CanvasLayer/UpgradeChoiceContainer/Choice2"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("1_4l55f")
+theme_override_font_sizes/font_size = 48
+text = "  SELECT  "
+
+[node name="Choice3" type="VBoxContainer" parent="CanvasLayer/UpgradeChoiceContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer/UpgradeChoiceContainer/Choice3"]
+layout_mode = 2
+size_flags_horizontal = 4
+stretch_mode = 2
+
+[node name="Title" type="Label" parent="CanvasLayer/UpgradeChoiceContainer/Choice3"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("1_4l55f")
+theme_override_font_sizes/font_size = 48
+text = "Dummy description"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Description" type="Label" parent="CanvasLayer/UpgradeChoiceContainer/Choice3"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_fonts/font = ExtResource("1_4l55f")
+theme_override_font_sizes/font_size = 36
+text = "Dummy description"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="Button" type="Button" parent="CanvasLayer/UpgradeChoiceContainer/Choice3"]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("1_4l55f")
 theme_override_font_sizes/font_size = 48
@@ -349,3 +384,4 @@ show_percentage = false
 
 [connection signal="pressed" from="CanvasLayer/UpgradeChoiceContainer/Choice1/Button" to="." method="_on_upgrade_button_pressed" binds= [1]]
 [connection signal="pressed" from="CanvasLayer/UpgradeChoiceContainer/Choice2/Button" to="." method="_on_upgrade_button_pressed" binds= [2]]
+[connection signal="pressed" from="CanvasLayer/UpgradeChoiceContainer/Choice3/Button" to="." method="_on_upgrade_button_pressed" binds= [3]]

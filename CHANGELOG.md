@@ -3,18 +3,22 @@
 # 1.2.0 (xxxx-xx-xx)
 
 * Gameplay:
-    * Upgrade: HEAL ME - Restore all health ahead of the next wave.
-    * Upgrade: SPEED SURGE - Left trigger gives the player a SURGE of SPEED.
-    * Chasing enemies now use proper navigation instead of hoping for the best.  Beware!  
-* Misc:
-    * [MAYBE] Zoom camera effects for wave start and end.
-    * Adjusted player movement at wave start to commence at the entrance door.
+    * Upgrades:
+        * Player now has a choice of 3 between waves (was: 2)
+        * NEW: HEAL ME - Restore all health ahead of the next wave.
+        * NEW: SPEED SURGE - Left trigger gives the player a SURGE of SPEED.
+    * Chasing enemies now use proper navigation instead of hoping for the best.  Beware! 
 * Bug fixes:
+    * Deadlock could occur on upgrade screen if there weren't enough eligible upgrades. 
     * Player could get stuck hunting for key or exit.  Proper navigation implemented to avoid this.
-    * Deadlock could occur on upgrade screen if there weren't enough eligible upgrades.
+    * Enemies vanishing too early when wave ending during SHARK ATTACK.
     * Shark spray sound synced properly with gameplay.
     * Game ending when in FISH FRENZY would result in player stuck at a weird angle.
     * Player and Mini Shark projectiles now despawn on game ending.
+* Misc:
+    * [MAYBE] Zoom camera effects for wave start and end.
+    * Adjusted player movement at wave start to commence at the entrance door.
+    * [INTERNAL] Added godot-git-plugin.
 
 # 1.1.0 (2024-03-03)
 

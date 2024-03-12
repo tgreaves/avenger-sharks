@@ -28,6 +28,7 @@ var spawn_number = 0
 
 var spawned_items_this_wave = []
 var upgrade_focus_memory_left_button
+var upgrade_focus_memory_middle_button
 var upgrade_focus_memory_right_button
 var intro
 var dedication
@@ -37,6 +38,7 @@ var first_game_played = false
 
 var upgrade_one_index
 var upgrade_two_index
+var upgrade_three_index
 
 var accept_pause = true
 
@@ -356,14 +358,14 @@ func wave_end():
     
     game_status = GETTING_KEY
     
-    for enemy in get_tree().get_nodes_in_group("enemyGroup"):
-        enemy.swim_escape()
-    
     if $Player.power_pellet_enabled:
         $Player.power_pellet_enabled = false
         $Player.power_pellet_warning_running = false
         $Player.end_shark_attack()
     
+    for enemy in get_tree().get_nodes_in_group("enemyGroup"):
+        enemy.swim_escape()
+        
     $HUD.get_node("CanvasLayer/Label").text = "WAVE COMPLETE!"
     $HUD.get_node("CanvasLayer/Label").visible = true;
     
@@ -729,7 +731,8 @@ func handle_pause_input():
             
             if game_status_before_pause == UPGRADE_WAITING_FOR_CHOICE:
                 upgrade_focus_memory_left_button = $HUD/CanvasLayer/UpgradeChoiceContainer/Choice1/Button.has_focus()
-                upgrade_focus_memory_right_button = $HUD/CanvasLayer/UpgradeChoiceContainer/Choice2/Button.has_focus()
+                upgrade_focus_memory_middle_button = $HUD/CanvasLayer/UpgradeChoiceContainer/Choice2/Button.has_focus()
+                upgrade_focus_memory_right_button = $HUD/CanvasLayer/UpgradeChoiceContainer/Choice3/Button.has_focus()
                 
                 Logging.log_entry("Left: " + str(upgrade_focus_memory_left_button) + " right: " + str(upgrade_focus_memory_right_button))
             
@@ -848,9 +851,13 @@ func _on_pause_menu_unpause_game_pressed():
         if upgrade_focus_memory_left_button:
             $HUD/CanvasLayer/UpgradeChoiceContainer/Choice1/Button.grab_focus()
             upgrade_focus_memory_left_button = false
+            
+        if upgrade_focus_memory_middle_button:
+            $HUD/CanvasLayer/UpgradeChoiceContainer/Choice2/Button.grab_focus()
+            upgrade_focus_memory_middle_button = false
         
         if upgrade_focus_memory_right_button:
-            $HUD/CanvasLayer/UpgradeChoiceContainer/Choice2/Button.grab_focus()
+            $HUD/CanvasLayer/UpgradeChoiceContainer/Choice3/Button.grab_focus()
             upgrade_focus_memory_right_button = false
 
     $PauseMenu.set_process_input(false)
@@ -900,22 +907,23 @@ func upgrade_screen():
     
     upgrade_one_index = 0
     upgrade_two_index = 0
+    upgrade_three_index = 0
     
     # Form an array of upgrades that are eligible for inclusion.
     var eligible_upgrades:Array = []
     
     for single_upgrade in $Player.upgrades:
         var single_upgrade_detail = $Player.upgrades.get(single_upgrade)
-        #Logging.log_entry("Considering: " + str(single_upgrade_detail))
+        Logging.log_entry("Considering: " + str(single_upgrade_detail))
         if single_upgrade_detail[0] < single_upgrade_detail[1]:
-            #Logging.log_entry("PUSHING")
+            Logging.log_entry("PUSHING")
             # This can be included as we have not exceeded max level of the upgrade.
             eligible_upgrades.append(single_upgrade)
     
     Logging.log_entry("Eligible upgrades count: " + str(eligible_upgrades.size()))
     Logging.log_entry("Upgrades list: " + str(eligible_upgrades))
     
-    while eligible_upgrades.size() < 2:
+    while eligible_upgrades.size() < 3:
         Logging.log_entry("Not enough upgrades.  Adding default HEAL ME as a fall-back.")
         eligible_upgrades.append('HEAL ME')
     
@@ -924,20 +932,24 @@ func upgrade_screen():
     Logging.log_entry("Shuffled list: " + str(eligible_upgrades))
     upgrade_one_index = eligible_upgrades.pop_front()
     upgrade_two_index = eligible_upgrades.pop_front()
+    upgrade_three_index = eligible_upgrades.pop_front()
                 
     if constants.DEV_FORCE_UPGRADE:
         upgrade_one_index = constants.DEV_FORCE_UPGRADE
         
     $HUD/CanvasLayer/UpgradeChoiceContainer/Choice1/TextureRect.texture = load($Player.upgrades[upgrade_one_index][2])
     $HUD/CanvasLayer/UpgradeChoiceContainer/Choice2/TextureRect.texture = load($Player.upgrades[upgrade_two_index][2])
-    
+    $HUD/CanvasLayer/UpgradeChoiceContainer/Choice3/TextureRect.texture = load($Player.upgrades[upgrade_three_index][2])
+
     $HUD/CanvasLayer/UpgradeChoiceContainer/Choice1/Title.text = upgrade_one_index
     $HUD/CanvasLayer/UpgradeChoiceContainer/Choice2/Title.text = upgrade_two_index
+    $HUD/CanvasLayer/UpgradeChoiceContainer/Choice3/Title.text = upgrade_three_index
     
     $HUD/CanvasLayer/UpgradeChoiceContainer/Choice1/Description.text = $Player.upgrades[upgrade_one_index][3]
     $HUD/CanvasLayer/UpgradeChoiceContainer/Choice2/Description.text = $Player.upgrades[upgrade_two_index][3]
+    $HUD/CanvasLayer/UpgradeChoiceContainer/Choice3/Description.text = $Player.upgrades[upgrade_three_index][3]
     
-    $HUD/CanvasLayer/UpgradeChoiceContainer/Choice1/Button.grab_focus()
+    $HUD/CanvasLayer/UpgradeChoiceContainer/Choice2/Button.grab_focus()
     
     $HUD/CanvasLayer/UpgradeChoiceContainer.modulate = Color(0,0,0,0)
     $HUD/CanvasLayer/UpgradeChoiceContainer.visible = true
