@@ -78,7 +78,7 @@ func _ready():
         'MORE POWER':       [ 0, 3, 'res://Images/crosshair184.png', 'Increase Power Up duration by 20%'],
         'LOOT LOVER':       [ 0, 3, 'res://Images/crosshair184.png', 'Increase item drop rate by 10%'],
         'CHEAT DEATH':      [ 0, 1, 'res://Images/crosshair184.png', 'Regain 50% health upon death - Once!'],
-        'SWIM SURGE':       [ 0, 1, 'res://Images/crosshair184.png', 'Left trigger to SURGE at your enemies'],
+        'SWIM SURGE':       [ 0, 3, 'res://Images/crosshair184.png', 'Improve swim surge re-use time by 10%'],
         'HEAL ME':          [ -1, 0, 'res://Images/crosshair184.png', 'Instantly regain all health']
     }
     
@@ -219,6 +219,7 @@ func get_input():
             
             $SwimSurgeRunningTimer.start()
             $AudioStreamPlayerSplash.play()
+            $SurgeParticles.set_emitting(true)
            
 func _physics_process(_delta):
     get_input()
@@ -364,6 +365,7 @@ func _physics_process(_delta):
                             
                             # BLOOD THIRSTY
                             $AnimatedSprite2D.set_modulate(Color(1, 0, 0, 1))
+                            $HungryParticles.set_emitting(true)
                             
                             # Force direction change
                             for single_enemy in get_tree().get_nodes_in_group('enemyGroup'):
@@ -852,6 +854,7 @@ func remove_aiming_line():
         
 func end_shark_attack():
     $AnimatedSprite2D.set_modulate(Color(1, 1, 1, 1))
+    $HungryParticles.set_emitting(false)
     get_parent().get_node('SharkAttackMusic').stop()
     get_parent().get_node('AudioStreamPlayerMusic').set_stream_paused(false)
                 
@@ -861,7 +864,15 @@ func end_shark_attack():
     
 func _on_swim_surge_running_timer_timeout():
     swim_surge_activate = false
-    $SwimSurgeReuseTimer.start()
+    $SurgeParticles.set_emitting(false)
+    
+    var swim_surge_improvement_percentage = upgrades['SWIM SURGE'][0] * 10
+    Logging.log_entry("Swim surgae percentage = " + str(swim_surge_improvement_percentage))
+    var swim_surge_recharge_time = constants.SWIM_SURGE_BASE_RECHARGE_TIME - ((swim_surge_improvement_percentage / 100.0) * constants.SWIM_SURGE_BASE_RECHARGE_TIME)
+    
+    Logging.log_entry("Jack Greaves is amazing - recharge time will be " + str(swim_surge_recharge_time))
+    
+    $SwimSurgeReuseTimer.start(swim_surge_recharge_time)
 
 func _on_swim_surge_reuse_timer_timeout():
     swim_surge_available = true

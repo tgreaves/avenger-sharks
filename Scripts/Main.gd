@@ -77,6 +77,7 @@ func _ready():
         Steam.overlay_toggled.connect(_on_steam_overlay_toggled)
         Steam.input_device_connected.connect(_on_steam_input_device_connected)
         Steam.input_device_disconnected.connect(_on_steam_input_device_disconnected)
+        Steam.current_stats_received.connect(_on_steam_stats_ready)
             
     Storage.load_config()
     
@@ -389,7 +390,15 @@ func wave_end():
         
     for artillery in get_tree().get_nodes_in_group('artilleryGroup'):
         artillery.queue_free()
-    
+        
+    # Pop Steam achievement if appropriate.
+    if SteamClient.STEAM_RUNNING:
+        if game_mode == 'ARCADE':
+            match wave_number:
+                1:
+                    Steam.setAchievement('ACH_ARCADE_BEAT_1_WAVE')
+                    Steam.storeStats()
+        
 func wave_end_cleanup():
         
     $Player.visible = false;
@@ -442,6 +451,9 @@ func return_to_main_screen():
         
     for dinosaur in get_tree().get_nodes_in_group('dinosaurGroup'):
         dinosaur.queue_free()
+        
+    for dinosaur_attack in get_tree().get_nodes_in_group('dinosaurAttack'):
+        dinosaur_attack.queue_free()
         
     for artillery in get_tree().get_nodes_in_group('artilleryGroup'):
         artillery.queue_free()
@@ -1050,3 +1062,12 @@ func _on_wave_time_left_timer_timeout():
         $Key/AnimatedSprite2D.play();
         
         wave_end()
+        
+func _on_steam_stats_ready(game: int, result: int, user: int) -> void:
+    Logging.log_entry("Steam stats / achievements now available.")
+    
+    if constants.DEV_WIPE_ACHIEVEMENTS:
+        Logging.log_entry("Wiping achievements...")
+        Steam.clearAchievement('ACH_ARCADE_BEAT_1_WAVE')
+        Steam.storeStats()
+

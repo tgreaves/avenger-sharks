@@ -1,4 +1,4 @@
-[gd_scene load_steps=58 format=3 uid="uid://5yp4e43ckdrj"]
+[gd_scene load_steps=65 format=3 uid="uid://5yp4e43ckdrj"]
 
 [ext_resource type="Script" path="res://Scripts/Player.gd" id="1_m4brx"]
 [ext_resource type="Texture2D" uid="uid://ikcchi1bmyrs" path="res://Sprites/Shark/Shark1.png" id="2_px875"]
@@ -39,6 +39,7 @@
 [ext_resource type="AudioStream" uid="uid://vq6a2soq7m0i" path="res://Sound/glug-glug-glug-39140.mp3" id="38_86qdg"]
 [ext_resource type="AudioStream" uid="uid://di185cyn4vxdo" path="res://Sound/powering_up_funny_sci-fi_dry-102263.mp3" id="39_sydp1"]
 [ext_resource type="FontFile" uid="uid://dclfn1fjcq5i7" path="res://Fonts/PressStart2P-Regular.ttf" id="40_8elap"]
+[ext_resource type="Texture2D" uid="uid://blmls1u06ubt2" path="res://Particles/flare_01.png" id="40_78iqq"]
 [ext_resource type="AudioStream" uid="uid://ba0q1jycm55i3" path="res://Sound/laser5-47286.wav" id="41_l7qa2"]
 [ext_resource type="AudioStream" uid="uid://dee567wkg1cj" path="res://Sound/hq-explosion-6288-reverse.mp3" id="44_dvals"]
 [ext_resource type="AudioStream" uid="uid://dl3w6ch8pux8d" path="res://Sound/yay-6120.mp3" id="45_fj125"]
@@ -193,6 +194,36 @@ animations = [{
 "speed": 10.0
 }]
 
+[sub_resource type="Gradient" id="Gradient_5c14i"]
+offsets = PackedFloat32Array(0, 0.18894)
+colors = PackedColorArray(1, 0, 0, 1, 0.029587, 0, 0.970413, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_lvy03"]
+gradient = SubResource("Gradient_5c14i")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_k4dtl"]
+lifetime_randomness = 0.5
+particle_flag_disable_z = true
+emission_shape = 1
+emission_sphere_radius = 75.0
+gravity = Vector3(0, 0, 0)
+color_ramp = SubResource("GradientTexture1D_lvy03")
+
+[sub_resource type="Gradient" id="Gradient_80uc6"]
+offsets = PackedFloat32Array(0, 0.580645)
+colors = PackedColorArray(1, 0, 0, 1, 0.478431, 0, 0.0509804, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_k5rfa"]
+gradient = SubResource("Gradient_80uc6")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_ihmkv"]
+lifetime_randomness = 0.5
+particle_flag_disable_z = true
+emission_shape = 1
+emission_sphere_radius = 75.0
+gravity = Vector3(0, 0, 0)
+color_ramp = SubResource("GradientTexture1D_k5rfa")
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bywa3"]
 bg_color = Color(0, 0, 0, 1)
 
@@ -249,6 +280,30 @@ scale = Vector2(3, 3)
 sprite_frames = SubResource("SpriteFrames_bvem5")
 frame = 5
 frame_progress = 1.0
+
+[node name="SurgeParticles" type="GPUParticles2D" parent="."]
+modulate = Color(1, 1, 1, 0.305882)
+emitting = false
+amount = 64
+process_material = SubResource("ParticleProcessMaterial_k4dtl")
+texture = ExtResource("40_78iqq")
+lifetime = 2.0
+speed_scale = 2.0
+randomness = 0.35
+fixed_fps = 0
+draw_order = 0
+
+[node name="HungryParticles" type="GPUParticles2D" parent="."]
+modulate = Color(1, 1, 1, 0.305882)
+emitting = false
+amount = 64
+process_material = SubResource("ParticleProcessMaterial_ihmkv")
+texture = ExtResource("40_78iqq")
+lifetime = 2.0
+speed_scale = 2.0
+randomness = 0.35
+fixed_fps = 0
+draw_order = 0
 
 [node name="AimingLine" type="Line2D" parent="."]
 points = PackedVector2Array(0, 0)
