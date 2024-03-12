@@ -1,4 +1,4 @@
-[gd_scene load_steps=57 format=3 uid="uid://5yp4e43ckdrj"]
+[gd_scene load_steps=58 format=3 uid="uid://5yp4e43ckdrj"]
 
 [ext_resource type="Script" path="res://Scripts/Player.gd" id="1_m4brx"]
 [ext_resource type="Texture2D" uid="uid://ikcchi1bmyrs" path="res://Sprites/Shark/Shark1.png" id="2_px875"]
@@ -10,7 +10,6 @@
 [ext_resource type="Texture2D" uid="uid://c4rfkd6arhtvm" path="res://Sprites/Shark/Shark7.png" id="8_2abrt"]
 [ext_resource type="Texture2D" uid="uid://dd5w8b6cnmfow" path="res://Sprites/Shark/Shark8.png" id="9_6ph23"]
 [ext_resource type="Texture2D" uid="uid://chfcb5gy11be1" path="res://Sprites/Explosions/Explosion4/0001.png" id="10_dfhe1"]
-[ext_resource type="AudioStream" uid="uid://3dfl0qmhv15n" path="res://Sound/laser5-47286.mp3" id="10_v8evc"]
 [ext_resource type="AudioStream" uid="uid://dtpbwgcaf00bn" path="res://Sound/Boss hit 1.wav" id="11_g4ac8"]
 [ext_resource type="Texture2D" uid="uid://cn2mgyrc20w6q" path="res://Sprites/Explosions/Explosion4/0002.png" id="11_r7t7p"]
 [ext_resource type="Texture2D" uid="uid://brkgoddfwhykd" path="res://Sprites/Explosions/Explosion4/0003.png" id="12_lkm55"]
@@ -40,10 +39,12 @@
 [ext_resource type="AudioStream" uid="uid://vq6a2soq7m0i" path="res://Sound/glug-glug-glug-39140.mp3" id="38_86qdg"]
 [ext_resource type="AudioStream" uid="uid://di185cyn4vxdo" path="res://Sound/powering_up_funny_sci-fi_dry-102263.mp3" id="39_sydp1"]
 [ext_resource type="FontFile" uid="uid://dclfn1fjcq5i7" path="res://Fonts/PressStart2P-Regular.ttf" id="40_8elap"]
+[ext_resource type="AudioStream" uid="uid://ba0q1jycm55i3" path="res://Sound/laser5-47286.wav" id="41_l7qa2"]
 [ext_resource type="AudioStream" uid="uid://dee567wkg1cj" path="res://Sound/hq-explosion-6288-reverse.mp3" id="44_dvals"]
 [ext_resource type="AudioStream" uid="uid://dl3w6ch8pux8d" path="res://Sound/yay-6120.mp3" id="45_fj125"]
 [ext_resource type="AudioStream" uid="uid://dwquinjikuv4o" path="res://Sound/notification-for-game-scenes-132473.mp3" id="47_1ngf2"]
 [ext_resource type="Texture2D" uid="uid://cd3uri86u07f" path="res://Textures/2d_lights_and_shadows_neutral_point_light.webp" id="49_nsf5y"]
+[ext_resource type="AudioStream" uid="uid://1oto0eo2onwk" path="res://Sound/splash-by-blaukreuz-6261.wav" id="49_pjns7"]
 [ext_resource type="Texture2D" uid="uid://be1l4stvjmcog" path="res://Sprites/Blood/bloodfx001_01.png" id="71_f4bva"]
 [ext_resource type="Texture2D" uid="uid://cynsah81npsn3" path="res://Sprites/Blood/bloodfx001_02.png" id="72_657n3"]
 [ext_resource type="Texture2D" uid="uid://d3tdosv5031k" path="res://Sprites/Blood/bloodfx001_03.png" id="73_olu8i"]
@@ -290,6 +291,17 @@ theme_override_styles/fill = SubResource("StyleBoxFlat_jyh0b")
 value = 50.0
 show_percentage = false
 
+[node name="SurgeProgressBar" type="ProgressBar" parent="."]
+visible = false
+offset_left = -54.0
+offset_top = -128.0
+offset_right = 53.0
+offset_bottom = -107.0
+theme_override_styles/background = SubResource("StyleBoxFlat_1kikt")
+theme_override_styles/fill = SubResource("StyleBoxFlat_jyh0b")
+value = 50.0
+show_percentage = false
+
 [node name="PowerUpTickTimer" type="Timer" parent="."]
 one_shot = true
 
@@ -346,8 +358,16 @@ wait_time = 0.25
 one_shot = true
 autostart = true
 
+[node name="SwimSurgeRunningTimer" type="Timer" parent="."]
+wait_time = 0.25
+one_shot = true
+
+[node name="SwimSurgeReuseTimer" type="Timer" parent="."]
+wait_time = 3.0
+one_shot = true
+
 [node name="AudioStreamPlayerSpray" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("10_v8evc")
+stream = ExtResource("41_l7qa2")
 bus = &"Effects"
 
 [node name="AudioStreamPlayerHit" type="AudioStreamPlayer" parent="."]
@@ -380,9 +400,15 @@ bus = &"Effects"
 stream = ExtResource("47_1ngf2")
 bus = &"Effects"
 
+[node name="AudioStreamPlayerSplash" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("49_pjns7")
+
 [node name="PointLight2D" type="PointLight2D" parent="."]
 visible = false
 shadow_enabled = true
 texture = ExtResource("49_nsf5y")
 texture_scale = 10.12
 height = 50.0
+
+[connection signal="timeout" from="SwimSurgeRunningTimer" to="." method="_on_swim_surge_running_timer_timeout"]
+[connection signal="timeout" from="SwimSurgeReuseTimer" to="." method="_on_swim_surge_reuse_timer_timeout"]

@@ -902,7 +902,7 @@ func upgrade_screen():
     upgrade_two_index = 0
     
     # Form an array of upgrades that are eligible for inclusion.
-    var eligible_upgrades:Array
+    var eligible_upgrades:Array = []
     
     for single_upgrade in $Player.upgrades:
         var single_upgrade_detail = $Player.upgrades.get(single_upgrade)

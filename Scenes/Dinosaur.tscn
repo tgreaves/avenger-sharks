@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://Scripts/Dinosaur.gd" id="1_b5leg"]
 [ext_resource type="Texture2D" uid="uid://cidfg3jimn4je" path="res://Sprites/DinoSprites - vita.png" id="1_kt61w"]
-[ext_resource type="AudioStream" uid="uid://3dfl0qmhv15n" path="res://Sound/laser5-47286.mp3" id="3_5e8tr"]
+[ext_resource type="AudioStream" uid="uid://ba0q1jycm55i3" path="res://Sound/laser5-47286.wav" id="3_2ucln"]
 [ext_resource type="AudioStream" uid="uid://uasmo2ylqfag" path="res://Sound/monster-growl-140377.mp3" id="4_8dyv5"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_08v17"]
@@ -115,7 +115,7 @@ wait_time = 5.0
 one_shot = true
 
 [node name="AudioStreamDinosaurAttack" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("3_5e8tr")
+stream = ExtResource("3_2ucln")
 bus = &"Effects"
 
 [node name="AudioStreamDinosaurGrowl" type="AudioStreamPlayer" parent="."]

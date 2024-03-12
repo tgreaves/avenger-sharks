@@ -46,6 +46,8 @@ var powerup_labels_being_displayed = 0
 var fire_delay = constants.PLAYER_FIRE_DELAY
 var grenade_delay = constants.PLAYER_GRENADE_DELAY
 var astar_pathing_grid
+var swim_surge_available:bool = true
+var swim_surge_activate:bool = false
 
 func _ready():
     shark_status = ALIVE;
@@ -76,6 +78,7 @@ func _ready():
         'MORE POWER':       [ 0, 3, 'res://Images/crosshair184.png', 'Increase Power Up duration by 20%'],
         'LOOT LOVER':       [ 0, 3, 'res://Images/crosshair184.png', 'Increase item drop rate by 10%'],
         'CHEAT DEATH':      [ 0, 1, 'res://Images/crosshair184.png', 'Regain 50% health upon death - Once!'],
+        'SWIM SURGE':       [ 0, 1, 'res://Images/crosshair184.png', 'Left trigger to SURGE at your enemies'],
         'HEAL ME':          [ -1, -1, 'res://Images/crosshair184.png', 'Instantly regain all health']
     }
     
@@ -85,6 +88,8 @@ func prepare_for_new_game():
     spray_size = 0.5
     fish_frenzy_enabled = false
     power_pellet_enabled = false
+    swim_surge_available = true
+    swim_surge_activate = false
     $AnimatedSprite2D.set_modulate(Color(1, 1, 1, 1))
     
     for single_powerup in max_powerup_levels:
@@ -111,10 +116,12 @@ func prepare_for_new_wave():
 func get_input():
     
     if shark_status != ALIVE:
-        return;
+        return
         
     var input_direction = Input.get_vector("left", "right", "up", "down")
-    velocity = input_direction * speed
+    
+    if !swim_surge_activate:
+        velocity = input_direction * speed
         
     if $FireRateTimer.time_left == 0 && get_parent().game_mode == 'ARCADE':    
         # Mouse aiming
@@ -198,6 +205,21 @@ func get_input():
         if Storage.Config.get_value('config','enable_haptics',false):
             Input.start_joy_vibration(0, 0.25, 0.25, constants.PLAYER_FISH_FRENZY_DURATION)
         
+    if shark_status == ALIVE and Input.is_action_just_pressed('secondary_ability'):
+        # For now, this will trigger SWIM SURGE.        
+        Logging.log_entry("secondary_ability just pressed")
+        
+        if swim_surge_available and input_direction:
+            Logging.log_entry("Criteria for activation successful.")
+            swim_surge_activate = true
+            swim_surge_available = false
+            
+            var tween_surge = get_tree().create_tween()   
+            tween_surge.tween_property(self, "velocity", input_direction*3000, 0.25)
+            
+            $SwimSurgeRunningTimer.start()
+            $AudioStreamPlayerSplash.play()
+           
 func _physics_process(_delta):
     get_input()
     move_and_slide()
@@ -242,7 +264,7 @@ func _physics_process(_delta):
                         $AnimatedSprite2D.set_modulate(Color(1, 1, 1, 1))
                     
                     $PowerPelletWarningTimer.start()
-            
+
             if velocity.x > 0:
                 $AnimatedSprite2D.set_flip_h(true);
             
@@ -833,3 +855,9 @@ func end_shark_attack():
         single_enemy.reset_state_timer()
         single_enemy.stop_calling_for_help()
     
+func _on_swim_surge_running_timer_timeout():
+    swim_surge_activate = false
+    $SwimSurgeReuseTimer.start()
+
+func _on_swim_surge_reuse_timer_timeout():
+    swim_surge_available = true
