@@ -14,7 +14,7 @@ const DEV_SPAWN_ENEMY_COUNT = 0
 const DEV_SPAWN_ONE_ENEMY_TYPE = ''
 const DEV_FORCE_UPGRADE = 'SWIM SURGE'
 const DEV_WAVE_LASTS_FOREVER = false
-const DEV_WIPE_ACHIEVEMENTS = true
+const DEV_WIPE_ACHIEVEMENTS = false
 
 # Hardware settings
 const WINDOW_TITLE = "Avenger Sharks " + GAME_VERSION

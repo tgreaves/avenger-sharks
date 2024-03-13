@@ -13,7 +13,9 @@
     * Graphics: 'DINNER TIME' particle effects added.
 * Platform:
     * STEAM ACHIEVEMENTS!
-        * Beat 1 wave.
+        * Beat 1 / 5 / 10 waves in arcade mode.
+        * Rescue 100 / 500 / 1000 fish.
+        * [HIDDEN] Fail to clear the first wave.
 * Bug fixes:
     * Deadlock could occur on upgrade screen if there weren't enough eligible upgrades. 
     * Player could get stuck hunting for key or exit.  Proper navigation implemented to avoid this.

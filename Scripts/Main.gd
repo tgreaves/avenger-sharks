@@ -336,8 +336,6 @@ func start_wave():
     else:
         spawn_enemy('start_spawn','spawn_pattern',false)   
 
-    
-    
     i=0;
 
     while (i < fish_left_this_wave):
@@ -398,6 +396,10 @@ func wave_end():
                 1:
                     Steam.setAchievement('ACH_ARCADE_BEAT_1_WAVE')
                     Steam.storeStats()
+                5:
+                    Steam.setAchievement('ACH_ARCADE_BEAT_5_WAVES')
+                10:
+                    Steam.setAchievement('ACH_ARCADE_BEAT_10_WAVES')
         
 func wave_end_cleanup():
         
@@ -425,10 +427,27 @@ func game_over():
     $HUD.get_node("CanvasLayer/Label").text = "[center]GAME OVER";
     $AudioStreamPlayerMusic.pitch_scale = 1.0
     
+    if SteamClient.STEAM_RUNNING:
+        if wave_number == 1:
+            Steam.setAchievement('ACH_ARCADE_NAME_IS_BRUCE')
+    
+        # Done at end of game to play nicely with Steam rate limiting.
+        var fish_hold = Storage.Stats.get_value('player','fish_rescued',0)
+        if fish_hold >=100 and fish_hold < 500:
+            Steam.setAchievement('ACH_RESCUE_100_FISH')
+        
+        if fish_hold >=500 and fish_hold < 1000:
+            Steam.setAchievement('ACH_RESCUE_500_FISH')
+            
+        if fish_hold >= 1000:
+            Steam.setAchievement('ACH_RESCUE_1000_FISH')
+            
+        Steam.storeStats()
+    
     $AudioStreamPlayerMusic.stop()
     $MenuMusic.play()
     
-    $GameOverTimer.start();
+    $GameOverTimer.start()
 
 func return_to_main_screen():
     for shark_spray in get_tree().get_nodes_in_group("sharkSprayGroup"):
@@ -833,7 +852,7 @@ func _on_player_player_got_fish():
         Storage.Stats.set_value('player','high_score',score)
         
     Storage.increase_stat('player', 'fish_rescued', 1)    
-        
+    
     fish_collected += 1
     fish_left_this_wave -= 1
     _on_enemy_update_score_display();
@@ -1068,6 +1087,6 @@ func _on_steam_stats_ready(game: int, result: int, user: int) -> void:
     
     if constants.DEV_WIPE_ACHIEVEMENTS:
         Logging.log_entry("Wiping achievements...")
-        Steam.clearAchievement('ACH_ARCADE_BEAT_1_WAVE')
+        #Steam.clearAchievement('ACH_ARCADE_BEAT_1_WAVE')
         Steam.storeStats()
 
