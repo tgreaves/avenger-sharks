@@ -1,18 +1,18 @@
 extends Node
 
-const GAME_VERSION = "1.2.0-pathfinder"
+const GAME_VERSION = "1.2.0"
 
 # Developer settings.
 const DEV_DELAY_ON_START = false
 const DEV_LOGGING = true
 const DEV_LOG_WAVE_DESIGN = false
 const DEV_ALLOW_CHEATS = false
-const DEV_SKIP_INTRO = true
-const DEV_START_GAME_IMMEDIATELY = true
-const DEV_STEAM_TESTING = true
+const DEV_SKIP_INTRO = false
+const DEV_START_GAME_IMMEDIATELY = false
+const DEV_STEAM_TESTING = false
 const DEV_SPAWN_ENEMY_COUNT = 0
-const DEV_SPAWN_ONE_ENEMY_TYPE = ''
-const DEV_FORCE_UPGRADE = 'SWIM SURGE'
+const DEV_SPAWN_ONE_ENEMY_TYPE = 'rogue'
+const DEV_FORCE_UPGRADE = ''
 const DEV_WAVE_LASTS_FOREVER = false
 const DEV_WIPE_ACHIEVEMENTS = false
 
@@ -25,7 +25,7 @@ const CAMERA_ZOOM_EFFECTS = false
 const PLAY_WAVE_END_MUSIC = false
 
 const START_WAVE = 1
-const WAVE_SURVIVAL_TIME_BASE = 5
+const WAVE_SURVIVAL_TIME_BASE = 30
 const WAVE_SURVIVAL_TIME_INCREASE = 5
 const WAVE_SURVIVAL_TIME_MAXIMUM = 60
 
@@ -112,7 +112,7 @@ const ENEMY_SETTINGS = {
         'minimum_wave': 1,
         'spawn_chance': 1.0,
         'speed':    450,
-        'health':   4,
+        'health':   3,
         'AI':       'CHASE',
         'score':    10,
         'can_be_knocked_back':  true,
@@ -203,7 +203,7 @@ const ENEMY_DEFAULT_CHANGE_DIRECTION_MAXIMUM_SECONDS = 3;
 
 const ENEMY_ALL_CHASE_WHEN_POPULATION_LOW = 10
 
-const ENEMY_TRAP_HEALTH = 10
+const ENEMY_TRAP_HEALTH = 4
 
 const ENEMY_CALL_FOR_HELP_MINIMUM_TIME = 2.0
 const ENEMY_CALL_FOR_HELP_MAXIMUM_TIME = 3.0
@@ -249,4 +249,4 @@ const POWER_PELLET_ACTIVE_DURATION = 10
 
 # Upgrades
 const ARMOUR_DAMAGE_REDUCTION_PERCENTAGE = 10
-const SWIM_SURGE_BASE_RECHARGE_TIME = 3.0
+const SWIM_SURGE_BASE_RECHARGE_TIME = 4.0

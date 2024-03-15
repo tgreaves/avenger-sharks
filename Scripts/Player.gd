@@ -875,4 +875,8 @@ func _on_swim_surge_running_timer_timeout():
     $SwimSurgeReuseTimer.start(swim_surge_recharge_time)
 
 func _on_swim_surge_reuse_timer_timeout():
+    Logging.log_entry("SURGE READY")
     swim_surge_available = true
+    #powerup_label_animation('SURGE READY')
+    $AnimatedSprite2DSurgeReady.set_visible(true)
+    $AnimatedSprite2DSurgeReady.play()

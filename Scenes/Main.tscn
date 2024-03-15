@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=3 uid="uid://bxw6akrvsd84v"]
+[gd_scene load_steps=25 format=3 uid="uid://bxw6akrvsd84v"]
 
 [ext_resource type="Script" path="res://Scripts/Main.gd" id="1_yyejc"]
 [ext_resource type="PackedScene" uid="uid://dlyr1neald0e4" path="res://Scenes/Dedication.tscn" id="2_utmp5"]
@@ -19,6 +19,7 @@
 [ext_resource type="PackedScene" uid="uid://5yp4e43ckdrj" path="res://Scenes/Player.tscn" id="15_3wn6m"]
 [ext_resource type="PackedScene" uid="uid://ci0jxmpdr3ue5" path="res://Scenes/Options.tscn" id="15_ai8du"]
 [ext_resource type="PackedScene" uid="uid://c61dmtdssq0mw" path="res://Scenes/Key.tscn" id="16_0rume"]
+[ext_resource type="PackedScene" uid="uid://ch5uo6wnokcvq" path="res://Scenes/HowToPlay.tscn" id="18_1nqwg"]
 [ext_resource type="AudioStream" uid="uid://c88vweca03hvy" path="res://Sound/lady-of-the-80x27s-128379.mp3" id="20_exbtf"]
 [ext_resource type="AudioStream" uid="uid://bg0hxy3wpmvun" path="res://Sound/shark-hunt-16191.mp3" id="20_ixctd"]
 [ext_resource type="AudioStream" uid="uid://bvgi2r1adyvav" path="res://Sound/countdown-sound-effect-8-bit-151797.mp3" id="23_4lpjy"]
@@ -74,6 +75,9 @@ visible = false
 visible = false
 
 [node name="Options" parent="." instance=ExtResource("15_ai8du")]
+visible = false
+
+[node name="HowToPlay" parent="." instance=ExtResource("18_1nqwg")]
 visible = false
 
 [node name="Player" parent="." instance=ExtResource("15_3wn6m")]
@@ -138,6 +142,7 @@ bus = &"Effects"
 [connection signal="credits_pressed" from="MainMenu" to="." method="_on_main_menu_credits_pressed"]
 [connection signal="exit_game_pressed" from="MainMenu" to="." method="_on_main_menu_exit_game_pressed"]
 [connection signal="game_mode_pressed" from="MainMenu" to="." method="_on_main_menu_game_mode_pressed"]
+[connection signal="how_to_play_pressed" from="MainMenu" to="." method="_on_main_menu_how_to_play_pressed"]
 [connection signal="options_pressed" from="MainMenu" to="." method="_on_main_menu_options_pressed"]
 [connection signal="start_game_pressed" from="MainMenu" to="." method="_on_main_menu_start_game_pressed"]
 [connection signal="statistics_pressed" from="MainMenu" to="." method="_on_main_menu_statistics_pressed"]
@@ -146,6 +151,7 @@ bus = &"Effects"
 [connection signal="credits_return_button_pressed" from="Credits" to="." method="_on_credits_credits_return_button_pressed"]
 [connection signal="statistics_return_button_pressed" from="Statistics" to="." method="_on_statistics_statistics_return_button_pressed"]
 [connection signal="options_return_button_pressed" from="Options" to="." method="_on_options_options_return_button_pressed"]
+[connection signal="how_to_play_return_button_pressed" from="HowToPlay" to="." method="_on_how_to_play_return_button_pressed"]
 [connection signal="player_died" from="Player" to="." method="_on_player_player_died"]
 [connection signal="player_found_exit" from="Player" to="." method="_on_player_player_found_exit"]
 [connection signal="player_found_exit_stop_key_movement" from="Player" to="Key" method="_on_player_player_found_exit_stop_key_movement"]

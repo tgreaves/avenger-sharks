@@ -49,6 +49,7 @@ enum {
     CREDITS,
     STATISTICS,
     OPTIONS,
+    HOW_TO_PLAY,
     WAVE_START,
     GAME_RUNNING,
     GAME_PAUSED,
@@ -109,6 +110,7 @@ func _ready():
     $PauseMenu.get_node('CanvasLayer').visible = false
     $Statistics.get_node('CanvasLayer').visible = false
     $Credits.get_node('CanvasLayer').visible = false
+    $HowToPlay.get_node('CanvasLayer').visible = false
     $Options.get_node('CanvasLayer').visible = false
     $Player.set_process(false);
     $Player.set_physics_process(false);
@@ -481,6 +483,8 @@ func return_to_main_screen():
     $Key.hide()
     despawn_all_items()
     $Player.stop_fish_frenzy()
+    $CountdownEffect.stop()
+    $Player/HungryParticles.set_emitting(false)
     
     Storage.save_stats()
     
@@ -910,6 +914,13 @@ func _on_main_menu_credits_pressed():
     $HUD/CanvasLayer/HighScore.visible = false;
     $Credits/CanvasLayer.visible = true
     $Credits.commence_scroll()
+    
+func _on_main_menu_how_to_play_pressed():
+    game_status = HOW_TO_PLAY
+    $MainMenu.get_node("CanvasLayer").visible = false
+    $HowToPlay/CanvasLayer/VBoxContainer/ReturnButton.grab_focus()
+    $HUD/CanvasLayer/HighScore.visible = false;
+    $HowToPlay/CanvasLayer.visible = true
 
 func dedication_has_finished():
     dedication.queue_free()
@@ -1023,6 +1034,13 @@ func _on_credits_credits_return_button_pressed():
     $HUD/CanvasLayer/HighScore.visible = true
     $Credits/CanvasLayer.visible = false
 
+func _on_how_to_play_return_button_pressed():
+    game_status = MAIN_MENU
+    $MainMenu.get_node("CanvasLayer").visible = true
+    $MainMenu/CanvasLayer/MainMenuContainer/HowToPlay.grab_focus()
+    $HUD/CanvasLayer/HighScore.visible = true
+    $HowToPlay/CanvasLayer.visible = false
+
 func _on_main_menu_options_pressed():
     game_status = OPTIONS
     $MainMenu.get_node("CanvasLayer").visible = false
@@ -1082,11 +1100,10 @@ func _on_wave_time_left_timer_timeout():
         
         wave_end()
         
-func _on_steam_stats_ready(game: int, result: int, user: int) -> void:
+func _on_steam_stats_ready(_game: int, _result: int, _user: int) -> void:
     Logging.log_entry("Steam stats / achievements now available.")
     
     if constants.DEV_WIPE_ACHIEVEMENTS:
         Logging.log_entry("Wiping achievements...")
         #Steam.clearAchievement('ACH_ARCADE_BEAT_1_WAVE')
         Steam.storeStats()
-

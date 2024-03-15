@@ -8,9 +8,15 @@
         * Player now has a choice of 3 between waves (was: 2)
         * NEW: HEAL ME - Restore all health ahead of the next wave.
         * NEW: SPEED SURGE - Improves SPEED SURGE recharge time.
+    * Balance:
+        * Knight health lowered to 3 (was: 4)
+        * Trap health lowered to 4 (was: 10)
     * Chasing enemies now use proper navigation instead of hoping for the best.  Beware! 
 * Misc: 
     * Graphics: 'DINNER TIME' particle effects added.
+    * How To Play screen added.
+    * Adjusted player movement at wave start to commence at the entrance door.
+    * [INTERNAL] Added godot-git-plugin.
 * Platform:
     * STEAM ACHIEVEMENTS!
         * Beat 1 / 5 / 10 waves in arcade mode.
@@ -19,14 +25,11 @@
 * Bug fixes:
     * Deadlock could occur on upgrade screen if there weren't enough eligible upgrades. 
     * Player could get stuck hunting for key or exit.  Proper navigation implemented to avoid this.
-    * Enemies vanishing too early when wave ending during SHARK ATTACK.
-    * Shark spray sound synced properly with gameplay.
+    * Enemies would vanish too early when the wave ended during SHARK ATTACK.
+    * Shark spray sound not synced properly with gameplay.
+    * Countdown sound would keep playing when returning to main menu.
     * Game ending when in FISH FRENZY would result in player stuck at a weird angle.
-    * Player, Mini Shark and Dinosaur projectiles now despawn on game ending.
-* Misc:
-    * [MAYBE] Zoom camera effects for wave start and end.
-    * Adjusted player movement at wave start to commence at the entrance door.
-    * [INTERNAL] Added godot-git-plugin.
+    * Player, Mini Shark and Dinosaur projectiles not despawning on game ending.
 
 # 1.1.0 (2024-03-03)
 

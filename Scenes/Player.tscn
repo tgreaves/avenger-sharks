@@ -1,4 +1,4 @@
-[gd_scene load_steps=65 format=3 uid="uid://5yp4e43ckdrj"]
+[gd_scene load_steps=74 format=3 uid="uid://5yp4e43ckdrj"]
 
 [ext_resource type="Script" path="res://Scripts/Player.gd" id="1_m4brx"]
 [ext_resource type="Texture2D" uid="uid://ikcchi1bmyrs" path="res://Sprites/Shark/Shark1.png" id="2_px875"]
@@ -40,8 +40,13 @@
 [ext_resource type="AudioStream" uid="uid://di185cyn4vxdo" path="res://Sound/powering_up_funny_sci-fi_dry-102263.mp3" id="39_sydp1"]
 [ext_resource type="FontFile" uid="uid://dclfn1fjcq5i7" path="res://Fonts/PressStart2P-Regular.ttf" id="40_8elap"]
 [ext_resource type="Texture2D" uid="uid://blmls1u06ubt2" path="res://Particles/flare_01.png" id="40_78iqq"]
+[ext_resource type="Texture2D" uid="uid://dpnh82bexsu7d" path="res://Sprites/Explosions/WaterExplosion/Water__05.png" id="40_m3oy2"]
+[ext_resource type="Texture2D" uid="uid://djcxss8vcxcyv" path="res://Sprites/Explosions/WaterExplosion/Water__04.png" id="41_b0oyw"]
 [ext_resource type="AudioStream" uid="uid://ba0q1jycm55i3" path="res://Sound/laser5-47286.wav" id="41_l7qa2"]
+[ext_resource type="Texture2D" uid="uid://5onixek6sj6r" path="res://Sprites/Explosions/WaterExplosion/Water__03.png" id="42_pm0a5"]
+[ext_resource type="Texture2D" uid="uid://bh58c8y72t27l" path="res://Sprites/Explosions/WaterExplosion/Water__02.png" id="43_oogna"]
 [ext_resource type="AudioStream" uid="uid://dee567wkg1cj" path="res://Sound/hq-explosion-6288-reverse.mp3" id="44_dvals"]
+[ext_resource type="Texture2D" uid="uid://b132nn5mor6d3" path="res://Sprites/Explosions/WaterExplosion/Water__01.png" id="44_k56it"]
 [ext_resource type="AudioStream" uid="uid://dl3w6ch8pux8d" path="res://Sound/yay-6120.mp3" id="45_fj125"]
 [ext_resource type="AudioStream" uid="uid://dwquinjikuv4o" path="res://Sound/notification-for-game-scenes-132473.mp3" id="47_1ngf2"]
 [ext_resource type="Texture2D" uid="uid://cd3uri86u07f" path="res://Textures/2d_lights_and_shadows_neutral_point_light.webp" id="49_nsf5y"]
@@ -194,6 +199,32 @@ animations = [{
 "speed": 10.0
 }]
 
+[sub_resource type="SpriteFrames" id="SpriteFrames_jthnu"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("40_m3oy2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("41_b0oyw")
+}, {
+"duration": 1.0,
+"texture": ExtResource("42_pm0a5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("43_oogna")
+}, {
+"duration": 1.0,
+"texture": ExtResource("44_k56it")
+}, {
+"duration": 1.0,
+"texture": null
+}],
+"loop": false,
+"name": &"default",
+"speed": 5.0
+}]
+
 [sub_resource type="Gradient" id="Gradient_5c14i"]
 offsets = PackedFloat32Array(0, 0.18894)
 colors = PackedColorArray(1, 0, 0, 1, 0.029587, 0, 0.970413, 1)
@@ -208,6 +239,24 @@ emission_shape = 1
 emission_sphere_radius = 75.0
 gravity = Vector3(0, 0, 0)
 color_ramp = SubResource("GradientTexture1D_lvy03")
+
+[sub_resource type="Gradient" id="Gradient_hqx5m"]
+colors = PackedColorArray(0.878431, 0.768627, 0, 1, 0.029587, 0, 0.970413, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_t1qpm"]
+gradient = SubResource("Gradient_hqx5m")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_8u7m5"]
+lifetime_randomness = 0.5
+particle_flag_disable_z = true
+emission_shape = 1
+emission_sphere_radius = 75.0
+gravity = Vector3(2.08165e-12, 2.08165e-12, 2.08165e-12)
+radial_accel_min = -10.4
+radial_accel_max = -10.4
+scale_min = 0.25
+scale_max = 0.3
+color_ramp = SubResource("GradientTexture1D_t1qpm")
 
 [sub_resource type="Gradient" id="Gradient_80uc6"]
 offsets = PackedFloat32Array(0, 0.580645)
@@ -281,6 +330,15 @@ sprite_frames = SubResource("SpriteFrames_bvem5")
 frame = 5
 frame_progress = 1.0
 
+[node name="AnimatedSprite2DSurgeReady" type="AnimatedSprite2D" parent="."]
+visible = false
+texture_filter = 1
+scale = Vector2(1.5, 1.5)
+sprite_frames = SubResource("SpriteFrames_jthnu")
+frame = 5
+frame_progress = 1.0
+speed_scale = 1.5
+
 [node name="SurgeParticles" type="GPUParticles2D" parent="."]
 modulate = Color(1, 1, 1, 0.305882)
 emitting = false
@@ -291,6 +349,19 @@ lifetime = 2.0
 speed_scale = 2.0
 randomness = 0.35
 fixed_fps = 0
+draw_order = 0
+
+[node name="SurgeReadyParticles" type="GPUParticles2D" parent="."]
+visible = false
+modulate = Color(1, 1, 1, 0.305882)
+show_behind_parent = true
+emitting = false
+amount = 64
+process_material = SubResource("ParticleProcessMaterial_8u7m5")
+texture = ExtResource("40_78iqq")
+randomness = 0.35
+fixed_fps = 0
+visibility_rect = Rect2(-100, -100, 10, 10)
 draw_order = 0
 
 [node name="HungryParticles" type="GPUParticles2D" parent="."]
