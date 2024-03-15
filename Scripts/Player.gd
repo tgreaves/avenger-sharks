@@ -48,6 +48,7 @@ var grenade_delay = constants.PLAYER_GRENADE_DELAY
 var astar_pathing_grid
 var swim_surge_available:bool = true
 var swim_surge_activate:bool = false
+var tween_surge:Tween
 
 func _ready():
     shark_status = ALIVE;
@@ -193,6 +194,10 @@ func get_input():
             remove_aiming_line()
             
     if Input.is_action_pressed('fish_frenzy') && fish_frenzy_enabled == true:
+        # If we are SWIM SURGING, stop that immediately so we don't fall off the map.
+        if swim_surge_activate:
+            _on_swim_surge_running_timer_timeout()
+        
         fish_frenzy_enabled = false
         shark_status=FISH_FRENZY
         fish_frenzy_colour = 'BLUE'
@@ -207,14 +212,12 @@ func get_input():
         
     if shark_status == ALIVE and Input.is_action_just_pressed('secondary_ability'):
         # For now, this will trigger SWIM SURGE.        
-        Logging.log_entry("secondary_ability just pressed")
         
         if swim_surge_available and input_direction:
-            Logging.log_entry("Criteria for activation successful.")
             swim_surge_activate = true
             swim_surge_available = false
             
-            var tween_surge = get_tree().create_tween()   
+            tween_surge = get_tree().create_tween()   
             tween_surge.tween_property(self, "velocity", input_direction*3000, 0.25)
             
             $SwimSurgeRunningTimer.start()
@@ -424,7 +427,7 @@ func _physics_process(_delta):
                     upgrades['CHEAT DEATH'][0] = 0
                     get_parent().get_node('HUD').update_upgrade_summary()
                     
-                    player_energy = 0.5 * constants.PLAYER_START_GAME_ENERGY
+                    player_energy = 0.75 * constants.PLAYER_START_GAME_ENERGY
                     $EnergyProgressBar.value = player_energy
                     
                     # Play explosion backwards (a bit slower so sound FX fits)
@@ -620,11 +623,6 @@ func _on_main_player_hunt_key(passed_key_global_position):
     key_global_position = passed_key_global_position
     
     astar_pathing_grid = get_parent().get_node('Arena').get_astar_route_from_positions(global_position, key_global_position)
-    Logging.log_entry("ROUTE IS: " + str(astar_pathing_grid))
-    
-    # Start heading towards the first one.
-    Logging.log_entry("First one would be: " + str(astar_pathing_grid[0]))
-    Logging.log_entry("Actual coords: " + str(get_parent().get_node('Arena').get_position_from_tilemap(astar_pathing_grid[0])))
     
     var target_direction = (get_parent().get_node('Arena').get_position_from_tilemap(astar_pathing_grid[0]) - global_position).normalized()
     velocity = target_direction * constants.PLAYER_SPEED_ESCAPING
@@ -863,20 +861,16 @@ func end_shark_attack():
         single_enemy.stop_calling_for_help()
     
 func _on_swim_surge_running_timer_timeout():
+    tween_surge.kill()
     swim_surge_activate = false
     $SurgeParticles.set_emitting(false)
     
     var swim_surge_improvement_percentage = upgrades['SWIM SURGE'][0] * 10
-    Logging.log_entry("Swim surgae percentage = " + str(swim_surge_improvement_percentage))
     var swim_surge_recharge_time = constants.SWIM_SURGE_BASE_RECHARGE_TIME - ((swim_surge_improvement_percentage / 100.0) * constants.SWIM_SURGE_BASE_RECHARGE_TIME)
-    
-    Logging.log_entry("Jack Greaves is amazing - recharge time will be " + str(swim_surge_recharge_time))
-    
+       
     $SwimSurgeReuseTimer.start(swim_surge_recharge_time)
 
 func _on_swim_surge_reuse_timer_timeout():
-    Logging.log_entry("SURGE READY")
     swim_surge_available = true
-    #powerup_label_animation('SURGE READY')
     $AnimatedSprite2DSurgeReady.set_visible(true)
     $AnimatedSprite2DSurgeReady.play()

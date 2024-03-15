@@ -11,6 +11,8 @@
     * Balance:
         * Knight health lowered to 3 (was: 4)
         * Trap health lowered to 4 (was: 10)
+        * CHEAT DEATH now restores 75% of player health on activation.
+        * Special waves can only start after Wave 3 (was: 2)
     * Chasing enemies now use proper navigation instead of hoping for the best.  Beware! 
 * Misc: 
     * Graphics: 'DINNER TIME' particle effects added.

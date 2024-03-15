@@ -435,10 +435,12 @@ func game_over():
     
         # Done at end of game to play nicely with Steam rate limiting.
         var fish_hold = Storage.Stats.get_value('player','fish_rescued',0)
-        if fish_hold >=100 and fish_hold < 500:
+        
+        # To catch players that hit achievements BEFORE they were introduced, check all of them.
+        if fish_hold >=100:
             Steam.setAchievement('ACH_RESCUE_100_FISH')
         
-        if fish_hold >=500 and fish_hold < 1000:
+        if fish_hold >=500:
             Steam.setAchievement('ACH_RESCUE_500_FISH')
             
         if fish_hold >= 1000:
@@ -522,7 +524,6 @@ func spawn_item():
         
         # If a power pellet, due to their blinking nature, reset all pellet animations to be in sync.
         if spawned_item == 'power-pellet':
-            Logging.log_entry("We spawned a power pellet")
             for single_item in get_tree().get_nodes_in_group('itemGroup'):
                 if single_item.item_type == 'power_pellet':
                     single_item.get_node('AnimatedSprite2D').stop()
@@ -539,10 +540,7 @@ func spawn_enemy(spawn_to_use,spawn_pattern_to_use,half_spawn_boolean):
     var spawn_array = TheDirector.WaveDesign.get(spawn_to_use).get('spawn_array')
     var number_to_spawn = spawn_array.size()
     
-    Logging.log_entry("Spawn pattern lookup to use: " + str(spawn_pattern_to_use))
-    
     if half_spawn_boolean:
-        Logging.log_entry("half_spawn_boolean detected.")
         @warning_ignore("integer_division")
         var spawn_a = int(number_to_spawn/2)
         var spawn_b = number_to_spawn - spawn_a
@@ -558,8 +556,6 @@ func spawn_enemy(spawn_to_use,spawn_pattern_to_use,half_spawn_boolean):
     # Why? Stops the end of the wave being boring with the player having to wait to find the enemies.
     if (enemies_on_screen+number_to_spawn <= constants.ENEMY_ALL_CHASE_WHEN_POPULATION_LOW) && (enemies_left_this_wave <= constants.ENEMY_ALL_CHASE_WHEN_POPULATION_LOW):
         spawn_pattern = 'CIRCLE_SURROUND_PLAYER'
-
-    Logging.log_entry("Pattern: " + str(spawn_pattern))
 
     # Uncomment this to force a spawn pattern for testing.
     #spawn_pattern='RANDOM'
@@ -713,12 +709,9 @@ func _process(_delta):
             if spawn_number < TheDirector.WaveDesign.get('total_spawns', 0):
                 spawn_number+=1
                 
-                Logging.log_entry("Reinforcements: Spawn number " + str(spawn_number))
                 var spawn_label = "spawn_" + str(spawn_number)
                 
-                if TheDirector.WaveDesign.get(spawn_label).get('spawn_pattern_b'):
-                    Logging.log_entry("Spawn Pattern B has been detected.")
-                    
+                if TheDirector.WaveDesign.get(spawn_label).get('spawn_pattern_b'):                    
                     spawn_enemy(spawn_label, 'spawn_pattern', true)
                     spawn_enemy(spawn_label, 'spawn_pattern_b', true)
                 else:
@@ -753,12 +746,9 @@ func _input(ev):
 
 func handle_pause_input():
     match game_status:
-        GAME_RUNNING,WAVE_START,GETTING_KEY,WAVE_END,UPGRADE_SCREEN,UPGRADE_WAITING_FOR_CHOICE:
-            Logging.log_entry("Need to pause the game")
-                    
+        GAME_RUNNING,WAVE_START,GETTING_KEY,WAVE_END,UPGRADE_SCREEN,UPGRADE_WAITING_FOR_CHOICE:                    
             # Avoid 'double press' if we have just come back from the pause menu
             if !accept_pause:
-                Logging.log_entry("NO PAUSING YET")
                 return
             
             game_status_before_pause = game_status
@@ -768,9 +758,7 @@ func handle_pause_input():
                 upgrade_focus_memory_left_button = $HUD/CanvasLayer/UpgradeChoiceContainer/Choice1/Button.has_focus()
                 upgrade_focus_memory_middle_button = $HUD/CanvasLayer/UpgradeChoiceContainer/Choice2/Button.has_focus()
                 upgrade_focus_memory_right_button = $HUD/CanvasLayer/UpgradeChoiceContainer/Choice3/Button.has_focus()
-                
-                Logging.log_entry("Left: " + str(upgrade_focus_memory_left_button) + " right: " + str(upgrade_focus_memory_right_button))
-            
+                 
             $PauseMenu.get_node('CanvasLayer').visible = true
             $PauseMenu.set_process_input(true)
             $PauseMenu.pause()
@@ -878,7 +866,6 @@ func _on_main_menu_exit_game_pressed():
     get_tree().quit();
 
 func _on_pause_menu_unpause_game_pressed():
-    Logging.log_entry('Ending pause')
     game_status = game_status_before_pause
     $PauseMenu.get_node('CanvasLayer').visible = false
     
@@ -956,22 +943,15 @@ func upgrade_screen():
     
     for single_upgrade in $Player.upgrades:
         var single_upgrade_detail = $Player.upgrades.get(single_upgrade)
-        Logging.log_entry("Considering: " + str(single_upgrade_detail))
         if single_upgrade_detail[0] < single_upgrade_detail[1]:
-            Logging.log_entry("PUSHING")
             # This can be included as we have not exceeded max level of the upgrade.
             eligible_upgrades.append(single_upgrade)
     
-    Logging.log_entry("Eligible upgrades count: " + str(eligible_upgrades.size()))
-    Logging.log_entry("Upgrades list: " + str(eligible_upgrades))
-    
     while eligible_upgrades.size() < 3:
-        Logging.log_entry("Not enough upgrades.  Adding default HEAL ME as a fall-back.")
         eligible_upgrades.append('HEAL ME')
     
     # Now select the two upgrades to present to the player.
     eligible_upgrades.shuffle()
-    Logging.log_entry("Shuffled list: " + str(eligible_upgrades))
     upgrade_one_index = eligible_upgrades.pop_front()
     upgrade_two_index = eligible_upgrades.pop_front()
     upgrade_three_index = eligible_upgrades.pop_front()
@@ -1084,15 +1064,12 @@ func _on_accept_pause_timer_timeout():
     accept_pause = true
     
 func _on_wave_time_left_timer_timeout():
-    if game_mode =='ARCADE' and game_status == GAME_RUNNING:
-        Logging.log_entry("Wave duration timeout hit")
-        
+    if game_mode =='ARCADE' and game_status == GAME_RUNNING:        
         # Make sure we update time to 0
         update_time_left_display() 
         
         # Have a random enemy drop the key in fear.
         var random_enemy_idx = randi_range(0, get_tree().get_nodes_in_group("enemyGroup").size()-1)
-        Logging.log_entry("Random number: " + str(random_enemy_idx))
         $Key.global_position = get_tree().get_nodes_in_group("enemyGroup")[random_enemy_idx].global_position
         $Key.show();
         $Key/CollisionShape2D.disabled = false;

@@ -1,6 +1,6 @@
 extends Node
 
-const GAME_VERSION = "1.2.0"
+const GAME_VERSION = "1.2.0 RC3"
 
 # Developer settings.
 const DEV_DELAY_ON_START = false
@@ -11,7 +11,7 @@ const DEV_SKIP_INTRO = false
 const DEV_START_GAME_IMMEDIATELY = false
 const DEV_STEAM_TESTING = false
 const DEV_SPAWN_ENEMY_COUNT = 0
-const DEV_SPAWN_ONE_ENEMY_TYPE = 'rogue'
+const DEV_SPAWN_ONE_ENEMY_TYPE = ''
 const DEV_FORCE_UPGRADE = ''
 const DEV_WAVE_LASTS_FOREVER = false
 const DEV_WIPE_ACHIEVEMENTS = false
@@ -73,7 +73,7 @@ const ARTILLERY_WARNING_TIME = 4
 const ARTILLERY_CHASE_SPEED = 5
 
 # Enemy spawning
-const ENEMY_SPAWN_WAVE_SPECIAL_MIN_WAVE = 2
+const ENEMY_SPAWN_WAVE_SPECIAL_MIN_WAVE = 3
 
 const ENEMY_SPAWN_WAVE_SPECIAL_CONFIGURATION = {
     90:      ['STANDARD', '', ''],
