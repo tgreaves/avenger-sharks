@@ -95,6 +95,12 @@ func prepare_for_new_game():
     
     for single_powerup in max_powerup_levels:
         current_powerup_levels[single_powerup] = 0
+        
+    for single_key in upgrades.keys():
+        if single_key == 'HEAL ME':
+            upgrades[single_key][0] = -1
+        else:
+            upgrades[single_key][0] = 0
     
     get_parent().get_node('HUD').reset_powerup_bar()
     get_parent().get_node('HUD').reset_powerup_bar_text()

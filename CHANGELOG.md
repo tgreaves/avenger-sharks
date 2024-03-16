@@ -1,9 +1,9 @@
 # Changelog
 
-# 1.2.0 (xxxx-xx-xx)
+# 1.2.0 (2024-03-16)
 
 * Gameplay:
-    * Player can now SPEED SURGE (left trigger / X key) to help avoid enemies.
+    * Player can now SPEED SURGE (left trigger / SPACE) to help avoid enemies.
     * Upgrades:
         * Player now has a choice of 3 between waves (was: 2)
         * NEW: HEAL ME - Restore all health ahead of the next wave.
@@ -11,7 +11,7 @@
     * Balance:
         * Knight health lowered to 3 (was: 4)
         * Trap health lowered to 4 (was: 10)
-        * CHEAT DEATH now restores 75% of player health on activation.
+        * CHEAT DEATH now restores 75% of player health on activation (was: 50%)
         * Special waves can only start after Wave 3 (was: 2)
     * Chasing enemies now use proper navigation instead of hoping for the best.  Beware! 
 * Misc: 
@@ -26,6 +26,7 @@
         * [HIDDEN] Fail to clear the first wave.
 * Bug fixes:
     * Deadlock could occur on upgrade screen if there weren't enough eligible upgrades. 
+    * CHEAT DEATH could persist between games.  Upgrades now more consistently reset.
     * Player could get stuck hunting for key or exit.  Proper navigation implemented to avoid this.
     * Enemies would vanish too early when the wave ended during SHARK ATTACK.
     * Shark spray sound not synced properly with gameplay.
