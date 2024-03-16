@@ -28,7 +28,6 @@ func _input(ev):
         return
 
     if Input.is_action_just_pressed('start') or Input.is_action_just_pressed('quit'):
-        Logging.log_entry("Signal")
         emit_signal('unpause_game_pressed')
 
 func _on_unpause_game_pressed():

@@ -761,7 +761,7 @@ animations = [{
 offsets = PackedFloat32Array(0.461111, 1)
 colors = PackedColorArray(1, 1, 0, 1, 1, 0.0392157, 0.996078, 1)
 
-[sub_resource type="GradientTexture1D" id="GradientTexture1D_pyiss"]
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_2eks3"]
 gradient = SubResource("Gradient_erpy6")
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_jvb61"]
@@ -774,7 +774,7 @@ radial_accel_min = -20.0
 radial_accel_max = -20.0
 scale_min = 0.5
 scale_max = 0.75
-color_ramp = SubResource("GradientTexture1D_pyiss")
+color_ramp = SubResource("GradientTexture1D_2eks3")
 hue_variation_max = 0.75
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_boxa1"]

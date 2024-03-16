@@ -1,5 +1,39 @@
 # Changelog
 
+# 1.2.0 (2024-03-16)
+
+* Gameplay:
+    * Player can now SPEED SURGE (left trigger / SPACE) to help avoid enemies.
+    * Upgrades:
+        * Player now has a choice of 3 between waves (was: 2)
+        * NEW: HEAL ME - Restore all health ahead of the next wave.
+        * NEW: SPEED SURGE - Improves SPEED SURGE recharge time.
+    * Balance:
+        * Knight health lowered to 3 (was: 4)
+        * Trap health lowered to 4 (was: 10)
+        * CHEAT DEATH now restores 75% of player health on activation (was: 50%)
+        * Special waves can only start after Wave 3 (was: 2)
+    * Chasing enemies now use proper navigation instead of hoping for the best.  Beware! 
+* Misc: 
+    * Graphics: 'DINNER TIME' particle effects added.
+    * How To Play screen added.
+    * Adjusted player movement at wave start to commence at the entrance door.
+    * [INTERNAL] Added godot-git-plugin.
+* Platform:
+    * STEAM ACHIEVEMENTS!
+        * Beat 1 / 5 / 10 waves in arcade mode.
+        * Rescue 100 / 500 / 1000 fish.
+        * [HIDDEN] Fail to clear the first wave.
+* Bug fixes:
+    * Deadlock could occur on upgrade screen if there weren't enough eligible upgrades. 
+    * CHEAT DEATH could persist between games.  Upgrades now more consistently reset.
+    * Player could get stuck hunting for key or exit.  Proper navigation implemented to avoid this.
+    * Enemies would vanish too early when the wave ended during SHARK ATTACK.
+    * Shark spray sound not synced properly with gameplay.
+    * Countdown sound would keep playing when returning to main menu.
+    * Game ending when in FISH FRENZY would result in player stuck at a weird angle.
+    * Player, Mini Shark and Dinosaur projectiles not despawning on game ending.
+
 # 1.1.0 (2024-03-03)
 
 * Gameplay:
@@ -22,7 +56,7 @@
     * Diet: At some point, Necromancers stopped wanting to eat fish.  Fixed.
     * UI: Tightened up mouse showing / hiding as appropriate
 * Platform:
-    * Steam : GodotSteam GDExtension upgraded to 4.6.
+    * Steam: GodotSteam GDExtension upgraded to 4.6.
 * Misc:
     * Haptic feedback added! Vibrates on player hit + shark frenzy.  Turn on in OPTIONS.
         * This will not work on all platforms.

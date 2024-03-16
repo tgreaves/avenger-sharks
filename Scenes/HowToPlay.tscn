@@ -1,0 +1,72 @@
+[gd_scene load_steps=5 format=3 uid="uid://ch5uo6wnokcvq"]
+
+[ext_resource type="Script" path="res://Scripts/HowToPlay.gd" id="1_q1tn6"]
+[ext_resource type="FontFile" uid="uid://dclfn1fjcq5i7" path="res://Fonts/PressStart2P-Regular.ttf" id="2_51vyp"]
+
+[sub_resource type="InputEventAction" id="InputEventAction_0knlb"]
+action = &"back"
+
+[sub_resource type="Shortcut" id="Shortcut_ke7hp"]
+events = [SubResource("InputEventAction_0knlb")]
+
+[node name="HowToPlay" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_q1tn6")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -1279.0
+offset_top = -549.0
+offset_right = 1278.0
+offset_bottom = 552.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TitleLabel" type="Label" parent="CanvasLayer/VBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_51vyp")
+theme_override_font_sizes/font_size = 72
+text = "HOW TO PLAY"
+horizontal_alignment = 1
+
+[node name="HowToPlayText" type="RichTextLabel" parent="CanvasLayer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/line_separation = 24
+theme_override_fonts/normal_font = ExtResource("2_51vyp")
+theme_override_font_sizes/normal_font_size = 48
+bbcode_enabled = true
+text = "[center]
+MOVEMENT: WASD OR LEFT STICK
+AIM: MOUSE OR RIGHT STICK
+
+FISH FRENZY: E OR RIGHT TRIGGER
+SWIM SURGE: SPACE OR LEFT TRIGGER
+
+COLLECT [img]Sprites/Fish/fishTile_072.png[/img][img]Sprites/Fish/fishTile_076.png[/img][img]Sprites/Fish/fishTile_078.png[/img][img]Sprites/Fish/fishTile_080.png[/img] TO POWER UP FISH FRENZY!
+
+[img height=128 width=128]Sprites/dinosaur-snapshot.png[/img] WILL HELP YOU!
+
+"
+
+[node name="ReturnButton" type="Button" parent="CanvasLayer/VBoxContainer"]
+custom_minimum_size = Vector2(600, 2.08165e-12)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_fonts/font = ExtResource("2_51vyp")
+theme_override_font_sizes/font_size = 64
+shortcut = SubResource("Shortcut_ke7hp")
+text = "RETURN"
+
+[connection signal="pressed" from="CanvasLayer/VBoxContainer/ReturnButton" to="." method="_on_return_button_pressed"]

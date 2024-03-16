@@ -45,6 +45,10 @@ var power_pellet_warning_running = false
 var powerup_labels_being_displayed = 0
 var fire_delay = constants.PLAYER_FIRE_DELAY
 var grenade_delay = constants.PLAYER_GRENADE_DELAY
+var astar_pathing_grid
+var swim_surge_available:bool = true
+var swim_surge_activate:bool = false
+var tween_surge:Tween
 
 func _ready():
     shark_status = ALIVE;
@@ -65,6 +69,7 @@ func _ready():
     
     upgrades = {
         # Code          [ Current Level, Max Level, Image path, Description
+        # If Max Level is 0 then it is a health-style purchase (Purchase once, instand result, doesn't stick)
         # If Max Level is 1 then it can only ever be purchased once (Binary item)
         'MAGNET':           [ 0, 1, 'res://Images/crosshair184.png', 'A powerful magnet which does magnet things.'],
         'ARMOUR':           [ 0, 3, 'res://Images/crosshair184.png', 'Decrease incoming damage by 10%'],
@@ -73,7 +78,9 @@ func _ready():
         'DOMINANT DINO':    [ 0, 3, 'res://Images/crosshair184.png', 'Increase Mr Dinosaur attack time by 20%'],
         'MORE POWER':       [ 0, 3, 'res://Images/crosshair184.png', 'Increase Power Up duration by 20%'],
         'LOOT LOVER':       [ 0, 3, 'res://Images/crosshair184.png', 'Increase item drop rate by 10%'],
-        'CHEAT DEATH':      [ 0, 1, 'res://Images/crosshair184.png', 'Regain 50% health upon death - Once!']
+        'CHEAT DEATH':      [ 0, 1, 'res://Images/crosshair184.png', 'Regain 50% health upon death - Once!'],
+        'SWIM SURGE':       [ 0, 3, 'res://Images/crosshair184.png', 'Improve swim surge re-use time by 10%'],
+        'HEAL ME':          [ -1, 0, 'res://Images/crosshair184.png', 'Instantly regain all health']
     }
     
 func prepare_for_new_game():
@@ -82,10 +89,18 @@ func prepare_for_new_game():
     spray_size = 0.5
     fish_frenzy_enabled = false
     power_pellet_enabled = false
+    swim_surge_available = true
+    swim_surge_activate = false
     $AnimatedSprite2D.set_modulate(Color(1, 1, 1, 1))
     
     for single_powerup in max_powerup_levels:
         current_powerup_levels[single_powerup] = 0
+        
+    for single_key in upgrades.keys():
+        if single_key == 'HEAL ME':
+            upgrades[single_key][0] = -1
+        else:
+            upgrades[single_key][0] = 0
     
     get_parent().get_node('HUD').reset_powerup_bar()
     get_parent().get_node('HUD').reset_powerup_bar_text()
@@ -108,19 +123,19 @@ func prepare_for_new_wave():
 func get_input():
     
     if shark_status != ALIVE:
-        return;
+        return
         
     var input_direction = Input.get_vector("left", "right", "up", "down")
-    velocity = input_direction * speed
     
-    #$AnimatedSprite2D.look_at(get_global_mouse_position())
-    #$AnimatedSprite2D.rotation_degrees += 180
-    
+    if !swim_surge_activate:
+        velocity = input_direction * speed
+        
     if $FireRateTimer.time_left == 0 && get_parent().game_mode == 'ARCADE':    
         # Mouse aiming
         if Input.is_action_pressed('shark_fire_mouse'):
-            var shark_spray = SharkSprayScene.instantiate();
-            get_parent().add_child(shark_spray);
+            var shark_spray = SharkSprayScene.instantiate()
+            get_parent().add_child(shark_spray)
+            shark_spray.add_to_group('sharkSprayGroup')
             var target_direction = (get_global_mouse_position() - global_position).normalized()
             shark_spray.global_position = position;
             shark_spray.velocity = velocity + (target_direction * constants.PLAYER_FIRE_SPEED)
@@ -135,9 +150,10 @@ func get_input():
         # Controller (Twin stick)
         var shoot_direction = Input.get_vector("shoot_left", "shoot_right", "shoot_up", "shoot_down");
         if shoot_direction:
-            var shark_spray = SharkSprayScene.instantiate();
-            get_parent().add_child(shark_spray);
-            shark_spray.global_position = position;
+            var shark_spray = SharkSprayScene.instantiate()
+            get_parent().add_child(shark_spray)
+            shark_spray.add_to_group('sharkSprayGroup')
+            shark_spray.global_position = position
             
             var shoot_input = Vector2.ZERO;
             shoot_input.x = Input.get_action_strength("shoot_right") - Input.get_action_strength("shoot_left");
@@ -184,6 +200,10 @@ func get_input():
             remove_aiming_line()
             
     if Input.is_action_pressed('fish_frenzy') && fish_frenzy_enabled == true:
+        # If we are SWIM SURGING, stop that immediately so we don't fall off the map.
+        if swim_surge_activate:
+            _on_swim_surge_running_timer_timeout()
+        
         fish_frenzy_enabled = false
         shark_status=FISH_FRENZY
         fish_frenzy_colour = 'BLUE'
@@ -196,6 +216,20 @@ func get_input():
         if Storage.Config.get_value('config','enable_haptics',false):
             Input.start_joy_vibration(0, 0.25, 0.25, constants.PLAYER_FISH_FRENZY_DURATION)
         
+    if shark_status == ALIVE and Input.is_action_just_pressed('secondary_ability'):
+        # For now, this will trigger SWIM SURGE.        
+        
+        if swim_surge_available and input_direction:
+            swim_surge_activate = true
+            swim_surge_available = false
+            
+            tween_surge = get_tree().create_tween()   
+            tween_surge.tween_property(self, "velocity", input_direction*3000, 0.25)
+            
+            $SwimSurgeRunningTimer.start()
+            $AudioStreamPlayerSplash.play()
+            $SurgeParticles.set_emitting(true)
+           
 func _physics_process(_delta):
     get_input()
     move_and_slide()
@@ -240,7 +274,7 @@ func _physics_process(_delta):
                         $AnimatedSprite2D.set_modulate(Color(1, 1, 1, 1))
                     
                     $PowerPelletWarningTimer.start()
-            
+
             if velocity.x > 0:
                 $AnimatedSprite2D.set_flip_h(true);
             
@@ -340,6 +374,7 @@ func _physics_process(_delta):
                             
                             # BLOOD THIRSTY
                             $AnimatedSprite2D.set_modulate(Color(1, 0, 0, 1))
+                            $HungryParticles.set_emitting(true)
                             
                             # Force direction change
                             for single_enemy in get_tree().get_nodes_in_group('enemyGroup'):
@@ -373,12 +408,13 @@ func _physics_process(_delta):
                     var i=0
                     
                     while i <= 32:  
-                        var target_direction = Vector2(1,1).normalized();
-                        target_direction = target_direction.rotated ( deg_to_rad(360.0/32.0) * i);
-                        var shark_spray = SharkSprayScene.instantiate();
-                        get_parent().add_child(shark_spray);
-                        shark_spray.global_position = position;
-                        shark_spray.velocity = target_direction * constants.PLAYER_FIRE_SPEED;
+                        var target_direction = Vector2(1,1).normalized()
+                        target_direction = target_direction.rotated ( deg_to_rad(360.0/32.0) * i)
+                        var shark_spray = SharkSprayScene.instantiate()
+                        get_parent().add_child(shark_spray)
+                        shark_spray.add_to_group('sharkSprayGroup')
+                        shark_spray.global_position = position
+                        shark_spray.velocity = target_direction * constants.PLAYER_FIRE_SPEED
                         
                         if fish_frenzy_colour == 'BLUE':
                             fish_frenzy_colour = 'GREEN'
@@ -397,7 +433,7 @@ func _physics_process(_delta):
                     upgrades['CHEAT DEATH'][0] = 0
                     get_parent().get_node('HUD').update_upgrade_summary()
                     
-                    player_energy = 0.5 * constants.PLAYER_START_GAME_ENERGY
+                    player_energy = 0.75 * constants.PLAYER_START_GAME_ENERGY
                     $EnergyProgressBar.value = player_energy
                     
                     # Play explosion backwards (a bit slower so sound FX fits)
@@ -437,19 +473,46 @@ func _physics_process(_delta):
             if $HuntingKeyTimer.time_left == 0:
                 position = get_parent().get_node('Key').global_position
             
+            # Have we reached the next node on the astar pathing grid?
+            var tilemap_coords = get_parent().get_node('Arena').get_tilemap_coords(global_position)
+            
+            if astar_pathing_grid.size():
+                if tilemap_coords == astar_pathing_grid[0]:
+                    astar_pathing_grid.pop_front()
+                    
+                    if astar_pathing_grid.size():
+                        var target_direction = (get_parent().get_node('Arena').get_position_from_tilemap(astar_pathing_grid[0]) - global_position).normalized()
+                        velocity = target_direction * constants.PLAYER_SPEED_ESCAPING
+                
             for i in get_slide_collision_count():
                 var collision = get_slide_collision(i)
                 
                 if collision.get_collider().name == 'Key':  
                     shark_status = HUNTING_EXIT;
-                    var target_direction = (get_parent().get_node('Arena').get_node('ExitDoor').global_position - global_position).normalized();
-                    velocity = target_direction * constants.PLAYER_SPEED_ESCAPING;
                     get_parent().get_node('Arena').get_node('ExitDoor').get_node('CollisionShape2D').disabled = false;
                     emit_signal('player_got_key')
+                    
+                    var exit_door_global = get_parent().get_node('Arena').get_node('ExitDoor').global_position            
+                    astar_pathing_grid = get_parent().get_node('Arena').get_astar_route_from_positions(global_position, exit_door_global)
+                  
+                    # Start heading towards the first one. 
+                    var target_direction = (get_parent().get_node('Arena').get_position_from_tilemap(astar_pathing_grid[0]) - global_position).normalized()
+                    velocity = target_direction * constants.PLAYER_SPEED_ESCAPING
+                    
                     $HuntingDoorTimer.start()
         HUNTING_EXIT:
             var did_collide = false
             
+            # Have we reached the next node on the astar pathing grid?
+            var tilemap_coords = get_parent().get_node('Arena').get_tilemap_coords(global_position)
+            
+            if tilemap_coords == astar_pathing_grid[0]:
+                astar_pathing_grid.pop_front()
+                
+                if astar_pathing_grid.size():
+                    var target_direction = (get_parent().get_node('Arena').get_position_from_tilemap(astar_pathing_grid[0]) - global_position).normalized()
+                    velocity = target_direction * constants.PLAYER_SPEED_ESCAPING
+                        
             if velocity.x > 0:
                 $AnimatedSprite2D.set_flip_h(true);
             
@@ -476,9 +539,12 @@ func _physics_process(_delta):
                     get_parent().get_node('Arena').open_top_door()
                     get_parent().get_node('Arena').get_node('ExitDoor').get_node('CollisionShape2D').disabled = true;
                     
-                    emit_signal('player_found_exit_stop_key_movement');
-                    shark_status=GOING_THROUGH_DOOR;
-                   
+                    emit_signal('player_found_exit_stop_key_movement')
+                    shark_status=GOING_THROUGH_DOOR
+                    
+                    #var tween_camera = get_tree().create_tween()   
+                    #tween_camera.tween_property($Camera2D, "zoom", Vector2(3.0,3.0), 0.2)
+                
                     $DoorOpenTimer.start()   
                     
             if !did_collide:
@@ -561,9 +627,13 @@ func _on_main_player_hunt_key(passed_key_global_position):
     
     shark_status = HUNTING_KEY
     key_global_position = passed_key_global_position
-    var target_direction = (key_global_position - global_position).normalized()
+    
+    astar_pathing_grid = get_parent().get_node('Arena').get_astar_route_from_positions(global_position, key_global_position)
+    
+    var target_direction = (get_parent().get_node('Arena').get_position_from_tilemap(astar_pathing_grid[0]) - global_position).normalized()
     velocity = target_direction * constants.PLAYER_SPEED_ESCAPING
     
+    # 'Break glass'
     $HuntingKeyTimer.start()
 
 func _on_main_player_move_to_starting_position():
@@ -621,6 +691,7 @@ func mini_shark_fire(shark_fire_direction):
     for mini_shark in get_tree().get_nodes_in_group("miniSharkGroup"):
         var mini_shark_spray = SharkSprayScene.instantiate()
         get_parent().add_child(mini_shark_spray)
+        mini_shark_spray.add_to_group('miniSharkSprayGroup')
         mini_shark_spray.global_position = mini_shark.global_position
         mini_shark_spray.velocity = shark_fire_direction * constants.PLAYER_FIRE_SPEED;
         
@@ -731,18 +802,24 @@ func decrease_powerup_level(powerup):
 func _on_hud_upgrade_button_pressed(button_number):
 
     var selected_upgrade
-    if button_number == 1:
-        selected_upgrade = get_parent().upgrade_one_index
-    else:
-        selected_upgrade = get_parent().upgrade_two_index
+    
+    match button_number:
+        1:
+            selected_upgrade = get_parent().upgrade_one_index
+        2:
+            selected_upgrade = get_parent().upgrade_two_index
+        3:
+            selected_upgrade = get_parent().upgrade_three_index
     
     $AudioStreamPlayerSelectedUpgrade.play()
     
     # Mark upgrade as in use by increasing its level.
     # Ensure level does not exceed the maximum allowed.
-    upgrades[selected_upgrade][0] = upgrades[selected_upgrade][0] + 1
-    if upgrades[selected_upgrade][0] > upgrades[selected_upgrade][1]:
-        upgrades[selected_upgrade][0] = upgrades[selected_upgrade][1]
+    
+    if upgrades[selected_upgrade][0] != -1:
+        upgrades[selected_upgrade][0] = upgrades[selected_upgrade][0] + 1
+        if upgrades[selected_upgrade][0] > upgrades[selected_upgrade][1]:
+            upgrades[selected_upgrade][0] = upgrades[selected_upgrade][1]
     
     match selected_upgrade:
         'MAGNET':
@@ -755,6 +832,14 @@ func _on_hud_upgrade_button_pressed(button_number):
             $FishProgressBar.max_value = fish_needed
         'MORE POWER':
             get_parent().get_node('HUD').reset_powerup_bar_durations()
+        'HEAL ME':
+            var original_energy = player_energy
+            player_energy = constants.PLAYER_START_GAME_ENERGY
+            _on_main_player_update_energy()
+                            
+            if (original_energy <= constants.PLAYER_LOW_ENERGY_BLINK) && (player_energy > constants.PLAYER_LOW_ENERGY_BLINK):
+                emit_signal('player_no_longer_low_energy')
+            
     
     get_parent().get_node('HUD').update_upgrade_summary()
     
@@ -773,6 +858,7 @@ func remove_aiming_line():
         
 func end_shark_attack():
     $AnimatedSprite2D.set_modulate(Color(1, 1, 1, 1))
+    $HungryParticles.set_emitting(false)
     get_parent().get_node('SharkAttackMusic').stop()
     get_parent().get_node('AudioStreamPlayerMusic').set_stream_paused(false)
                 
@@ -780,3 +866,17 @@ func end_shark_attack():
         single_enemy.reset_state_timer()
         single_enemy.stop_calling_for_help()
     
+func _on_swim_surge_running_timer_timeout():
+    tween_surge.kill()
+    swim_surge_activate = false
+    $SurgeParticles.set_emitting(false)
+    
+    var swim_surge_improvement_percentage = upgrades['SWIM SURGE'][0] * 10
+    var swim_surge_recharge_time = constants.SWIM_SURGE_BASE_RECHARGE_TIME - ((swim_surge_improvement_percentage / 100.0) * constants.SWIM_SURGE_BASE_RECHARGE_TIME)
+       
+    $SwimSurgeReuseTimer.start(swim_surge_recharge_time)
+
+func _on_swim_surge_reuse_timer_timeout():
+    swim_surge_available = true
+    $AnimatedSprite2DSurgeReady.set_visible(true)
+    $AnimatedSprite2DSurgeReady.play()

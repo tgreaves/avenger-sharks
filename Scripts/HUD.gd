@@ -83,7 +83,7 @@ func update_upgrade_summary():
     var upgrades = get_parent().get_node('Player').upgrades
     
     for single_upgrade in upgrades:
-        if upgrades[single_upgrade][0]:
+        if upgrades[single_upgrade][0] > 0:
             if upgrades[single_upgrade][1] > 1:
                 # Upgrade has multiple levels.
                 sidebar_text += single_upgrade + " " + str(upgrades[single_upgrade][0])

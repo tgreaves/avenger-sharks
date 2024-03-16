@@ -28,6 +28,7 @@ var spawn_number = 0
 
 var spawned_items_this_wave = []
 var upgrade_focus_memory_left_button
+var upgrade_focus_memory_middle_button
 var upgrade_focus_memory_right_button
 var intro
 var dedication
@@ -37,6 +38,7 @@ var first_game_played = false
 
 var upgrade_one_index
 var upgrade_two_index
+var upgrade_three_index
 
 var accept_pause = true
 
@@ -47,6 +49,7 @@ enum {
     CREDITS,
     STATISTICS,
     OPTIONS,
+    HOW_TO_PLAY,
     WAVE_START,
     GAME_RUNNING,
     GAME_PAUSED,
@@ -75,6 +78,7 @@ func _ready():
         Steam.overlay_toggled.connect(_on_steam_overlay_toggled)
         Steam.input_device_connected.connect(_on_steam_input_device_connected)
         Steam.input_device_disconnected.connect(_on_steam_input_device_disconnected)
+        Steam.current_stats_received.connect(_on_steam_stats_ready)
             
     Storage.load_config()
     
@@ -106,6 +110,7 @@ func _ready():
     $PauseMenu.get_node('CanvasLayer').visible = false
     $Statistics.get_node('CanvasLayer').visible = false
     $Credits.get_node('CanvasLayer').visible = false
+    $HowToPlay.get_node('CanvasLayer').visible = false
     $Options.get_node('CanvasLayer').visible = false
     $Player.set_process(false);
     $Player.set_physics_process(false);
@@ -252,12 +257,18 @@ func prepare_for_wave():
     $Player.prepare_for_new_wave()
     $Player/Camera2D.enabled = true
     $Player.visible = true
-    $Player.position = Vector2(2650, 2500);
+    #$Player.position = Vector2(2650, 2500)
+    $Player.position = Vector2(2650, 2600)
     $Player.get_node("AnimatedSprite2D").animation = 'default';
     $Player.get_node("AnimatedSprite2D").play()
     
     var tween = get_tree().create_tween()
     tween.tween_property(self, "modulate", Color(1,1,1,1), 0.5)
+    
+    if constants.CAMERA_ZOOM_EFFECTS and wave_number == 1:
+        $Player/Camera2D.set_zoom(Vector2(4.0,4.0))
+        var tween_camera = get_tree().create_tween()   
+        tween_camera.tween_property($Player/Camera2D, "zoom", Vector2(1.0,1.0), 2.5).set_trans(tween_camera.EASE_OUT)
     
     emit_signal("player_move_to_starting_position");
 
@@ -327,8 +338,6 @@ func start_wave():
     else:
         spawn_enemy('start_spawn','spawn_pattern',false)   
 
-    
-    
     i=0;
 
     while (i < fish_left_this_wave):
@@ -350,14 +359,14 @@ func wave_end():
     
     game_status = GETTING_KEY
     
-    for enemy in get_tree().get_nodes_in_group("enemyGroup"):
-        enemy.swim_escape()
-    
     if $Player.power_pellet_enabled:
         $Player.power_pellet_enabled = false
         $Player.power_pellet_warning_running = false
         $Player.end_shark_attack()
     
+    for enemy in get_tree().get_nodes_in_group("enemyGroup"):
+        enemy.swim_escape()
+        
     $HUD.get_node("CanvasLayer/Label").text = "WAVE COMPLETE!"
     $HUD.get_node("CanvasLayer/Label").visible = true;
     
@@ -381,7 +390,19 @@ func wave_end():
         
     for artillery in get_tree().get_nodes_in_group('artilleryGroup'):
         artillery.queue_free()
-    
+        
+    # Pop Steam achievement if appropriate.
+    if SteamClient.STEAM_RUNNING:
+        if game_mode == 'ARCADE':
+            match wave_number:
+                1:
+                    Steam.setAchievement('ACH_ARCADE_BEAT_1_WAVE')
+                    Steam.storeStats()
+                5:
+                    Steam.setAchievement('ACH_ARCADE_BEAT_5_WAVES')
+                10:
+                    Steam.setAchievement('ACH_ARCADE_BEAT_10_WAVES')
+        
 func wave_end_cleanup():
         
     $Player.visible = false;
@@ -408,12 +429,37 @@ func game_over():
     $HUD.get_node("CanvasLayer/Label").text = "[center]GAME OVER";
     $AudioStreamPlayerMusic.pitch_scale = 1.0
     
+    if SteamClient.STEAM_RUNNING:
+        if wave_number == 1:
+            Steam.setAchievement('ACH_ARCADE_NAME_IS_BRUCE')
+    
+        # Done at end of game to play nicely with Steam rate limiting.
+        var fish_hold = Storage.Stats.get_value('player','fish_rescued',0)
+        
+        # To catch players that hit achievements BEFORE they were introduced, check all of them.
+        if fish_hold >=100:
+            Steam.setAchievement('ACH_RESCUE_100_FISH')
+        
+        if fish_hold >=500:
+            Steam.setAchievement('ACH_RESCUE_500_FISH')
+            
+        if fish_hold >= 1000:
+            Steam.setAchievement('ACH_RESCUE_1000_FISH')
+            
+        Steam.storeStats()
+    
     $AudioStreamPlayerMusic.stop()
     $MenuMusic.play()
     
-    $GameOverTimer.start();
+    $GameOverTimer.start()
 
 func return_to_main_screen():
+    for shark_spray in get_tree().get_nodes_in_group("sharkSprayGroup"):
+        shark_spray.queue_free()
+    
+    for mini_shark_spray in get_tree().get_nodes_in_group("miniSharkSprayGroup"):
+        mini_shark_spray.queue_free()
+    
     for enemy in get_tree().get_nodes_in_group("enemyGroup"):
         enemy.queue_free()
         
@@ -429,12 +475,18 @@ func return_to_main_screen():
     for dinosaur in get_tree().get_nodes_in_group('dinosaurGroup'):
         dinosaur.queue_free()
         
+    for dinosaur_attack in get_tree().get_nodes_in_group('dinosaurAttack'):
+        dinosaur_attack.queue_free()
+        
     for artillery in get_tree().get_nodes_in_group('artilleryGroup'):
         artillery.queue_free()
         
     $ArtilleryTimer.stop() 
     $Key.hide()
     despawn_all_items()
+    $Player.stop_fish_frenzy()
+    $CountdownEffect.stop()
+    $Player/HungryParticles.set_emitting(false)
     
     Storage.save_stats()
     
@@ -472,7 +524,6 @@ func spawn_item():
         
         # If a power pellet, due to their blinking nature, reset all pellet animations to be in sync.
         if spawned_item == 'power-pellet':
-            Logging.log_entry("We spawned a power pellet")
             for single_item in get_tree().get_nodes_in_group('itemGroup'):
                 if single_item.item_type == 'power_pellet':
                     single_item.get_node('AnimatedSprite2D').stop()
@@ -489,10 +540,7 @@ func spawn_enemy(spawn_to_use,spawn_pattern_to_use,half_spawn_boolean):
     var spawn_array = TheDirector.WaveDesign.get(spawn_to_use).get('spawn_array')
     var number_to_spawn = spawn_array.size()
     
-    Logging.log_entry("Spawn pattern lookup to use: " + str(spawn_pattern_to_use))
-    
     if half_spawn_boolean:
-        Logging.log_entry("half_spawn_boolean detected.")
         @warning_ignore("integer_division")
         var spawn_a = int(number_to_spawn/2)
         var spawn_b = number_to_spawn - spawn_a
@@ -508,8 +556,6 @@ func spawn_enemy(spawn_to_use,spawn_pattern_to_use,half_spawn_boolean):
     # Why? Stops the end of the wave being boring with the player having to wait to find the enemies.
     if (enemies_on_screen+number_to_spawn <= constants.ENEMY_ALL_CHASE_WHEN_POPULATION_LOW) && (enemies_left_this_wave <= constants.ENEMY_ALL_CHASE_WHEN_POPULATION_LOW):
         spawn_pattern = 'CIRCLE_SURROUND_PLAYER'
-
-    Logging.log_entry("Pattern: " + str(spawn_pattern))
 
     # Uncomment this to force a spawn pattern for testing.
     #spawn_pattern='RANDOM'
@@ -663,12 +709,9 @@ func _process(_delta):
             if spawn_number < TheDirector.WaveDesign.get('total_spawns', 0):
                 spawn_number+=1
                 
-                Logging.log_entry("Reinforcements: Spawn number " + str(spawn_number))
                 var spawn_label = "spawn_" + str(spawn_number)
                 
-                if TheDirector.WaveDesign.get(spawn_label).get('spawn_pattern_b'):
-                    Logging.log_entry("Spawn Pattern B has been detected.")
-                    
+                if TheDirector.WaveDesign.get(spawn_label).get('spawn_pattern_b'):                    
                     spawn_enemy(spawn_label, 'spawn_pattern', true)
                     spawn_enemy(spawn_label, 'spawn_pattern_b', true)
                 else:
@@ -703,12 +746,9 @@ func _input(ev):
 
 func handle_pause_input():
     match game_status:
-        GAME_RUNNING,WAVE_START,GETTING_KEY,WAVE_END,UPGRADE_SCREEN,UPGRADE_WAITING_FOR_CHOICE:
-            Logging.log_entry("Need to pause the game")
-                    
+        GAME_RUNNING,WAVE_START,GETTING_KEY,WAVE_END,UPGRADE_SCREEN,UPGRADE_WAITING_FOR_CHOICE:                    
             # Avoid 'double press' if we have just come back from the pause menu
             if !accept_pause:
-                Logging.log_entry("NO PAUSING YET")
                 return
             
             game_status_before_pause = game_status
@@ -716,10 +756,9 @@ func handle_pause_input():
             
             if game_status_before_pause == UPGRADE_WAITING_FOR_CHOICE:
                 upgrade_focus_memory_left_button = $HUD/CanvasLayer/UpgradeChoiceContainer/Choice1/Button.has_focus()
-                upgrade_focus_memory_right_button = $HUD/CanvasLayer/UpgradeChoiceContainer/Choice2/Button.has_focus()
-                
-                Logging.log_entry("Left: " + str(upgrade_focus_memory_left_button) + " right: " + str(upgrade_focus_memory_right_button))
-            
+                upgrade_focus_memory_middle_button = $HUD/CanvasLayer/UpgradeChoiceContainer/Choice2/Button.has_focus()
+                upgrade_focus_memory_right_button = $HUD/CanvasLayer/UpgradeChoiceContainer/Choice3/Button.has_focus()
+                 
             $PauseMenu.get_node('CanvasLayer').visible = true
             $PauseMenu.set_process_input(true)
             $PauseMenu.pause()
@@ -805,7 +844,7 @@ func _on_player_player_got_fish():
         Storage.Stats.set_value('player','high_score',score)
         
     Storage.increase_stat('player', 'fish_rescued', 1)    
-        
+    
     fish_collected += 1
     fish_left_this_wave -= 1
     _on_enemy_update_score_display();
@@ -827,7 +866,6 @@ func _on_main_menu_exit_game_pressed():
     get_tree().quit();
 
 func _on_pause_menu_unpause_game_pressed():
-    Logging.log_entry('Ending pause')
     game_status = game_status_before_pause
     $PauseMenu.get_node('CanvasLayer').visible = false
     
@@ -835,9 +873,13 @@ func _on_pause_menu_unpause_game_pressed():
         if upgrade_focus_memory_left_button:
             $HUD/CanvasLayer/UpgradeChoiceContainer/Choice1/Button.grab_focus()
             upgrade_focus_memory_left_button = false
+            
+        if upgrade_focus_memory_middle_button:
+            $HUD/CanvasLayer/UpgradeChoiceContainer/Choice2/Button.grab_focus()
+            upgrade_focus_memory_middle_button = false
         
         if upgrade_focus_memory_right_button:
-            $HUD/CanvasLayer/UpgradeChoiceContainer/Choice2/Button.grab_focus()
+            $HUD/CanvasLayer/UpgradeChoiceContainer/Choice3/Button.grab_focus()
             upgrade_focus_memory_right_button = false
 
     $PauseMenu.set_process_input(false)
@@ -859,6 +901,13 @@ func _on_main_menu_credits_pressed():
     $HUD/CanvasLayer/HighScore.visible = false;
     $Credits/CanvasLayer.visible = true
     $Credits.commence_scroll()
+    
+func _on_main_menu_how_to_play_pressed():
+    game_status = HOW_TO_PLAY
+    $MainMenu.get_node("CanvasLayer").visible = false
+    $HowToPlay/CanvasLayer/VBoxContainer/ReturnButton.grab_focus()
+    $HUD/CanvasLayer/HighScore.visible = false;
+    $HowToPlay/CanvasLayer.visible = true
 
 func dedication_has_finished():
     dedication.queue_free()
@@ -887,35 +936,42 @@ func upgrade_screen():
     
     upgrade_one_index = 0
     upgrade_two_index = 0
+    upgrade_three_index = 0
     
-    var deadlock_solved = false
+    # Form an array of upgrades that are eligible for inclusion.
+    var eligible_upgrades:Array = []
     
-    while (!deadlock_solved):
-        upgrade_one_index = $Player.upgrades.keys()[ randi() % $Player.upgrades.size() ]
-        upgrade_two_index = $Player.upgrades.keys()[ randi() % $Player.upgrades.size() ]
-        
-        # 1st check: Don't suggest identical upgrades.
-        if upgrade_one_index != upgrade_two_index:
-            
-            # 2nd check: Don't suggest upgrades that are at max level already
-            # (Option for future: Ability to swap out upgrades?)
-            
-            if $Player.upgrades[upgrade_one_index][0] < $Player.upgrades[upgrade_one_index][1] and $Player.upgrades[upgrade_two_index][0] < $Player.upgrades[upgrade_two_index][1]:
-                deadlock_solved = true
-         
+    for single_upgrade in $Player.upgrades:
+        var single_upgrade_detail = $Player.upgrades.get(single_upgrade)
+        if single_upgrade_detail[0] < single_upgrade_detail[1]:
+            # This can be included as we have not exceeded max level of the upgrade.
+            eligible_upgrades.append(single_upgrade)
+    
+    while eligible_upgrades.size() < 3:
+        eligible_upgrades.append('HEAL ME')
+    
+    # Now select the two upgrades to present to the player.
+    eligible_upgrades.shuffle()
+    upgrade_one_index = eligible_upgrades.pop_front()
+    upgrade_two_index = eligible_upgrades.pop_front()
+    upgrade_three_index = eligible_upgrades.pop_front()
+                
     if constants.DEV_FORCE_UPGRADE:
         upgrade_one_index = constants.DEV_FORCE_UPGRADE
         
     $HUD/CanvasLayer/UpgradeChoiceContainer/Choice1/TextureRect.texture = load($Player.upgrades[upgrade_one_index][2])
     $HUD/CanvasLayer/UpgradeChoiceContainer/Choice2/TextureRect.texture = load($Player.upgrades[upgrade_two_index][2])
-    
+    $HUD/CanvasLayer/UpgradeChoiceContainer/Choice3/TextureRect.texture = load($Player.upgrades[upgrade_three_index][2])
+
     $HUD/CanvasLayer/UpgradeChoiceContainer/Choice1/Title.text = upgrade_one_index
     $HUD/CanvasLayer/UpgradeChoiceContainer/Choice2/Title.text = upgrade_two_index
+    $HUD/CanvasLayer/UpgradeChoiceContainer/Choice3/Title.text = upgrade_three_index
     
     $HUD/CanvasLayer/UpgradeChoiceContainer/Choice1/Description.text = $Player.upgrades[upgrade_one_index][3]
     $HUD/CanvasLayer/UpgradeChoiceContainer/Choice2/Description.text = $Player.upgrades[upgrade_two_index][3]
+    $HUD/CanvasLayer/UpgradeChoiceContainer/Choice3/Description.text = $Player.upgrades[upgrade_three_index][3]
     
-    $HUD/CanvasLayer/UpgradeChoiceContainer/Choice1/Button.grab_focus()
+    $HUD/CanvasLayer/UpgradeChoiceContainer/Choice2/Button.grab_focus()
     
     $HUD/CanvasLayer/UpgradeChoiceContainer.modulate = Color(0,0,0,0)
     $HUD/CanvasLayer/UpgradeChoiceContainer.visible = true
@@ -957,6 +1013,13 @@ func _on_credits_credits_return_button_pressed():
     $MainMenu/CanvasLayer/MainMenuContainer/Credits.grab_focus()
     $HUD/CanvasLayer/HighScore.visible = true
     $Credits/CanvasLayer.visible = false
+
+func _on_how_to_play_return_button_pressed():
+    game_status = MAIN_MENU
+    $MainMenu.get_node("CanvasLayer").visible = true
+    $MainMenu/CanvasLayer/MainMenuContainer/HowToPlay.grab_focus()
+    $HUD/CanvasLayer/HighScore.visible = true
+    $HowToPlay/CanvasLayer.visible = false
 
 func _on_main_menu_options_pressed():
     game_status = OPTIONS
@@ -1001,18 +1064,23 @@ func _on_accept_pause_timer_timeout():
     accept_pause = true
     
 func _on_wave_time_left_timer_timeout():
-    if game_mode =='ARCADE' and game_status == GAME_RUNNING:
-        Logging.log_entry("Wave duration timeout hit")
-        
+    if game_mode =='ARCADE' and game_status == GAME_RUNNING:        
         # Make sure we update time to 0
         update_time_left_display() 
         
         # Have a random enemy drop the key in fear.
         var random_enemy_idx = randi_range(0, get_tree().get_nodes_in_group("enemyGroup").size()-1)
-        Logging.log_entry("Random number: " + str(random_enemy_idx))
         $Key.global_position = get_tree().get_nodes_in_group("enemyGroup")[random_enemy_idx].global_position
         $Key.show();
         $Key/CollisionShape2D.disabled = false;
         $Key/AnimatedSprite2D.play();
         
         wave_end()
+        
+func _on_steam_stats_ready(_game: int, _result: int, _user: int) -> void:
+    Logging.log_entry("Steam stats / achievements now available.")
+    
+    if constants.DEV_WIPE_ACHIEVEMENTS:
+        Logging.log_entry("Wiping achievements...")
+        #Steam.clearAchievement('ACH_ARCADE_BEAT_1_WAVE')
+        Steam.storeStats()

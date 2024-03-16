@@ -1,10 +1,11 @@
 extends Node
 
-const GAME_VERSION = "1.1.0"
+const GAME_VERSION = "1.2.0"
 
 # Developer settings.
 const DEV_DELAY_ON_START = false
 const DEV_LOGGING = false
+const DEV_LOG_WAVE_DESIGN = false
 const DEV_ALLOW_CHEATS = false
 const DEV_SKIP_INTRO = false
 const DEV_START_GAME_IMMEDIATELY = false
@@ -13,10 +14,12 @@ const DEV_SPAWN_ENEMY_COUNT = 0
 const DEV_SPAWN_ONE_ENEMY_TYPE = ''
 const DEV_FORCE_UPGRADE = ''
 const DEV_WAVE_LASTS_FOREVER = false
+const DEV_WIPE_ACHIEVEMENTS = false
 
 # Hardware settings
 const WINDOW_TITLE = "Avenger Sharks " + GAME_VERSION
 const WINDOW_SIZE = Vector2(1920,1080)
+const CAMERA_ZOOM_EFFECTS = false
 
 # Game settings
 const PLAY_WAVE_END_MUSIC = false
@@ -31,8 +34,8 @@ const ARENA_SPAWN_MAX_X = 2500 * 2
 const ARENA_SPAWN_MIN_Y = 320
 const ARENA_SPAWN_MAX_Y = 1250 * 2
 
-const ARENA_OBSTACLE_MINIMUM = 3
-const ARENA_OBSTACLE_MAXIMUM = 7
+const ARENA_OBSTACLE_MINIMUM = 5 # 3
+const ARENA_OBSTACLE_MAXIMUM = 10  # 7 
 const ARENA_OBSTACLE_SIZE_MINIMUM = 3
 const ARENA_OBSTACLE_SIZE_MAXIMUM = 5
 
@@ -70,7 +73,7 @@ const ARTILLERY_WARNING_TIME = 4
 const ARTILLERY_CHASE_SPEED = 5
 
 # Enemy spawning
-const ENEMY_SPAWN_WAVE_SPECIAL_MIN_WAVE = 2
+const ENEMY_SPAWN_WAVE_SPECIAL_MIN_WAVE = 3
 
 const ENEMY_SPAWN_WAVE_SPECIAL_CONFIGURATION = {
     90:      ['STANDARD', '', ''],
@@ -109,7 +112,7 @@ const ENEMY_SETTINGS = {
         'minimum_wave': 1,
         'spawn_chance': 1.0,
         'speed':    450,
-        'health':   4,
+        'health':   3,
         'AI':       'CHASE',
         'score':    10,
         'can_be_knocked_back':  true,
@@ -192,15 +195,15 @@ const ENEMY_ALLOW_DAMAGE_WHEN_SPAWNING = false
 
 const ENEMY_ATTACK_ARC_DEGREES = 20;
 
-const ENEMY_CHASE_REORIENT_MINIMUM_SECONDS = 0.2 
-const ENEMY_CHASE_REORIENT_MAXIMUM_SECONDS = 0.2 
+const ENEMY_CHASE_REORIENT_MINIMUM_SECONDS = 0.1    # 0.2
+const ENEMY_CHASE_REORIENT_MAXIMUM_SECONDS = 0.1    # 0.2
 
 const ENEMY_DEFAULT_CHANGE_DIRECTION_MINIMUM_SECONDS = 1;
 const ENEMY_DEFAULT_CHANGE_DIRECTION_MAXIMUM_SECONDS = 3;
 
 const ENEMY_ALL_CHASE_WHEN_POPULATION_LOW = 10
 
-const ENEMY_TRAP_HEALTH = 10
+const ENEMY_TRAP_HEALTH = 4
 
 const ENEMY_CALL_FOR_HELP_MINIMUM_TIME = 2.0
 const ENEMY_CALL_FOR_HELP_MAXIMUM_TIME = 3.0
@@ -246,3 +249,4 @@ const POWER_PELLET_ACTIVE_DURATION = 10
 
 # Upgrades
 const ARMOUR_DAMAGE_REDUCTION_PERCENTAGE = 10
+const SWIM_SURGE_BASE_RECHARGE_TIME = 4.0

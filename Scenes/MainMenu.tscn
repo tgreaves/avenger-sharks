@@ -42,6 +42,18 @@ text = "Version xxx"
 horizontal_alignment = 2
 vertical_alignment = 2
 
+[node name="CopyrightLabel" type="Label" parent="CanvasLayer"]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -201.0
+offset_right = 1152.0
+grow_vertical = 0
+theme_override_fonts/font = ExtResource("1_jvmua")
+theme_override_font_sizes/font_size = 32
+text = "Copyright © 2023-present Tristan Greaves"
+vertical_alignment = 2
+
 [node name="MainMenuContainer" type="VBoxContainer" parent="CanvasLayer"]
 anchors_preset = 8
 anchor_left = 0.5
@@ -62,8 +74,6 @@ layout_mode = 2
 theme_override_fonts/font = ExtResource("1_jvmua")
 theme_override_font_sizes/font_size = 64
 text = "AVENGER SHARKS
-
-By Tristan Greaves
 "
 horizontal_alignment = 1
 
@@ -122,11 +132,35 @@ text = "OPTIONS"
 layout_mode = 2
 size_flags_vertical = 6
 focus_neighbor_top = NodePath("../Options")
-focus_neighbor_bottom = NodePath("../ExitGame")
+focus_neighbor_bottom = NodePath("../HowToPlay")
 theme_override_fonts/font = ExtResource("1_jvmua")
 theme_override_font_sizes/font_size = 64
 text = "CREDITS
 "
+
+[node name="BlankLabel3" type="Label" parent="CanvasLayer/MainMenuContainer"]
+layout_mode = 2
+size_flags_vertical = 6
+focus_neighbor_bottom = NodePath("../Credits")
+theme_override_fonts/font = ExtResource("1_jvmua")
+theme_override_font_sizes/font_size = 64
+
+[node name="HowToPlay" type="Button" parent="CanvasLayer/MainMenuContainer"]
+layout_mode = 2
+size_flags_vertical = 6
+focus_neighbor_top = NodePath("../Credits")
+focus_neighbor_bottom = NodePath("../ExitGame")
+theme_override_fonts/font = ExtResource("1_jvmua")
+theme_override_font_sizes/font_size = 64
+text = "HOW TO PLAY
+"
+
+[node name="BlankLabel4" type="Label" parent="CanvasLayer/MainMenuContainer"]
+layout_mode = 2
+size_flags_vertical = 6
+focus_neighbor_bottom = NodePath("../Credits")
+theme_override_fonts/font = ExtResource("1_jvmua")
+theme_override_font_sizes/font_size = 64
 
 [node name="ExitGame" type="Button" parent="CanvasLayer/MainMenuContainer"]
 layout_mode = 2
@@ -142,4 +176,5 @@ text = "EXIT"
 [connection signal="pressed" from="CanvasLayer/MainMenuContainer/Statistics" to="." method="_on_statistics_pressed"]
 [connection signal="pressed" from="CanvasLayer/MainMenuContainer/Options" to="." method="_on_options_pressed"]
 [connection signal="pressed" from="CanvasLayer/MainMenuContainer/Credits" to="." method="_on_credits_pressed"]
+[connection signal="pressed" from="CanvasLayer/MainMenuContainer/HowToPlay" to="." method="_on_how_to_play_pressed"]
 [connection signal="pressed" from="CanvasLayer/MainMenuContainer/ExitGame" to="." method="_on_exit_game_pressed"]

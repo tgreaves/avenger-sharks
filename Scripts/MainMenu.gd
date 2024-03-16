@@ -7,6 +7,7 @@ signal cheats_pressed
 signal game_mode_pressed
 signal statistics_pressed
 signal options_pressed
+signal how_to_play_pressed
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -51,3 +52,6 @@ func _on_statistics_pressed():
 
 func _on_options_pressed():
     emit_signal('options_pressed')
+
+func _on_how_to_play_pressed():
+    emit_signal('how_to_play_pressed')

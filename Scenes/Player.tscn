@@ -1,4 +1,4 @@
-[gd_scene load_steps=57 format=3 uid="uid://5yp4e43ckdrj"]
+[gd_scene load_steps=74 format=3 uid="uid://5yp4e43ckdrj"]
 
 [ext_resource type="Script" path="res://Scripts/Player.gd" id="1_m4brx"]
 [ext_resource type="Texture2D" uid="uid://ikcchi1bmyrs" path="res://Sprites/Shark/Shark1.png" id="2_px875"]
@@ -10,7 +10,6 @@
 [ext_resource type="Texture2D" uid="uid://c4rfkd6arhtvm" path="res://Sprites/Shark/Shark7.png" id="8_2abrt"]
 [ext_resource type="Texture2D" uid="uid://dd5w8b6cnmfow" path="res://Sprites/Shark/Shark8.png" id="9_6ph23"]
 [ext_resource type="Texture2D" uid="uid://chfcb5gy11be1" path="res://Sprites/Explosions/Explosion4/0001.png" id="10_dfhe1"]
-[ext_resource type="AudioStream" uid="uid://3dfl0qmhv15n" path="res://Sound/laser5-47286.mp3" id="10_v8evc"]
 [ext_resource type="AudioStream" uid="uid://dtpbwgcaf00bn" path="res://Sound/Boss hit 1.wav" id="11_g4ac8"]
 [ext_resource type="Texture2D" uid="uid://cn2mgyrc20w6q" path="res://Sprites/Explosions/Explosion4/0002.png" id="11_r7t7p"]
 [ext_resource type="Texture2D" uid="uid://brkgoddfwhykd" path="res://Sprites/Explosions/Explosion4/0003.png" id="12_lkm55"]
@@ -40,10 +39,18 @@
 [ext_resource type="AudioStream" uid="uid://vq6a2soq7m0i" path="res://Sound/glug-glug-glug-39140.mp3" id="38_86qdg"]
 [ext_resource type="AudioStream" uid="uid://di185cyn4vxdo" path="res://Sound/powering_up_funny_sci-fi_dry-102263.mp3" id="39_sydp1"]
 [ext_resource type="FontFile" uid="uid://dclfn1fjcq5i7" path="res://Fonts/PressStart2P-Regular.ttf" id="40_8elap"]
+[ext_resource type="Texture2D" uid="uid://blmls1u06ubt2" path="res://Particles/flare_01.png" id="40_78iqq"]
+[ext_resource type="Texture2D" uid="uid://dpnh82bexsu7d" path="res://Sprites/Explosions/WaterExplosion/Water__05.png" id="40_m3oy2"]
+[ext_resource type="Texture2D" uid="uid://djcxss8vcxcyv" path="res://Sprites/Explosions/WaterExplosion/Water__04.png" id="41_b0oyw"]
+[ext_resource type="AudioStream" uid="uid://ba0q1jycm55i3" path="res://Sound/laser5-47286.wav" id="41_l7qa2"]
+[ext_resource type="Texture2D" uid="uid://5onixek6sj6r" path="res://Sprites/Explosions/WaterExplosion/Water__03.png" id="42_pm0a5"]
+[ext_resource type="Texture2D" uid="uid://bh58c8y72t27l" path="res://Sprites/Explosions/WaterExplosion/Water__02.png" id="43_oogna"]
 [ext_resource type="AudioStream" uid="uid://dee567wkg1cj" path="res://Sound/hq-explosion-6288-reverse.mp3" id="44_dvals"]
+[ext_resource type="Texture2D" uid="uid://b132nn5mor6d3" path="res://Sprites/Explosions/WaterExplosion/Water__01.png" id="44_k56it"]
 [ext_resource type="AudioStream" uid="uid://dl3w6ch8pux8d" path="res://Sound/yay-6120.mp3" id="45_fj125"]
 [ext_resource type="AudioStream" uid="uid://dwquinjikuv4o" path="res://Sound/notification-for-game-scenes-132473.mp3" id="47_1ngf2"]
 [ext_resource type="Texture2D" uid="uid://cd3uri86u07f" path="res://Textures/2d_lights_and_shadows_neutral_point_light.webp" id="49_nsf5y"]
+[ext_resource type="AudioStream" uid="uid://1oto0eo2onwk" path="res://Sound/splash-by-blaukreuz-6261.wav" id="49_pjns7"]
 [ext_resource type="Texture2D" uid="uid://be1l4stvjmcog" path="res://Sprites/Blood/bloodfx001_01.png" id="71_f4bva"]
 [ext_resource type="Texture2D" uid="uid://cynsah81npsn3" path="res://Sprites/Blood/bloodfx001_02.png" id="72_657n3"]
 [ext_resource type="Texture2D" uid="uid://d3tdosv5031k" path="res://Sprites/Blood/bloodfx001_03.png" id="73_olu8i"]
@@ -192,6 +199,80 @@ animations = [{
 "speed": 10.0
 }]
 
+[sub_resource type="SpriteFrames" id="SpriteFrames_jthnu"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("40_m3oy2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("41_b0oyw")
+}, {
+"duration": 1.0,
+"texture": ExtResource("42_pm0a5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("43_oogna")
+}, {
+"duration": 1.0,
+"texture": ExtResource("44_k56it")
+}, {
+"duration": 1.0,
+"texture": null
+}],
+"loop": false,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="Gradient" id="Gradient_5c14i"]
+offsets = PackedFloat32Array(0, 0.18894)
+colors = PackedColorArray(1, 0, 0, 1, 0.029587, 0, 0.970413, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_lvy03"]
+gradient = SubResource("Gradient_5c14i")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_k4dtl"]
+lifetime_randomness = 0.5
+particle_flag_disable_z = true
+emission_shape = 1
+emission_sphere_radius = 75.0
+gravity = Vector3(0, 0, 0)
+color_ramp = SubResource("GradientTexture1D_lvy03")
+
+[sub_resource type="Gradient" id="Gradient_hqx5m"]
+colors = PackedColorArray(0.878431, 0.768627, 0, 1, 0.029587, 0, 0.970413, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_t1qpm"]
+gradient = SubResource("Gradient_hqx5m")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_8u7m5"]
+lifetime_randomness = 0.5
+particle_flag_disable_z = true
+emission_shape = 1
+emission_sphere_radius = 75.0
+gravity = Vector3(2.08165e-12, 2.08165e-12, 2.08165e-12)
+radial_accel_min = -10.4
+radial_accel_max = -10.4
+scale_min = 0.25
+scale_max = 0.3
+color_ramp = SubResource("GradientTexture1D_t1qpm")
+
+[sub_resource type="Gradient" id="Gradient_80uc6"]
+offsets = PackedFloat32Array(0, 0.580645)
+colors = PackedColorArray(1, 0, 0, 1, 0.478431, 0, 0.0509804, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_k5rfa"]
+gradient = SubResource("Gradient_80uc6")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_ihmkv"]
+lifetime_randomness = 0.5
+particle_flag_disable_z = true
+emission_shape = 1
+emission_sphere_radius = 75.0
+gravity = Vector3(0, 0, 0)
+color_ramp = SubResource("GradientTexture1D_k5rfa")
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bywa3"]
 bg_color = Color(0, 0, 0, 1)
 
@@ -249,6 +330,52 @@ sprite_frames = SubResource("SpriteFrames_bvem5")
 frame = 5
 frame_progress = 1.0
 
+[node name="AnimatedSprite2DSurgeReady" type="AnimatedSprite2D" parent="."]
+visible = false
+texture_filter = 1
+scale = Vector2(1.5, 1.5)
+sprite_frames = SubResource("SpriteFrames_jthnu")
+frame = 5
+frame_progress = 1.0
+speed_scale = 1.5
+
+[node name="SurgeParticles" type="GPUParticles2D" parent="."]
+modulate = Color(1, 1, 1, 0.305882)
+emitting = false
+amount = 64
+process_material = SubResource("ParticleProcessMaterial_k4dtl")
+texture = ExtResource("40_78iqq")
+lifetime = 2.0
+speed_scale = 2.0
+randomness = 0.35
+fixed_fps = 0
+draw_order = 0
+
+[node name="SurgeReadyParticles" type="GPUParticles2D" parent="."]
+visible = false
+modulate = Color(1, 1, 1, 0.305882)
+show_behind_parent = true
+emitting = false
+amount = 64
+process_material = SubResource("ParticleProcessMaterial_8u7m5")
+texture = ExtResource("40_78iqq")
+randomness = 0.35
+fixed_fps = 0
+visibility_rect = Rect2(-100, -100, 10, 10)
+draw_order = 0
+
+[node name="HungryParticles" type="GPUParticles2D" parent="."]
+modulate = Color(1, 1, 1, 0.305882)
+emitting = false
+amount = 64
+process_material = SubResource("ParticleProcessMaterial_ihmkv")
+texture = ExtResource("40_78iqq")
+lifetime = 2.0
+speed_scale = 2.0
+randomness = 0.35
+fixed_fps = 0
+draw_order = 0
+
 [node name="AimingLine" type="Line2D" parent="."]
 points = PackedVector2Array(0, 0)
 width = 2.0
@@ -285,6 +412,17 @@ offset_left = -54.0
 offset_top = -102.0
 offset_right = 53.0
 offset_bottom = -81.0
+theme_override_styles/background = SubResource("StyleBoxFlat_1kikt")
+theme_override_styles/fill = SubResource("StyleBoxFlat_jyh0b")
+value = 50.0
+show_percentage = false
+
+[node name="SurgeProgressBar" type="ProgressBar" parent="."]
+visible = false
+offset_left = -54.0
+offset_top = -128.0
+offset_right = 53.0
+offset_bottom = -107.0
 theme_override_styles/background = SubResource("StyleBoxFlat_1kikt")
 theme_override_styles/fill = SubResource("StyleBoxFlat_jyh0b")
 value = 50.0
@@ -334,11 +472,11 @@ wait_time = 0.25
 one_shot = true
 
 [node name="HuntingKeyTimer" type="Timer" parent="."]
-wait_time = 3.0
+wait_time = 4.0
 one_shot = true
 
 [node name="HuntingDoorTimer" type="Timer" parent="."]
-wait_time = 3.0
+wait_time = 4.0
 one_shot = true
 
 [node name="PlayerHitGracePeriodTimer" type="Timer" parent="."]
@@ -346,8 +484,16 @@ wait_time = 0.25
 one_shot = true
 autostart = true
 
+[node name="SwimSurgeRunningTimer" type="Timer" parent="."]
+wait_time = 0.25
+one_shot = true
+
+[node name="SwimSurgeReuseTimer" type="Timer" parent="."]
+wait_time = 3.0
+one_shot = true
+
 [node name="AudioStreamPlayerSpray" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("10_v8evc")
+stream = ExtResource("41_l7qa2")
 bus = &"Effects"
 
 [node name="AudioStreamPlayerHit" type="AudioStreamPlayer" parent="."]
@@ -380,9 +526,15 @@ bus = &"Effects"
 stream = ExtResource("47_1ngf2")
 bus = &"Effects"
 
+[node name="AudioStreamPlayerSplash" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("49_pjns7")
+
 [node name="PointLight2D" type="PointLight2D" parent="."]
 visible = false
 shadow_enabled = true
 texture = ExtResource("49_nsf5y")
 texture_scale = 10.12
 height = 50.0
+
+[connection signal="timeout" from="SwimSurgeRunningTimer" to="." method="_on_swim_surge_running_timer_timeout"]
+[connection signal="timeout" from="SwimSurgeReuseTimer" to="." method="_on_swim_surge_reuse_timer_timeout"]
