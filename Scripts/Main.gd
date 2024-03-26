@@ -1,5 +1,30 @@
 extends Node
 
+signal player_hunt_key
+signal player_move_to_starting_position
+signal player_enable_fish_frenzy
+signal player_update_energy
+signal player_update_fish
+
+enum {
+	DEDICATION,
+	INTRO_SEQUENCE,
+	MAIN_MENU,
+	CREDITS,
+	STATISTICS,
+	OPTIONS,
+	HOW_TO_PLAY,
+	WAVE_START,
+	GAME_RUNNING,
+	GAME_PAUSED,
+	GETTING_KEY,
+	WAVE_END,
+	UPGRADE_SCREEN,
+	UPGRADE_WAITING_FOR_CHOICE,
+	PREPARE_FOR_WAVE,
+	GAME_OVER
+}
+
 @export var dedication_scene: PackedScene
 @export var intro_scene: PackedScene
 @export var enemy_scene: PackedScene
@@ -42,32 +67,6 @@ var upgrade_three_index
 
 var accept_pause = true
 
-enum {
-	DEDICATION,
-	INTRO_SEQUENCE,
-	MAIN_MENU,
-	CREDITS,
-	STATISTICS,
-	OPTIONS,
-	HOW_TO_PLAY,
-	WAVE_START,
-	GAME_RUNNING,
-	GAME_PAUSED,
-	GETTING_KEY,
-	WAVE_END,
-	UPGRADE_SCREEN,
-	UPGRADE_WAITING_FOR_CHOICE,
-	PREPARE_FOR_WAVE,
-	GAME_OVER
-}
-
-signal player_hunt_key
-signal player_move_to_starting_position
-signal player_enable_fish_frenzy
-signal player_update_energy
-signal player_update_fish
-
-
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	randomize()
@@ -75,7 +74,7 @@ func _ready():
 	$ArtilleryTimer.connect("timeout", _on_artillery_timer)
 
 	if Engine.has_singleton("Steam") && (OS.has_feature("steam") or constants.DEV_STEAM_TESTING):
-		SteamClient.SteamSetup()
+		SteamClient.steam_setup()
 		Steam.overlay_toggled.connect(_on_steam_overlay_toggled)
 		Steam.input_device_connected.connect(_on_steam_input_device_connected)
 		Steam.input_device_disconnected.connect(_on_steam_input_device_disconnected)
@@ -84,7 +83,7 @@ func _ready():
 	Storage.load_config()
 
 	# Set screen mode based on config.
-	if Storage.Config.get_value("config", "screen_mode", "FULL_SCREEN") == "FULL_SCREEN":
+	if Storage.config.get_value("config", "screen_mode", "FULL_SCREEN") == "FULL_SCREEN":
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 	else:
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
@@ -96,15 +95,15 @@ func _ready():
 	# Set volume levels from config.
 	AudioServer.set_bus_volume_db(
 		AudioServer.get_bus_index("Master"),
-		linear_to_db(Storage.Config.get_value("config", "master_volume", 1.0))
+		linear_to_db(Storage.config.get_value("config", "master_volume", 1.0))
 	)
 	AudioServer.set_bus_volume_db(
 		AudioServer.get_bus_index("Music"),
-		linear_to_db(Storage.Config.get_value("config", "music_volume", 1.0))
+		linear_to_db(Storage.config.get_value("config", "music_volume", 1.0))
 	)
 	AudioServer.set_bus_volume_db(
 		AudioServer.get_bus_index("Effects"),
-		linear_to_db(Storage.Config.get_value("config", "effects_volume", 1.0))
+		linear_to_db(Storage.config.get_value("config", "effects_volume", 1.0))
 	)
 
 	$WaveTimeLeftTimer.connect("timeout", _on_wave_time_left_timer_timeout)
@@ -163,7 +162,7 @@ func main_menu():
 	$Player.set_physics_process(false)
 	$Player.visible = false
 	$Player.get_node("CollisionShape2D").disabled = false
-	$Player._ready()
+	$Player.do_ready()
 
 	$UnderwaterFar.visible = true
 	$UnderwaterNear.visible = true
@@ -174,7 +173,7 @@ func main_menu():
 	$MainMenu.get_node("CanvasLayer").visible = true
 	$HUD/CanvasLayer/HighScore.visible = true
 	$MainMenu.set_process_input(true)
-	$MainMenu._ready()
+	$MainMenu.do_ready()
 
 	var tween = get_tree().create_tween()
 	tween.tween_property(self, "modulate", Color(1, 1, 1, 1), 0.5)
@@ -256,7 +255,7 @@ func prepare_for_wave():
 
 	$Arena.reset_arena_floor()
 
-	for i in range(1, TheDirector.WaveDesign.get("obstacle_number", 0)):
+	for i in range(1, TheDirector.wave_design.get("obstacle_number", 0)):
 		$Arena.add_obstacle()
 
 	# Fish spawning
@@ -315,7 +314,7 @@ func wave_intro():
 			"ARCADE":
 				wave_text = (
 					"SURVIVE "
-					+ str(TheDirector.WaveDesign.get("wave_time"))
+					+ str(TheDirector.wave_design.get("wave_time"))
 					+ " SECONDS FOR NEXT WAVE!"
 				)
 			"PACIFIST":
@@ -325,11 +324,11 @@ func wave_intro():
 			"[center]WAVE "
 			+ str(wave_number)
 			+ "\n\nSURVIVE "
-			+ str(TheDirector.WaveDesign.get("wave_time"))
+			+ str(TheDirector.wave_design.get("wave_time"))
 			+ " SECONDS!"
 		)
 
-	var spawn_text = TheDirector.WaveDesign.get("spawn_text", "")
+	var spawn_text = TheDirector.wave_design.get("spawn_text", "")
 
 	$HUD.get_node("CanvasLayer/Label").text = wave_text
 
@@ -347,7 +346,7 @@ func start_wave():
 	if $SharkAttackMusic.is_playing():
 		$SharkAttackMusic.stop()
 
-	if wave_number > Storage.Stats.get_value("player", "furthest_wave", 0):
+	if wave_number > Storage.stats.get_value("player", "furthest_wave", 0):
 		Storage.increase_stat("player", "furthest_wave", 1)
 
 	$HUD.get_node("CanvasLayer/Score").visible = true
@@ -356,16 +355,16 @@ func start_wave():
 
 	dropped_items_on_screen = 0
 
-	$WaveTimeLeftTimer.start(TheDirector.WaveDesign.get("wave_time"))
+	$WaveTimeLeftTimer.start(TheDirector.wave_design.get("wave_time"))
 	$ItemSpawnTimer.start(
 		randf_range(constants.ITEM_SPAWN_MINIMUM_SECONDS, constants.ITEM_SPAWN_MAXIMUM_SECONDS)
 	)
-	$EnemySpawnTimer.start(TheDirector.WaveDesign.get("reinforcements_timer", 0))
+	$EnemySpawnTimer.start(TheDirector.wave_design.get("reinforcements_timer", 0))
 
 	spawn_number = 0
-	enemies_left_this_wave = TheDirector.WaveDesign.get("total_enemies")
+	enemies_left_this_wave = TheDirector.wave_design.get("total_enemies")
 
-	if TheDirector.WaveDesign.get("boss_wave", false):
+	if TheDirector.wave_design.get("boss_wave", false):
 		$HUD.boss_health_reveal()
 	else:
 		spawn_enemy("start_spawn", "spawn_pattern", false)
@@ -380,7 +379,7 @@ func start_wave():
 		update_fish_left_display()
 
 	# Artillery
-	if TheDirector.WaveDesign.get("artillery", false):
+	if TheDirector.wave_design.get("artillery", false):
 		$ArtilleryTimer.start(
 			randf_range(constants.ARTILLERY_MINIMUM_TIME, constants.ARTILLERY_MAXIMUM_TIME)
 		)
@@ -426,7 +425,7 @@ func wave_end():
 		artillery.queue_free()
 
 	# Pop Steam achievement if appropriate.
-	if SteamClient.STEAM_RUNNING:
+	if SteamClient.steam_running:
 		if game_mode == "ARCADE":
 			match wave_number:
 				1:
@@ -464,12 +463,12 @@ func game_over():
 	$HUD.get_node("CanvasLayer/Label").text = "[center]GAME OVER"
 	$AudioStreamPlayerMusic.pitch_scale = 1.0
 
-	if SteamClient.STEAM_RUNNING:
+	if SteamClient.steam_running:
 		if wave_number == 1:
 			Steam.setAchievement("ACH_ARCADE_NAME_IS_BRUCE")
 
 		# Done at end of game to play nicely with Steam rate limiting.
-		var fish_hold = Storage.Stats.get_value("player", "fish_rescued", 0)
+		var fish_hold = Storage.stats.get_value("player", "fish_rescued", 0)
 
 		# To catch players that hit achievements BEFORE they were introduced, check all of them.
 		if fish_hold >= 100:
@@ -530,7 +529,7 @@ func return_to_main_screen():
 
 
 func spawn_item():
-	var ITEMS
+	var items
 	var spawn_position
 	var valid_spawn = false
 
@@ -543,11 +542,11 @@ func spawn_item():
 			valid_spawn = true
 
 	if game_mode == "ARCADE":
-		ITEMS = constants.ARCADE_SPAWNING_ITEMS
+		items = constants.ARCADE_SPAWNING_ITEMS
 	else:
-		ITEMS = constants.PACIFIST_SPAWNING_ITEMS
+		items = constants.PACIFIST_SPAWNING_ITEMS
 
-	var spawned_item = ITEMS[randi() % ITEMS.size()]
+	var spawned_item = items[randi() % items.size()]
 
 	if spawned_item == "dinosaur":
 		var dinosaur = dinosaur_scene.instantiate()
@@ -579,8 +578,8 @@ func despawn_all_items():
 
 
 func spawn_enemy(spawn_to_use, spawn_pattern_to_use, half_spawn_boolean):
-	var spawn_pattern = TheDirector.WaveDesign.get(spawn_to_use).get(spawn_pattern_to_use)
-	var spawn_array = TheDirector.WaveDesign.get(spawn_to_use).get("spawn_array")
+	var spawn_pattern = TheDirector.wave_design.get(spawn_to_use).get(spawn_pattern_to_use)
+	var spawn_array = TheDirector.wave_design.get(spawn_to_use).get("spawn_array")
 	var number_to_spawn = spawn_array.size()
 
 	if half_spawn_boolean:
@@ -595,8 +594,10 @@ func spawn_enemy(spawn_to_use, spawn_pattern_to_use, half_spawn_boolean):
 
 		number_to_spawn = spawn_array.size()
 
-	# If this is the final spawn this wave, AND it is considered a 'low population' spawn, surround the player.
-	# Why? Stops the end of the wave being boring with the player having to wait to find the enemies.
+	# If this is the final spawn this wave, AND it is considered a 'low population' spawn, surround
+	# the player.
+	# Why? Stops the end of the wave being boring with the player having to wait to find
+	# the enemies.
 	if (
 		(enemies_on_screen + number_to_spawn <= constants.ENEMY_ALL_CHASE_WHEN_POPULATION_LOW)
 		&& (enemies_left_this_wave <= constants.ENEMY_ALL_CHASE_WHEN_POPULATION_LOW)
@@ -770,7 +771,7 @@ func spawn_fish():
 
 
 func _process(_delta):
-	if SteamClient.STEAM_RUNNING:
+	if SteamClient.steam_running:
 		Steam.run_callbacks()
 
 	if game_status == WAVE_START:
@@ -802,18 +803,18 @@ func _process(_delta):
 			spawn_item()
 
 		if $EnemySpawnTimer.time_left == 0:
-			if spawn_number < TheDirector.WaveDesign.get("total_spawns", 0):
+			if spawn_number < TheDirector.wave_design.get("total_spawns", 0):
 				spawn_number += 1
 
 				var spawn_label = "spawn_" + str(spawn_number)
 
-				if TheDirector.WaveDesign.get(spawn_label).get("spawn_pattern_b"):
+				if TheDirector.wave_design.get(spawn_label).get("spawn_pattern_b"):
 					spawn_enemy(spawn_label, "spawn_pattern", true)
 					spawn_enemy(spawn_label, "spawn_pattern_b", true)
 				else:
 					spawn_enemy(spawn_label, "spawn_pattern", false)
 
-				$EnemySpawnTimer.start(TheDirector.WaveDesign.get("reinforcements_timer"))
+				$EnemySpawnTimer.start(TheDirector.wave_design.get("reinforcements_timer"))
 
 	if game_status == GAME_OVER:
 		if $GameOverTimer.time_left == 0:
@@ -873,7 +874,7 @@ func handle_pause_input():
 			get_tree().paused = true
 
 
-func _on_enemy_update_score(
+func on_enemy_update_score(
 	score_to_add,
 	enemy_global_position,
 	death_source,
@@ -892,8 +893,8 @@ func _on_enemy_update_score(
 	if death_source == "PLAYER-SHOT":
 		score_multiplier += 1
 
-	if score > Storage.Stats.get_value("player", "high_score"):
-		Storage.Stats.set_value("player", "high_score", score)
+	if score > Storage.stats.get_value("player", "high_score"):
+		Storage.stats.set_value("player", "high_score", score)
 
 	Storage.increase_stat("player", "enemies_defeated", 1)
 
@@ -929,11 +930,11 @@ func _on_enemy_update_score_display():
 		$HUD.get_node("CanvasLayer").get_node("Score").text += " x" + str(score_multiplier)
 
 	$HUD.get_node("CanvasLayer").get_node("HighScore").text = (
-		"HIGH SCORE\n" + str(Storage.Stats.get_value("player", "high_score"))
+		"HIGH SCORE\n" + str(Storage.stats.get_value("player", "high_score"))
 	)
 
 
-func _reset_score_multiplier():
+func reset_score_multiplier():
 	score_multiplier = 1
 	_on_enemy_update_score_display()
 
@@ -945,7 +946,7 @@ func update_time_left_display():
 		GAME_RUNNING, GETTING_KEY, WAVE_END, UPGRADE_SCREEN, UPGRADE_WAITING_FOR_CHOICE:
 			time_left = int(ceil($WaveTimeLeftTimer.time_left))
 		_:
-			time_left = TheDirector.WaveDesign.get("wave_time")
+			time_left = TheDirector.wave_design.get("wave_time")
 
 		# FOOBAR
 	$HUD.get_node("CanvasLayer").get_node("EnemiesLeft").text = "TIME\n" + str(time_left)
@@ -977,8 +978,8 @@ func _on_player_player_died():
 
 func _on_player_player_got_fish():
 	score = score + constants.GET_FISH_SCORE
-	if score > Storage.Stats.get_value("player", "high_score"):
-		Storage.Stats.set_value("player", "high_score", score)
+	if score > Storage.stats.get_value("player", "high_score"):
+		Storage.stats.set_value("player", "high_score", score)
 
 	Storage.increase_stat("player", "fish_rescued", 1)
 
@@ -1080,9 +1081,6 @@ func _on_player_player_no_longer_low_energy():
 
 func upgrade_screen():
 	# Select two upgrades to offer the player at random.
-
-	# 'MAGNET':       [ 0, 1, 'res://Images/placeholder.png', 'A powerful magnet which does magnet things.'],
-	# 'ARMOUR':       [ 0, 3, 'Images/placeholder.png', 'Decrease incoming damage by 10%']
 
 	upgrade_one_index = 0
 	upgrade_two_index = 0

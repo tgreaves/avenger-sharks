@@ -30,6 +30,6 @@ func _physics_process(_delta):
 			self.queue_free()
 			break
 
-		collision.get_collider().get_node(".")._death("PLAYER-SHOT")
+		collision.get_collider().get_node(".").death("PLAYER-SHOT")
 		$CollisionShape2D.disabled = true
 		self.queue_free()

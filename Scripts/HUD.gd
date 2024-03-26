@@ -1,15 +1,14 @@
 extends Control
 
-var PowerUpBarSequence = ["SPEED UP", "FAST SPRAY", "BIG SPRAY", "GRENADE", "MINI SHARK"]
-
-var PowerUpIndex = 0
-
 signal upgrade_button_pressed(button_number)
 
+const POWERUP_BAR_SEQUENCE = ["SPEED UP", "FAST SPRAY", "BIG SPRAY", "GRENADE", "MINI SHARK"]
+
+var powerup_index = 0
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	PowerUpIndex = 0
+	powerup_index = 0
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -46,7 +45,7 @@ func hide_powerup_bar():
 
 
 func reset_powerup_bar():
-	PowerUpIndex = 0
+	powerup_index = 0
 
 	for single_powerup in $CanvasLayer/PowerUpContainer.get_children():
 		single_powerup.visible = false
@@ -85,7 +84,7 @@ func set_powerup_level(powerup, level):
 
 
 func set_all_powerup_levels():
-	for powerup in PowerUpBarSequence:
+	for powerup in POWERUP_BAR_SEQUENCE:
 		set_powerup_level(powerup, get_parent().get_node("Player").current_powerup_levels[powerup])
 
 
@@ -94,8 +93,6 @@ func _on_upgrade_button_pressed(button_number):
 
 
 func update_upgrade_summary():
-#        'MAGNET':           [ 0, 1, 'res://Images/crosshair184.png', 'A powerful magnet which does magnet things.'],
-#        'ARMOUR':           [ 0, 3, 'res://Images/crosshair184.png', 'Decrease incoming damage by 10%'],
 
 	var sidebar_text = ""
 	var upgrades = get_parent().get_node("Player").upgrades
@@ -123,12 +120,12 @@ func flash_screen_red():
 
 
 func boss_health_reveal():
-	$CanvasLayer/BossHealthBar.max_value = TheDirector.WaveDesign.get("boss_health")
+	$CanvasLayer/BossHealthBar.max_value = TheDirector.wave_design.get("boss_health")
 	$CanvasLayer/BossHealthBar.value = 0
 
 	var tween = get_tree().create_tween()
 	tween.tween_property(
-		$CanvasLayer/BossHealthBar, "value", TheDirector.WaveDesign.get("boss_health"), 2.0
+		$CanvasLayer/BossHealthBar, "value", TheDirector.wave_design.get("boss_health"), 2.0
 	)
 
 	$CanvasLayer/BossHealthBar.visible = true

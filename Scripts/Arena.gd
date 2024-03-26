@@ -1,7 +1,6 @@
 extends TileMap
 
-var ObstacleDict: Dictionary
-var ArenaFloorDefault: Array
+var obstacle_dict: Dictionary
 var astar: AStarGrid2D
 
 
@@ -115,14 +114,14 @@ func add_obstacle():
 		true
 	)
 
-	# Set obstacles in ObstacleDict
+	# Set obstacles in obstacle_dict
 	for x in range(obstacle_start_x - 1, obstacle_start_x + obstacle_size_x + 1):
 		for y in range(obstacle_start_y - 1, obstacle_start_y + obstacle_size_y + 1):
-			ObstacleDict[Vector2i(x, y)] = true
+			obstacle_dict[Vector2i(x, y)] = true
 
 
 func reset_arena_floor():
-	for tile in ObstacleDict:
+	for tile in obstacle_dict:
 		set_cell(2, tile, -1)
 
 	reset_obstacle_dictionary()
@@ -130,11 +129,11 @@ func reset_arena_floor():
 
 
 func reset_obstacle_dictionary():
-	ObstacleDict.clear()
+	obstacle_dict.clear()
 
 	for y in range(3, 32):
-		ObstacleDict[Vector2i(31, y)] = true
-		ObstacleDict[Vector2i(32, y)] = true
+		obstacle_dict[Vector2i(31, y)] = true
+		obstacle_dict[Vector2i(32, y)] = true
 
 
 func reset_astar_grid():
@@ -153,7 +152,7 @@ func astar_route(source_vector, destination_vector):
 func overlapping_obstacle(obstacle_pos, obstacle_size):
 	for x in range(obstacle_pos.x - 1, obstacle_pos.x + obstacle_size.x + 1):
 		for y in range(obstacle_pos.y - 1, obstacle_pos.y + obstacle_size.y + 1):
-			if ObstacleDict.get(Vector2i(x, y), false):
+			if obstacle_dict.get(Vector2i(x, y), false):
 				return true
 
 	return false
@@ -162,7 +161,7 @@ func overlapping_obstacle(obstacle_pos, obstacle_size):
 func conflict_with_obstacle(coords):
 	var map_coords = local_to_map(to_local(coords))
 
-	if ObstacleDict.get(Vector2i(map_coords.x, map_coords.y)):
+	if obstacle_dict.get(Vector2i(map_coords.x, map_coords.y)):
 		return true
 
 	return false

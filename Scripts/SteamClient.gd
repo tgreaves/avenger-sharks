@@ -1,27 +1,27 @@
 extends Node
 
-@export var STEAM_RUNNING = false
-var STEAM_ID
-var STEAM_NAME
-var STEAM_SUBSCRIBED
+@export var steam_running = false
+var steam_id
+var steam_name
+var steam_subscribed
 
 
-func SteamSetup():
+func steam_setup():
 	Steam.steamInit()
 
-	STEAM_RUNNING = Steam.isSteamRunning()
+	steam_running = Steam.isSteamRunning()
 
-	if !STEAM_RUNNING:
+	if !steam_running:
 		Logging.log_entry("Steam not running.")
 		get_tree().quit()
 
-	STEAM_ID = Steam.getSteamID()
-	STEAM_NAME = Steam.getFriendPersonaName(STEAM_ID)
-	STEAM_SUBSCRIBED = Steam.isSubscribed()
+	steam_id = Steam.getSteamID()
+	steam_name = Steam.getFriendPersonaName(steam_id)
+	steam_subscribed = Steam.isSubscribed()
 
-	Logging.log_entry("Your steam name: " + str(STEAM_NAME))
-	Logging.log_entry("Subscribed: " + str(STEAM_SUBSCRIBED))
+	Logging.log_entry("Your steam name: " + str(steam_name))
+	Logging.log_entry("Subscribed: " + str(steam_subscribed))
 
-	if !STEAM_SUBSCRIBED:
+	if !steam_subscribed:
 		Logging.log_entry("Game not owned.")
 		get_tree().quit()

@@ -1,11 +1,11 @@
 extends CharacterBody2D
 
+enum { SPAWNING, WANDER, DYING, SWIM_ESCAPE }
+
 const EnemyAttackScene = preload("res://Scenes/EnemyAttack.tscn")
 const EnemyTrapScene = preload("res://Scenes/EnemyTrap.tscn")
 
 @export var state = SPAWNING
-
-enum { SPAWNING, WANDER, DYING, SWIM_ESCAPE }
 
 var enemy_type
 var enemy_speed
@@ -478,13 +478,13 @@ func _physics_process(delta):
 			&& get_parent().game_mode == "ARCADE"
 		):
 			var collided_with = collision.get_collider()
-			collided_with.get_node(".")._death(1)
+			collided_with.get_node(".").death(1)
 			$AudioStreamPlayerFishSplat.play()
 		else:
 			if collision.get_collider().name == "Player":
 				var collided_with = collision.get_collider()
-				collided_with._player_hit()
-				_death("PLAYER-BODY")
+				collided_with.player_hit()
+				death("PLAYER-BODY")
 			else:
 				# Hit a wall? Ensure AI mode is standard.
 				if ai_mode == "CHASE":
@@ -498,7 +498,7 @@ func _physics_process(delta):
 					ai_mode = ai_mode_setting
 
 
-func _death(death_source):
+func death(death_source):
 	if state == SPAWNING && !constants.ENEMY_ALLOW_DAMAGE_WHEN_SPAWNING:
 		return
 
@@ -535,7 +535,7 @@ func _death(death_source):
 			if grouped_enemy:
 				grouped_enemy_has_died = grouped_enemy_death()
 
-			var actual_scored = get_parent()._on_enemy_update_score(
+			var actual_scored = get_parent().on_enemy_update_score(
 				enemy_score,
 				global_position,
 				death_source,

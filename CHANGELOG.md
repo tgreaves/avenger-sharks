@@ -4,6 +4,8 @@
 
 * Bug fixes:
 	* Player could STILL get stuck hunting for exit.  Fixed.  Properly this time!
+* Misc:
+	* [INTERNAL] Code refactoring with GDScript Toolkit.
 
 # 1.2.0 (2024-03-16)
 

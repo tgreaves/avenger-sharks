@@ -55,4 +55,4 @@ func _physics_process(_delta):
 				if collision.get_collider().name.contains("Artillery"):
 					break
 
-				collision.get_collider().get_node(".")._death("PLAYER-SHOT")
+				collision.get_collider().get_node(".").death("PLAYER-SHOT")

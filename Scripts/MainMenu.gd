@@ -27,6 +27,8 @@ func _ready():
 		$CanvasLayer/MainMenuContainer/Options.visible = false
 		$CanvasLayer/MainMenuContainer/ExitGame.visible = false
 
+func do_ready():
+	_ready()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):

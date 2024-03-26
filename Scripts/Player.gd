@@ -1,8 +1,13 @@
 extends CharacterBody2D
 
-const SharkSprayScene = preload("res://Scenes/SharkSpray.tscn")
-const GrenadeScene = preload("res://Scenes/Grenade.tscn")
-const MiniSharkScene = preload("res://Scenes/MiniShark.tscn")
+signal player_died
+signal player_got_fish
+signal player_got_key
+signal player_found_exit_stop_key_movement
+signal player_found_exit
+signal player_low_energy
+signal player_no_longer_low_energy
+signal player_made_upgrade_choice
 
 enum {
 	ALIVE,
@@ -17,6 +22,10 @@ enum {
 	CHEATING_DEATH
 }
 
+const SharkSprayScene = preload("res://Scenes/SharkSpray.tscn")
+const GrenadeScene = preload("res://Scenes/Grenade.tscn")
+const MiniSharkScene = preload("res://Scenes/MiniShark.tscn")
+
 @export var speed = constants.PLAYER_SPEED
 @export var player_energy = constants.PLAYER_START_GAME_ENERGY
 @export var shark_status = ALIVE
@@ -24,15 +33,6 @@ enum {
 @export var current_powerup_levels = {}
 @export var max_powerup_levels = {}
 @export var upgrades = {}
-
-signal player_died
-signal player_got_fish
-signal player_got_key
-signal player_found_exit_stop_key_movement
-signal player_found_exit
-signal player_low_energy
-signal player_no_longer_low_energy
-signal player_made_upgrade_choice
 
 var key_global_position
 var initial_player_position
@@ -70,7 +70,8 @@ func _ready():
 
 	upgrades = {
 		# Code          [ Current Level, Max Level, Image path, Description
-		# If Max Level is 0 then it is a health-style purchase (Purchase once, instand result, doesn't stick)
+		# If Max Level is 0 then it is a health-style purchase (Purchase once, instant result,
+		# doesn't stick)
 		# If Max Level is 1 then it can only ever be purchased once (Binary item)
 		"MAGNET":
 		[0, 1, "res://Images/crosshair184.png", "A powerful magnet which does magnet things."],
@@ -90,6 +91,8 @@ func _ready():
 		"HEAL ME": [-1, 0, "res://Images/crosshair184.png", "Instantly regain all health"]
 	}
 
+func do_ready():
+	_ready()
 
 func prepare_for_new_game():
 	speed = constants.PLAYER_SPEED
@@ -233,7 +236,7 @@ func get_input():
 		$FishFrenzyTimer.start(constants.PLAYER_FISH_FRENZY_DURATION)
 		$FishFrenzyFireTimer.start(constants.PLAYER_FISH_FRENZY_FIRE_DELAY)
 
-		if Storage.Config.get_value("config", "enable_haptics", false):
+		if Storage.config.get_value("config", "enable_haptics", false):
 			Input.start_joy_vibration(0, 0.25, 0.25, constants.PLAYER_FISH_FRENZY_DURATION)
 
 	if shark_status == ALIVE and Input.is_action_just_pressed("secondary_ability"):
@@ -312,13 +315,13 @@ func _physics_process(_delta):
 					break
 
 				if collision.get_collider().is_in_group("fishGroup"):
-					collided_with.get_node(".")._death(false)
+					collided_with.get_node(".").death(false)
 					$AudioStreamPlayerGotFish.play()
 					emit_signal("player_got_fish")
 					break
 
 				if collision.get_collider().is_in_group("dinosaurGroup"):
-					collided_with.get_node(".")._go_on_a_rampage()
+					collided_with.get_node(".").go_on_a_rampage()
 					break
 
 				if collision.get_collider().is_in_group("itemGroup"):
@@ -450,8 +453,8 @@ func _physics_process(_delta):
 					break
 
 				# Default - Enemy
-				collided_with.get_node(".")._death("PLAYER-BODY")
-				_player_hit()
+				collided_with.get_node(".").death("PLAYER-BODY")
+				player_hit()
 
 		FISH_FRENZY:
 			if $FishFrenzyTimer.time_left == 0:
@@ -666,7 +669,7 @@ func _physics_process(_delta):
 					get_parent().get_node("Arena").get_node("PlayerStartLocation").get_node("CollisionShape2D").disabled = true
 
 
-func _player_hit():
+func player_hit():
 	if shark_status != ALIVE:
 		return
 
@@ -674,11 +677,11 @@ func _player_hit():
 		$PlayerHitGracePeriodTimer.start()
 		$AudioStreamPlayerHit.play()
 
-		get_parent()._reset_score_multiplier()
+		get_parent().reset_score_multiplier()
 
 		get_parent().get_node("HUD").flash_screen_red()
 
-		if Storage.Config.get_value("config", "enable_haptics", false):
+		if Storage.config.get_value("config", "enable_haptics", false):
 			Input.start_joy_vibration(0, 0.5, 0.5, 0.05)
 
 		var damage_reduction_percentage = (

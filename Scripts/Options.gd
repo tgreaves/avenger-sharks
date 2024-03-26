@@ -33,7 +33,7 @@ func build_options_screen():
 		AudioServer.get_bus_volume_db(AudioServer.get_bus_index("Effects"))
 	)
 
-	if Storage.Config.get_value("config", "enable_haptics", false):
+	if Storage.config.get_value("config", "enable_haptics", false):
 		$CanvasLayer/OptionsContainer/EnableHapticsContainer/EnableHapticsSetting.text = "ON"
 	else:
 		$CanvasLayer/OptionsContainer/EnableHapticsContainer/EnableHapticsSetting.text = "OFF"
@@ -48,21 +48,21 @@ func _on_screen_mode_button_pressed():
 		$CanvasLayer/OptionsContainer/ScreenModeContainer/ScreenModeSetting.text = "WINDOWED"
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
 		get_window().size = constants.WINDOW_SIZE
-		Storage.Config.set_value("config", "screen_mode", "WINDOWED")
+		Storage.config.set_value("config", "screen_mode", "WINDOWED")
 	else:
 		$CanvasLayer/OptionsContainer/ScreenModeContainer/ScreenModeSetting.text = "FULL SCREEN"
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
-		Storage.Config.set_value("config", "screen_mode", "FULL_SCREEN")
+		Storage.config.set_value("config", "screen_mode", "FULL_SCREEN")
 
 
 func _on_master_volume_setting_value_changed(value):
 	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Master"), linear_to_db(value))
-	Storage.Config.set_value("config", "master_volume", value)
+	Storage.config.set_value("config", "master_volume", value)
 
 
 func _on_music_volume_setting_value_changed(value):
 	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Music"), linear_to_db(value))
-	Storage.Config.set_value("config", "music_volume", value)
+	Storage.config.set_value("config", "music_volume", value)
 
 
 func _on_effects_volume_setting_value_changed(value):
@@ -71,14 +71,14 @@ func _on_effects_volume_setting_value_changed(value):
 		return
 
 	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Effects"), linear_to_db(value))
-	Storage.Config.set_value("config", "effects_volume", value)
+	Storage.config.set_value("config", "effects_volume", value)
 	get_parent().get_node("Player/AudioStreamPlayerSpray").play()
 
 
 func _on_enable_haptics_button_pressed():
 	if $CanvasLayer/OptionsContainer/EnableHapticsContainer/EnableHapticsSetting.text == "ON":
 		$CanvasLayer/OptionsContainer/EnableHapticsContainer/EnableHapticsSetting.text = "OFF"
-		Storage.Config.set_value("config", "enable_haptics", false)
+		Storage.config.set_value("config", "enable_haptics", false)
 	else:
 		$CanvasLayer/OptionsContainer/EnableHapticsContainer/EnableHapticsSetting.text = "ON"
-		Storage.Config.set_value("config", "enable_haptics", true)
+		Storage.config.set_value("config", "enable_haptics", true)

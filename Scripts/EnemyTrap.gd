@@ -29,7 +29,7 @@ func _physics_process(_delta):
 					self.queue_free()
 					break
 
-				collision.get_collider().get_node(".")._player_hit()
+				collision.get_collider().get_node(".").player_hit()
 
 				$CollisionShape2D.disabled = true
 				self.queue_free()
@@ -40,7 +40,7 @@ func _physics_process(_delta):
 				self.queue_free()
 
 
-func _death(_death_source):
+func death(_death_source):
 	if state != DYING:
 		trap_health = trap_health - 1
 

@@ -15,7 +15,7 @@ func _physics_process(delta):
 		var target_direction = (target_position - global_position).normalized()
 		velocity = target_direction * 200
 
-		var _collision = move_and_collide(velocity * delta)
+		move_and_collide(velocity * delta)
 
 
 func swim_to_necromancer():

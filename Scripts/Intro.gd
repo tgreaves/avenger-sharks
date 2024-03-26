@@ -1,7 +1,5 @@
 extends Node2D
 
-@export var fish_scene: PackedScene
-
 enum {
 	ALL_IS_FINE,
 	LABEL_GONE,
@@ -12,6 +10,8 @@ enum {
 	SHARK_CHASE,
 	FADE_OUT
 }
+
+@export var fish_scene: PackedScene
 
 var state
 var shark_rotation = 0

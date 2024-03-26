@@ -1,17 +1,16 @@
 extends CharacterBody2D
 
-const DinosaurAttackScene = preload("res://Scenes/DinosaurAttack.tscn")
-var state = IDLE
-
 enum { IDLE, RAMPAGING }
 
+const DinosaurAttackScene = preload("res://Scenes/DinosaurAttack.tscn")
+var state = IDLE
 
 func _ready():
 	$AnimatedSprite2D.play()
 	state = IDLE
 
 
-func _go_on_a_rampage():
+func go_on_a_rampage():
 	state = RAMPAGING
 	set_collision_layer_value(6, false)  # No longer be an item.
 	set_collision_layer_value(8, true)  # Be a DINOSAUR!

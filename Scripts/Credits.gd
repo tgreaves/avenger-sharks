@@ -26,7 +26,7 @@ func prepare_content():
 	var fresh_content = ""
 	var content_array = content.split("\n", true, 0)
 	for single_line in content_array:
-		if SteamClient.STEAM_RUNNING:
+		if SteamClient.steam_running:
 			if single_line.contains("itch"):
 				continue
 

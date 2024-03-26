@@ -1,10 +1,10 @@
 extends CharacterBody2D
 
-var ITEMS = ["chest", "chest", "chest", "health"]
+enum { SPAWNING, READY }
+
+const ITEMS = ["chest", "chest", "chest", "health"]
 
 @export var item_type = ""
-
-enum { SPAWNING, READY }
 
 var state = SPAWNING
 var source = ""

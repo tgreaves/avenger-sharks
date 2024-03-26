@@ -69,4 +69,4 @@ func _on_flashing_timer_timeout():
 
 func _on_body_entered(_body):
 	# The masking means it must be the player that is inside us.
-	get_parent().get_node("Player")._player_hit()
+	get_parent().get_node("Player").player_hit()

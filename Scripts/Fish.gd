@@ -54,7 +54,7 @@ func _physics_process(delta):
 
 			var target_direction = (target_position - global_position).normalized()
 			velocity = target_direction * 5000
-			var _collision = move_and_collide(velocity * delta)
+			move_and_collide(velocity * delta)
 
 		INTRO_WANDER:
 			if velocity.x > 0:
@@ -94,13 +94,13 @@ func _physics_process(delta):
 			var target_direction = (target_position - global_position).normalized()
 			velocity = target_direction * 200
 
-			var _collision = move_and_collide(velocity * delta)
+			move_and_collide(velocity * delta)
 
 		INTRO_AT_NECROMANCER:
 			set_collision_mask_value(1, false)
 
 
-func _death(blood):
+func death(blood):
 	$CollisionShape2D.set_deferred("disabled", true)
 	remove_from_group("fishGroup")
 
