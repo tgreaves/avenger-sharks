@@ -255,9 +255,6 @@ func _physics_process(delta):
 							)
 							velocity = target_direction * enemy_speed
 
-						#var target_direction = (get_parent().get_node("Player").global_position - global_position).normalized();
-						#velocity = target_direction * enemy_speed;
-
 						$StateTimer.start(
 							randf_range(
 								constants.ENEMY_CHASE_REORIENT_MINIMUM_SECONDS,
@@ -694,8 +691,8 @@ func help_me_label_animation(label_text):
 func is_enemy_alive():
 	if state == WANDER:
 		return true
-	else:
-		return false
+
+	return false
 
 
 func consider_calling_for_help():

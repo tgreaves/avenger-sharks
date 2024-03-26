@@ -98,7 +98,6 @@ func _physics_process(delta):
 
 		INTRO_AT_NECROMANCER:
 			set_collision_mask_value(1, false)
-			pass
 
 
 func _death(blood):

@@ -1003,8 +1003,8 @@ func _on_hud_upgrade_button_pressed(button_number):
 func is_player_alive():
 	if shark_status == ALIVE:
 		return true
-	else:
-		return false
+
+	return false
 
 
 func remove_aiming_line():
