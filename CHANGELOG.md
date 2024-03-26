@@ -1,5 +1,10 @@
 # Changelog
 
+# 1.3.0 (xxxx-xx-xx)
+
+* Bug fixes:
+    * Player could STILL get stuck hunting for exit.  Fixed.  Properly this time!
+
 # 1.2.0 (2024-03-16)
 
 * Gameplay:

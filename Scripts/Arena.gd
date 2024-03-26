@@ -136,8 +136,6 @@ func reset_astar_grid():
     astar.cell_size = Vector2(16,16)
     astar.update()
     
-    Logging.log_entry("astargrid reset and good to go")
-
 func astar_route(source_vector, destination_vector):
     var route = astar.get_id_path(source_vector, destination_vector)
     return route
