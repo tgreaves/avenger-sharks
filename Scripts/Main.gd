@@ -413,7 +413,8 @@ func wave_end():
 	despawn_all_items()
 	$ArtilleryTimer.stop()
 
-	emit_signal("player_hunt_key", $Key.global_position)
+	#emit_signal("player_hunt_key", $Key.global_position)
+	player_hunt_key.emit($Key.global_position)
 
 	for fish in get_tree().get_nodes_in_group("fishGroup"):
 		fish.queue_free()

@@ -4,8 +4,12 @@
 
 * Bug fixes:
 	* Player could STILL get stuck hunting for exit.  Fixed.  Properly this time!
+* Platform:
+	* Godot upgrade to 4.3.stable.
+	* Steam: GodotSteam GDExtension upgraded to 4.10-gde (Stated as supporting Godot 4.3)
 * Misc:
 	* [INTERNAL] Code refactoring with GDScript Toolkit.
+	* [INTERNAL] godot-git-plugin upgraded to v3.1.1.
 
 # 1.2.0 (2024-03-16)
 

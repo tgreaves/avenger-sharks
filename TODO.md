@@ -22,6 +22,40 @@
 
 # Bugs
 
+Bugs with power ups you want to avoid or your run will be ruined.
+
+Fish Affinity power up bug: If you have a full pink bar and Frenzy is ready and
+you save it for the next level and choose the Fish Affinity power up, you can no
+longer use your Frenzy move.
+
+How to avoid: As long as your pink meter is not full feel free to choose the Fish
+Affinity power up, if your pink meter is full and Frenzy is ready, DO NOT choose
+Fish Affinity. Simply pick another option and your meter will be fine.
+
+Cheat Death bug: If you have Cheat Death and you die as the level is getting
+ready to end (screen will have a countdown of 3, 2, 1), you will revive but be
+unable to collect the key. This keeps you permanently stuck on that level until 
+you either quit or die.
+
+If you manage to survive long enough with this bug, all enemies will cease to
+spawn and you will be soft locked with quitting the game to be your only option.
+
+How to avoid: If you have Cheat Death DO NOT DIE while the 3, 2, 1 countdown is
+on screen to end the level.
+
+I have performed these enough times to feel it is worth posting here to help
+others avoid these situations to the best of their abilities. I have lost too
+many runs due to these bugs.
+
+Not sure if these will ever get patched but here is hoping one day maybe. Until
+then use the above to help avoid these.
+
+Using Frenzy during the 3, 2, 1 countdown to next stage will make the countdown
+stop on 1 and not let you advance to the next stage.
+
+How to avoid: Don't use Frenzy move when the stage is about to complete and
+change to the next one.
+
 * BOSS WAVE
 	* Randomly determine boss characteristics.
 	* Energy bar (which zoooooms up to max when it first appears on HUD)
@@ -89,4 +123,3 @@
 		* Hits one time to lose one life
 		* If it loses two more, then it is done but can take three lives one hit.
 		
-
