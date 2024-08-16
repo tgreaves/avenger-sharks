@@ -32,15 +32,15 @@ func _input(ev):
 		return
 
 	if Input.is_action_just_pressed("start") or Input.is_action_just_pressed("quit"):
-		emit_signal("unpause_game_pressed")
+		unpause_game_pressed.emit()
 
 
 func _on_unpause_game_pressed():
-	emit_signal("unpause_game_pressed")
+	unpause_game_pressed.emit()
 
 
 func _on_abandon_game_pressed():
-	emit_signal("abandon_game_pressed")
+	abandon_game_pressed.emit()
 
 
 func _on_accept_pause_timer_timeout():

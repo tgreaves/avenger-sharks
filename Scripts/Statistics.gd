@@ -32,4 +32,5 @@ func add_statistic(stat_name, stat_value):
 
 
 func _on_return_button_pressed():
-	emit_signal("statistics_return_button_pressed")
+	statistics_return_button_pressed.emit()
+	

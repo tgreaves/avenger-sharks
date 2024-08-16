@@ -287,7 +287,7 @@ func prepare_for_wave():
 			tween_camera.EASE_OUT
 		)
 
-	emit_signal("player_move_to_starting_position")
+	player_move_to_starting_position.emit()
 
 	_on_enemy_update_score_display()
 
@@ -296,8 +296,8 @@ func prepare_for_wave():
 	else:
 		update_fish_left_display()
 
-	emit_signal("player_update_energy")
-	emit_signal("player_update_fish")
+	player_update_energy.emit()
+	player_update_fish.emit()
 
 	$Key/CollisionShape2D.disabled = true
 
@@ -413,7 +413,6 @@ func wave_end():
 	despawn_all_items()
 	$ArtilleryTimer.stop()
 
-	#emit_signal("player_hunt_key", $Key.global_position)
 	player_hunt_key.emit($Key.global_position)
 
 	for fish in get_tree().get_nodes_in_group("fishGroup"):
@@ -987,14 +986,13 @@ func _on_player_player_got_fish():
 	fish_collected += 1
 	fish_left_this_wave -= 1
 	_on_enemy_update_score_display()
-	emit_signal("player_update_fish")
+	player_update_fish.emit()
 
 	if game_mode == "PACIFIST":
 		update_fish_left_display()
 	else:
 		if fish_collected == $Player.get_node("FishProgressBar").max_value:
-			emit_signal("player_enable_fish_frenzy")
-
+			player_enable_fish_frenzy.emit()
 
 func _on_player_player_found_exit():
 	wave_end_cleanup()

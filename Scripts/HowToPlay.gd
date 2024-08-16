@@ -14,4 +14,4 @@ func _process(_delta):
 
 
 func _on_return_button_pressed():
-	emit_signal("how_to_play_return_button_pressed")
+	how_to_play_return_button_pressed.emit()

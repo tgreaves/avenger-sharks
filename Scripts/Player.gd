@@ -317,7 +317,7 @@ func _physics_process(_delta):
 				if collision.get_collider().is_in_group("fishGroup"):
 					collided_with.get_node(".").death(false)
 					$AudioStreamPlayerGotFish.play()
-					emit_signal("player_got_fish")
+					player_got_fish.emit()
 					break
 
 				if collision.get_collider().is_in_group("dinosaurGroup"):
@@ -358,7 +358,7 @@ func _physics_process(_delta):
 								(original_energy <= constants.PLAYER_LOW_ENERGY_BLINK)
 								&& (player_energy > constants.PLAYER_LOW_ENERGY_BLINK)
 							):
-								emit_signal("player_no_longer_low_energy")
+								player_no_longer_low_energy.emit()
 
 							collided_with.get_node(".").despawn()
 
@@ -514,7 +514,7 @@ func _physics_process(_delta):
 					shark_status = CHEATING_DEATH
 					$PlayerExplosionTimer.start()
 				else:
-					emit_signal("player_died")
+					player_died.emit()
 					shark_status = EXPLODED
 		CHEATING_DEATH:
 			if $PlayerExplosionTimer.time_left == 0:
@@ -567,7 +567,7 @@ func _physics_process(_delta):
 				if collision.get_collider().name == "Key":
 					shark_status = HUNTING_EXIT
 					get_parent().get_node("Arena").get_node("ExitDoor").get_node("CollisionShape2D").disabled = false
-					emit_signal("player_got_key")
+					player_got_key.emit()
 
 					var exit_door_global = (
 						get_parent().get_node("Arena").get_node("ExitDoor").global_position
@@ -631,7 +631,7 @@ func _physics_process(_delta):
 					get_parent().get_node("Arena").open_top_door()
 					get_parent().get_node("Arena").get_node("ExitDoor").get_node("CollisionShape2D").disabled = true
 
-					emit_signal("player_found_exit_stop_key_movement")
+					player_found_exit_stop_key_movement.emit()
 					shark_status = GOING_THROUGH_DOOR
 
 					#var tween_camera = get_tree().create_tween()
@@ -656,7 +656,7 @@ func _physics_process(_delta):
 				var collision = get_slide_collision(i)
 
 				if collision.get_collider().name == "ExitLocation":
-					emit_signal("player_found_exit")
+					player_found_exit.emit()
 		MOVING_TO_START_POSITION:
 			if $DoorCloseTimer.time_left == 0:
 				# Close bottom door.
@@ -714,7 +714,7 @@ func player_hit():
 			_on_main_player_update_energy()
 
 			if player_energy <= constants.PLAYER_LOW_ENERGY_BLINK:
-				emit_signal("player_low_energy")
+				player_low_energy.emit()
 
 
 func _on_main_player_hunt_key(passed_key_global_position):
@@ -995,12 +995,12 @@ func _on_hud_upgrade_button_pressed(button_number):
 				(original_energy <= constants.PLAYER_LOW_ENERGY_BLINK)
 				&& (player_energy > constants.PLAYER_LOW_ENERGY_BLINK)
 			):
-				emit_signal("player_no_longer_low_energy")
+				player_no_longer_low_energy.emit()
 
 	get_parent().get_node("HUD").update_upgrade_summary()
 
 	# Go to next wave.
-	emit_signal("player_made_upgrade_choice")
+	player_made_upgrade_choice.emit()
 
 
 func is_player_alive():

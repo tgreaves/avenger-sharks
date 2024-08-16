@@ -40,7 +40,7 @@ func build_options_screen():
 
 
 func _on_return_button_pressed():
-	emit_signal("options_return_button_pressed")
+	options_return_button_pressed.emit()
 
 
 func _on_screen_mode_button_pressed():

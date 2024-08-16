@@ -53,4 +53,4 @@ func _process(_delta):
 func _on_return_button_pressed():
 	stop_scroll()
 	$CanvasLayer/VBoxContainer/ScrollContainer.scroll_vertical = 0
-	emit_signal("credits_return_button_pressed")
+	credits_return_button_pressed.emit()

@@ -89,7 +89,7 @@ func set_all_powerup_levels():
 
 
 func _on_upgrade_button_pressed(button_number):
-	emit_signal("upgrade_button_pressed", button_number)
+	upgrade_button_pressed.emit(button_number)
 
 
 func update_upgrade_summary():
