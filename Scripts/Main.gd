@@ -397,6 +397,9 @@ func wave_end():
 		$Player.power_pellet_warning_running = false
 		$Player.end_shark_attack()
 
+	if $Player.is_player_in_fish_frenzy():
+		$Player.stop_fish_frenzy()
+
 	for enemy in get_tree().get_nodes_in_group("enemyGroup"):
 		enemy.swim_escape()
 
@@ -948,13 +951,11 @@ func update_time_left_display():
 		_:
 			time_left = TheDirector.wave_design.get("wave_time")
 
-		# FOOBAR
 	$HUD.get_node("CanvasLayer").get_node("EnemiesLeft").text = "TIME\n" + str(time_left)
 
 	if time_left == 3 and !$CountdownEffect.is_playing():
 		$CountdownEffect.play()
 
-		# FOOBAR
 	if time_left and time_left <= 3:
 		$HUD.get_node("CanvasLayer/Label").text = (
 			"[center][font_size=128][pulse freq=1.0 color=#ffffff40 ease=-2.0]" + str(time_left)

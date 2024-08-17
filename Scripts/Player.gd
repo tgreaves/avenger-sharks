@@ -98,7 +98,12 @@ func prepare_for_new_game():
 	speed = constants.PLAYER_SPEED
 	fire_delay = constants.PLAYER_FIRE_DELAY
 	spray_size = 0.5
-	fish_frenzy_enabled = false
+	
+	if constants.DEV_FISH_FRENZY_AVAILABLE_IMMEDIATELY:
+		fish_frenzy_enabled = true
+	else:
+		fish_frenzy_enabled = false
+	
 	power_pellet_enabled = false
 	swim_surge_available = true
 	swim_surge_activate = false
@@ -1004,11 +1009,16 @@ func _on_hud_upgrade_button_pressed(button_number):
 
 
 func is_player_alive():
-	if shark_status == ALIVE:
+	if shark_status == ALIVE or shark_status == FISH_FRENZY:
 		return true
 
 	return false
 
+func is_player_in_fish_frenzy():
+	if shark_status == FISH_FRENZY:
+		return true
+	
+	return false
 
 func remove_aiming_line():
 	if $AimingLine.get_point_count() > 1:
