@@ -157,6 +157,7 @@ bus = &"Effects"
 [connection signal="player_found_exit_stop_key_movement" from="Player" to="Key" method="_on_player_player_found_exit_stop_key_movement"]
 [connection signal="player_got_fish" from="Player" to="." method="_on_player_player_got_fish"]
 [connection signal="player_got_key" from="Player" to="Key" method="_on_player_player_got_key"]
+[connection signal="player_has_stopped_cheating_death" from="Player" to="." method="_on_player_player_has_stopped_cheating_death"]
 [connection signal="player_low_energy" from="Player" to="." method="_on_player_player_low_energy"]
 [connection signal="player_made_upgrade_choice" from="Player" to="." method="_on_player_player_made_upgrade_choice"]
 [connection signal="player_no_longer_low_energy" from="Player" to="." method="_on_player_player_no_longer_low_energy"]

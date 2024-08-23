@@ -18,6 +18,7 @@ enum {
 	GAME_RUNNING,
 	GAME_PAUSED,
 	GETTING_KEY,
+	CHEATING_DEATH_AT_WAVE_END,
 	WAVE_END,
 	UPGRADE_SCREEN,
 	UPGRADE_WAITING_FOR_CHOICE,
@@ -207,7 +208,7 @@ func start_game():
 	$Player.get_node("FishProgressBar").max_value = constants.FISH_TO_TRIGGER_FISH_FRENZY
 	$Player.prepare_for_new_game()
 
-	$HUD/CanvasLayer/UpgradeSummary.text = ""
+	#$HUD/CanvasLayer/UpgradeSummary.text = ""
 	$HUD/CanvasLayer/UpgradeSummary.visible = true
 
 	if $MenuMusic.is_playing():
@@ -386,6 +387,14 @@ func start_wave():
 
 
 func wave_end():
+	
+	if $Player.is_player_cheating_death():
+		Logging.log_entry("Setting game_status to CHEATING_DEATH_AT_WAVE_END")
+		$HUD.get_node("CanvasLayer/Label").visible = false
+
+		game_status = CHEATING_DEATH_AT_WAVE_END
+		return
+
 	# Don't let wave end if the player beat it by dying!
 	if !$Player.is_player_alive():
 		return
@@ -946,7 +955,7 @@ func update_time_left_display():
 	var time_left
 
 	match game_status:
-		GAME_RUNNING, GETTING_KEY, WAVE_END, UPGRADE_SCREEN, UPGRADE_WAITING_FOR_CHOICE:
+		GAME_RUNNING, CHEATING_DEATH_AT_WAVE_END, GETTING_KEY, WAVE_END, UPGRADE_SCREEN, UPGRADE_WAITING_FOR_CHOICE:
 			time_left = int(ceil($WaveTimeLeftTimer.time_left))
 		_:
 			time_left = TheDirector.wave_design.get("wave_time")
@@ -1260,6 +1269,7 @@ func _on_wave_time_left_timer_timeout():
 		$Key/CollisionShape2D.disabled = false
 		$Key/AnimatedSprite2D.play()
 
+		Logging.log_entry('Invoking wave_end()')
 		wave_end()
 
 
@@ -1270,3 +1280,11 @@ func _on_steam_stats_ready(_game: int, _result: int, _user: int) -> void:
 		Logging.log_entry("Wiping achievements...")
 		#Steam.clearAchievement('ACH_ARCADE_BEAT_1_WAVE')
 		Steam.storeStats()
+
+
+# Player signal that CHEAT DEATH payoff has finished running.
+# If we are in CHEATING_DEATH_AT_WAVE_END, we can now get on with it!
+func _on_player_player_has_stopped_cheating_death() -> void:
+	if game_status == CHEATING_DEATH_AT_WAVE_END:
+		wave_end()
+		

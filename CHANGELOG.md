@@ -5,6 +5,7 @@
 * Bug fixes:
 	* Player could STILL get stuck hunting for exit.  Fixed.  Properly this time!
 	* FISH FRENZY activated when wave ends would trap the player in the wave forever.
+	* CHEAT DEATH activated when wave ends would trap the player in the wafe forever.
 * Platform:
 	* Godot upgrade to 4.3.stable.
 	* Steam: GodotSteam GDExtension upgraded to 4.10-gde (Stated as supporting Godot 4.3)

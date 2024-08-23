@@ -8,6 +8,7 @@ signal player_found_exit
 signal player_low_energy
 signal player_no_longer_low_energy
 signal player_made_upgrade_choice
+signal player_has_stopped_cheating_death
 
 enum {
 	ALIVE,
@@ -118,9 +119,14 @@ func prepare_for_new_game():
 		else:
 			upgrades[single_key][0] = 0
 
+	if constants.DEV_CHEAT_DEATH_AVAILABLE_IMMEDIATELY:
+		upgrades['CHEAT DEATH'][0] = 1
+
 	get_parent().get_node("HUD").reset_powerup_bar()
 	get_parent().get_node("HUD").reset_powerup_bar_text()
 	get_parent().get_node("HUD").set_all_powerup_levels()
+	get_parent().get_node("HUD").update_upgrade_summary()
+
 
 	despawn_mini_sharks()
 	$PowerUpTickTimer.start()
@@ -537,6 +543,9 @@ func _physics_process(_delta):
 
 				# Give a 1s grace period before taking damage again.
 				$PlayerHitGracePeriodTimer.start(1)
+				
+				player_has_stopped_cheating_death.emit()
+				
 		HUNTING_KEY:
 			if velocity.x > 0:
 				$AnimatedSprite2D.set_flip_h(true)
@@ -1016,6 +1025,15 @@ func is_player_alive():
 
 func is_player_in_fish_frenzy():
 	if shark_status == FISH_FRENZY:
+		return true
+	
+	return false
+	
+func is_player_cheating_death():
+	if shark_status == CHEATING_DEATH:
+		return true
+	
+	if shark_status == EXPLODING and upgrades["CHEAT DEATH"][0]:
 		return true
 	
 	return false
