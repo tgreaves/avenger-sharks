@@ -157,17 +157,13 @@ func get_input():
 	if $FireRateTimer.time_left == 0 && get_parent().game_mode == "ARCADE":
 		# Mouse aiming
 		if Input.is_action_pressed("shark_fire_mouse"):
-			var shark_spray = SharkSprayScene.instantiate()
-			get_parent().add_child(shark_spray)
-			shark_spray.add_to_group("sharkSprayGroup")
 			var target_direction = (get_global_mouse_position() - global_position).normalized()
-			shark_spray.global_position = position
-			shark_spray.velocity = velocity + (target_direction * constants.PLAYER_FIRE_SPEED)
-			Storage.increase_stat("player", "shots_fired", 1)
-
+			spawn_shark_spray(target_direction)
+			scatter_spray_handler(target_direction)
 			mini_shark_fire(target_direction)
 			grenade_fire(target_direction)
-
+			
+			Storage.increase_stat("player", "shots_fired", 1)
 			$AudioStreamPlayerSpray.play()
 			set_fire_rate_delay_timer()
 
@@ -176,11 +172,6 @@ func get_input():
 			"shoot_left", "shoot_right", "shoot_up", "shoot_down"
 		)
 		if shoot_direction:
-			var shark_spray = SharkSprayScene.instantiate()
-			get_parent().add_child(shark_spray)
-			shark_spray.add_to_group("sharkSprayGroup")
-			shark_spray.global_position = position
-
 			var shoot_input = Vector2.ZERO
 			shoot_input.x = (
 				Input.get_action_strength("shoot_right") - Input.get_action_strength("shoot_left")
@@ -190,12 +181,12 @@ func get_input():
 			)
 			shoot_direction = shoot_direction.normalized()
 
-			shark_spray.velocity = velocity + (shoot_direction * constants.PLAYER_FIRE_SPEED)
-			Storage.increase_stat("player", "shots_fired", 1)
-
+			spawn_shark_spray(shoot_direction)
+			scatter_spray_handler(shoot_direction)
 			mini_shark_fire(shoot_direction)
 			grenade_fire(shoot_direction)
 
+			Storage.increase_stat("player", "shots_fired", 1)
 			$AudioStreamPlayerSpray.play()
 			set_fire_rate_delay_timer()
 
@@ -418,7 +409,7 @@ func _physics_process(_delta):
 										)
 									)
 								"SCATTER SPRAY":
-									Logging.log_entry("Scatter spray collected")
+									pass
 								"GRENADE":
 									grenade_delay = (
 										constants.PLAYER_GRENADE_DELAY
@@ -868,6 +859,26 @@ func grenade_fire(_fire_direction):
 
 		$GrenadeRateTimer.start(grenade_delay)
 
+func scatter_spray_handler(target_direction):
+	if current_powerup_levels["SCATTER SPRAY"]:
+		var required_angle = 90 / (current_powerup_levels["SCATTER SPRAY"]+1)
+
+		match current_powerup_levels["SCATTER SPRAY"]:
+			1:
+				spawn_shark_spray(target_direction.rotated(deg_to_rad(required_angle)))
+				spawn_shark_spray(target_direction.rotated(deg_to_rad(-required_angle)))
+			2:
+				spawn_shark_spray(target_direction.rotated(deg_to_rad(required_angle)))
+				spawn_shark_spray(target_direction.rotated(deg_to_rad(required_angle*2)))
+				spawn_shark_spray(target_direction.rotated(deg_to_rad(-required_angle)))
+				spawn_shark_spray(target_direction.rotated(deg_to_rad(-required_angle*2)))
+			3:
+				spawn_shark_spray(target_direction.rotated(deg_to_rad(required_angle)))
+				spawn_shark_spray(target_direction.rotated(deg_to_rad(required_angle*2)))
+				spawn_shark_spray(target_direction.rotated(deg_to_rad(required_angle*3)))
+				spawn_shark_spray(target_direction.rotated(deg_to_rad(-required_angle)))
+				spawn_shark_spray(target_direction.rotated(deg_to_rad(-required_angle*2)))
+				spawn_shark_spray(target_direction.rotated(deg_to_rad(-required_angle*3)))
 
 func _on_main_player_enable_fish_frenzy():
 	powerup_label_animation("FRENZY READY!")
@@ -1020,6 +1031,12 @@ func _on_hud_upgrade_button_pressed(button_number):
 	# Go to next wave.
 	player_made_upgrade_choice.emit()
 
+func spawn_shark_spray(target_direction):
+	var shark_spray = SharkSprayScene.instantiate()
+	get_parent().add_child(shark_spray)
+	shark_spray.add_to_group("sharkSprayGroup")
+	shark_spray.global_position = position
+	shark_spray.velocity = velocity + (target_direction * constants.PLAYER_FIRE_SPEED)
 
 func is_player_alive():
 	if shark_status == ALIVE or shark_status == FISH_FRENZY:
