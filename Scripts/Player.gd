@@ -65,6 +65,7 @@ func _ready():
 		"SPEED UP": constants.POWERUP_SPEEDUP_MAX_LEVEL,
 		"FAST SPRAY": constants.POWERUP_FASTSPRAY_MAX_LEVEL,
 		"BIG SPRAY": constants.POWERUP_BIGSPRAY_MAX_LEVEL,
+		"SCATTER SPRAY": constants.POWERUP_SCATTERSPRAY_MAX_LEVEL,
 		"GRENADE": constants.POWERUP_GRENADE_MAX_LEVEL,
 		"MINI SHARK": constants.POWERUP_MINISHARK_MAX_LEVEL
 	}
@@ -375,12 +376,13 @@ func _physics_process(_delta):
 
 						"chest":
 							var powerup_options = [
-								"SPEED UP", "FAST SPRAY", "BIG SPRAY", "GRENADE", "MINI SHARK"
+								"SPEED UP", "FAST SPRAY", "BIG SPRAY", "SCATTER SPRAY", "GRENADE", "MINI SHARK"
 							]
 							var powerup_selected = powerup_options[randi() % powerup_options.size()]
 
-							# Uncomment to test.
-							#powerup_selected = 'GRENADE'
+							# Developer testing.
+							if constants.DEV_FORCE_POWERUP:
+								powerup_selected = constants.DEV_FORCE_POWERUP
 
 							# Increase powerup level (but not over its maximum allowed)
 							current_powerup_levels[powerup_selected] += 1
@@ -415,6 +417,8 @@ func _physics_process(_delta):
 											* current_powerup_levels[powerup_selected]
 										)
 									)
+								"SCATTER SPRAY":
+									Logging.log_entry("Scatter spray collected")
 								"GRENADE":
 									grenade_delay = (
 										constants.PLAYER_GRENADE_DELAY
