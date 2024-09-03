@@ -12,9 +12,12 @@
 * Platform:
 	* Godot upgrade to 4.3.stable.
 	* Steam: GodotSteam GDExtension upgraded to 4.10-gde (Stated as supporting Godot 4.3)
+	* Web: Support reinstated following Godot 4.3 fixing threads / MacOS browser issues.
 * Misc:
 	* [INTERNAL] Code refactoring with GDScript Toolkit.
 	* [INTERNAL] godot-git-plugin upgraded to v3.1.1.
+
+Thanks to chopsteak for their bug reporting via Steam Community!
 
 # 1.2.0 (2024-03-16)
 

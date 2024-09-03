@@ -45,6 +45,7 @@ enum {
 @export var game_mode = "ARCADE"
 @export var dropped_items_on_screen = 0
 @export var grouped_enemy_id = 0
+@export var SteamEngine = null
 
 var game_status_before_pause
 
@@ -76,10 +77,10 @@ func _ready():
 
 	if Engine.has_singleton("Steam") && (OS.has_feature("steam") or constants.DEV_STEAM_TESTING):
 		SteamClient.steam_setup()
-		Steam.overlay_toggled.connect(_on_steam_overlay_toggled)
-		Steam.input_device_connected.connect(_on_steam_input_device_connected)
-		Steam.input_device_disconnected.connect(_on_steam_input_device_disconnected)
-		Steam.current_stats_received.connect(_on_steam_stats_ready)
+		SteamClient.SteamEngine.overlay_toggled.connect(_on_steam_overlay_toggled)
+		SteamClient.SteamEngine.input_device_connected.connect(_on_steam_input_device_connected)
+		SteamClient.SteamEngine.input_device_disconnected.connect(_on_steam_input_device_disconnected)
+		SteamClient.SteamEngine.current_stats_received.connect(_on_steam_stats_ready)
 
 	Storage.load_config()
 
@@ -441,12 +442,12 @@ func wave_end():
 		if game_mode == "ARCADE":
 			match wave_number:
 				1:
-					Steam.setAchievement("ACH_ARCADE_BEAT_1_WAVE")
-					Steam.storeStats()
+					SteamClient.SteamEngine.setAchievement("ACH_ARCADE_BEAT_1_WAVE")
+					SteamClient.SteamEngine.storeStats()
 				5:
-					Steam.setAchievement("ACH_ARCADE_BEAT_5_WAVES")
+					SteamClient.SteamEngine.setAchievement("ACH_ARCADE_BEAT_5_WAVES")
 				10:
-					Steam.setAchievement("ACH_ARCADE_BEAT_10_WAVES")
+					SteamClient.SteamEngine.setAchievement("ACH_ARCADE_BEAT_10_WAVES")
 
 
 func wave_end_cleanup():
@@ -477,22 +478,22 @@ func game_over():
 
 	if SteamClient.steam_running:
 		if wave_number == 1:
-			Steam.setAchievement("ACH_ARCADE_NAME_IS_BRUCE")
+			SteamClient.SteamEngine.setAchievement("ACH_ARCADE_NAME_IS_BRUCE")
 
 		# Done at end of game to play nicely with Steam rate limiting.
 		var fish_hold = Storage.stats.get_value("player", "fish_rescued", 0)
 
 		# To catch players that hit achievements BEFORE they were introduced, check all of them.
 		if fish_hold >= 100:
-			Steam.setAchievement("ACH_RESCUE_100_FISH")
+			SteamClient.SteamEngine.setAchievement("ACH_RESCUE_100_FISH")
 
 		if fish_hold >= 500:
-			Steam.setAchievement("ACH_RESCUE_500_FISH")
+			SteamClient.SteamEngine.setAchievement("ACH_RESCUE_500_FISH")
 
 		if fish_hold >= 1000:
-			Steam.setAchievement("ACH_RESCUE_1000_FISH")
+			SteamClient.SteamEngine.setAchievement("ACH_RESCUE_1000_FISH")
 
-		Steam.storeStats()
+		SteamClient.SteamEngine.storeStats()
 
 	$AudioStreamPlayerMusic.stop()
 	$MenuMusic.play()
@@ -784,7 +785,7 @@ func spawn_fish():
 
 func _process(_delta):
 	if SteamClient.steam_running:
-		Steam.run_callbacks()
+		SteamClient.SteamEngine.run_callbacks()
 
 	if game_status == WAVE_START:
 		if $WaveIntroTimer.time_left == 0:
@@ -1278,8 +1279,8 @@ func _on_steam_stats_ready(_game: int, _result: int, _user: int) -> void:
 
 	if constants.DEV_WIPE_ACHIEVEMENTS:
 		Logging.log_entry("Wiping achievements...")
-		#Steam.clearAchievement('ACH_ARCADE_BEAT_1_WAVE')
-		Steam.storeStats()
+		#SteamClient.SteamEngine.clearAchievement('ACH_ARCADE_BEAT_1_WAVE')
+		SteamClient.SteamEngine.storeStats()
 
 
 # Player signal that CHEAT DEATH payoff has finished running.
