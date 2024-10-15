@@ -1,10 +1,10 @@
 extends Node
 
-const GAME_VERSION = "1.3.0.dev"
+const GAME_VERSION = "1.3.0"
 
 # Developer settings.
 const DEV_DELAY_ON_START = false
-const DEV_LOGGING = true
+const DEV_LOGGING = false
 const DEV_LOG_WAVE_DESIGN = false
 const DEV_ALLOW_CHEATS = false
 const DEV_SKIP_INTRO = false
