@@ -11,7 +11,7 @@
 	* Haptic feedback now works on MacOS (Fixed in Godot 4.3)
 * Platform:
 	* Godot upgrade to 4.3.stable.
-	* Steam: GodotSteam GDExtension upgraded to 4.10-gde (Stated as supporting Godot 4.3)
+	* Steam: GodotSteam GDExtension upgraded to 4.11-gde (Stated as supporting Godot 4.3)
 	* Web: Support reinstated following Godot 4.3 fixing threads / MacOS browser issues.
 * Misc:
 	* [INTERNAL] Code refactoring with GDScript Toolkit.
