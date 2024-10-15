@@ -186,6 +186,32 @@ theme_override_styles/fill = SubResource("StyleBoxFlat_bf8k5")
 value = 50.0
 show_percentage = false
 
+[node name="SCATTER SPRAY" type="VBoxContainer" parent="CanvasLayer/PowerUpContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="CanvasLayer/PowerUpContainer/SCATTER SPRAY"]
+z_index = 1
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("1_4l55f")
+theme_override_font_sizes/font_size = 32
+text = "SCATTER SPRAY"
+horizontal_alignment = 1
+
+[node name="ProgressBar" type="ProgressBar" parent="CanvasLayer/PowerUpContainer/SCATTER SPRAY/Label"]
+z_as_relative = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_aujmq")
+theme_override_styles/fill = SubResource("StyleBoxFlat_bf8k5")
+value = 50.0
+show_percentage = false
+
 [node name="GRENADE" type="VBoxContainer" parent="CanvasLayer/PowerUpContainer"]
 layout_mode = 2
 size_flags_horizontal = 3

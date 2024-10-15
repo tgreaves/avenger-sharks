@@ -45,6 +45,3 @@ Click first image to watch the trailer.
 ![Avenger Sharks screenshot 2](/Store_Assets/screenshot-frenzy.png)
 
 ![Avenger Sharks screenshot 1](/Store_Assets/screenshot-gameplay.png)
-
-
-
