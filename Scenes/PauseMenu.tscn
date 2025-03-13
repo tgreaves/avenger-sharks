@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://dfksl6get6jnk"]
 
-[ext_resource type="Script" path="res://Scripts/PauseMenu.gd" id="1_3r7mf"]
+[ext_resource type="Script" uid="uid://dpjck0syb5ya3" path="res://Scripts/PauseMenu.gd" id="1_3r7mf"]
 [ext_resource type="FontFile" uid="uid://dclfn1fjcq5i7" path="res://Fonts/PressStart2P-Regular.ttf" id="2_qm1nk"]
 
 [sub_resource type="Shortcut" id="Shortcut_s5al1"]

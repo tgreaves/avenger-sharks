@@ -1,6 +1,6 @@
 [gd_scene load_steps=16 format=3 uid="uid://dl3gcb38nvw46"]
 
-[ext_resource type="Script" path="res://Scripts/EnemyTrap.gd" id="1_7c2qk"]
+[ext_resource type="Script" uid="uid://bfxhclxuc4543" path="res://Scripts/EnemyTrap.gd" id="1_7c2qk"]
 [ext_resource type="Texture2D" uid="uid://cu4wy1d8botty" path="res://Sprites/Bear_Trap.png" id="2_y8xv8"]
 [ext_resource type="Texture2D" uid="uid://dpnh82bexsu7d" path="res://Sprites/Explosions/WaterExplosion/Water__05.png" id="3_eo0xu"]
 [ext_resource type="Texture2D" uid="uid://djcxss8vcxcyv" path="res://Sprites/Explosions/WaterExplosion/Water__04.png" id="4_hqxq0"]

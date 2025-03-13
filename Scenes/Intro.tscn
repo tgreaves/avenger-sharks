@@ -1,7 +1,7 @@
 [gd_scene load_steps=84 format=3 uid="uid://dde3f2uantk5b"]
 
 [ext_resource type="Texture2D" uid="uid://ikcchi1bmyrs" path="res://Sprites/Shark/Shark1.png" id="1_0o88s"]
-[ext_resource type="Script" path="res://Scripts/Intro.gd" id="1_pfwli"]
+[ext_resource type="Script" uid="uid://dpomwkili21u6" path="res://Scripts/Intro.gd" id="1_pfwli"]
 [ext_resource type="PackedScene" uid="uid://18lymhdawjy7" path="res://Scenes/Fish.tscn" id="2_aktqh"]
 [ext_resource type="Texture2D" uid="uid://bdivog3ud6gr" path="res://Sprites/Shark/Shark2.png" id="2_kn1m0"]
 [ext_resource type="FontFile" uid="uid://dclfn1fjcq5i7" path="res://Fonts/PressStart2P-Regular.ttf" id="3_8w4sk"]
@@ -11,7 +11,7 @@
 [ext_resource type="Texture2D" uid="uid://b11pog2gr6q20" path="res://Images/UnderwaterFantasy/foregound-merged.png" id="4_s1wj1"]
 [ext_resource type="Texture2D" uid="uid://bopdr8ypwa6id" path="res://Sprites/Shark/Shark5.png" id="5_4fryh"]
 [ext_resource type="Texture2D" uid="uid://cqdniuump4djq" path="res://Sprites/Shark/Shark6.png" id="6_ee3iq"]
-[ext_resource type="Script" path="res://Scripts/IntroShark.gd" id="6_vb38i"]
+[ext_resource type="Script" uid="uid://y7fea43xx7i8" path="res://Scripts/IntroShark.gd" id="6_vb38i"]
 [ext_resource type="Texture2D" uid="uid://c4rfkd6arhtvm" path="res://Sprites/Shark/Shark7.png" id="7_1shh4"]
 [ext_resource type="Texture2D" uid="uid://dd5w8b6cnmfow" path="res://Sprites/Shark/Shark8.png" id="8_qyqkr"]
 [ext_resource type="Texture2D" uid="uid://chfcb5gy11be1" path="res://Sprites/Explosions/Explosion4/0001.png" id="9_f577m"]
@@ -41,7 +41,7 @@
 [ext_resource type="Texture2D" uid="uid://c2kkxkkidhkwc" path="res://Sprites/Explosions/Explosion4/0025.png" id="33_y4ipl"]
 [ext_resource type="AudioStream" uid="uid://tjew5vbb1jca" path="res://Sound/Music Box Loop.mp3" id="38_ux0ay"]
 [ext_resource type="Texture2D" uid="uid://71x34ukulwpb" path="res://Sprites/Necromancer_creativekind-Sheet.png" id="39_imp04"]
-[ext_resource type="Script" path="res://Scripts/IntroNecromancer.gd" id="39_kcmhv"]
+[ext_resource type="Script" uid="uid://8thwxj8whm72" path="res://Scripts/IntroNecromancer.gd" id="39_kcmhv"]
 [ext_resource type="AudioStream" uid="uid://i8px3dwm5dhu" path="res://Sound/Fight to the Death.mp3" id="39_pe1b1"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_b32hh"]

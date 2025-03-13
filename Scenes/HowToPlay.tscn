@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=3 uid="uid://ch5uo6wnokcvq"]
 
-[ext_resource type="Script" path="res://Scripts/HowToPlay.gd" id="1_q1tn6"]
+[ext_resource type="Script" uid="uid://c6rhtg0omxq0p" path="res://Scripts/HowToPlay.gd" id="1_q1tn6"]
 [ext_resource type="FontFile" uid="uid://dclfn1fjcq5i7" path="res://Fonts/PressStart2P-Regular.ttf" id="2_51vyp"]
 
 [sub_resource type="InputEventAction" id="InputEventAction_0knlb"]

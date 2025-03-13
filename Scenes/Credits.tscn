@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=3 uid="uid://cy3emhfwvf1gj"]
 
-[ext_resource type="Script" path="res://Scripts/Credits.gd" id="1_sq6qr"]
+[ext_resource type="Script" uid="uid://58ur22xhevue" path="res://Scripts/Credits.gd" id="1_sq6qr"]
 [ext_resource type="FontFile" uid="uid://dclfn1fjcq5i7" path="res://Fonts/PressStart2P-Regular.ttf" id="2_22yya"]
 
 [sub_resource type="InputEventAction" id="InputEventAction_0knlb"]

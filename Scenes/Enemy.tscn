@@ -1,6 +1,6 @@
 [gd_scene load_steps=120 format=3 uid="uid://bkmx1mvtb8dxr"]
 
-[ext_resource type="Script" path="res://Scripts/Enemy.gd" id="1_6udno"]
+[ext_resource type="Script" uid="uid://cfhqj33cq7qfl" path="res://Scripts/Enemy.gd" id="1_6udno"]
 [ext_resource type="Texture2D" uid="uid://ps2dg61ty76w" path="res://Sprites/knight-run-sheet.png" id="2_7pnuj"]
 [ext_resource type="Texture2D" uid="uid://q6dsymwdbl1c" path="res://Sprites/Bee/Bee_Death.png" id="2_phgyt"]
 [ext_resource type="Texture2D" uid="uid://c4xfdnq5c38c0" path="res://Sprites/knight-death-sheet.png" id="2_q1u0q"]

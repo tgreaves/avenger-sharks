@@ -1,6 +1,6 @@
 [gd_scene load_steps=17 format=3 uid="uid://dc1eectou7p5h"]
 
-[ext_resource type="Script" path="res://Scripts/SharkSpray.gd" id="1_5rkhy"]
+[ext_resource type="Script" uid="uid://dh23m3b2uqeet" path="res://Scripts/SharkSpray.gd" id="1_5rkhy"]
 [ext_resource type="Texture2D" uid="uid://ig2s00164uhd" path="res://Sprites/SharkSpray/Water__01.png" id="2_udl16"]
 [ext_resource type="Texture2D" uid="uid://cdu83ucyr77of" path="res://Sprites/SharkSpray/Water__02.png" id="3_nwshx"]
 [ext_resource type="Texture2D" uid="uid://beqfs5j7nfpc3" path="res://Sprites/SharkSpray/Water__03.png" id="4_dpmcb"]

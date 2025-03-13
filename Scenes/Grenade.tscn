@@ -1,7 +1,7 @@
 [gd_scene load_steps=33 format=3 uid="uid://bfyqubi7aig46"]
 
 [ext_resource type="Texture2D" uid="uid://cinvfy4a4t816" path="res://Sprites/VladPenn-weapon-pack.png" id="1_06c74"]
-[ext_resource type="Script" path="res://Scripts/Grenade.gd" id="1_jd10r"]
+[ext_resource type="Script" uid="uid://bo1fekawg2pnx" path="res://Scripts/Grenade.gd" id="1_jd10r"]
 [ext_resource type="Texture2D" uid="uid://chfcb5gy11be1" path="res://Sprites/Explosions/Explosion4/0001.png" id="3_cw4xh"]
 [ext_resource type="Texture2D" uid="uid://cn2mgyrc20w6q" path="res://Sprites/Explosions/Explosion4/0002.png" id="4_d2j0g"]
 [ext_resource type="Texture2D" uid="uid://brkgoddfwhykd" path="res://Sprites/Explosions/Explosion4/0003.png" id="5_l8axt"]

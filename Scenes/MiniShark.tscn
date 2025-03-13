@@ -1,6 +1,6 @@
 [gd_scene load_steps=37 format=3 uid="uid://bgterca3plunj"]
 
-[ext_resource type="Script" path="res://Scripts/MiniShark.gd" id="1_ibbvb"]
+[ext_resource type="Script" uid="uid://clwr2cp2py1tx" path="res://Scripts/MiniShark.gd" id="1_ibbvb"]
 [ext_resource type="Texture2D" uid="uid://ikcchi1bmyrs" path="res://Sprites/Shark/Shark1.png" id="2_1bgod"]
 [ext_resource type="Texture2D" uid="uid://bdivog3ud6gr" path="res://Sprites/Shark/Shark2.png" id="3_bsc3s"]
 [ext_resource type="Texture2D" uid="uid://d05wftn5oy54p" path="res://Sprites/Shark/Shark3.png" id="4_rjo7d"]
