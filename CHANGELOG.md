@@ -1,5 +1,11 @@
 # Changelog
 
+# 1.4.0 (2026-xx-xx)
+
+* Platform:
+	* Godot upgrade to 4.7.stable.
+	* Steam: GodotSteam GDExtension upgraded to 4.20.
+
 # 1.3.0 (2024-10-15)
 
 * Gameplay:

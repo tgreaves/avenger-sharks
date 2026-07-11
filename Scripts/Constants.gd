@@ -1,6 +1,6 @@
 extends Node
 
-const GAME_VERSION = "1.3.0"
+const GAME_VERSION = "1.4.0-wip"
 
 # Developer settings.
 const DEV_DELAY_ON_START = false

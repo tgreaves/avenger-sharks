@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://bcqacic7yj4ds"]
+[gd_scene format=3 uid="uid://bcqacic7yj4ds"]
 
 [ext_resource type="FontFile" uid="uid://dclfn1fjcq5i7" path="res://Fonts/PressStart2P-Regular.ttf" id="1_4l55f"]
 [ext_resource type="Script" uid="uid://ce0stwhbbea0s" path="res://Scripts/HUD.gd" id="1_bwdok"]
@@ -12,7 +12,7 @@ bg_color = Color(0.972549, 0.321569, 0.580392, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7hvoe"]
 bg_color = Color(1, 0, 0, 1)
 
-[node name="HUD" type="Control"]
+[node name="HUD" type="Control" unique_id=215000281]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -21,9 +21,9 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_bwdok")
 
-[node name="CanvasLayer" type="CanvasLayer" parent="."]
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=667901414]
 
-[node name="Score" type="Label" parent="CanvasLayer"]
+[node name="Score" type="Label" parent="CanvasLayer" unique_id=1809116274]
 offset_top = -2.0
 offset_right = 636.0
 offset_bottom = 89.0
@@ -32,7 +32,7 @@ theme_override_fonts/font = ExtResource("1_4l55f")
 theme_override_font_sizes/font_size = 64
 text = "SCORE"
 
-[node name="Label" type="RichTextLabel" parent="CanvasLayer"]
+[node name="Label" type="RichTextLabel" parent="CanvasLayer" unique_id=2078738218]
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -51,7 +51,7 @@ fit_content = true
 scroll_active = false
 autowrap_mode = 0
 
-[node name="Label2" type="Label" parent="CanvasLayer"]
+[node name="Label2" type="Label" parent="CanvasLayer" unique_id=1284657261]
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -68,7 +68,7 @@ theme_override_font_sizes/font_size = 64
 horizontal_alignment = 1
 vertical_alignment = 2
 
-[node name="HighScore" type="Label" parent="CanvasLayer"]
+[node name="HighScore" type="Label" parent="CanvasLayer" unique_id=2129333417]
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
@@ -83,7 +83,7 @@ text = "HIGH SCORE
 0"
 horizontal_alignment = 1
 
-[node name="EnemiesLeft" type="Label" parent="CanvasLayer"]
+[node name="EnemiesLeft" type="Label" parent="CanvasLayer" unique_id=1264898589]
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
@@ -96,7 +96,7 @@ theme_override_font_sizes/font_size = 64
 text = "TIME"
 horizontal_alignment = 2
 
-[node name="PowerUpContainer" type="VBoxContainer" parent="CanvasLayer"]
+[node name="PowerUpContainer" type="VBoxContainer" parent="CanvasLayer" unique_id=1635403270]
 anchors_preset = 3
 anchor_left = 1.0
 anchor_top = 1.0
@@ -107,10 +107,10 @@ offset_top = -26.0
 grow_horizontal = 0
 grow_vertical = 0
 
-[node name="SPEED UP" type="VBoxContainer" parent="CanvasLayer/PowerUpContainer"]
+[node name="SPEED UP" type="VBoxContainer" parent="CanvasLayer/PowerUpContainer" unique_id=1656961841]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="CanvasLayer/PowerUpContainer/SPEED UP"]
+[node name="Label" type="Label" parent="CanvasLayer/PowerUpContainer/SPEED UP" unique_id=855195816]
 z_index = 1
 custom_minimum_size = Vector2(2.08165e-12, 2.08165e-12)
 layout_mode = 2
@@ -121,7 +121,7 @@ text = "SPEED-UP
 "
 horizontal_alignment = 1
 
-[node name="ProgressBar" type="ProgressBar" parent="CanvasLayer/PowerUpContainer/SPEED UP/Label"]
+[node name="ProgressBar" type="ProgressBar" parent="CanvasLayer/PowerUpContainer/SPEED UP/Label" unique_id=474773146]
 z_as_relative = false
 layout_mode = 1
 anchors_preset = 15
@@ -134,11 +134,11 @@ theme_override_styles/fill = SubResource("StyleBoxFlat_bf8k5")
 value = 50.0
 show_percentage = false
 
-[node name="FAST SPRAY" type="VBoxContainer" parent="CanvasLayer/PowerUpContainer"]
+[node name="FAST SPRAY" type="VBoxContainer" parent="CanvasLayer/PowerUpContainer" unique_id=133946805]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Label" type="Label" parent="CanvasLayer/PowerUpContainer/FAST SPRAY"]
+[node name="Label" type="Label" parent="CanvasLayer/PowerUpContainer/FAST SPRAY" unique_id=553133028]
 z_index = 1
 layout_mode = 2
 size_flags_horizontal = 3
@@ -147,7 +147,7 @@ theme_override_font_sizes/font_size = 32
 text = "FAST SPRAY"
 horizontal_alignment = 1
 
-[node name="ProgressBar" type="ProgressBar" parent="CanvasLayer/PowerUpContainer/FAST SPRAY/Label"]
+[node name="ProgressBar" type="ProgressBar" parent="CanvasLayer/PowerUpContainer/FAST SPRAY/Label" unique_id=1277833986]
 z_as_relative = false
 layout_mode = 1
 anchors_preset = 15
@@ -160,11 +160,11 @@ theme_override_styles/fill = SubResource("StyleBoxFlat_bf8k5")
 value = 50.0
 show_percentage = false
 
-[node name="BIG SPRAY" type="VBoxContainer" parent="CanvasLayer/PowerUpContainer"]
+[node name="BIG SPRAY" type="VBoxContainer" parent="CanvasLayer/PowerUpContainer" unique_id=611905622]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Label" type="Label" parent="CanvasLayer/PowerUpContainer/BIG SPRAY"]
+[node name="Label" type="Label" parent="CanvasLayer/PowerUpContainer/BIG SPRAY" unique_id=1444715408]
 z_index = 1
 layout_mode = 2
 size_flags_horizontal = 3
@@ -173,7 +173,7 @@ theme_override_font_sizes/font_size = 32
 text = "BIG SPRAY"
 horizontal_alignment = 1
 
-[node name="ProgressBar" type="ProgressBar" parent="CanvasLayer/PowerUpContainer/BIG SPRAY/Label"]
+[node name="ProgressBar" type="ProgressBar" parent="CanvasLayer/PowerUpContainer/BIG SPRAY/Label" unique_id=1885421927]
 z_as_relative = false
 layout_mode = 1
 anchors_preset = 15
@@ -186,11 +186,11 @@ theme_override_styles/fill = SubResource("StyleBoxFlat_bf8k5")
 value = 50.0
 show_percentage = false
 
-[node name="SCATTER SPRAY" type="VBoxContainer" parent="CanvasLayer/PowerUpContainer"]
+[node name="SCATTER SPRAY" type="VBoxContainer" parent="CanvasLayer/PowerUpContainer" unique_id=473237932]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Label" type="Label" parent="CanvasLayer/PowerUpContainer/SCATTER SPRAY"]
+[node name="Label" type="Label" parent="CanvasLayer/PowerUpContainer/SCATTER SPRAY" unique_id=923619382]
 z_index = 1
 layout_mode = 2
 size_flags_horizontal = 3
@@ -199,7 +199,7 @@ theme_override_font_sizes/font_size = 32
 text = "SCATTER SPRAY"
 horizontal_alignment = 1
 
-[node name="ProgressBar" type="ProgressBar" parent="CanvasLayer/PowerUpContainer/SCATTER SPRAY/Label"]
+[node name="ProgressBar" type="ProgressBar" parent="CanvasLayer/PowerUpContainer/SCATTER SPRAY/Label" unique_id=1226359613]
 z_as_relative = false
 layout_mode = 1
 anchors_preset = 15
@@ -212,11 +212,11 @@ theme_override_styles/fill = SubResource("StyleBoxFlat_bf8k5")
 value = 50.0
 show_percentage = false
 
-[node name="GRENADE" type="VBoxContainer" parent="CanvasLayer/PowerUpContainer"]
+[node name="GRENADE" type="VBoxContainer" parent="CanvasLayer/PowerUpContainer" unique_id=1018225752]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Label" type="Label" parent="CanvasLayer/PowerUpContainer/GRENADE"]
+[node name="Label" type="Label" parent="CanvasLayer/PowerUpContainer/GRENADE" unique_id=375746177]
 z_index = 1
 layout_mode = 2
 size_flags_horizontal = 3
@@ -225,7 +225,7 @@ theme_override_font_sizes/font_size = 32
 text = "GRENADE"
 horizontal_alignment = 1
 
-[node name="ProgressBar" type="ProgressBar" parent="CanvasLayer/PowerUpContainer/GRENADE/Label"]
+[node name="ProgressBar" type="ProgressBar" parent="CanvasLayer/PowerUpContainer/GRENADE/Label" unique_id=577484610]
 z_as_relative = false
 layout_mode = 1
 anchors_preset = 15
@@ -238,11 +238,11 @@ theme_override_styles/fill = SubResource("StyleBoxFlat_bf8k5")
 value = 50.0
 show_percentage = false
 
-[node name="MINI SHARK" type="VBoxContainer" parent="CanvasLayer/PowerUpContainer"]
+[node name="MINI SHARK" type="VBoxContainer" parent="CanvasLayer/PowerUpContainer" unique_id=515890473]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Label" type="Label" parent="CanvasLayer/PowerUpContainer/MINI SHARK"]
+[node name="Label" type="Label" parent="CanvasLayer/PowerUpContainer/MINI SHARK" unique_id=1737104132]
 z_index = 1
 layout_mode = 2
 size_flags_horizontal = 3
@@ -251,7 +251,7 @@ theme_override_font_sizes/font_size = 32
 text = "MINI SHARK"
 horizontal_alignment = 1
 
-[node name="ProgressBar" type="ProgressBar" parent="CanvasLayer/PowerUpContainer/MINI SHARK/Label"]
+[node name="ProgressBar" type="ProgressBar" parent="CanvasLayer/PowerUpContainer/MINI SHARK/Label" unique_id=1776533577]
 z_as_relative = false
 layout_mode = 1
 anchors_preset = 15
@@ -264,7 +264,7 @@ theme_override_styles/fill = SubResource("StyleBoxFlat_bf8k5")
 value = 50.0
 show_percentage = false
 
-[node name="UpgradeChoiceContainer" type="HBoxContainer" parent="CanvasLayer"]
+[node name="UpgradeChoiceContainer" type="HBoxContainer" parent="CanvasLayer" unique_id=738072932]
 anchors_preset = 14
 anchor_top = 0.5
 anchor_right = 1.0
@@ -277,16 +277,16 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 40
 
-[node name="Choice1" type="VBoxContainer" parent="CanvasLayer/UpgradeChoiceContainer"]
+[node name="Choice1" type="VBoxContainer" parent="CanvasLayer/UpgradeChoiceContainer" unique_id=487788323]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="TextureRect" type="TextureRect" parent="CanvasLayer/UpgradeChoiceContainer/Choice1"]
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer/UpgradeChoiceContainer/Choice1" unique_id=1408447458]
 layout_mode = 2
 size_flags_horizontal = 4
 stretch_mode = 2
 
-[node name="Title" type="Label" parent="CanvasLayer/UpgradeChoiceContainer/Choice1"]
+[node name="Title" type="Label" parent="CanvasLayer/UpgradeChoiceContainer/Choice1" unique_id=712362722]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("1_4l55f")
 theme_override_font_sizes/font_size = 48
@@ -294,7 +294,7 @@ text = "Dummy description"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="Description" type="Label" parent="CanvasLayer/UpgradeChoiceContainer/Choice1"]
+[node name="Description" type="Label" parent="CanvasLayer/UpgradeChoiceContainer/Choice1" unique_id=1017610117]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_fonts/font = ExtResource("1_4l55f")
@@ -304,22 +304,22 @@ horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 2
 
-[node name="Button" type="Button" parent="CanvasLayer/UpgradeChoiceContainer/Choice1"]
+[node name="Button" type="Button" parent="CanvasLayer/UpgradeChoiceContainer/Choice1" unique_id=32133007]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("1_4l55f")
 theme_override_font_sizes/font_size = 48
 text = "SELECT"
 
-[node name="Choice2" type="VBoxContainer" parent="CanvasLayer/UpgradeChoiceContainer"]
+[node name="Choice2" type="VBoxContainer" parent="CanvasLayer/UpgradeChoiceContainer" unique_id=407331852]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="TextureRect" type="TextureRect" parent="CanvasLayer/UpgradeChoiceContainer/Choice2"]
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer/UpgradeChoiceContainer/Choice2" unique_id=1628195625]
 layout_mode = 2
 size_flags_horizontal = 4
 stretch_mode = 2
 
-[node name="Title" type="Label" parent="CanvasLayer/UpgradeChoiceContainer/Choice2"]
+[node name="Title" type="Label" parent="CanvasLayer/UpgradeChoiceContainer/Choice2" unique_id=1816244416]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("1_4l55f")
 theme_override_font_sizes/font_size = 48
@@ -327,7 +327,7 @@ text = "Dummy description"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="Description" type="Label" parent="CanvasLayer/UpgradeChoiceContainer/Choice2"]
+[node name="Description" type="Label" parent="CanvasLayer/UpgradeChoiceContainer/Choice2" unique_id=2046761551]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_fonts/font = ExtResource("1_4l55f")
@@ -337,22 +337,22 @@ horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 2
 
-[node name="Button" type="Button" parent="CanvasLayer/UpgradeChoiceContainer/Choice2"]
+[node name="Button" type="Button" parent="CanvasLayer/UpgradeChoiceContainer/Choice2" unique_id=1553648764]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("1_4l55f")
 theme_override_font_sizes/font_size = 48
 text = "  SELECT  "
 
-[node name="Choice3" type="VBoxContainer" parent="CanvasLayer/UpgradeChoiceContainer"]
+[node name="Choice3" type="VBoxContainer" parent="CanvasLayer/UpgradeChoiceContainer" unique_id=174544335]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="TextureRect" type="TextureRect" parent="CanvasLayer/UpgradeChoiceContainer/Choice3"]
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer/UpgradeChoiceContainer/Choice3" unique_id=77373141]
 layout_mode = 2
 size_flags_horizontal = 4
 stretch_mode = 2
 
-[node name="Title" type="Label" parent="CanvasLayer/UpgradeChoiceContainer/Choice3"]
+[node name="Title" type="Label" parent="CanvasLayer/UpgradeChoiceContainer/Choice3" unique_id=1212298824]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("1_4l55f")
 theme_override_font_sizes/font_size = 48
@@ -360,7 +360,7 @@ text = "Dummy description"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="Description" type="Label" parent="CanvasLayer/UpgradeChoiceContainer/Choice3"]
+[node name="Description" type="Label" parent="CanvasLayer/UpgradeChoiceContainer/Choice3" unique_id=1211769762]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_fonts/font = ExtResource("1_4l55f")
@@ -370,13 +370,13 @@ horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 2
 
-[node name="Button" type="Button" parent="CanvasLayer/UpgradeChoiceContainer/Choice3"]
+[node name="Button" type="Button" parent="CanvasLayer/UpgradeChoiceContainer/Choice3" unique_id=1793587759]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("1_4l55f")
 theme_override_font_sizes/font_size = 48
 text = "  SELECT  "
 
-[node name="UpgradeSummary" type="Label" parent="CanvasLayer"]
+[node name="UpgradeSummary" type="Label" parent="CanvasLayer" unique_id=442002824]
 anchors_preset = 4
 anchor_top = 0.5
 anchor_bottom = 0.5
@@ -389,7 +389,7 @@ theme_override_fonts/font = ExtResource("1_4l55f")
 theme_override_font_sizes/font_size = 32
 vertical_alignment = 2
 
-[node name="DamageRect" type="ColorRect" parent="CanvasLayer"]
+[node name="DamageRect" type="ColorRect" parent="CanvasLayer" unique_id=1317800753]
 visible = false
 modulate = Color(0, 0, 0, 0)
 anchors_preset = 15
@@ -399,7 +399,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.411765, 0, 0, 0.686275)
 
-[node name="BossHealthBar" type="ProgressBar" parent="CanvasLayer"]
+[node name="BossHealthBar" type="ProgressBar" parent="CanvasLayer" unique_id=988839779]
 offset_left = 1061.0
 offset_top = 170.0
 offset_right = 1484.0
