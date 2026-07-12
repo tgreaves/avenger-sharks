@@ -35,6 +35,9 @@ var can_be_knocked_back = false
 var knocked_back = false
 var astar_pathing_grid
 
+@onready var arena = get_parent().get_node("Arena")
+@onready var player = get_parent().get_node("Player")
+
 
 func _ready():
 	$CallForHelpTimer.connect("timeout", _on_call_for_help_timer_timeout)
@@ -207,7 +210,7 @@ func _physics_process(delta):
 
 			if $StateTimer.time_left == 0 and !knocked_back:
 				var ai_mode_to_use = ai_mode
-				if get_parent().get_node("Player").power_pellet_enabled:
+				if player.power_pellet_enabled:
 					ai_mode_to_use = "RUN_AWAY"
 					$ScaredParticles.set_emitting(true)
 				else:
@@ -238,7 +241,7 @@ func _physics_process(delta):
 							get_parent()
 							. get_node("Arena")
 							. get_astar_route_from_positions(
-								global_position, get_parent().get_node("Player").global_position
+								global_position, player.global_position
 							)
 						)
 						astar_pathing_grid.pop_front()
@@ -246,7 +249,7 @@ func _physics_process(delta):
 						if astar_pathing_grid.size():
 							var target_direction = (
 								(
-									get_parent().get_node("Arena").get_position_from_tilemap(
+									arena.get_position_from_tilemap(
 										astar_pathing_grid[0]
 									)
 									- global_position
@@ -265,7 +268,7 @@ func _physics_process(delta):
 					# Flee the player.
 					"RUN_AWAY":
 						var target_direction = (
-							(global_position - get_parent().get_node("Player").global_position)
+							(global_position - player.global_position)
 							. normalized()
 						)
 						velocity = target_direction * (enemy_speed / 2)
@@ -306,7 +309,7 @@ func _physics_process(delta):
 							if astar_pathing_grid.size():
 								target_direction = (
 									(
-										get_parent().get_node("Arena").get_position_from_tilemap(
+										arena.get_position_from_tilemap(
 											astar_pathing_grid[0]
 										)
 										- global_position
@@ -373,7 +376,7 @@ func _physics_process(delta):
 				queue_free()
 
 			var target_position = (
-				get_parent().get_node("Arena").get_node("ExitDoor").global_position
+				arena.get_node("ExitDoor").global_position
 			)
 
 			if global_position.distance_to(target_position) <= 200:
@@ -383,7 +386,7 @@ func _physics_process(delta):
 			#velocity = target_direction * 2500
 
 			# Have we reached the next node on the astar pathing grid?
-			var tilemap_coords = get_parent().get_node("Arena").get_tilemap_coords(global_position)
+			var tilemap_coords = arena.get_tilemap_coords(global_position)
 
 			if tilemap_coords == astar_pathing_grid[0]:
 				astar_pathing_grid.pop_front()
@@ -391,7 +394,7 @@ func _physics_process(delta):
 				if astar_pathing_grid.size():
 					var target_direction = (
 						(
-							get_parent().get_node("Arena").get_position_from_tilemap(
+							arena.get_position_from_tilemap(
 								astar_pathing_grid[0]
 							)
 							- global_position
@@ -427,7 +430,7 @@ func _physics_process(delta):
 		$AttackTimer.time_left == 0
 		&& state == WANDER
 		&& attack_timer_min
-		&& (!get_parent().get_node("Player").power_pellet_enabled)
+		&& (!player.power_pellet_enabled)
 	):
 		match attack_type:
 			"STANDARD":
@@ -436,7 +439,7 @@ func _physics_process(delta):
 				enemy_attack.add_to_group("enemyAttack")
 
 				var target_direction = (
-					(get_parent().get_node("Player").global_position - global_position).normalized()
+					(player.global_position - global_position).normalized()
 				)
 
 				# We don't want enemies to always be a perfect shot.
@@ -569,69 +572,59 @@ func death(death_source):
 				$KnockbackTimer.start(constants.ENEMY_KNOCKBACK_TIMER)
 
 
-# Handle grouped enemy death.
-# Basically, keep the group (snake!) together properly.
+# Handle the death of one segment of a "grouped" enemy (the snake).
+#
+# A snake shares the group "groupedEnemy-<id>": one head (child_of_enemy ==
+# false) followed by body segments, each carrying a child_number and a
+# reference to the segment ahead of it. When a segment dies we keep the rest
+# of the chain intact.
+#
+# `self` is the dying segment; its state is already DYING by the time we get
+# here, so it is skipped (along with any other dying segment) as we walk the
+# group.
+#
+# Returns true only when the whole snake is now gone — the caller uses this to
+# decrement the wave's enemy counts. That can only happen when the head dies
+# and no living segments remain behind it.
 func grouped_enemy_death():
-	var remember_the_parent
+	var group_name = "groupedEnemy-" + str(enemy_group_id)
 
-	# What was destroyed?
 	if child_of_enemy:
-		# I am a child.
-		# We just need to recompute child numbers for everything except the parent.
+		# A body segment died: renumber the surviving segments in order.
 		var i = 0
-		for single_enemy in get_tree().get_nodes_in_group("groupedEnemy-" + str(enemy_group_id)):
-			if single_enemy.name == name:
-				continue
-			if single_enemy.state == DYING:
+		for single_enemy in get_tree().get_nodes_in_group(group_name):
+			if single_enemy.name == name or single_enemy.state == DYING:
 				continue
 			i += 1
 			single_enemy.set_child_number(i)
 
-		# I am the parent.
+		return false
 
-		# Congratulations.  You are the new parent.
+	# The head died: promote the first surviving segment to be the new head,
+	# then renumber the segments behind it and point them at the new head.
+	var i = 0
+	var new_head
+	for single_enemy in get_tree().get_nodes_in_group(group_name):
+		if single_enemy.name == name or single_enemy.state == DYING:
+			continue
 
-		# You are a child.
+		i += 1
+		if i == 1:
+			single_enemy.set_child_of_enemy(false)
+			new_head = single_enemy
+		else:
+			single_enemy.set_child_number(i - 1)
+			single_enemy.set_parent_node(new_head)
 
-		# If we didn't count anything - we must have been the last piece.
-	else:
-		# I am the parent.
-		var i = 0
+	# No survivors counted means that was the last segment of the snake.
+	if !i:
+		return true
 
-		for single_enemy in get_tree().get_nodes_in_group("groupedEnemy-" + str(enemy_group_id)):
-			if single_enemy.name == name:
-				continue
-
-				# Congratulations.  You are the new parent.
-
-				# You are a child.
-			if single_enemy.state == DYING:
-				continue
-
-				# Congratulations.  You are the new parent.
-
-				# You are a child.
-			i += 1
-			if i == 1:
-				# Congratulations.  You are the new parent.
-				single_enemy.set_child_of_enemy(false)
-				remember_the_parent = single_enemy
-
-				# You are a child.
-			else:
-				# You are a child.
-				single_enemy.set_child_number(i - 1)
-				single_enemy.set_parent_node(remember_the_parent)
-
-			# If we didn't count anything - we must have been the last piece.
-		if !i:
-			# If we didn't count anything - we must have been the last piece.
-			return true
 	return false
 
 
 func leave_behind_item():
-	var percentage_calc = (get_parent().get_node("Player").upgrades["LOOT LOVER"][0] * 10.0) / 100.0
+	var percentage_calc = (player.upgrades["LOOT LOVER"][0] * 10.0) / 100.0
 	var leave_percentage = (
 		constants.ENEMY_LEAVE_BEHIND_ITEM_PERCENTAGE
 		+ (percentage_calc * constants.ENEMY_LEAVE_BEHIND_ITEM_PERCENTAGE)
@@ -727,13 +720,13 @@ func swim_escape():
 	$ScaredParticles.set_emitting(false)
 
 	# What's our best route out of here?
-	astar_pathing_grid = get_parent().get_node("Arena").get_astar_route_from_positions(
-		global_position, get_parent().get_node("Arena").get_node("ExitDoor").global_position
+	astar_pathing_grid = arena.get_astar_route_from_positions(
+		global_position, arena.get_node("ExitDoor").global_position
 	)
 
 	var target_direction = (
 		(
-			get_parent().get_node("Arena").get_position_from_tilemap(astar_pathing_grid[0])
+			arena.get_position_from_tilemap(astar_pathing_grid[0])
 			- global_position
 		)
 		. normalized()

@@ -53,10 +53,46 @@ const PLAYER_SPEED_ESCAPING = 1200
 const PLAYER_FIRE_DELAY = 0.15
 const PLAYER_FIRE_DELAY_POWERUP_DECREASE = 0.01
 const PLAYER_FIRE_SPEED = 1600
+const PLAYER_FIRE_SIZE_BASE = 0.5
 const PLAYER_FIRE_SIZE_POWERUP_INCREASE = 0.25
 
 const PLAYER_GRENADE_DELAY = 0.6
 const PLAYER_GRENADE_DELAY_POWERUP_DECREASE = 0.1
+
+# Powerups whose effect is a scalar stat recomputed from level:
+#   stat = base + (direction * step * level)
+# Powerups with non-scalar effects (SCATTER SPRAY, MINI SHARK) are handled
+# explicitly in Player.gd and deliberately omitted here.
+const POWERUP_STAT_FORMULAS = {
+	"SPEED UP":
+	{
+		"property": "speed",
+		"base": PLAYER_SPEED,
+		"step": PLAYER_SPEED_POWERUP_INCREASE,
+		"direction": 1
+	},
+	"FAST SPRAY":
+	{
+		"property": "fire_delay",
+		"base": PLAYER_FIRE_DELAY,
+		"step": PLAYER_FIRE_DELAY_POWERUP_DECREASE,
+		"direction": -1
+	},
+	"BIG SPRAY":
+	{
+		"property": "spray_size",
+		"base": PLAYER_FIRE_SIZE_BASE,
+		"step": PLAYER_FIRE_SIZE_POWERUP_INCREASE,
+		"direction": 1
+	},
+	"GRENADE":
+	{
+		"property": "grenade_delay",
+		"base": PLAYER_GRENADE_DELAY,
+		"step": PLAYER_GRENADE_DELAY_POWERUP_DECREASE,
+		"direction": -1
+	}
+}
 
 const PLAYER_HIT_BY_ENEMY_DAMAGE = 10
 

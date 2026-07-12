@@ -51,6 +51,9 @@ var swim_surge_available: bool = true
 var swim_surge_activate: bool = false
 var tween_surge: Tween
 
+@onready var arena = get_parent().get_node("Arena")
+@onready var hud = get_parent().get_node("HUD")
+
 
 func _ready():
 	shark_status = ALIVE
@@ -99,8 +102,9 @@ func do_ready():
 func prepare_for_new_game():
 	speed = constants.PLAYER_SPEED
 	fire_delay = constants.PLAYER_FIRE_DELAY
-	spray_size = 0.5
-	
+	spray_size = constants.PLAYER_FIRE_SIZE_BASE
+	grenade_delay = constants.PLAYER_GRENADE_DELAY
+
 	if constants.DEV_FISH_FRENZY_AVAILABLE_IMMEDIATELY:
 		fish_frenzy_enabled = true
 	else:
@@ -123,10 +127,10 @@ func prepare_for_new_game():
 	if constants.DEV_CHEAT_DEATH_AVAILABLE_IMMEDIATELY:
 		upgrades['CHEAT DEATH'][0] = 1
 
-	get_parent().get_node("HUD").reset_powerup_bar()
-	get_parent().get_node("HUD").reset_powerup_bar_text()
-	get_parent().get_node("HUD").set_all_powerup_levels()
-	get_parent().get_node("HUD").update_upgrade_summary()
+	hud.reset_powerup_bar()
+	hud.reset_powerup_bar_text()
+	hud.set_all_powerup_levels()
+	hud.update_upgrade_summary()
 
 
 	despawn_mini_sharks()
@@ -383,57 +387,27 @@ func _physics_process(_delta):
 							):
 								current_powerup_levels[powerup_selected] = max_powerup_levels[powerup_selected]
 
-							match powerup_selected:
-								"SPEED UP":
-									speed = (
-										constants.PLAYER_SPEED
-										+ (
-											constants.PLAYER_SPEED_POWERUP_INCREASE
-											* current_powerup_levels[powerup_selected]
-										)
-									)
-								"FAST SPRAY":
-									fire_delay = (
-										constants.PLAYER_FIRE_DELAY
-										- (
-											constants.PLAYER_FIRE_DELAY_POWERUP_DECREASE
-											* current_powerup_levels[powerup_selected]
-										)
-									)
-								"BIG SPRAY":
-									spray_size = (
-										0.5
-										+ (
-											constants.PLAYER_FIRE_SIZE_POWERUP_INCREASE
-											* current_powerup_levels[powerup_selected]
-										)
-									)
-								"SCATTER SPRAY":
-									pass
-								"GRENADE":
-									grenade_delay = (
-										constants.PLAYER_GRENADE_DELAY
-										- (
-											constants.PLAYER_GRENADE_DELAY_POWERUP_DECREASE
-											* current_powerup_levels[powerup_selected]
-										)
-									)
-								"MINI SHARK":
-									if (
-										get_tree().get_nodes_in_group("miniSharkGroup").size()
-										< max_powerup_levels[powerup_selected]
-									):
-										var new_mini_shark = MiniSharkScene.instantiate()
-										add_child(new_mini_shark)
-										new_mini_shark.add_to_group("miniSharkGroup")
+							# Scalar-stat powerups (SPEED UP / FAST SPRAY / BIG SPRAY /
+							# GRENADE) recompute from level via the formula table.
+							apply_powerup_level(powerup_selected)
 
-										# Reset circular position of the mini sharks when we spawn a new one, to ensure
-										# everything stays evenly spaced.
-										recalculate_mini_shark_spacing()
+							# MINI SHARK is not a scalar stat: it spawns a shark.
+							if powerup_selected == "MINI SHARK":
+								if (
+									get_tree().get_nodes_in_group("miniSharkGroup").size()
+									< max_powerup_levels[powerup_selected]
+								):
+									var new_mini_shark = MiniSharkScene.instantiate()
+									add_child(new_mini_shark)
+									new_mini_shark.add_to_group("miniSharkGroup")
+
+									# Reset circular position of the mini sharks when we spawn a new one, to ensure
+									# everything stays evenly spaced.
+									recalculate_mini_shark_spacing()
 
 							powerup_label_animation(powerup_selected + "!")
-							get_parent().get_node("HUD").activate_powerup(powerup_selected)
-							get_parent().get_node("HUD").set_powerup_level(
+							hud.activate_powerup(powerup_selected)
+							hud.set_powerup_level(
 								powerup_selected, current_powerup_levels[powerup_selected]
 							)
 							$AudioStreamPowerUp.play()
@@ -506,7 +480,7 @@ func _physics_process(_delta):
 				# Can the player cheat death?
 				if upgrades["CHEAT DEATH"][0]:
 					upgrades["CHEAT DEATH"][0] = 0
-					get_parent().get_node("HUD").update_upgrade_summary()
+					hud.update_upgrade_summary()
 
 					player_energy = 0.75 * constants.PLAYER_START_GAME_ENERGY
 					$EnergyProgressBar.value = player_energy
@@ -552,7 +526,7 @@ func _physics_process(_delta):
 				position = get_parent().get_node("Key").global_position
 
 			# Have we reached the next node on the astar pathing grid?
-			var tilemap_coords = get_parent().get_node("Arena").get_tilemap_coords(global_position)
+			var tilemap_coords = arena.get_tilemap_coords(global_position)
 
 			if astar_pathing_grid.size():
 				if tilemap_coords == astar_pathing_grid[0]:
@@ -561,7 +535,7 @@ func _physics_process(_delta):
 					if astar_pathing_grid.size():
 						var target_direction = (
 							(
-								get_parent().get_node("Arena").get_position_from_tilemap(
+								arena.get_position_from_tilemap(
 									astar_pathing_grid[0]
 								)
 								- global_position
@@ -575,11 +549,11 @@ func _physics_process(_delta):
 
 				if collision.get_collider().name == "Key":
 					shark_status = HUNTING_EXIT
-					get_parent().get_node("Arena").get_node("ExitDoor").get_node("CollisionShape2D").disabled = false
+					arena.get_node("ExitDoor").get_node("CollisionShape2D").disabled = false
 					player_got_key.emit()
 
 					var exit_door_global = (
-						get_parent().get_node("Arena").get_node("ExitDoor").global_position
+						arena.get_node("ExitDoor").global_position
 					)
 					astar_pathing_grid = (
 						get_parent()
@@ -590,7 +564,7 @@ func _physics_process(_delta):
 					# Start heading towards the first one.
 					var target_direction = (
 						(
-							get_parent().get_node("Arena").get_position_from_tilemap(
+							arena.get_position_from_tilemap(
 								astar_pathing_grid[0]
 							)
 							- global_position
@@ -602,7 +576,7 @@ func _physics_process(_delta):
 					$HuntingDoorTimer.start()
 		HUNTING_EXIT:
 			# Have we reached the next node on the astar pathing grid?
-			var tilemap_coords = get_parent().get_node("Arena").get_tilemap_coords(global_position)
+			var tilemap_coords = arena.get_tilemap_coords(global_position)
 
 			if tilemap_coords == astar_pathing_grid[0]:
 				astar_pathing_grid.pop_front()
@@ -610,7 +584,7 @@ func _physics_process(_delta):
 				if astar_pathing_grid.size():
 					var target_direction = (
 						(
-							get_parent().get_node("Arena").get_position_from_tilemap(
+							arena.get_position_from_tilemap(
 								astar_pathing_grid[0]
 							)
 							- global_position
@@ -637,8 +611,8 @@ func _physics_process(_delta):
 					velocity = Vector2i(0, 0)
 
 					# Open door.
-					get_parent().get_node("Arena").open_top_door()
-					get_parent().get_node("Arena").get_node("ExitDoor").get_node("CollisionShape2D").disabled = true
+					arena.open_top_door()
+					arena.get_node("ExitDoor").get_node("CollisionShape2D").disabled = true
 
 					player_found_exit_stop_key_movement.emit()
 					shark_status = GOING_THROUGH_DOOR
@@ -652,7 +626,7 @@ func _physics_process(_delta):
 			if $DoorOpenTimer.time_left == 0:
 				var target_direction = (
 					(
-						get_parent().get_node("Arena").get_node("ExitLocation").global_position
+						arena.get_node("ExitLocation").global_position
 						- global_position
 					)
 					. normalized()
@@ -669,13 +643,13 @@ func _physics_process(_delta):
 		MOVING_TO_START_POSITION:
 			if $DoorCloseTimer.time_left == 0:
 				# Close bottom door.
-				get_parent().get_node("Arena").close_bottom_door()
+				arena.close_bottom_door()
 			for i in get_slide_collision_count():
 				var collision = get_slide_collision(i)
 
 				if collision.get_collider().name == "PlayerStartLocation":
 					shark_status = ALIVE
-					get_parent().get_node("Arena").get_node("PlayerStartLocation").get_node("CollisionShape2D").disabled = true
+					arena.get_node("PlayerStartLocation").get_node("CollisionShape2D").disabled = true
 
 
 func player_hit():
@@ -688,7 +662,7 @@ func player_hit():
 
 		get_parent().reset_score_multiplier()
 
-		get_parent().get_node("HUD").flash_screen_red()
+		hud.flash_screen_red()
 
 		if Storage.config.get_value("config", "enable_haptics", false):
 			Input.start_joy_vibration(0, 0.5, 0.5, 0.05)
@@ -735,13 +709,13 @@ func _on_main_player_hunt_key(passed_key_global_position):
 	shark_status = HUNTING_KEY
 	key_global_position = passed_key_global_position
 
-	astar_pathing_grid = get_parent().get_node("Arena").get_astar_route_from_positions(
+	astar_pathing_grid = arena.get_astar_route_from_positions(
 		global_position, key_global_position
 	)
 
 	var target_direction = (
 		(
-			get_parent().get_node("Arena").get_position_from_tilemap(astar_pathing_grid[0])
+			arena.get_position_from_tilemap(astar_pathing_grid[0])
 			- global_position
 		)
 		. normalized()
@@ -759,7 +733,7 @@ func _on_main_player_move_to_starting_position():
 	set_physics_process(true)
 	visible = true
 
-	get_parent().get_node("Arena").get_node("PlayerStartLocation").get_node("CollisionShape2D").disabled = false
+	arena.get_node("PlayerStartLocation").get_node("CollisionShape2D").disabled = false
 
 	var target_direction = (initial_player_position - global_position).normalized()
 	velocity = target_direction * constants.PLAYER_SPEED
@@ -915,7 +889,7 @@ func stop_fish_frenzy():
 func power_up_tick():
 	for powerup in max_powerup_levels:
 		if current_powerup_levels[powerup] >= 1:
-			var single_powerup = get_parent().get_node("HUD/CanvasLayer/PowerUpContainer").get_node(
+			var single_powerup = hud.get_node("CanvasLayer/PowerUpContainer").get_node(
 				powerup
 			)
 			var value = single_powerup.get_node("Label/ProgressBar").value
@@ -926,56 +900,41 @@ func power_up_tick():
 				if value <= 0:
 					decrease_powerup_level(powerup)
 
-					match powerup:
-						"SPEED UP":
-							speed = (
-								constants.PLAYER_SPEED
-								+ (
-									constants.PLAYER_SPEED_POWERUP_INCREASE
-									* current_powerup_levels[powerup]
-								)
-							)
-						"FAST SPRAY":
-							fire_delay = (
-								constants.PLAYER_FIRE_DELAY
-								- (
-									constants.PLAYER_FIRE_DELAY_POWERUP_DECREASE
-									* current_powerup_levels[powerup]
-								)
-							)
-						"BIG SPRAY":
-							spray_size = (
-								0.5
-								+ (
-									constants.PLAYER_FIRE_SIZE_POWERUP_INCREASE
-									* current_powerup_levels[powerup]
-								)
-							)
-						"GRENADE":
-							grenade_delay = (
-								constants.PLAYER_GRENADE_DELAY
-								- (
-									constants.PLAYER_GRENADE_DELAY_POWERUP_DECREASE
-									* current_powerup_levels[powerup]
-								)
-							)
-						"MINI SHARK":
-							for single_shark in get_tree().get_nodes_in_group("miniSharkGroup"):
-								single_shark.queue_free()
-								break
+					# Scalar-stat powerups recompute from the (now decreased) level.
+					apply_powerup_level(powerup)
 
-							recalculate_mini_shark_spacing()
+					# MINI SHARK is not a scalar stat: it despawns a shark.
+					if powerup == "MINI SHARK":
+						for single_shark in get_tree().get_nodes_in_group("miniSharkGroup"):
+							single_shark.queue_free()
+							break
+
+						recalculate_mini_shark_spacing()
+
+
+# Recompute a powerup's scalar stat from its current level, driven by the
+# formula table in Constants. No-op for powerups without a scalar stat
+# (SCATTER SPRAY, MINI SHARK), which are handled explicitly at each call site.
+func apply_powerup_level(powerup):
+	var formula = constants.POWERUP_STAT_FORMULAS.get(powerup)
+	if formula == null:
+		return
+
+	set(
+		formula.property,
+		formula.base + (formula.direction * formula.step * current_powerup_levels[powerup])
+	)
 
 
 func decrease_powerup_level(powerup):
 	current_powerup_levels[powerup] = current_powerup_levels[powerup] - 1
 	if current_powerup_levels[powerup] <= 0:
 		current_powerup_levels[powerup] = 0
-		get_parent().get_node("HUD").deactivate_powerup(powerup)
+		hud.deactivate_powerup(powerup)
 	else:
-		get_parent().get_node("HUD").activate_powerup(powerup)
+		hud.activate_powerup(powerup)
 
-	get_parent().get_node("HUD").set_powerup_level(powerup, current_powerup_levels[powerup])
+	hud.set_powerup_level(powerup, current_powerup_levels[powerup])
 
 
 func _on_hud_upgrade_button_pressed(button_number):
@@ -1014,7 +973,7 @@ func _on_hud_upgrade_button_pressed(button_number):
 			)
 			$FishProgressBar.max_value = fish_needed
 		"MORE POWER":
-			get_parent().get_node("HUD").reset_powerup_bar_durations()
+			hud.reset_powerup_bar_durations()
 		"HEAL ME":
 			var original_energy = player_energy
 			player_energy = constants.PLAYER_START_GAME_ENERGY
@@ -1026,7 +985,7 @@ func _on_hud_upgrade_button_pressed(button_number):
 			):
 				player_no_longer_low_energy.emit()
 
-	get_parent().get_node("HUD").update_upgrade_summary()
+	hud.update_upgrade_summary()
 
 	# Go to next wave.
 	player_made_upgrade_choice.emit()

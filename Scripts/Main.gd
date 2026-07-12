@@ -377,7 +377,7 @@ func start_wave():
 		spawn_fish()
 		i = i + 1
 
-	if game_mode == "PACIFST":
+	if game_mode == "PACIFIST":
 		update_fish_left_display()
 
 	# Artillery
@@ -1260,12 +1260,13 @@ func _on_wave_time_left_timer_timeout():
 		update_time_left_display()
 
 		# Have a random enemy drop the key in fear.
-		var random_enemy_idx = randi_range(
-			0, get_tree().get_nodes_in_group("enemyGroup").size() - 1
-		)
-		$Key.global_position = (
-			get_tree().get_nodes_in_group("enemyGroup")[random_enemy_idx].global_position
-		)
+		# If there are no enemies left, drop it on the player instead.
+		var enemies = get_tree().get_nodes_in_group("enemyGroup")
+		if enemies.size():
+			var random_enemy_idx = randi_range(0, enemies.size() - 1)
+			$Key.global_position = enemies[random_enemy_idx].global_position
+		else:
+			$Key.global_position = $Player.global_position
 		$Key.show()
 		$Key/CollisionShape2D.disabled = false
 		$Key/AnimatedSprite2D.play()
