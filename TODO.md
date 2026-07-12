@@ -44,6 +44,12 @@
   - Faster move speed
   - Unlocks with X total collected fish (currency)
 
+### Local co-op (two players)
+
+- Full architecture and phased implementation plan: [docs/COOP_PLAN.md](docs/COOP_PLAN.md)
+- Design locked: shared zoom-to-fit camera, shared lives / co-op game over, 1–2 players.
+- Large multi-phase effort. Profile A* pathfinding before Phase 1 and optimise only if warranted (co-op adds pathfinding pressure but the optimisation is not a hard blocker — see the plan).
+
 ### Statistics
 
 - Ability for the user to reset
