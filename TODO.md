@@ -145,8 +145,11 @@ references are approximate and may drift as the code changes.
 - [ ] **Infinite `while !valid_spawn` loops** for placement (`Main.gd` spawn
   helpers, `Arena.gd` `add_obstacle`). If the arena fills with obstacles these
   never terminate. Add a max-attempts fallback.
-- [ ] **`Arena.gd` extends `TileMap`**, deprecated since Godot 4.3 in favour of
-  `TileMapLayer`. Works on 4.7 but is migration debt.
+- [x] **`Arena.gd` extends `TileMap`**, deprecated since Godot 4.3 in favour of
+  `TileMapLayer`. Migrated: scene root is now a `Node2D` with `Base`/`Walls`/
+  `Items` `TileMapLayer` children; runtime tile edits and coordinate lookups go
+  through the `Items` layer. **Needs an in-editor play-test** (obstacles render,
+  doors open/close, enemy A* + player key/exit hunt path correctly).
 
 ## Refactoring / Maintainability
 

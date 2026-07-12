@@ -217,7 +217,7 @@ func get_input():
 					var line_end_position = $RayCast2D.get_collider().position
 
 					# Tilemaps default to (0,0) hit location unless we do something special...
-					if $RayCast2D.get_collider().name == "Arena":
+					if $RayCast2D.get_collider() is TileMapLayer:
 						line_end_position = $RayCast2D.get_collision_point()
 
 					# Remove existing target.
@@ -318,7 +318,7 @@ func _physics_process(_delta):
 				var collision = get_slide_collision(i)
 				var collided_with = collision.get_collider()
 
-				if collision.get_collider().name == "Arena":
+				if collision.get_collider() is TileMapLayer:
 					break
 
 				if collision.get_collider().is_in_group("fishGroup"):

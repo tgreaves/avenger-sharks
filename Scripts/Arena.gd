@@ -1,7 +1,10 @@
-extends TileMap
+extends Node2D
 
 var obstacle_dict: Dictionary
 var astar: AStarGrid2D
+
+# Obstacles and doors are drawn on the "Items" TileMapLayer at runtime.
+@onready var items_layer: TileMapLayer = $Items
 
 
 # Called when the node enters the scene tree for the first time.
@@ -11,27 +14,27 @@ func _ready():
 
 # Top / Bottom door functions.
 func open_top_door():
-	set_cell(2, Vector2(31, 2), -1, Vector2i(9, 7))
+	items_layer.set_cell(Vector2(31, 2), -1, Vector2i(9, 7))
 
-	set_cell(2, Vector2(32, 2), -1, Vector2i(9, 7))
+	items_layer.set_cell(Vector2(32, 2), -1, Vector2i(9, 7))
 
 
 func close_top_door():
-	set_cell(2, Vector2(31, 2), 0, Vector2i(6, 6))
+	items_layer.set_cell(Vector2(31, 2), 0, Vector2i(6, 6))
 
-	set_cell(2, Vector2(32, 2), 0, Vector2i(7, 6))
+	items_layer.set_cell(Vector2(32, 2), 0, Vector2i(7, 6))
 
 
 func open_bottom_door():
-	set_cell(2, Vector2(31, 33), -1, Vector2i(6, 6))
+	items_layer.set_cell(Vector2(31, 33), -1, Vector2i(6, 6))
 
-	set_cell(2, Vector2(32, 33), -1, Vector2i(7, 6))
+	items_layer.set_cell(Vector2(32, 33), -1, Vector2i(7, 6))
 
 
 func close_bottom_door():
-	set_cell(2, Vector2(31, 33), 0, Vector2i(6, 6))
+	items_layer.set_cell(Vector2(31, 33), 0, Vector2i(6, 6))
 
-	set_cell(2, Vector2(32, 33), 0, Vector2i(7, 6))
+	items_layer.set_cell(Vector2(32, 33), 0, Vector2i(7, 6))
 
 
 func add_obstacle():
@@ -58,24 +61,23 @@ func add_obstacle():
 			valid_placement = true
 
 	# Top left edge
-	set_cell(2, Vector2(obstacle_start_x, obstacle_start_y), 1, Vector2i(0, 10))
+	items_layer.set_cell(Vector2(obstacle_start_x, obstacle_start_y), 1, Vector2i(0, 10))
 	astar.set_point_solid(Vector2(obstacle_start_x, obstacle_start_y), true)
 
 	for i in range(1, obstacle_size_x - 1):
-		set_cell(2, Vector2(obstacle_start_x + i, obstacle_start_y), 1, Vector2i(1, 10))
+		items_layer.set_cell(Vector2(obstacle_start_x + i, obstacle_start_y), 1, Vector2i(1, 10))
 		astar.set_point_solid(Vector2(obstacle_start_x + i, obstacle_start_y), true)
 
 	# Top right edge
-	set_cell(
-		2, Vector2(obstacle_start_x + (obstacle_size_x - 1), obstacle_start_y), 1, Vector2i(3, 10)
+	items_layer.set_cell(
+		Vector2(obstacle_start_x + (obstacle_size_x - 1), obstacle_start_y), 1, Vector2i(3, 10)
 	)
 	astar.set_point_solid(Vector2(obstacle_start_x + (obstacle_size_x - 1), obstacle_start_y), true)
 
 	# Vertical edges
 	for i in range(1, obstacle_size_y - 1):
-		set_cell(2, Vector2(obstacle_start_x, obstacle_start_y + i), 1, Vector2i(2, 11))
-		set_cell(
-			2,
+		items_layer.set_cell(Vector2(obstacle_start_x, obstacle_start_y + i), 1, Vector2i(2, 11))
+		items_layer.set_cell(
 			Vector2(obstacle_start_x + (obstacle_size_x - 1), obstacle_start_y + i),
 			1,
 			Vector2i(2, 11)
@@ -86,14 +88,13 @@ func add_obstacle():
 		)
 
 	# Bottom left edge
-	set_cell(
-		2, Vector2(obstacle_start_x, obstacle_start_y + (obstacle_size_y - 1)), 1, Vector2i(1, 12)
+	items_layer.set_cell(
+		Vector2(obstacle_start_x, obstacle_start_y + (obstacle_size_y - 1)), 1, Vector2i(1, 12)
 	)
 	astar.set_point_solid(Vector2(obstacle_start_x, obstacle_start_y + (obstacle_size_y - 1)), true)
 
 	for i in range(1, obstacle_size_x - 1):
-		set_cell(
-			2,
+		items_layer.set_cell(
 			Vector2(obstacle_start_x + i, obstacle_start_y + (obstacle_size_y - 1)),
 			1,
 			Vector2i(1, 10)
@@ -103,8 +104,7 @@ func add_obstacle():
 		)
 
 	# Bottom right edge
-	set_cell(
-		2,
+	items_layer.set_cell(
 		Vector2(obstacle_start_x + (obstacle_size_x - 1), obstacle_start_y + (obstacle_size_y - 1)),
 		1,
 		Vector2(3, 12)
@@ -122,7 +122,7 @@ func add_obstacle():
 
 func reset_arena_floor():
 	for tile in obstacle_dict:
-		set_cell(2, tile, -1)
+		items_layer.set_cell(tile, -1)
 
 	reset_obstacle_dictionary()
 	reset_astar_grid()
@@ -159,7 +159,7 @@ func overlapping_obstacle(obstacle_pos, obstacle_size):
 
 
 func conflict_with_obstacle(coords):
-	var map_coords = local_to_map(to_local(coords))
+	var map_coords = items_layer.local_to_map(items_layer.to_local(coords))
 
 	if obstacle_dict.get(Vector2i(map_coords.x, map_coords.y)):
 		return true
@@ -168,11 +168,11 @@ func conflict_with_obstacle(coords):
 
 
 func get_tilemap_coords(coords):
-	return local_to_map(to_local(coords))
+	return items_layer.local_to_map(items_layer.to_local(coords))
 
 
 func get_position_from_tilemap(coords):
-	return to_global(map_to_local(coords))
+	return items_layer.to_global(items_layer.map_to_local(coords))
 
 
 func get_astar_route_from_positions(source, target):

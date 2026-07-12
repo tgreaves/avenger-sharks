@@ -8,6 +8,8 @@
 * Bug fixes:
 	* PACIFIST mode: fish counter failed to update at wave start due to a misspelt game mode check.
 	* GRENADE fire rate no longer carries over from a previous game; grenade delay is now reset at the start of each new game.
+* Misc:
+	* [INTERNAL] Arena migrated from the deprecated TileMap node to TileMapLayer nodes.
 
 # 1.3.0 (2024-10-15)
 
