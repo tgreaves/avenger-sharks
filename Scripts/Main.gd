@@ -213,6 +213,26 @@ func sync_player_instances():
 	elif player_count == 1 and player_two != null:
 		despawn_player_two()
 
+	assign_player_devices()
+
+
+# Assign each player's input source and haptics device based on player_count.
+#   1-player: player 1 uses ANY (keyboard/mouse AND controller both drive it).
+#   2-player: player 1 = keyboard/mouse, player 2 = gamepad 0.
+func assign_player_devices():
+	var player_one = get_primary_player()
+
+	if player_count == 2:
+		player_one.input = PlayerInput.new(PlayerInput.Mode.SPECIFIC, PlayerInput.KEYBOARD_DEVICE)
+		player_one.haptics_device = 0  # No rumble on keyboard; harmless.
+
+		if player_two != null:
+			player_two.input = PlayerInput.new(PlayerInput.Mode.SPECIFIC, 0)  # Gamepad 0.
+			player_two.haptics_device = 0
+	else:
+		player_one.input = PlayerInput.new(PlayerInput.Mode.ANY)
+		player_one.haptics_device = 0
+
 
 func despawn_player_two():
 	if player_two != null:
