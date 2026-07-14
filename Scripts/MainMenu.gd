@@ -5,6 +5,7 @@ signal exit_game_pressed
 signal credits_pressed
 signal cheats_pressed
 signal game_mode_pressed
+signal player_count_pressed
 signal statistics_pressed
 signal options_pressed
 signal how_to_play_pressed
@@ -51,6 +52,9 @@ func _on_credits_pressed():
 
 func _on_game_mode_pressed():
 	game_mode_pressed.emit()
+
+func _on_player_count_pressed():
+	player_count_pressed.emit()
 
 func _on_statistics_pressed():
 	statistics_pressed.emit()

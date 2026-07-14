@@ -43,6 +43,7 @@ enum {
 @export var fish_collected = 0
 @export var fish_left_this_wave = 0
 @export var game_mode = "ARCADE"
+@export var player_count = 1
 @export var dropped_items_on_screen = 0
 @export var grouped_enemy_id = 0
 @export var SteamEngine = null
@@ -211,6 +212,8 @@ func main_menu():
 	$HUD/CanvasLayer/HighScore.visible = true
 	$MainMenu.set_process_input(true)
 	$MainMenu.do_ready()
+
+	update_player_count_label()
 
 	var tween = get_tree().create_tween()
 	tween.tween_property(self, "modulate", Color(1, 1, 1, 1), 0.5)
@@ -1201,6 +1204,21 @@ func _on_main_menu_game_mode_pressed():
 		game_mode = "ARCADE"
 
 	$MainMenu/CanvasLayer/MainMenuContainer/GameMode.text = "MODE: " + str(game_mode)
+
+
+func _on_main_menu_player_count_pressed():
+	if player_count == 1:
+		player_count = 2
+	else:
+		player_count = 1
+
+	update_player_count_label()
+
+
+func update_player_count_label():
+	$MainMenu/CanvasLayer/MainMenuContainer/PlayerCount.text = (
+		"PLAYERS: " + str(player_count)
+	)
 
 
 func _on_main_menu_statistics_pressed():

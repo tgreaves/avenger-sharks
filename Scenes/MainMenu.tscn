@@ -97,10 +97,19 @@ text = "START GAME
 layout_mode = 2
 size_flags_vertical = 6
 focus_neighbor_top = NodePath("../StartGame")
-focus_neighbor_bottom = NodePath("../Statistics")
+focus_neighbor_bottom = NodePath("../PlayerCount")
 theme_override_fonts/font = ExtResource("1_jvmua")
 theme_override_font_sizes/font_size = 64
 text = "MODE: ARCADE"
+
+[node name="PlayerCount" type="Button" parent="CanvasLayer/MainMenuContainer"]
+layout_mode = 2
+size_flags_vertical = 6
+focus_neighbor_top = NodePath("../GameMode")
+focus_neighbor_bottom = NodePath("../Statistics")
+theme_override_fonts/font = ExtResource("1_jvmua")
+theme_override_font_sizes/font_size = 64
+text = "PLAYERS: 1"
 
 [node name="BlankLabel2" type="Label" parent="CanvasLayer/MainMenuContainer"]
 layout_mode = 2
@@ -112,7 +121,7 @@ theme_override_font_sizes/font_size = 64
 [node name="Statistics" type="Button" parent="CanvasLayer/MainMenuContainer"]
 layout_mode = 2
 size_flags_vertical = 6
-focus_neighbor_top = NodePath("../GameMode")
+focus_neighbor_top = NodePath("../PlayerCount")
 focus_neighbor_bottom = NodePath("../Options")
 theme_override_fonts/font = ExtResource("1_jvmua")
 theme_override_font_sizes/font_size = 64
@@ -173,6 +182,7 @@ text = "EXIT"
 
 [connection signal="pressed" from="CanvasLayer/MainMenuContainer/StartGame" to="." method="_on_start_game_pressed"]
 [connection signal="pressed" from="CanvasLayer/MainMenuContainer/GameMode" to="." method="_on_game_mode_pressed"]
+[connection signal="pressed" from="CanvasLayer/MainMenuContainer/PlayerCount" to="." method="_on_player_count_pressed"]
 [connection signal="pressed" from="CanvasLayer/MainMenuContainer/Statistics" to="." method="_on_statistics_pressed"]
 [connection signal="pressed" from="CanvasLayer/MainMenuContainer/Options" to="." method="_on_options_pressed"]
 [connection signal="pressed" from="CanvasLayer/MainMenuContainer/Credits" to="." method="_on_credits_pressed"]
