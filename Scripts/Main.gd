@@ -229,6 +229,8 @@ func assign_player_devices():
 		if player_two != null:
 			player_two.input = PlayerInput.new(PlayerInput.Mode.SPECIFIC, 0)  # Gamepad 0.
 			player_two.haptics_device = 0
+			player_two.player_tint = constants.PLAYER_2_TINT
+			player_two.apply_tint()
 	else:
 		player_one.input = PlayerInput.new(PlayerInput.Mode.ANY)
 		player_one.haptics_device = 0

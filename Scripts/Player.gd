@@ -60,6 +60,10 @@ var haptics_device := 0
 # Which arena start marker this player swims to at wave start (player 2 uses a
 # second marker so both sharks swim in together).
 var start_marker_name := "PlayerStartLocation"
+# Persistent identity tint (player 2 is tinted so the two sharks are distinct).
+# Applied via the sprites' self_modulate, which multiplies with the transient
+# modulate effects (power-pellet red, damage flash) rather than clobbering them.
+var player_tint := constants.PLAYER_1_TINT
 
 @onready var arena = get_parent().get_node("Arena")
 @onready var hud = get_parent().get_node("HUD")
@@ -72,6 +76,8 @@ func _ready():
 	# node being named "Player" (which cannot be unique once there are two).
 	if !is_in_group("players"):
 		add_to_group("players")
+
+	apply_tint()
 
 	if initial_player_position:
 		global_position = initial_player_position
@@ -863,6 +869,15 @@ func scatter_spray_handler(target_direction):
 func _on_main_player_enable_fish_frenzy():
 	powerup_label_animation("FRENZY READY!")
 	fish_frenzy_enabled = true
+
+
+# Apply this player's identity tint to the shark sprites via self_modulate,
+# which multiplies with the transient modulate effects (power-pellet, damage)
+# instead of clobbering them.
+func apply_tint():
+	$AnimatedSprite2D.self_modulate = player_tint
+	$AnimatedSprite2DDamaged.self_modulate = player_tint
+	$AnimatedSprite2DSurgeReady.self_modulate = player_tint
 
 
 # Screen shake is owned by the shared co-op camera, so it is felt across both

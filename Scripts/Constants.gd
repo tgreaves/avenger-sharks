@@ -32,6 +32,15 @@ const CAMERA_PLAYER_MARGIN = 700.0          # World-units of padding around play
 const CAMERA_POSITION_LERP = 5.0            # Higher = snappier follow.
 const CAMERA_ZOOM_LERP = 4.0                # Higher = snappier zoom.
 
+# Player identity tints (applied via the shark sprites' self_modulate, so they
+# compose with the transient modulate effects for power-pellet / damage).
+# Player 1 is untinted (natural colour); player 2 gets a distinct cast.
+const PLAYER_1_TINT = Color(1, 1, 1, 1)
+# Orange cast. Red pushed above 1.0 and green kept high for the orange hue, with
+# blue crushed. Amplifying (rather than capping red at 1.0 and darkening the
+# others, which goes muddy brown) keeps it a clean, bright orange.
+const PLAYER_2_TINT = Color(1.7, 0.85, 0.2, 1)
+
 # Game settings
 const PLAY_WAVE_END_MUSIC = false
 
