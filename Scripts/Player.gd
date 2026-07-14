@@ -51,6 +51,13 @@ var swim_surge_available: bool = true
 var swim_surge_activate: bool = false
 var tween_surge: Tween
 
+# Per-player input source. Defaults to ANY (1-player: keyboard + controller both
+# drive this player, as in single-player). Reassigned to a device-scoped
+# SPECIFIC instance when a second player is present.
+var input := PlayerInput.new(PlayerInput.Mode.ANY)
+# Haptics target device; set from the assigned controller for player 2.
+var haptics_device := 0
+
 @onready var arena = get_parent().get_node("Arena")
 @onready var hud = get_parent().get_node("HUD")
 
@@ -103,6 +110,12 @@ func _ready():
 
 func do_ready():
 	_ready()
+
+
+func _input(event):
+	# Feeds device-scoped input state in SPECIFIC (2-player) mode. No-op in ANY.
+	input.feed_event(event)
+
 
 func prepare_for_new_game():
 	speed = constants.PLAYER_SPEED
@@ -158,36 +171,27 @@ func get_input():
 	if shark_status != ALIVE:
 		return
 
-	var input_direction = Input.get_vector("left", "right", "up", "down")
+	var input_direction = input.get_move_vector()
 
 	if !swim_surge_activate:
 		velocity = input_direction * speed
 
 	if $FireRateTimer.time_left == 0 && get_parent().game_mode == "ARCADE":
-		# Mouse aiming
-		if Input.is_action_pressed("shark_fire_mouse"):
+		# Mouse aiming (only for the player that owns the mouse)
+		if input.uses_mouse() and input.is_pressed("shark_fire_mouse"):
 			var target_direction = (get_global_mouse_position() - global_position).normalized()
 			spawn_shark_spray(target_direction)
 			scatter_spray_handler(target_direction)
 			mini_shark_fire(target_direction)
 			grenade_fire(target_direction)
-			
+
 			Storage.increase_stat("player", "shots_fired", 1)
 			$AudioStreamPlayerSpray.play()
 			set_fire_rate_delay_timer()
 
 		# Controller (Twin stick)
-		var shoot_direction = Input.get_vector(
-			"shoot_left", "shoot_right", "shoot_up", "shoot_down"
-		)
+		var shoot_direction = input.get_aim_vector()
 		if shoot_direction:
-			var shoot_input = Vector2.ZERO
-			shoot_input.x = (
-				Input.get_action_strength("shoot_right") - Input.get_action_strength("shoot_left")
-			)
-			shoot_input.y = (
-				Input.get_action_strength("shoot_down") - Input.get_action_strength("shoot_up")
-			)
 			shoot_direction = shoot_direction.normalized()
 
 			spawn_shark_spray(shoot_direction)
@@ -201,18 +205,9 @@ func get_input():
 
 	# Aiming line support (Controller only)
 	if get_parent().game_mode == "ARCADE":
-		var shoot_direction = Input.get_vector(
-			"shoot_left", "shoot_right", "shoot_up", "shoot_down"
-		)
+		var shoot_direction = input.get_aim_vector()
 
 		if shoot_direction:
-			var shoot_input = Vector2.ZERO
-			shoot_input.x = (
-				Input.get_action_strength("shoot_right") - Input.get_action_strength("shoot_left")
-			)
-			shoot_input.y = (
-				Input.get_action_strength("shoot_down") - Input.get_action_strength("shoot_up")
-			)
 			shoot_direction = shoot_direction.normalized()
 
 			$RayCast2D.target_position = shoot_direction * 10000
@@ -234,7 +229,7 @@ func get_input():
 			# Remove targetting line when stick not being used.
 			remove_aiming_line()
 
-	if Input.is_action_pressed("fish_frenzy") && fish_frenzy_enabled == true:
+	if input.is_pressed("fish_frenzy") && fish_frenzy_enabled == true:
 		# If we are SWIM SURGING, stop that immediately so we don't fall off the map.
 		if swim_surge_activate:
 			_on_swim_surge_running_timer_timeout()
@@ -249,9 +244,9 @@ func get_input():
 		$FishFrenzyFireTimer.start(constants.PLAYER_FISH_FRENZY_FIRE_DELAY)
 
 		if Storage.config.get_value("config", "enable_haptics", false):
-			Input.start_joy_vibration(0, 0.25, 0.25, constants.PLAYER_FISH_FRENZY_DURATION)
+			Input.start_joy_vibration(haptics_device, 0.25, 0.25, constants.PLAYER_FISH_FRENZY_DURATION)
 
-	if shark_status == ALIVE and Input.is_action_just_pressed("secondary_ability"):
+	if shark_status == ALIVE and input.is_just_pressed("secondary_ability"):
 		# For now, this will trigger SWIM SURGE.
 
 		if swim_surge_available and input_direction:
@@ -670,7 +665,7 @@ func player_hit():
 		hud.flash_screen_red()
 
 		if Storage.config.get_value("config", "enable_haptics", false):
-			Input.start_joy_vibration(0, 0.5, 0.5, 0.05)
+			Input.start_joy_vibration(haptics_device, 0.5, 0.5, 0.05)
 
 		var damage_reduction_percentage = (
 			upgrades["ARMOUR"][0] * constants.ARMOUR_DAMAGE_REDUCTION_PERCENTAGE
