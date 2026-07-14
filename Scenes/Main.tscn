@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=3 uid="uid://bxw6akrvsd84v"]
+[gd_scene format=3 uid="uid://bxw6akrvsd84v"]
 
 [ext_resource type="Script" uid="uid://cj10txdbe3cd2" path="res://Scripts/Main.gd" id="1_yyejc"]
 [ext_resource type="PackedScene" uid="uid://dlyr1neald0e4" path="res://Scenes/Dedication.tscn" id="2_utmp5"]
@@ -25,7 +25,7 @@
 [ext_resource type="AudioStream" uid="uid://bvgi2r1adyvav" path="res://Sound/countdown-sound-effect-8-bit-151797.mp3" id="23_4lpjy"]
 [ext_resource type="AudioStream" uid="uid://csu46ibf7e8md" path="res://Sound/romantic-melody-of-the-80s-129224.mp3" id="23_pr0en"]
 
-[node name="Main" type="Node2D"]
+[node name="Main" type="Node2D" unique_id=1933226704]
 script = ExtResource("1_yyejc")
 dedication_scene = ExtResource("2_utmp5")
 intro_scene = ExtResource("2_vh1q3")
@@ -37,97 +37,97 @@ item_scene = ExtResource("7_vsrs7")
 statistics_scene = ExtResource("8_jsswd")
 artillery_scene = ExtResource("10_p4xnb")
 
-[node name="UnderwaterFar" type="TextureRect" parent="."]
+[node name="UnderwaterFar" type="TextureRect" parent="." unique_id=44414532]
 visible = false
 offset_right = 2562.0
 offset_bottom = 1433.0
 texture = ExtResource("9_uabo0")
 
-[node name="UnderwaterNear" type="TextureRect" parent="."]
+[node name="UnderwaterNear" type="TextureRect" parent="." unique_id=1465861210]
 visible = false
 z_index = 2
 offset_right = 2557.0
 offset_bottom = 1436.0
 texture = ExtResource("10_p7nrg")
 
-[node name="Arena" parent="." instance=ExtResource("11_cdl54")]
+[node name="Arena" parent="." unique_id=1150937874 instance=ExtResource("11_cdl54")]
 
-[node name="HUD" parent="." instance=ExtResource("12_ldcme")]
+[node name="HUD" parent="." unique_id=2075798377 instance=ExtResource("12_ldcme")]
 offset_left = 38.0
 offset_top = -14.0
 offset_right = 38.0
 offset_bottom = -14.0
 
-[node name="MainMenu" parent="." instance=ExtResource("13_u3xax")]
+[node name="MainMenu" parent="." unique_id=558755472 instance=ExtResource("13_u3xax")]
 offset_left = -1018.0
 offset_top = 93.0
 offset_right = -1018.0
 offset_bottom = 93.0
 
-[node name="PauseMenu" parent="." instance=ExtResource("14_fssl1")]
+[node name="PauseMenu" parent="." unique_id=1467719564 instance=ExtResource("14_fssl1")]
 process_mode = 3
 visible = false
 
-[node name="Credits" parent="." instance=ExtResource("6_epeem")]
+[node name="Credits" parent="." unique_id=44623908 instance=ExtResource("6_epeem")]
 visible = false
 
-[node name="Statistics" parent="." instance=ExtResource("8_jsswd")]
+[node name="Statistics" parent="." unique_id=1605056620 instance=ExtResource("8_jsswd")]
 visible = false
 
-[node name="Options" parent="." instance=ExtResource("15_ai8du")]
+[node name="Options" parent="." unique_id=689890490 instance=ExtResource("15_ai8du")]
 visible = false
 
-[node name="HowToPlay" parent="." instance=ExtResource("18_1nqwg")]
+[node name="HowToPlay" parent="." unique_id=1627210061 instance=ExtResource("18_1nqwg")]
 visible = false
 
-[node name="Player" parent="." instance=ExtResource("15_3wn6m")]
+[node name="Player" parent="." unique_id=2037117605 instance=ExtResource("15_3wn6m")]
 position = Vector2(2650, 714)
 
-[node name="Key" parent="." instance=ExtResource("16_0rume")]
+[node name="Key" parent="." unique_id=226785373 instance=ExtResource("16_0rume")]
 
-[node name="WaveIntroTimer" type="Timer" parent="."]
+[node name="WaveIntroTimer" type="Timer" parent="." unique_id=933876991]
 wait_time = 2.4
 one_shot = true
 
-[node name="WaveTimeLeftTimer" type="Timer" parent="."]
+[node name="WaveTimeLeftTimer" type="Timer" parent="." unique_id=1713528181]
 one_shot = true
 
-[node name="WaveEndTimer" type="Timer" parent="."]
+[node name="WaveEndTimer" type="Timer" parent="." unique_id=2096693343]
 wait_time = 0.4
 one_shot = true
 
-[node name="GameOverTimer" type="Timer" parent="."]
+[node name="GameOverTimer" type="Timer" parent="." unique_id=220130287]
 wait_time = 3.0
 one_shot = true
 
-[node name="ItemSpawnTimer" type="Timer" parent="."]
+[node name="ItemSpawnTimer" type="Timer" parent="." unique_id=1867050214]
 wait_time = 2.0
 one_shot = true
 
-[node name="EnemySpawnTimer" type="Timer" parent="."]
+[node name="EnemySpawnTimer" type="Timer" parent="." unique_id=1780003048]
 one_shot = true
 
-[node name="ArtilleryTimer" type="Timer" parent="."]
+[node name="ArtilleryTimer" type="Timer" parent="." unique_id=1173139493]
 
-[node name="AcceptPauseTimer" type="Timer" parent="."]
+[node name="AcceptPauseTimer" type="Timer" parent="." unique_id=373293461]
 wait_time = 0.05
 
-[node name="AudioStreamPlayerMusic" type="AudioStreamPlayer" parent="."]
+[node name="AudioStreamPlayerMusic" type="AudioStreamPlayer" parent="." unique_id=1803986658]
 stream = ExtResource("20_exbtf")
 bus = &"Music"
 
-[node name="SharkAttackMusic" type="AudioStreamPlayer" parent="."]
+[node name="SharkAttackMusic" type="AudioStreamPlayer" parent="." unique_id=1358474095]
 stream = ExtResource("20_ixctd")
 bus = &"Music"
 
-[node name="WaveEndMusic" type="AudioStreamPlayer" parent="."]
+[node name="WaveEndMusic" type="AudioStreamPlayer" parent="." unique_id=1729860465]
 bus = &"Music"
 
-[node name="MenuMusic" type="AudioStreamPlayer" parent="."]
+[node name="MenuMusic" type="AudioStreamPlayer" parent="." unique_id=948733806]
 stream = ExtResource("23_pr0en")
 bus = &"Music"
 
-[node name="CountdownEffect" type="AudioStreamPlayer" parent="."]
+[node name="CountdownEffect" type="AudioStreamPlayer" parent="." unique_id=2082413384]
 stream = ExtResource("23_4lpjy")
 volume_db = 8.0
 bus = &"Effects"
