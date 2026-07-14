@@ -369,6 +369,16 @@ position = Vector2(1.20001, -25)
 shape = SubResource("RectangleShape2D_gufkr")
 disabled = true
 
+[node name="PlayerStartLocation2" type="CharacterBody2D" parent="."]
+z_index = 2
+position = Vector2(569.25, 151.6)
+collision_layer = 16
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlayerStartLocation2"]
+position = Vector2(1.20001, -25)
+shape = SubResource("RectangleShape2D_gufkr")
+disabled = true
+
 [node name="Node2D" type="Node2D" parent="." unique_id=1507797379]
 
 [node name="CanvasModulate" type="CanvasModulate" parent="." unique_id=1022935849]

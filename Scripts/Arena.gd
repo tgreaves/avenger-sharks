@@ -120,20 +120,29 @@ func add_obstacle():
 			obstacle_dict[Vector2i(x, y)] = true
 
 
-func reset_arena_floor():
+func reset_arena_floor(player_count := 1):
 	for tile in obstacle_dict:
 		items_layer.set_cell(tile, -1)
 
-	reset_obstacle_dictionary()
+	reset_obstacle_dictionary(player_count)
 	reset_astar_grid()
 
 
-func reset_obstacle_dictionary():
+func reset_obstacle_dictionary(player_count := 1):
 	obstacle_dict.clear()
 
+	# Reserve player 1's swim-in lane (the door columns) so obstacles never
+	# block it and trap the shark.
 	for y in range(3, 32):
 		obstacle_dict[Vector2i(31, y)] = true
 		obstacle_dict[Vector2i(32, y)] = true
+
+	# In 2-player, also reserve player 2's swim-in lane (its start marker sits
+	# ~3 tiles right of player 1's).
+	if player_count >= 2:
+		for y in range(3, 32):
+			obstacle_dict[Vector2i(35, y)] = true
+			obstacle_dict[Vector2i(36, y)] = true
 
 
 func reset_astar_grid():

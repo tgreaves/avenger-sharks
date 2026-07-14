@@ -1,5 +1,10 @@
 extends Node
 
+const PlayerScene = preload("res://Scenes/Player.tscn")
+
+# Offset of player 2's start position relative to player 1.
+const PLAYER_2_START_OFFSET = Vector2(300, 0)
+
 signal player_hunt_key
 signal player_move_to_starting_position
 signal player_enable_fish_frenzy
@@ -124,10 +129,11 @@ func _ready():
 	$Credits.get_node("CanvasLayer").visible = false
 	$HowToPlay.get_node("CanvasLayer").visible = false
 	$Options.get_node("CanvasLayer").visible = false
-	$Player.set_process(false)
-	$Player.set_physics_process(false)
-	$Player.visible = false
-	$Player.get_node("CollisionShape2D").disabled = false
+	for player in get_players():
+		player.set_process(false)
+		player.set_physics_process(false)
+		player.visible = false
+		player.get_node("CollisionShape2D").disabled = false
 
 	# Ensure we update high score as this may have been located from storage.
 	_on_enemy_update_score_display()
@@ -182,6 +188,38 @@ func get_nearest_player(from_position):
 	return nearest
 
 
+# Player 2 (the scene-instanced $Player is always player 1). Held so we can
+# despawn it when returning to a single-player menu.
+var player_two = null
+
+
+# Ensure the number of live player nodes matches player_count. Player 1 is the
+# scene-instanced $Player; player 2 is spawned/despawned here.
+func sync_player_instances():
+	if player_count == 2 and player_two == null:
+		player_two = PlayerScene.instantiate()
+		# Player 2 swims in to its own start marker so both sharks enter together.
+		player_two.start_marker_name = "PlayerStartLocation2"
+		# Display + wave-start swim-in signals are wired for player 2. Death, fish
+		# scoring, key/exit hunting and upgrades stay single-player (player 1
+		# only) until the Phase 5 wave-lifecycle work.
+		player_update_energy.connect(player_two._on_main_player_update_energy)
+		player_update_fish.connect(player_two._on_main_player_update_fish)
+		player_enable_fish_frenzy.connect(player_two._on_main_player_enable_fish_frenzy)
+		player_move_to_starting_position.connect(
+			player_two._on_main_player_move_to_starting_position
+		)
+		add_child(player_two)
+	elif player_count == 1 and player_two != null:
+		despawn_player_two()
+
+
+func despawn_player_two():
+	if player_two != null:
+		player_two.queue_free()
+		player_two = null
+
+
 func main_menu():
 	game_status = MAIN_MENU
 	score = 0
@@ -203,10 +241,11 @@ func main_menu():
 	# Hand camera control back to the menu/intro scenes.
 	get_coop_camera().deactivate()
 
-	$Player.set_process(false)
-	$Player.set_physics_process(false)
-	$Player.visible = false
-	$Player.get_node("CollisionShape2D").disabled = false
+	for player in get_players():
+		player.set_process(false)
+		player.set_physics_process(false)
+		player.visible = false
+		player.get_node("CollisionShape2D").disabled = false
 	$Player.do_ready()
 
 	$UnderwaterFar.visible = true
@@ -245,14 +284,18 @@ func start_game():
 
 	Storage.increase_stat("player", "games_played", 1)
 
-	if cheat_mode == true:
-		$Player.player_energy = constants.PLAYER_START_GAME_ENERGY_CHEATING
-	else:
-		$Player.player_energy = constants.PLAYER_START_GAME_ENERGY
+	# Create/destroy player 2 to match the selected player count.
+	sync_player_instances()
 
-	$Player.get_node("EnergyProgressBar").max_value = $Player.player_energy
-	$Player.get_node("FishProgressBar").max_value = constants.FISH_TO_TRIGGER_FISH_FRENZY
-	$Player.prepare_for_new_game()
+	for player in get_players():
+		if cheat_mode == true:
+			player.player_energy = constants.PLAYER_START_GAME_ENERGY_CHEATING
+		else:
+			player.player_energy = constants.PLAYER_START_GAME_ENERGY
+
+		player.get_node("EnergyProgressBar").max_value = player.player_energy
+		player.get_node("FishProgressBar").max_value = constants.FISH_TO_TRIGGER_FISH_FRENZY
+		player.prepare_for_new_game()
 
 	#$HUD/CanvasLayer/UpgradeSummary.text = ""
 	$HUD/CanvasLayer/UpgradeSummary.visible = true
@@ -268,7 +311,8 @@ func start_game():
 		update_time_left_display()
 	else:
 		update_fish_left_display()
-		$Player.get_node("FishProgressBar").visible = false
+		for player in get_players():
+			player.get_node("FishProgressBar").visible = false
 
 	prepare_for_wave()
 
@@ -300,7 +344,7 @@ func prepare_for_wave():
 	$MainMenu.set_process_input(false)
 	$Arena.visible = true
 
-	$Arena.reset_arena_floor()
+	$Arena.reset_arena_floor(player_count)
 
 	for i in range(1, TheDirector.wave_design.get("obstacle_number", 0)):
 		$Arena.add_obstacle()
@@ -314,14 +358,17 @@ func prepare_for_wave():
 			+ ((wave_number - 1) * constants.FISH_TO_SPAWN_PACIFIST_WAVE_MULTIPLIER)
 		)
 
-	$Player.set_process(true)
-	$Player.set_physics_process(true)
-	$Player.prepare_for_new_wave()
-	$Player.visible = true
-	#$Player.position = Vector2(2650, 2500)
-	$Player.position = Vector2(2650, 2600)
-	$Player.get_node("AnimatedSprite2D").animation = "default"
-	$Player.get_node("AnimatedSprite2D").play()
+	var player_index = 0
+	for player in get_players():
+		player.set_process(true)
+		player.set_physics_process(true)
+		player.prepare_for_new_wave()
+		player.visible = true
+		#player.position = Vector2(2650, 2500)
+		player.position = Vector2(2650, 2600) + (PLAYER_2_START_OFFSET * player_index)
+		player.get_node("AnimatedSprite2D").animation = "default"
+		player.get_node("AnimatedSprite2D").play()
+		player_index += 1
 
 	# Take over camera control for gameplay.
 	get_coop_camera().activate()
@@ -505,9 +552,10 @@ func wave_end():
 
 
 func wave_end_cleanup():
-	$Player.visible = false
-	$Player.set_process(false)
-	$Player.set_physics_process(false)
+	for player in get_players():
+		player.visible = false
+		player.set_process(false)
+		player.set_physics_process(false)
 	$Key.visible = false
 
 	for enemy_attack in get_tree().get_nodes_in_group("enemyAttack"):
@@ -586,11 +634,15 @@ func return_to_main_screen():
 	$ArtilleryTimer.stop()
 	$Key.hide()
 	despawn_all_items()
-	$Player.stop_fish_frenzy()
+	for player in get_players():
+		player.stop_fish_frenzy()
+		player.get_node("HungryParticles").set_emitting(false)
 	$CountdownEffect.stop()
-	$Player/HungryParticles.set_emitting(false)
 
 	Storage.save_stats()
+
+	# Remove player 2 (if any); it is re-created from player_count on next game.
+	despawn_player_two()
 
 	main_menu()
 

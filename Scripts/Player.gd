@@ -57,6 +57,9 @@ var tween_surge: Tween
 var input := PlayerInput.new(PlayerInput.Mode.ANY)
 # Haptics target device; set from the assigned controller for player 2.
 var haptics_device := 0
+# Which arena start marker this player swims to at wave start (player 2 uses a
+# second marker so both sharks swim in together).
+var start_marker_name := "PlayerStartLocation"
 
 @onready var arena = get_parent().get_node("Arena")
 @onready var hud = get_parent().get_node("HUD")
@@ -647,9 +650,9 @@ func _physics_process(_delta):
 			for i in get_slide_collision_count():
 				var collision = get_slide_collision(i)
 
-				if collision.get_collider().name == "PlayerStartLocation":
+				if collision.get_collider().name == start_marker_name:
 					shark_status = ALIVE
-					arena.get_node("PlayerStartLocation").get_node("CollisionShape2D").disabled = true
+					arena.get_node(start_marker_name).get_node("CollisionShape2D").disabled = true
 
 
 func player_hit():
@@ -733,9 +736,12 @@ func _on_main_player_move_to_starting_position():
 	set_physics_process(true)
 	visible = true
 
-	arena.get_node("PlayerStartLocation").get_node("CollisionShape2D").disabled = false
+	var marker = arena.get_node(start_marker_name)
+	marker.get_node("CollisionShape2D").disabled = false
 
-	var target_direction = (initial_player_position - global_position).normalized()
+	# Swim toward this player's own start marker (which triggers ALIVE on
+	# collision). Each player has its own marker so both swim in together.
+	var target_direction = (marker.global_position - global_position).normalized()
 	velocity = target_direction * constants.PLAYER_SPEED
 
 	$DoorCloseTimer.start()
