@@ -128,8 +128,40 @@ The sharp edge of the whole feature.
 - Spawn N players at wave start rather than relying on the scene-instanced one;
   give each a per-player start offset (`initial_player_position`).
 - Replace hardcoded haptics device `0` with the player's `device_id`.
-- Recommend a small standalone **input-device spike** first — Godot's mixed
-  keyboard/gamepad device handling for couch play is fiddly.
+
+### Input-device spike — DONE (validated)
+
+A throwaway spike (`Spikes/PlayerInput.gd`, `Spikes/input_spike.tscn`)
+validated the input model. Confirmed by play-test: 1-player any-device works,
+and 2-player keyboard+gamepad partitions cleanly. Two-gamepad config is built
+and pending only a second controller (hardware) to confirm.
+
+The validated model, to fold into the real `Player.gd`:
+
+- **Two modes, not one:**
+  - `ANY` (1-player) delegates to the global `Input.*` calls, which honour the
+    project's `device":-1` ("any device") action bindings — so keyboard/mouse
+    AND controller drive the one player simultaneously. **This is today's
+    behaviour and must be preserved.**
+  - `SPECIFIC` (2-player) filters per device. Godot's global
+    `Input.is_action_pressed()` cannot filter by device once bindings use
+    `device":-1`, so this mode tracks action state from `_input(event)` using
+    `event.get_device()` + `event.is_action_pressed/get_action_strength`.
+- **Keyboard/mouse need a sentinel device id** (`KEYBOARD_DEVICE`) to be
+  distinguished from gamepad 0. Not needed for a two-gamepad pairing (devices
+  0 and 1 are already distinct), which is therefore the simpler case.
+- **"Fire" is two actions**, not one: `shark_fire` (controller) and
+  `shark_fire_mouse` (mouse). The per-player input must route both (spike's
+  `is_firing()` helper).
+
+Still open (Phase 2 / Phase 6):
+
+- Two-gamepad no-bleed check with real hardware (arriving — then verify).
+- Device-id stability across (re)connection — do pads reliably enumerate 0, 1?
+- P1/P2 physical assignment UX (keyboard+pad vs pad+pad) — a Phase 6 menu
+  decision; the plumbing supports any assignment.
+
+The spike files under `Spikes/` are throwaway and not wired into the game.
 
 ## Phase 3 — Shared zoom-to-fit camera
 
