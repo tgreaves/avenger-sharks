@@ -20,7 +20,7 @@ func go_on_a_rampage():
 	$AnimatedSprite2D.play("dinosaur-run")
 	$DinosaurAttackTimer.start(0.1)  # Insta attack first time.
 
-	var rampage_percentage = get_parent().get_node("Player").upgrades["DOMINANT DINO"][0] * 20
+	var rampage_percentage = get_parent().get_primary_player().upgrades["DOMINANT DINO"][0] * 20
 	var survival_time = (
 		constants.DINOSAUR_SURVIVAL_TIME
 		+ ((rampage_percentage / 100.0) * constants.DINOSAUR_SURVIVAL_TIME)

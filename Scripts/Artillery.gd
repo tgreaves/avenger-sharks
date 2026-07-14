@@ -3,6 +3,7 @@ extends CharacterBody2D
 enum { CHASING, EXPLODING, SAFE }
 
 var state
+var shaken_player  # Player whose camera we shook, so we reset the same one.
 
 
 func _ready():
@@ -23,13 +24,14 @@ func _ready():
 func _physics_process(_delta):
 	match state:
 		CHASING:
-			# Chase the player.
+			# Chase the nearest player.
 			var target_direction = (
-				(get_parent().get_node("Player").global_position - global_position).normalized()
+				(get_parent().get_nearest_player(global_position).global_position - global_position).normalized()
 			)
 			position += target_direction * constants.ARTILLERY_CHASE_SPEED
 		EXPLODING:
-			get_parent().get_node("Player").shake(10)
+			shaken_player = get_parent().get_nearest_player(global_position)
+			shaken_player.shake(10)
 
 
 func _on_charging_timer_timeout():
@@ -51,7 +53,8 @@ func _on_charging_timer_timeout():
 			state = SAFE
 
 			$Area2D.set_monitoring(false)
-			get_parent().get_node("Player").shake_reset()
+			if shaken_player:
+				shaken_player.shake_reset()
 
 			$ChargingTimer.start(2)
 		SAFE:
@@ -67,6 +70,6 @@ func _on_flashing_timer_timeout():
 	$FlashingTimer.start(0.1)
 
 
-func _on_body_entered(_body):
-	# The masking means it must be the player that is inside us.
-	get_parent().get_node("Player").player_hit()
+func _on_body_entered(body):
+	# The masking means it must be a player that is inside us.
+	body.player_hit()

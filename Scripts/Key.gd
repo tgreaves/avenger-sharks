@@ -14,7 +14,7 @@ func _physics_process(_delta):
 		IDLE:
 			velocity = Vector2i(0, 0)
 		FOLLOWING_PLAYER:
-			global_position = get_parent().get_node("Player").global_position + Vector2(0, 50)
+			global_position = get_parent().get_nearest_player(global_position).global_position + Vector2(0, 50)
 
 
 func _on_player_player_got_key():

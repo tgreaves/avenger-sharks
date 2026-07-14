@@ -1,6 +1,7 @@
 # Couch Co-op — Architecture & Implementation Plan
 
-Status: **design only** — no code written yet.
+Status: **Phase 1 complete** (play-tested — single-player unchanged).
+Phases 2–6 not started.
 
 Design decisions locked in (see "Design choices" below), effort concentrated in
 Phases 1–2. Each phase is independently testable; Phase 1 ships with zero
@@ -46,17 +47,75 @@ hardest parts (per-player score reconciliation, revive state, split rendering).
 ## Phase 1 — Decouple the single player reference
 
 Pure refactor, **no behaviour change**; shippable on its own.
+**Status: code-complete, pending play-test.**
 
-- Introduce a **`PlayerManager`** (or a `players` array on `Main`) as the single
-  source of truth for active players. In 1-player mode it holds one entry.
-- Replace scattered `$Player` / `get_node("Player")` access with `players[]`
-  iteration or an explicit `get_nearest_player(pos)` helper.
-- **Enemies:** replace the `@onready var player` target with
-  `get_nearest_player(global_position)`. Biggest AI change; validate hardest.
-- **HUD:** currently reaches into `get_parent().get_node("Player")`. Decide per
-  element what is per-player vs shared (see Phase 4).
-- Risk: low individually, broad in reach. Do it incrementally — start with
-  `is_player_alive`-style aggregate helpers.
+### As-built approach
+
+Rather than a separate `PlayerManager` node, the source of truth is a Godot
+**group** plus three accessor helpers on `Main`:
+
+- Players join the `"players"` group in `Player._ready()` (code-only — no scene
+  diff, and idempotent via an `is_in_group` guard).
+- `Main.get_players()` → the group array.
+- `Main.get_primary_player()` → the canonical player for **stat reads**
+  (upgrades, powerups). Currently still resolves via `get_node("Player")` — the
+  one deliberate remaining name dependency, replaced in Phase 2.
+- `Main.get_nearest_player(pos)` → nearest by distance for **positional
+  targeting**. With one player it always returns that player.
+
+### The key distinction that emerged
+
+External `Player` references split into two kinds, and they need *different*
+replacements — this wasn't obvious until doing the work:
+
+- **Positional targeting** (who does this entity chase / flee / aim at / snap
+  to?) → `get_nearest_player(global_position)`. Converting these makes the
+  behaviour genuinely co-op-correct, not just co-op-safe.
+- **Non-positional stat reads** (`power_pellet_enabled`, `upgrades`,
+  `spray_size`, `max_powerup_levels`) → `get_primary_player()`. These have no
+  meaningful "nearest"; in Phase 2, projectile stat reads (e.g. `spray_size`)
+  should instead come from the *firing* player, threaded through at spawn.
+
+### What was actually converted (10 sites, 8 files)
+
+- Positional → `get_nearest_player`: Enemy CHASE / RUN_AWAY / attack-aim, Fish
+  magnet, Item magnet, Artillery chase, Key follow.
+- Stat reads → `get_primary_player`: Enemy (`power_pellet_enabled`, `upgrades`,
+  via the cached `@onready var player`), HUD ×4, Dinosaur, SharkSpray.
+- Collision identity → `is_in_group("players")`: the Enemy body-collision check
+  (`== "Player"`) — this is the one that genuinely *breaks* in co-op, since two
+  sibling nodes cannot share the name "Player".
+- Artillery `_on_body_entered` now calls `player_hit()` on the entering `body`
+  directly instead of looking up "Player" — more correct and co-op-ready.
+
+### Gotchas found while doing it
+
+- **`Enemy.gd` `@onready var player`** is used for *both* kinds. Kept it as the
+  primary-player stat reference and converted only the positional sites at their
+  point of use, so it no longer caches a single positional target forever.
+- **Artillery shake/reset must target the same player.** `shake()` and
+  `shake_reset()` fire at different moments; caching the shaken player in a
+  `shaken_player` var avoids resetting the wrong camera once there are two.
+- **`$Player...` false positives.** `Player.gd` "matches" like
+  `$PlayerExplosionTimer` and `$PlayerHitGracePeriodTimer` are child *timer*
+  nodes, not the player node — do not touch them.
+
+### Deliberately deferred to Phase 2
+
+- **`Main.gd`'s ~54 direct `$Player.` lifecycle calls** (spawn, camera, energy,
+  menu wiring) were left as-is. These are `Main` operating *the local player*;
+  converting them to N-player loops is Phase 2 and would be high-churn /
+  high-regression-risk with zero Phase-1 benefit.
+- Replacing `get_primary_player()`'s internal `get_node("Player")` with true
+  multi-player resolution.
+
+### Verification
+
+Single-player must be indistinguishable from before. Play-tested and confirmed
+unchanged. Full headless project load is clean (no script/parse errors). Areas
+exercised: enemy chase/flee (incl. power pellet), enemy ranged attacks, fish/item
+magnet upgrade pull, artillery chase + screen shake + hit, and the wave-end
+key-follow → hunt-exit sequence.
 
 ## Phase 2 — Multiple player instances & device-scoped input
 
@@ -119,8 +178,9 @@ The sharp edge of the whole feature.
 
 ## Effort & sequencing
 
-- **Phases 1–2 are the real cost** (decoupling + input). Once `players[]` and
-  device input exist, Phases 3–5 are additive.
+- **Phases 1–2 are the real cost** (decoupling + input). Phase 1 is done via the
+  `"players"` group + `Main` accessors (not a separate `PlayerManager` node);
+  once device input exists, Phases 3–5 are additive.
 - Each phase is independently testable; **Phase 1 ships with zero behaviour
   change**, so risk is incremental rather than big-bang.
 - Recommend a dedicated `feature/coop` branch (off a `v1.5.0` line), since this

@@ -53,15 +53,16 @@ func _physics_process(_delta):
 		READY:
 			move_and_slide()
 
-			var distance = position.distance_to(get_parent().get_node("Player").position)
+			var player = get_parent().get_nearest_player(global_position)
+			var distance = position.distance_to(player.position)
 
-			if get_parent().get_node("Player").item_magnet_enabled:
+			if player.item_magnet_enabled:
 				if distance < 250:
 					var target_direction = (
-						(get_parent().get_node("Player").global_position - global_position)
+						(player.global_position - global_position)
 						. normalized()
 					)
-					velocity = target_direction * (get_parent().get_node("Player").speed + 3000)
+					velocity = target_direction * (player.speed + 3000)
 
 
 func despawn():

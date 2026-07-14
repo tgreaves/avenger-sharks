@@ -58,7 +58,7 @@ func reset_powerup_bar_text():
 
 
 func reset_powerup_bar_durations():
-	var duration_percentage = get_parent().get_node("Player").upgrades["MORE POWER"][0] * 20
+	var duration_percentage = get_parent().get_primary_player().upgrades["MORE POWER"][0] * 20
 	var duration = int(
 		(
 			constants.POWERUP_ACTIVE_DURATION
@@ -76,7 +76,7 @@ func set_powerup_level(powerup, level):
 	if level == 0:
 		text = ""
 
-	if level == get_parent().get_node("Player").max_powerup_levels[powerup]:
+	if level == get_parent().get_primary_player().max_powerup_levels[powerup]:
 		text = " MAX"
 
 	var single_powerup = $CanvasLayer/PowerUpContainer.get_node(powerup)
@@ -85,7 +85,7 @@ func set_powerup_level(powerup, level):
 
 func set_all_powerup_levels():
 	for powerup in POWERUP_BAR_SEQUENCE:
-		set_powerup_level(powerup, get_parent().get_node("Player").current_powerup_levels[powerup])
+		set_powerup_level(powerup, get_parent().get_primary_player().current_powerup_levels[powerup])
 
 
 func _on_upgrade_button_pressed(button_number):
@@ -95,7 +95,7 @@ func _on_upgrade_button_pressed(button_number):
 func update_upgrade_summary():
 
 	var sidebar_text = ""
-	var upgrades = get_parent().get_node("Player").upgrades
+	var upgrades = get_parent().get_primary_player().upgrades
 
 	for single_upgrade in upgrades:
 		if upgrades[single_upgrade][0] > 0:

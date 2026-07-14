@@ -36,7 +36,9 @@ var knocked_back = false
 var astar_pathing_grid
 
 @onready var arena = get_parent().get_node("Arena")
-@onready var player = get_parent().get_node("Player")
+# Reference player for non-positional stat reads (power pellet, upgrades).
+# Positional targeting uses get_nearest_player() at the point of use instead.
+@onready var player = get_parent().get_primary_player()
 
 
 func _ready():
@@ -241,7 +243,8 @@ func _physics_process(delta):
 							get_parent()
 							. get_node("Arena")
 							. get_astar_route_from_positions(
-								global_position, player.global_position
+								global_position,
+								get_parent().get_nearest_player(global_position).global_position
 							)
 						)
 						astar_pathing_grid.pop_front()
@@ -268,7 +271,7 @@ func _physics_process(delta):
 					# Flee the player.
 					"RUN_AWAY":
 						var target_direction = (
-							(global_position - player.global_position)
+							(global_position - get_parent().get_nearest_player(global_position).global_position)
 							. normalized()
 						)
 						velocity = target_direction * (enemy_speed / 2)
@@ -439,7 +442,7 @@ func _physics_process(delta):
 				enemy_attack.add_to_group("enemyAttack")
 
 				var target_direction = (
-					(player.global_position - global_position).normalized()
+					(get_parent().get_nearest_player(global_position).global_position - global_position).normalized()
 				)
 
 				# We don't want enemies to always be a perfect shot.
@@ -484,7 +487,7 @@ func _physics_process(delta):
 			collided_with.get_node(".").death(1)
 			$AudioStreamPlayerFishSplat.play()
 		else:
-			if collision.get_collider().name == "Player":
+			if collision.get_collider().is_in_group("players"):
 				var collided_with = collision.get_collider()
 				collided_with.player_hit()
 				death("PLAYER-BODY")

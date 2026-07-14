@@ -58,6 +58,11 @@ var tween_surge: Tween
 func _ready():
 	shark_status = ALIVE
 
+	# Group membership lets other systems find players without relying on the
+	# node being named "Player" (which cannot be unique once there are two).
+	if !is_in_group("players"):
+		add_to_group("players")
+
 	if initial_player_position:
 		global_position = initial_player_position
 	else:

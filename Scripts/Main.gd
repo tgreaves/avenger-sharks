@@ -141,6 +141,41 @@ func _ready():
 		add_child(dedication)
 
 
+# --- Player access ---
+# Single source of truth for locating players, so other systems don't depend on
+# the "Player" node name. Today there is exactly one player; these helpers keep
+# behaviour identical while allowing a second player to be added later.
+
+
+func get_players():
+	return get_tree().get_nodes_in_group("players")
+
+
+# The canonical player for reading shared/player stats (upgrades, powerups, etc.).
+func get_primary_player():
+	return get_node("Player")
+
+
+# The player nearest to a world position — used by enemy/item targeting. With a
+# single player this always returns that player.
+func get_nearest_player(from_position):
+	var players = get_players()
+
+	if players.is_empty():
+		return null
+
+	var nearest = players[0]
+	var nearest_distance = from_position.distance_to(nearest.global_position)
+
+	for player in players:
+		var distance = from_position.distance_to(player.global_position)
+		if distance < nearest_distance:
+			nearest = player
+			nearest_distance = distance
+
+	return nearest
+
+
 func main_menu():
 	game_status = MAIN_MENU
 	score = 0
