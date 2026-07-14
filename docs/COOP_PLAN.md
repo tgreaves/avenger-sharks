@@ -271,7 +271,18 @@ are NOT part of this phase. This phase is only the shared-HUD elements below.
 ## Phase 6 — Menu, config, polish
 
 - Main-menu player-count toggle (reuse the existing `game_mode` toggle pattern).
+  DONE (basic 1/2 selector).
 - "Press A to join" drop-in, or fixed 2P start — TBD.
+- **Player/device setup screen** for a 2P game (assign control method to P1/P2).
+  Currently the assignment is hard-coded (P1 = keyboard/mouse, P2 = gamepad 0);
+  this screen would let players choose, and is the natural place for the item
+  below.
+- **Player-selectable shark colours.** Let each player pick their shark colour
+  from a set of presets, ideally on the device-setup screen above. Today the
+  tints are fixed constants (`PLAYER_1_TINT` / `PLAYER_2_TINT`); this makes them
+  a per-player choice. Note the tints apply via `self_modulate` and are amplified
+  above 1.0 to stay vivid — presets should follow the same approach (or move to
+  a shader recolour for cleaner results, per the TODO graphics idea).
 - Audit single-player assumptions in: Fish Frenzy, power-pellet music (global —
   fine), dinosaur rampage, artillery targeting (`$Player.position` — needs a
   target choice among players).
