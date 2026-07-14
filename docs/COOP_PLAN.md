@@ -1,7 +1,12 @@
 # Couch Co-op — Architecture & Implementation Plan
 
-Status: **Phase 1 complete** (play-tested — single-player unchanged).
-Phases 2–6 not started.
+Status: **Phase 1 complete**; **Phase 2a complete** (input routed through
+`PlayerInput`, player-count menu selector added — both play-tested, single-player
+unchanged). **Phase 2b next** (spawn P2 — now includes the shared camera, merged
+from Phase 3). Phase 4 (shared-HUD powerup/upgrade duplication) deferred and does
+not block a first playable co-op build.
+
+Resequenced after the 2b audit — see "Re-plan: entanglement finding".
 
 Design decisions locked in (see "Design choices" below), effort concentrated in
 Phases 1–2. Each phase is independently testable; Phase 1 ships with zero
@@ -119,15 +124,50 @@ key-follow → hunt-exit sequence.
 
 ## Phase 2 — Multiple player instances & device-scoped input
 
-The sharp edge of the whole feature.
+The sharp edge of the whole feature. Split into 2a (input routing) and 2b
+(spawning), because doing the work revealed 2b is entangled with the camera
+(Phase 3) — see "Re-plan: entanglement finding" below.
 
-- Input is global today. Add a `device_id` to each player and route all input
-  reads through a small `PlayerInput` wrapper that resolves the existing action
-  names (`left`, `shoot_left`, `fish_frenzy`, …) against the assigned device.
-  Assign e.g. P1 = keyboard+mouse or gamepad 0, P2 = gamepad 1.
-- Spawn N players at wave start rather than relying on the scene-instanced one;
-  give each a per-player start offset (`initial_player_position`).
-- Replace hardcoded haptics device `0` with the player's `device_id`.
+### Phase 2a — Route input through PlayerInput — DONE
+
+- `PlayerInput` promoted to `Scripts/PlayerInput.gd`; every input read in
+  `Player.gd` goes through a per-player `input` instance. Runs in `ANY` mode, so
+  single-player is unchanged. Haptics use a per-player `haptics_device` (still
+  0 for now). Play-tested; committed.
+- Also added: `player_count` main-menu selector (1/2), a menu toggle only —
+  nothing consumes it yet.
+
+### Phase 2b — Spawn the second player — NOT STARTED (blocked, see below)
+
+- Spawn N players rather than relying on the scene-instanced one; give each a
+  per-player start offset (`initial_player_position`).
+- Assign devices and switch each player's `input` to a `SPECIFIC` instance;
+  set `haptics_device` per player.
+- **Player 2 must be visually distinct.** Apply a colour filter/tint to the P2
+  shark sprite (e.g. `modulate` or a shader). Watch for interactions with
+  existing modulate usage — the shark already recolours for power-pellet
+  ("blood thirsty" red) and damage flashes, so the P2 tint must compose with,
+  not be clobbered by, those.
+
+### Re-plan: entanglement finding (before writing 2b)
+
+Auditing the ~40 `$Player.` lifecycle calls in `Main.gd` for 2b surfaced that
+spawning a second player is **not** cleanly separable from later phases:
+
+- **Camera is a child of `Player`** (`Player.tscn`). Two players ⇒ two cameras
+  fighting. Spawning P2 therefore *hard-requires* the shared camera (Phase 3);
+  there is no sensible "spawn P2 but keep the player-mounted camera" interim.
+- **Energy bar, fish bar, and aiming line live on the Player node**, not the
+  HUD — so these duplicate correctly for free when a second Player is spawned.
+  Good: less Phase 4 work than the original plan assumed.
+- **Powerup bar + upgrade-choice UI live in the shared HUD** and read a single
+  player. These can lag as "P1-only" without blocking a playable two-shark
+  game — so Phase 4 does *not* block a first playable co-op build.
+
+**Resequencing decision:** merge Phase 3 (shared camera) into 2b, because P2
+cannot be framed without it. Phase 4 (shared-HUD powerup/upgrade duplication)
+stays deferred — the first playable co-op build ships with P1-only powerup/
+upgrade UI, which is an acceptable rough edge. New order below.
 
 ### Input-device spike — DONE (validated)
 
@@ -140,9 +180,9 @@ The validated model, to fold into the real `Player.gd`:
 
 - **Two modes, not one:**
   - `ANY` (1-player) delegates to the global `Input.*` calls, which honour the
-    project's `device":-1` ("any device") action bindings — so keyboard/mouse
-    AND controller drive the one player simultaneously. **This is today's
-    behaviour and must be preserved.**
+	project's `device":-1` ("any device") action bindings — so keyboard/mouse
+	AND controller drive the one player simultaneously. **This is today's
+	behaviour and must be preserved.**
   - `SPECIFIC` (2-player) filters per device. Godot's global
     `Input.is_action_pressed()` cannot filter by device once bindings use
     `device":-1`, so this mode tracks action state from `_input(event)` using
@@ -163,7 +203,32 @@ Still open (Phase 2 / Phase 6):
 
 The spike files under `Spikes/` are throwaway and not wired into the game.
 
-## Phase 3 — Shared zoom-to-fit camera
+## Phase 3 — Shared zoom-to-fit camera (MERGED INTO 2b)
+
+Merged into 2b: P2 cannot be framed without the shared camera, so this is done
+as part of spawning the second player rather than as a later standalone phase.
+Details retained here for reference.
+
+### Behaviour spec (locked)
+
+- **Position:** follows the midpoint of all *living* players, lerped smoothly
+  (no snapping).
+- **Zoom:** zoom-to-fit the players' bounding box plus a margin, but **capped**
+  at a maximum zoom-out so sharks/enemies stay readable. Past the cap, the
+  trailing player drifts toward the screen edge — acceptable in this single
+  bounded arena. (Chosen over "always fit both", which makes sprites too small.)
+- **Clamp:** camera stays within the arena limits (never shows past the
+  playfield).
+- **Screen shake:** shared — one camera, so any shake (artillery, fish frenzy)
+  is felt by both players.
+- **1-player:** same rig, unchanged. One living player ⇒ midpoint is that
+  player and the bounding box is a point ⇒ zoom rests at the 1P default. The
+  wave-1 intro zoom tween is preserved by driving the shared camera's zoom.
+- **Tuning constants** (in `Constants.gd`, tune by feel after playtest): default
+  (min-separation) zoom = today's framing; max zoom-out cap; player margin;
+  position and zoom lerp speeds.
+
+### Implementation notes
 
 - Remove `Camera2D` from `Player.tscn`; add a **`CoopCamera`** on `Main`/`Arena`.
 - Each frame: center on the midpoint of living players; set `zoom` from their
@@ -176,10 +241,15 @@ The spike files under `Spikes/` are throwaway and not wired into the game.
 
 ## Phase 4 — HUD for two players
 
-- **Per-player** (duplicate): energy bar, fish-frenzy bar, powerup bar, upgrade
-  summary. Cleanest as a `PlayerHUD` sub-scene instantiated once per player,
-  bound to that player, anchored bottom-left / bottom-right.
-- **Shared** (single): score, high score, wave/time, boss health.
+Note (from the 2b audit): energy bar, fish-frenzy bar, and aiming line already
+live on the **Player** node, so they duplicate for free when P2 spawns — they
+are NOT part of this phase. This phase is only the shared-HUD elements below.
+
+- **Per-player, but currently in the shared HUD** (the real work): powerup bar
+  and upgrade-choice / upgrade-summary UI, which today read a single player.
+  The first playable co-op build ships these as P1-only; this phase makes them
+  per-player (e.g. a `PlayerHUD` sub-scene per player, anchored left/right).
+- **Shared** (single, no change): score, high score, wave/time, boss health.
 - Between-wave upgrade screen: decide independent picks (two pickers) vs one
   shared pick. Independent is truer to the roguelite feel but doubles the UI and
   focus-management work — the pause/focus-memory logic in `Main.gd` assumes one
