@@ -293,15 +293,6 @@ collision_mask = 368
 motion_mode = 1
 script = ExtResource("1_m4brx")
 
-[node name="Camera2D" type="Camera2D" parent="."]
-offset = Vector2(2.08165e-12, 2.08165e-12)
-enabled = false
-limit_left = 0
-limit_top = 0
-limit_right = 5300
-limit_bottom = 2720
-editor_draw_limits = true
-
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, -5)
 rotation = 1.5708

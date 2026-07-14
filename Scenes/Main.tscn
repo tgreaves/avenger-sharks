@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://bxw6akrvsd84v"]
 
 [ext_resource type="Script" uid="uid://cj10txdbe3cd2" path="res://Scripts/Main.gd" id="1_yyejc"]
+[ext_resource type="Script" path="res://Scripts/CoopCamera.gd" id="99_coopcam"]
 [ext_resource type="PackedScene" uid="uid://dlyr1neald0e4" path="res://Scenes/Dedication.tscn" id="2_utmp5"]
 [ext_resource type="PackedScene" uid="uid://dde3f2uantk5b" path="res://Scenes/Intro.tscn" id="2_vh1q3"]
 [ext_resource type="PackedScene" uid="uid://bkmx1mvtb8dxr" path="res://Scenes/Enemy.tscn" id="3_br4mh"]
@@ -82,6 +83,14 @@ visible = false
 
 [node name="Player" parent="." unique_id=2037117605 instance=ExtResource("15_3wn6m")]
 position = Vector2(2650, 714)
+
+[node name="CoopCamera" type="Camera2D" parent="."]
+limit_left = 0
+limit_top = 0
+limit_right = 5300
+limit_bottom = 2720
+editor_draw_limits = true
+script = ExtResource("99_coopcam")
 
 [node name="Key" parent="." unique_id=226785373 instance=ExtResource("16_0rume")]
 

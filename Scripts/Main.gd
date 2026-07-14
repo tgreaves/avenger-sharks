@@ -152,6 +152,11 @@ func get_players():
 	return get_tree().get_nodes_in_group("players")
 
 
+# The shared co-op camera (also used in 1-player).
+func get_coop_camera():
+	return $CoopCamera
+
+
 # The canonical player for reading shared/player stats (upgrades, powerups, etc.).
 func get_primary_player():
 	return get_node("Player")
@@ -195,7 +200,9 @@ func main_menu():
 	# Ensure music speed is always at normal.
 	_on_player_player_no_longer_low_energy()
 
-	$Player/Camera2D.enabled = false
+	# Hand camera control back to the menu/intro scenes.
+	get_coop_camera().deactivate()
+
 	$Player.set_process(false)
 	$Player.set_physics_process(false)
 	$Player.visible = false
@@ -310,22 +317,31 @@ func prepare_for_wave():
 	$Player.set_process(true)
 	$Player.set_physics_process(true)
 	$Player.prepare_for_new_wave()
-	$Player/Camera2D.enabled = true
 	$Player.visible = true
 	#$Player.position = Vector2(2650, 2500)
 	$Player.position = Vector2(2650, 2600)
 	$Player.get_node("AnimatedSprite2D").animation = "default"
 	$Player.get_node("AnimatedSprite2D").play()
 
+	# Take over camera control for gameplay.
+	get_coop_camera().activate()
+	get_coop_camera().global_position = $Player.position
+
 	var tween = get_tree().create_tween()
 	tween.tween_property(self, "modulate", Color(1, 1, 1, 1), 0.5)
 
 	if constants.CAMERA_ZOOM_EFFECTS and wave_number == 1:
-		$Player/Camera2D.set_zoom(Vector2(4.0, 4.0))
+		# Drive the shared camera's zoom directly for the intro; suspend its
+		# follow/zoom logic for the duration so it doesn't fight the tween.
+		var coop_camera = get_coop_camera()
+		coop_camera.manual_control = true
+		coop_camera.global_position = $Player.position
+		coop_camera.set_zoom(Vector2(4.0, 4.0))
 		var tween_camera = get_tree().create_tween()
-		tween_camera.tween_property($Player/Camera2D, "zoom", Vector2(1.0, 1.0), 2.5).set_trans(
+		tween_camera.tween_property(coop_camera, "zoom", Vector2(1.0, 1.0), 2.5).set_trans(
 			tween_camera.EASE_OUT
 		)
+		tween_camera.tween_callback(func(): coop_camera.manual_control = false)
 
 	player_move_to_starting_position.emit()
 

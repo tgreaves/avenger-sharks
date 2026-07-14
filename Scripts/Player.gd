@@ -859,14 +859,14 @@ func _on_main_player_enable_fish_frenzy():
 	fish_frenzy_enabled = true
 
 
+# Screen shake is owned by the shared co-op camera, so it is felt across both
+# players. These delegates keep existing callers (fish frenzy, Artillery) working.
 func shake(shake_amount):
-	$Camera2D.set_offset(
-		Vector2(randf_range(-1.0, 1.0) * shake_amount, randf_range(-1.0, 1.0) * shake_amount)
-	)
+	get_parent().get_coop_camera().shake(shake_amount)
 
 
 func shake_reset():
-	$Camera2D.set_offset(Vector2(0.0, 0.0))
+	get_parent().get_coop_camera().shake_reset()
 
 
 func _on_main_player_update_energy():

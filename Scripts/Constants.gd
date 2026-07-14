@@ -24,6 +24,14 @@ const WINDOW_TITLE = "Avenger Sharks " + GAME_VERSION
 const WINDOW_SIZE = Vector2(1920, 1080)
 const CAMERA_ZOOM_EFFECTS = false
 
+# Shared co-op camera (also used in 1-player, where it simply follows the one
+# shark at the default zoom). Tune by feel after playtest.
+const CAMERA_DEFAULT_ZOOM = 1.0             # Zoom when players are together / single player.
+const CAMERA_MIN_ZOOM = 0.5                 # Most zoomed-out allowed (readability cap).
+const CAMERA_PLAYER_MARGIN = 700.0          # World-units of padding around players' bounding box.
+const CAMERA_POSITION_LERP = 5.0            # Higher = snappier follow.
+const CAMERA_ZOOM_LERP = 4.0                # Higher = snappier zoom.
+
 # Game settings
 const PLAY_WAVE_END_MUSIC = false
 
