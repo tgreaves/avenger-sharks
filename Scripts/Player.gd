@@ -457,7 +457,7 @@ func _physics_process(_delta):
 					break
 
 				# Default - Enemy
-				collided_with.get_node(".").death("PLAYER-BODY")
+				collided_with.get_node(".").death("PLAYER-BODY", self)
 				player_hit()
 
 		FISH_FRENZY:
@@ -487,6 +487,7 @@ func _physics_process(_delta):
 						var shark_spray = SharkSprayScene.instantiate()
 						get_parent().add_child(shark_spray)
 						shark_spray.add_to_group("sharkSprayGroup")
+						shark_spray.owner_player = self
 						shark_spray.global_position = position
 						shark_spray.velocity = target_direction * constants.PLAYER_FIRE_SPEED
 
@@ -814,6 +815,7 @@ func mini_shark_fire(shark_fire_direction):
 		var mini_shark_spray = SharkSprayScene.instantiate()
 		get_parent().add_child(mini_shark_spray)
 		mini_shark_spray.add_to_group("miniSharkSprayGroup")
+		mini_shark_spray.owner_player = self
 		mini_shark_spray.global_position = mini_shark.global_position
 		mini_shark_spray.velocity = shark_fire_direction * constants.PLAYER_FIRE_SPEED
 
@@ -836,6 +838,7 @@ func grenade_fire(_fire_direction):
 		var grenade = GrenadeScene.instantiate()
 		get_parent().add_child(grenade)
 		grenade.add_to_group("grenadeGroup")
+		grenade.owner_player = self
 		grenade.global_position = position
 
 		var enemy_distance = 10000
@@ -1030,6 +1033,7 @@ func spawn_shark_spray(target_direction):
 	var shark_spray = SharkSprayScene.instantiate()
 	get_parent().add_child(shark_spray)
 	shark_spray.add_to_group("sharkSprayGroup")
+	shark_spray.owner_player = self
 	shark_spray.global_position = position
 	shark_spray.velocity = velocity + (target_direction * constants.PLAYER_FIRE_SPEED)
 

@@ -1,5 +1,8 @@
 extends CharacterBody2D
 
+# The player that fired this spray, for score attribution. Set by the spawner.
+var owner_player = null
+
 
 func _ready():
 	$AnimatedSprite2D.play()
@@ -31,6 +34,6 @@ func _physics_process(_delta):
 			self.queue_free()
 			break
 
-		collision.get_collider().get_node(".").death("PLAYER-SHOT")
+		collision.get_collider().get_node(".").death("PLAYER-SHOT", owner_player)
 		$CollisionShape2D.disabled = true
 		self.queue_free()

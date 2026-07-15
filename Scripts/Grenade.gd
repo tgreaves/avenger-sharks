@@ -3,6 +3,8 @@ extends CharacterBody2D
 enum { THROWING, EXPLODING }
 
 var state = "THROWING"
+# The player that threw this grenade, for score attribution. Set by the spawner.
+var owner_player = null
 
 
 func _ready():
@@ -55,4 +57,4 @@ func _physics_process(_delta):
 				if collision.get_collider().name.contains("Artillery"):
 					break
 
-				collision.get_collider().get_node(".").death("PLAYER-SHOT")
+				collision.get_collider().get_node(".").death("PLAYER-SHOT", owner_player)

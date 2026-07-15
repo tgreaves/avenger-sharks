@@ -504,7 +504,7 @@ func _physics_process(delta):
 					ai_mode = ai_mode_setting
 
 
-func death(death_source):
+func death(death_source, attacker = null):
 	if state == SPAWNING && !constants.ENEMY_ALLOW_DAMAGE_WHEN_SPAWNING:
 		return
 
@@ -547,7 +547,8 @@ func death(death_source):
 				death_source,
 				enemy_type,
 				enemy_is_split,
-				grouped_enemy_has_died
+				grouped_enemy_has_died,
+				attacker
 			)
 
 			score_label_animation(str(actual_scored))

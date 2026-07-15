@@ -1030,7 +1030,8 @@ func on_enemy_update_score(
 	death_source,
 	enemy_type,
 	enemy_is_split,
-	grouped_enemy_has_died
+	grouped_enemy_has_died,
+	attacker = null
 ):
 	if grouped_enemy_has_died:
 		enemies_left_this_wave = enemies_left_this_wave - 1
