@@ -22,7 +22,7 @@ unchanged.
 | Decision | Choice | Rationale |
 |---|---|---|
 | Camera | **Shared zoom-to-fit** | One camera tracks the midpoint of living players and zooms out as they separate (capped at a max distance). Best fit for a fast single-arena shooter; split-screen adds large cost for little benefit here. |
-| Death / revive | **Shared lives / co-op game over** | One shared life pool; game over when it is empty. Reuses most of the existing `game_over()` flow — changes *when* it fires, not the flow. Simplest scoring model (score is already global). |
+| Death / revive | **Per-shark energy; out until next wave; game over when both down** | The game has no "lives" — just a per-shark energy bar (death = energy hits zero). A downed shark sits out the rest of the wave and respawns at full energy next wave; game over only when *both* sharks are down in the same wave. No lives pool (corrected from the original plan). See Phase 5. |
 | Players | **1–2, selectable at main menu** | Single-player must remain the default and behave exactly as today. |
 
 ## Why this is hard today
@@ -255,17 +255,38 @@ are NOT part of this phase. This phase is only the shared-HUD elements below.
   focus-management work — the pause/focus-memory logic in `Main.gd` assumes one
   picker.
 
-## Phase 5 — Wave lifecycle & shared lives
+## Phase 5 — Wave lifecycle & co-op death
+
+**Death model corrected (there is no "lives" mechanic in the game).** The game
+uses a **per-shark energy bar**; death = energy hits zero (sudden, once, unless
+the one-shot CHEAT DEATH upgrade revives at 75%). `player_hit()` reduces energy;
+at `<= 0` the shark goes `EXPLODING` → `player_died.emit()` → `game_over()`. The
+original "shared lives pool" idea is **dropped** — it was a mechanic the game
+never had.
+
+Co-op death rule (locked):
+
+- **Out until next wave.** When a shark's energy hits zero it becomes inert for
+  the rest of the wave (its existing explosion → dead state). It respawns at
+  full energy at the next wave start (reusing the wave-start spawn loop that
+  already iterates all players).
+- **Game over only when BOTH sharks are down in the same wave.** So a single
+  death no longer ends the game in 2-player. Today's immediate-game-over path is
+  gated behind an "all players dead" check.
+- CHEAT DEATH still works per shark (fires before death is finalised).
+- No lives counter, no new HUD element — game-over is derived from energy state.
+
+Wave-end sequence:
 
 - The wave-end "hunt key → hunt exit → go through door" sequence (`Player.gd`
-  state machine + `Main.gd` signals) is single-actor. Simplest rule: **wave ends
-  when the key is collected by any player**; both sharks then exit (or the
-  survivor does).
-- Add a **shared lives pool** on `Main`: a death decrements it; respawn at next
-  wave if lives remain; **game over when it hits zero**. Reuses the existing
-  `game_over()` path.
+  state machine + `Main.gd` signals) is single-actor today. Simplest rule:
+  **wave ends when the key is collected by any player**; both sharks then exit
+  (or the survivor does).
+- P2's death/scoring/key/upgrade signals (deferred in 2b) are wired up here:
+  `player_died` → check "all dead" before `game_over()`; `player_got_fish` →
+  scores for whichever shark; etc.
 - `is_player_alive()` / `is_player_cheating_death()` become "any player…"
-  aggregates.
+  aggregates; add an "all players dead" helper for the game-over gate.
 - Score stays shared (already global in `Main`) — no per-player reconciliation.
 
 ## Phase 6 — Menu, config, polish
