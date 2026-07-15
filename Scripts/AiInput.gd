@@ -21,11 +21,11 @@ const KEEP_DISTANCE_ENTER := 500.0
 const KEEP_DISTANCE_EXIT := 650.0
 # Surge-dodge when an enemy gets closer than this.
 const DANGER_DISTANCE := 300.0
-# Seek fish only opportunistically: within this (short) range, and only when no
-# enemy is engaging (see ENGAGE_RANGE). Kept short so the CPU commits to combat
-# and doesn't make cross-arena detours for fish (which don't score until the
-# phase 5 wave-lifecycle work anyway).
-const FISH_SEEK_RANGE := 450.0
+# Seek fish opportunistically: grab a fish within this range as long as the CPU
+# is not currently dodging or backing away from an enemy (the danger/retreat
+# branches take priority). Kept short so it only detours for genuinely-nearby
+# fish rather than crossing the arena.
+const FISH_SEEK_RANGE := 550.0
 # Recompute the navigation path at most every this many physics frames (A* is
 # not free; the target rarely moves far between frames).
 const PATH_RECOMPUTE_FRAMES := 10
@@ -96,14 +96,11 @@ func update(owner, _delta) -> void:
 		_move = away_from_enemy
 		_path.clear()
 	else:
-		# 3. No nearby threat — seek a fish if one is close AND no enemy is
-		# engaging (so we commit to fights), else follow human. Longer-range
-		# goals, so navigate around obstacles via A*.
+		# 3. Not dodging or retreating — grab a nearby fish if there is one
+		# (even with enemies around, since we're at a safe distance here), else
+		# follow the human. Longer-range goals, so navigate obstacles via A*.
 		var target_pos = null
-		var engaging = enemy != null and enemy_distance <= ENGAGE_RANGE
-		var fish = null
-		if not engaging:
-			fish = _nearest_fish(owner)
+		var fish = _nearest_fish(owner)
 
 		if fish != null and owner.global_position.distance_to(fish.global_position) <= FISH_SEEK_RANGE:
 			target_pos = fish.global_position

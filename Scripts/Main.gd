@@ -45,7 +45,6 @@ enum {
 @export var wave_number = 1
 @export var enemies_left_this_wave = 0
 @export var enemies_on_screen = 0
-@export var fish_collected = 0
 @export var fish_left_this_wave = 0
 @export var game_mode = "ARCADE"
 @export var player_count = 1
@@ -228,9 +227,9 @@ func sync_player_instances():
 		player_two = PlayerScene.instantiate()
 		# Player 2 swims in to its own start marker so both sharks enter together.
 		player_two.start_marker_name = "PlayerStartLocation2"
-		# Display + wave-start swim-in signals are wired for player 2. Fish
-		# scoring, key/exit hunting and upgrades stay single-player (player 1
-		# only) until later Phase 5 slices.
+		# Display + wave-start swim-in signals are wired for player 2. Key/exit
+		# hunting and upgrades stay single-player (player 1 only) until later
+		# Phase 5 slices.
 		player_update_energy.connect(player_two._on_main_player_update_energy)
 		player_update_fish.connect(player_two._on_main_player_update_fish)
 		player_enable_fish_frenzy.connect(player_two._on_main_player_enable_fish_frenzy)
@@ -240,6 +239,8 @@ func sync_player_instances():
 		# Phase 5 slice 1: player 2 can die. Game over is gated on all players
 		# being dead (see _on_player_player_died).
 		player_two.player_died.connect(_on_player_player_died)
+		# Phase 5 slice 2a: player 2's fish score for player 2.
+		player_two.player_got_fish.connect(_on_player_player_got_fish)
 		add_child(player_two)
 	elif player_count == 1 and player_two != null:
 		despawn_player_two()
@@ -281,7 +282,7 @@ func main_menu():
 	for player in get_players():
 		player.player_score = 0
 		player.player_score_multiplier = 1
-	fish_collected = 0
+		player.fish_collected = 0
 	fish_left_this_wave = 0
 	wave_number = constants.START_WAVE - 1
 	enemies_on_screen = 0
@@ -1129,6 +1130,17 @@ func _two_human_players():
 	return player_count == 2 and not player_two_is_cpu and player_two != null
 
 
+# HUD label a collected fish should fly to for the given player. Player 1 always
+# uses the left "Score". Player 2 uses "Score2" when it is shown (2-player-human)
+# or "HighScore" (top-right) in 2-player-CPU, where Score2 is hidden.
+func fish_score_target_for(player):
+	if player == get_primary_player():
+		return "Score"
+	if _two_human_players():
+		return "Score2"
+	return "HighScore"
+
+
 # Position the score HUD. TIME sits in the centre in every mode (consistent).
 #   1-player / CPU: SCORE left, TIME centre, HIGH SCORE right; P2 hidden.
 #   2-player-human: P1 left, TIME centre, P2 right; HIGH SCORE hidden.
@@ -1261,24 +1273,24 @@ func _on_player_player_died():
 				player.visible = false
 
 
-func _on_player_player_got_fish():
-	# Fish still credit player 1 for now; per-player fish scoring lands with the
-	# per-player fish/frenzy slice (2a), when player 2's fish signal is wired.
-	get_primary_player().player_score += constants.GET_FISH_SCORE
+func _on_player_player_got_fish(collecting_player):
+	# Score and fish-frenzy progress credit the shark that collected the fish.
+	collecting_player.player_score += constants.GET_FISH_SCORE
 	update_high_score()
 
 	Storage.increase_stat("player", "fish_rescued", 1)
 
-	fish_collected += 1
-	fish_left_this_wave -= 1
+	collecting_player.fish_collected += 1
+	fish_left_this_wave -= 1  # Shared wave goal (PACIFIST); not per-player.
 	_on_enemy_update_score_display()
-	player_update_fish.emit()
+	collecting_player._on_main_player_update_fish()
 
 	if game_mode == "PACIFIST":
 		update_fish_left_display()
 	else:
-		if fish_collected == $Player.get_node("FishProgressBar").max_value:
-			player_enable_fish_frenzy.emit()
+		# This shark fills its own bar and triggers its own frenzy.
+		if collecting_player.fish_collected == collecting_player.get_node("FishProgressBar").max_value:
+			collecting_player._on_main_player_enable_fish_frenzy()
 
 func _on_player_player_found_exit():
 	wave_end_cleanup()

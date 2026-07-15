@@ -7,6 +7,9 @@ enum {
 var state = ACTIVE
 var fish_speed
 var intro_fish_id
+# HUD score label this fish flies to when collected (P1 -> top-left "Score",
+# P2 -> top-right "Score2").
+var score_target_node_name = "Score"
 
 
 func _ready():
@@ -42,13 +45,14 @@ func _physics_process(delta):
 			if $StateTimer.time_left == 0:
 				queue_free()
 
-			var target_position = (
-				get_parent()
-				. get_node("HUD")
-				. get_node("CanvasLayer")
-				. get_node("Score")
-				. global_position
+			# The score label lives on a CanvasLayer (screen space); convert its
+			# screen position to a world position so the fish flies to where the
+			# label actually appears on screen, at any camera zoom/pan.
+			var label = (
+				get_parent().get_node("HUD").get_node("CanvasLayer").get_node(score_target_node_name)
 			)
+			var screen_pos = label.global_position
+			var target_position = get_viewport().get_canvas_transform().affine_inverse() * screen_pos
 
 			if global_position.distance_to(target_position) < 20:
 				queue_free()
@@ -101,7 +105,7 @@ func _physics_process(delta):
 			set_collision_mask_value(1, false)
 
 
-func death(blood):
+func death(blood, collecting_player = null):
 	$CollisionShape2D.set_deferred("disabled", true)
 	remove_from_group("fishGroup")
 
@@ -112,6 +116,10 @@ func death(blood):
 		$AnimatedSprite2D.set_visible(false)
 		state = DESPAWNING
 	else:
+		# Fly to the HUD label for the collecting player (Main decides which,
+		# since it depends on mode: Score / Score2 / HighScore).
+		if collecting_player != null:
+			score_target_node_name = get_parent().fish_score_target_for(collecting_player)
 		state = SWIM_TO_SCORE
 
 

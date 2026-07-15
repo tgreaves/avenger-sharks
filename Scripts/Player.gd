@@ -1,7 +1,7 @@
 extends CharacterBody2D
 
 signal player_died
-signal player_got_fish
+signal player_got_fish(collecting_player)
 signal player_got_key
 signal player_found_exit_stop_key_movement
 signal player_found_exit
@@ -40,6 +40,8 @@ const MiniSharkScene = preload("res://Scenes/MiniShark.tscn")
 # each shark keeps its own.
 var player_score = 0
 var player_score_multiplier = 1
+# Fish collected toward this shark's own FISH FRENZY (per-player bar/frenzy).
+var fish_collected = 0
 
 var key_global_position
 var initial_player_position
@@ -352,9 +354,10 @@ func _physics_process(_delta):
 					break
 
 				if collision.get_collider().is_in_group("fishGroup"):
-					collided_with.get_node(".").death(false)
+					# The fish flies to this player's score display.
+					collided_with.get_node(".").death(false, self)
 					$AudioStreamPlayerGotFish.play()
-					player_got_fish.emit()
+					player_got_fish.emit(self)
 					break
 
 				if collision.get_collider().is_in_group("dinosaurGroup"):
@@ -477,7 +480,7 @@ func _physics_process(_delta):
 				if $AnimatedSprite2D.rotation_degrees >= 360:
 					$AnimatedSprite2D.rotation_degrees = 0
 
-				get_parent().fish_collected = (
+				fish_collected = (
 					($FishFrenzyTimer.time_left / constants.PLAYER_FISH_FRENZY_DURATION)
 					* constants.FISH_TO_TRIGGER_FISH_FRENZY
 				)
@@ -920,13 +923,13 @@ func _on_main_player_update_energy():
 
 
 func _on_main_player_update_fish():
-	$FishProgressBar.value = get_parent().fish_collected
+	$FishProgressBar.value = fish_collected
 
 
 func stop_fish_frenzy():
 	$AnimatedSprite2D.rotation_degrees = 0
 	shake_reset()
-	get_parent().fish_collected = 0
+	fish_collected = 0
 	_on_main_player_update_fish()
 	$CollisionShape2D.disabled = false
 
