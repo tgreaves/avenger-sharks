@@ -49,6 +49,7 @@ enum {
 @export var fish_left_this_wave = 0
 @export var game_mode = "ARCADE"
 @export var player_count = 1
+@export var player_two_is_cpu = false
 @export var dropped_items_on_screen = 0
 @export var grouped_enemy_id = 0
 @export var SteamEngine = null
@@ -227,7 +228,10 @@ func assign_player_devices():
 		player_one.haptics_device = 0  # No rumble on keyboard; harmless.
 
 		if player_two != null:
-			player_two.input = PlayerInput.new(PlayerInput.Mode.SPECIFIC, 0)  # Gamepad 0.
+			if player_two_is_cpu:
+				player_two.input = AiInput.new()
+			else:
+				player_two.input = PlayerInput.new(PlayerInput.Mode.SPECIFIC, 0)  # Gamepad 0.
 			player_two.haptics_device = 0
 			player_two.player_tint = constants.PLAYER_2_TINT
 			player_two.apply_tint()
@@ -1297,18 +1301,24 @@ func _on_main_menu_game_mode_pressed():
 
 
 func _on_main_menu_player_count_pressed():
+	# Cycle: 1 player -> 2 players -> 2 players (CPU) -> 1 player.
 	if player_count == 1:
 		player_count = 2
+		player_two_is_cpu = false
+	elif player_count == 2 and not player_two_is_cpu:
+		player_two_is_cpu = true
 	else:
 		player_count = 1
+		player_two_is_cpu = false
 
 	update_player_count_label()
 
 
 func update_player_count_label():
-	$MainMenu/CanvasLayer/MainMenuContainer/PlayerCount.text = (
-		"PLAYERS: " + str(player_count)
-	)
+	var label = "PLAYERS: " + str(player_count)
+	if player_count == 2 and player_two_is_cpu:
+		label += " (CPU)"
+	$MainMenu/CanvasLayer/MainMenuContainer/PlayerCount.text = label
 
 
 func _on_main_menu_statistics_pressed():

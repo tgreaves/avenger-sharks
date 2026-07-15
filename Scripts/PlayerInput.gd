@@ -84,6 +84,12 @@ func feed_event(event: InputEvent) -> void:
 			_pressed[a] = now_pressed
 
 
+# Per-frame update hook. Empty for device input (state comes from feed_event);
+# AI input overrides this to recompute its intent from the game world.
+func update(_owner, _delta) -> void:
+	pass
+
+
 func get_move_vector() -> Vector2:
 	if mode == Mode.ANY:
 		return Input.get_vector("left", "right", "up", "down")

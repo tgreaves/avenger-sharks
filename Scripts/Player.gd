@@ -271,6 +271,7 @@ func get_input():
 
 
 func _physics_process(_delta):
+	input.update(self, _delta)
 	get_input()
 	move_and_slide()
 

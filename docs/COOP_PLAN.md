@@ -287,6 +287,35 @@ are NOT part of this phase. This phase is only the shared-HUD elements below.
   fine), dinosaur rampage, artillery targeting (`$Player.position` — needs a
   target choice among players).
 
+## Phase 7 — CPU-controlled player 2 (also a testing aid)
+
+Lets 2-player mode be tested solo, stress-tests the co-op systems, and is a
+feature in its own right.
+
+**Key enabler:** `Player.get_input()` reads everything through the
+`PlayerInput` abstraction, so an AI is just a `PlayerInput` subclass that
+computes the move/aim/button intent from the game world instead of a device.
+Player.gd barely changes — the AI shark inherits scatter spray, mini-sharks,
+grenades, fire-rate, powerups, etc. for free.
+
+**Decisions (locked):**
+- Menu: the player-count toggle becomes a 3-way cycle — `1 → 2 → 2 (CPU)`.
+- Scope: built within today's P2 limits — the CPU moves/aims/fires/frenzies now,
+  but its fish collection won't score and it can't die until Phase 5. Same gaps
+  as human P2 today; full autonomy arrives with Phase 5.
+
+**Slices:**
+- **A — skeleton + wiring.** `AiInput` (extends `PlayerInput`) that just follows
+  the human player; 3-way menu cycle; assign it to P2 when CPU is selected.
+  Proves the seam.
+- **B — combat.** Aim + fire at nearest living enemy; trigger fish frenzy when
+  available.
+- **C — smarts.** Fish-seeking, swim-surge dodging, keep-distance, tuning.
+
+Implementation note: `Player._physics_process` needs to tick the AI each frame
+(before `get_input()` reads it) — an "update" hook on `PlayerInput` that the AI
+overrides and the device version leaves empty.
+
 ---
 
 ## Effort & sequencing
