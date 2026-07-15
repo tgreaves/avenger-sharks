@@ -15,8 +15,9 @@ Status (all play-tested, single-player unchanged throughout):
 - **Phase 4 — DONE.** Per-player powerup bar (4a) and simultaneous per-player
   upgrade screen (4b): vertical column UI with a manual cursor (keys/controller
   + mouse), per-player offers/summary, CPU deliberation + confirm flash.
-- **Phase 6 — TODO.** Menu/config polish: two-gamepad device-setup screen,
-  colour presets. Plus: verify the two-gamepad pairing on real hardware.
+- **Phase 6 — IN PROGRESS.** Device-setup / join screen DONE. Remaining:
+  two-gamepad hardware verification, colour presets, separate 1P/2P high scores,
+  single-player-assumption audit.
 
 The full two-player feature is complete and play-tested. Only Phase 6 (menu/
 config polish + the two-gamepad hardware check) remains; it does not block play.
@@ -350,47 +351,55 @@ subset in any order.
 **Done already:**
 - Main-menu player-count toggle (1 / 2 / 2-CPU 3-way cycle), reusing the
   `game_mode` toggle pattern.
+- **Device-setup / lobby screen (was item 1) — DONE.** `Scenes/SetupScreen.tscn`
+  + `Scripts/SetupScreen.gd`, instanced in `Main.tscn`; new `SETUP_SCREEN` game
+  status. Shown after START only for **2P-human** (1P and 2P-CPU start
+  directly). **Press-to-join / drop-in:** each unclaimed device (keyboard/mouse
+  or a gamepad) presses confirm (A / Enter / Space / left-click) to take the
+  next free slot in join order (P1 then P2); back (B / Esc) leaves a slot, or
+  cancels to the main menu if none claimed. Confirm with both slots filled
+  starts the game. The chosen devices feed `Main.player_devices`, which
+  `assign_player_devices()` now reads instead of the old hard-coded pairing
+  (keyboard-slot haptics map to gamepad 0 via `_haptics_device_for()`). The
+  keyboard slot renders as "KEYBOARD + MOUSE"; columns are top-aligned with a
+  fixed-height status box so headings don't shift when a device is claimed.
+  Colour picking was dropped from scope (kept the fixed `PLAYER_1/2_TINT`).
 
 **Remaining items:**
 
-1. **Device-setup / lobby screen** (the big one; needs a design decision first).
-   Today the 2P device assignment is **hard-coded**: P1 = keyboard/mouse,
-   P2 = gamepad 0 (see `Main.assign_player_devices()`). This screen lets players
-   choose who's on what. Open design question: how do players join —
-   **fixed start** vs **"press a button to join / claim a device"** drop-in.
-   This screen is the natural home for items 3 and 4 below.
-
-2. **Two-gamepad hardware verification** (quick; needs a second controller).
+1. **Two-gamepad hardware verification** (quick; needs a second controller).
    The two-gamepad pairing (P1 = pad 0, P2 = pad 1) has never been tested on
    real hardware — it shares the validated `SPECIFIC` `PlayerInput` code path,
-   so it is expected to work but is unverified. Pairs with item 1 (assigning two
-   pads). The input model itself was proven via the spike (`Spikes/`).
+   so it is expected to work but is unverified. The setup screen (now done)
+   already supports claiming two pads. The input model itself was proven via the
+   spike (`Spikes/`).
 
-3. **Player-selectable shark colours.** Let each player pick their shark colour
-   from presets, ideally on the setup screen (item 1). Today the tints are fixed
-   constants (`PLAYER_1_TINT` / `PLAYER_2_TINT` in `Constants.gd`). They apply
-   via the sprite `self_modulate`, amplified above 1.0 to stay vivid — presets
-   should follow the same approach (or move to a shader recolour for cleaner
-   results, per the TODO graphics idea). Watch the interaction with the
-   power-pellet red / damage-flash modulate.
+2. **Player-selectable shark colours.** Let each player pick their shark colour
+   from presets, ideally on the (now-built) setup screen. Today the tints are
+   fixed constants (`PLAYER_1_TINT` / `PLAYER_2_TINT` in `Constants.gd`). They
+   apply via the sprite `self_modulate`, amplified above 1.0 to stay vivid —
+   presets should follow the same approach (or move to a shader recolour for
+   cleaner results, per the TODO graphics idea). Watch the interaction with the
+   power-pellet red / damage-flash modulate. (Deferred out of the setup-screen
+   work — the screen currently keeps the fixed tints.)
 
-4. **Separate high scores for 1P vs 2P (incl. CPU).** Solo and co-op are
+3. **Separate high scores for 1P vs 2P (incl. CPU).** Solo and co-op are
    different challenges and should not share a leaderboard. Today there is a
    single `"high_score"` stat key, read/written in `Main.gd`
    (`update_high_score()`, `best_score()`, and the HUD "HIGH SCORE" display via
    `Storage.stats`). Split it by mode — e.g. `high_score` / `high_score_2p`,
    selected on `player_count`. Small, self-contained.
 
-5. **Single-player-assumption audit** (verification sweep). Check/fix systems
+4. **Single-player-assumption audit** (verification sweep). Check/fix systems
    that may still assume one player: **artillery targeting** (`$Player.position`
    → should target among players), **dinosaur rampage**, **Fish Frenzy**,
    power-pellet music (global — probably fine). Some may already be correct;
    this is a "check each" pass.
 
-**Suggested sequencing:** two-gamepad verification (item 2) first once the
-second controller is available; then the device-setup screen (item 1) as the
-anchor, with colours (3) and two-pad assignment folded in; then separate high
-scores (4) and the audit (5) as small independent commits.
+**Suggested sequencing:** two-gamepad verification (item 1) once the second
+controller is available; then colours (item 2) folded onto the setup screen;
+then separate high scores (item 3) and the audit (item 4) as small independent
+commits.
 
 ## Phase 7 — CPU-controlled player 2 (also a testing aid) — DONE
 

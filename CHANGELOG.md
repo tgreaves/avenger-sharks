@@ -9,10 +9,13 @@
 		* Both players choose their between-wave upgrade at the same time.
 		* A downed player sits out the rest of the wave and returns next wave; game over only when both are down.
 		* Optional CPU-controlled second player.
+		* Two-player device setup screen: each player presses a button to claim their controller (or keyboard + mouse) before the game starts.
+		* Separate high scores for each mode: 1 player, 2 players, and 2 players (CPU).
 * Bug fixes:
 	* PACIFIST mode: fish counter failed to update at wave start due to a misspelt game mode check.
 	* GRENADE fire rate no longer carries over from a previous game; grenade delay is now reset at the start of each new game.
 	* Fixed a crash at wave end if the survival timer expired with no enemies on screen.
+	* OPTIONS: fixed the oversized ENABLE HAPTICS button (a stray line break made its row taller than the others).
 * Platform:
 	* Godot upgrade to 4.7.stable.
 	* Steam: GodotSteam GDExtension upgraded to 4.20.

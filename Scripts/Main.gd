@@ -15,6 +15,7 @@ enum {
 	DEDICATION,
 	INTRO_SEQUENCE,
 	MAIN_MENU,
+	SETUP_SCREEN,
 	CREDITS,
 	STATISTICS,
 	OPTIONS,
@@ -125,6 +126,7 @@ func _ready():
 	$Arena.visible = false
 	$HUD/CanvasLayer.visible = false
 	$MainMenu.get_node("CanvasLayer").visible = false
+	$SetupScreen.get_node("CanvasLayer").visible = false
 	$PauseMenu.get_node("CanvasLayer").visible = false
 	$Statistics.get_node("CanvasLayer").visible = false
 	$Credits.get_node("CanvasLayer").visible = false
@@ -195,10 +197,26 @@ func best_score():
 	return best
 
 
-# Persist the high score if any shark has beaten it.
+# Which high-score stat key applies to the current mode. Solo, two-human co-op,
+# and CPU-assisted co-op are each a different challenge, so each keeps its own
+# board.
+func high_score_key():
+	if player_count == 2:
+		if player_two_is_cpu:
+			return "high_score_2p_cpu"
+		return "high_score_2p"
+	return "high_score"
+
+
+# The stored high score for the current mode.
+func high_score():
+	return Storage.stats.get_value("player", high_score_key(), 0)
+
+
+# Persist the high score if any shark has beaten it (for the current mode).
 func update_high_score():
-	if best_score() > Storage.stats.get_value("player", "high_score"):
-		Storage.stats.set_value("player", "high_score", best_score())
+	if best_score() > high_score():
+		Storage.stats.set_value("player", high_score_key(), best_score())
 
 
 # The canonical player for reading shared/player stats (upgrades, powerups, etc.).
@@ -229,6 +247,10 @@ func get_nearest_player(from_position):
 # Player 2 (the scene-instanced $Player is always player 1). Held so we can
 # despawn it when returning to a single-player menu.
 var player_two = null
+# Device id assigned to each human player slot ([P1, P2]) for 2-player SPECIFIC
+# input. Defaults to the historical hard-coded pairing (P1 keyboard/mouse,
+# P2 gamepad 0); the setup screen overwrites these before a 2P-human game.
+var player_devices = [PlayerInput.KEYBOARD_DEVICE, 0]
 # The shark currently carrying the wave-end key (null until one grabs it), so a
 # second shark can't also pick it up.
 var key_holder = null
@@ -279,25 +301,39 @@ func sync_player_instances():
 
 # Assign each player's input source and haptics device based on player_count.
 #   1-player: player 1 uses ANY (keyboard/mouse AND controller both drive it).
-#   2-player: player 1 = keyboard/mouse, player 2 = gamepad 0.
+#   2-player: each human slot uses the device chosen on the setup screen
+#             (player_devices). CPU player 2 is driven by AiInput.
+# Haptics only fire on gamepads: a keyboard slot maps to device 0 (harmless, no
+# rumble), otherwise the slot's own gamepad id.
 func assign_player_devices():
 	var player_one = get_primary_player()
 
 	if player_count == 2:
-		player_one.input = PlayerInput.new(PlayerInput.Mode.SPECIFIC, PlayerInput.KEYBOARD_DEVICE)
-		player_one.haptics_device = 0  # No rumble on keyboard; harmless.
+		var p1_device = player_devices[0]
+		player_one.input = PlayerInput.new(PlayerInput.Mode.SPECIFIC, p1_device)
+		player_one.haptics_device = _haptics_device_for(p1_device)
 
 		if player_two != null:
 			if player_two_is_cpu:
 				player_two.input = AiInput.new()
+				player_two.haptics_device = 0
 			else:
-				player_two.input = PlayerInput.new(PlayerInput.Mode.SPECIFIC, 0)  # Gamepad 0.
-			player_two.haptics_device = 0
+				var p2_device = player_devices[1]
+				player_two.input = PlayerInput.new(PlayerInput.Mode.SPECIFIC, p2_device)
+				player_two.haptics_device = _haptics_device_for(p2_device)
 			player_two.player_tint = constants.PLAYER_2_TINT
 			player_two.apply_tint()
 	else:
 		player_one.input = PlayerInput.new(PlayerInput.Mode.ANY)
 		player_one.haptics_device = 0
+
+
+# Gamepad id to use for haptics for a given input device. Keyboard has no rumble,
+# so it maps to device 0 (harmless if nothing is plugged in there).
+func _haptics_device_for(device_id):
+	if device_id == PlayerInput.KEYBOARD_DEVICE:
+		return 0
+	return device_id
 
 
 func despawn_player_two():
@@ -1161,9 +1197,7 @@ func _on_enemy_update_score_display():
 
 	$HUD.get_node("CanvasLayer/Score2").visible = show_second
 
-	$HUD.get_node("CanvasLayer/HighScore").text = (
-		"HIGH SCORE\n" + str(Storage.stats.get_value("player", "high_score"))
-	)
+	$HUD.get_node("CanvasLayer/HighScore").text = "HIGH SCORE\n" + str(high_score())
 
 
 func _two_human_players():
@@ -1386,7 +1420,40 @@ func _on_player_player_found_exit():
 
 
 func _on_main_menu_start_game_pressed():
+	# Two human players first pick their devices on the setup screen. Single
+	# player and 2-player-CPU (no second human device to claim) start directly.
+	if player_count == 2 and not player_two_is_cpu:
+		show_setup_screen()
+	else:
+		start_game()
+
+
+# Show the two-player device setup / join screen.
+func show_setup_screen():
+	game_status = SETUP_SCREEN
+	$MainMenu.get_node("CanvasLayer").visible = false
+	$MainMenu.set_process_input(false)
+	$SetupScreen.get_node("CanvasLayer").visible = true
+	$SetupScreen.open()
+
+
+# Setup screen: both devices claimed and confirmed. Store the chosen devices and
+# start the game.
+func _on_setup_screen_setup_confirmed(devices):
+	player_devices = devices
+	$SetupScreen.close()
+	$SetupScreen.get_node("CanvasLayer").visible = false
 	start_game()
+
+
+# Setup screen cancelled: return to the main menu.
+func _on_setup_screen_setup_cancelled():
+	$SetupScreen.close()
+	$SetupScreen.get_node("CanvasLayer").visible = false
+	game_status = MAIN_MENU
+	$MainMenu.get_node("CanvasLayer").visible = true
+	$MainMenu.set_process_input(true)
+	$MainMenu/CanvasLayer/MainMenuContainer/StartGame.grab_focus()
 
 
 func _on_main_menu_exit_game_pressed():
@@ -1593,6 +1660,9 @@ func update_player_count_label():
 	if player_count == 2 and player_two_is_cpu:
 		label += " (CPU)"
 	$MainMenu/CanvasLayer/MainMenuContainer/PlayerCount.text = label
+
+	# The menu HIGH SCORE reflects the currently-selected mode's board.
+	$HUD.get_node("CanvasLayer/HighScore").text = "HIGH SCORE\n" + str(high_score())
 
 
 func _on_main_menu_statistics_pressed():

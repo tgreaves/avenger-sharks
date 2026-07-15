@@ -131,8 +131,7 @@ size_flags_horizontal = 3
 size_flags_vertical = 1
 theme_override_fonts/font = ExtResource("2_2d14t")
 theme_override_font_sizes/font_size = 64
-text = "ENABLE HAPTICS
-"
+text = "ENABLE HAPTICS"
 
 [node name="EnableHapticsSetting" type="Button" parent="CanvasLayer/OptionsContainer/EnableHapticsContainer"]
 layout_mode = 2

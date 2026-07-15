@@ -17,6 +17,7 @@
 [ext_resource type="PackedScene" uid="uid://ds5km1djhril" path="res://Scenes/Arena.tscn" id="11_cdl54"]
 [ext_resource type="PackedScene" uid="uid://bcqacic7yj4ds" path="res://Scenes/HUD.tscn" id="12_ldcme"]
 [ext_resource type="PackedScene" uid="uid://dc60erflcrf6" path="res://Scenes/MainMenu.tscn" id="13_u3xax"]
+[ext_resource type="PackedScene" uid="uid://b2setupscrn01" path="res://Scenes/SetupScreen.tscn" id="13_setupscrn"]
 [ext_resource type="PackedScene" uid="uid://dfksl6get6jnk" path="res://Scenes/PauseMenu.tscn" id="14_fssl1"]
 [ext_resource type="PackedScene" uid="uid://5yp4e43ckdrj" path="res://Scenes/Player.tscn" id="15_3wn6m"]
 [ext_resource type="PackedScene" uid="uid://ci0jxmpdr3ue5" path="res://Scenes/Options.tscn" id="15_ai8du"]
@@ -65,6 +66,8 @@ offset_left = -1018.0
 offset_top = 93.0
 offset_right = -1018.0
 offset_bottom = 93.0
+
+[node name="SetupScreen" parent="." instance=ExtResource("13_setupscrn")]
 
 [node name="PauseMenu" parent="." unique_id=1467719564 instance=ExtResource("14_fssl1")]
 process_mode = 3
@@ -160,6 +163,8 @@ bus = &"Effects"
 [connection signal="options_pressed" from="MainMenu" to="." method="_on_main_menu_options_pressed"]
 [connection signal="start_game_pressed" from="MainMenu" to="." method="_on_main_menu_start_game_pressed"]
 [connection signal="statistics_pressed" from="MainMenu" to="." method="_on_main_menu_statistics_pressed"]
+[connection signal="setup_confirmed" from="SetupScreen" to="." method="_on_setup_screen_setup_confirmed"]
+[connection signal="setup_cancelled" from="SetupScreen" to="." method="_on_setup_screen_setup_cancelled"]
 [connection signal="abandon_game_pressed" from="PauseMenu" to="." method="_on_pause_menu_abandon_game_pressed"]
 [connection signal="unpause_game_pressed" from="PauseMenu" to="." method="_on_pause_menu_unpause_game_pressed"]
 [connection signal="credits_return_button_pressed" from="Credits" to="." method="_on_credits_credits_return_button_pressed"]

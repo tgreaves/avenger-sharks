@@ -41,6 +41,8 @@ func load_stats():
 	if err != OK:
 		# Could not load stats.  That's OK, might be first run.
 		stats.set_value("player", "high_score", 0)
+		stats.set_value("player", "high_score_2p", 0)
+		stats.set_value("player", "high_score_2p_cpu", 0)
 		stats.set_value("player", "games_played", 0)
 		stats.set_value("player", "shots_fired", 0)
 		stats.set_value("player", "enemies_defeated", 0)
