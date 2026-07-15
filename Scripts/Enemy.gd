@@ -692,6 +692,14 @@ func is_enemy_alive():
 	return false
 
 
+# Worth aiming/firing at: still on the field (spawning or wandering), not dying
+# or escaping. Spawning enemies are not yet damageable, but a human fires at
+# them anyway and the shots land as they become vulnerable — the CPU matches
+# that so it opens fire immediately at wave start.
+func is_enemy_targetable():
+	return state == SPAWNING or state == WANDER
+
+
 func consider_calling_for_help():
 	$CallForHelpTimer.set_wait_time(randf_range(0.1, 0.4))
 	$CallForHelpTimer.start()

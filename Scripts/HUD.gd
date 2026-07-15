@@ -6,6 +6,11 @@ const POWERUP_BAR_SEQUENCE = ["SPEED UP", "FAST SPRAY", "BIG SPRAY", "GRENADE", 
 
 var powerup_index = 0
 
+# Player 2's powerup bar (a runtime clone of player 1's authored container),
+# created by add_second_powerup_bar() when a second player is present.
+var powerup_container_2 = null
+
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	powerup_index = 0
@@ -16,8 +21,38 @@ func _process(_delta):
 	pass
 
 
-func activate_powerup(powerup):
-	var single_powerup = $CanvasLayer/PowerUpContainer.get_node(powerup)
+# Create player 2's powerup bar by cloning player 1's, anchored bottom-right.
+# Safe to call more than once.
+func add_second_powerup_bar():
+	if powerup_container_2 != null:
+		return
+	powerup_container_2 = $CanvasLayer/PowerUpContainer.duplicate()
+	powerup_container_2.name = "PowerUpContainer2"
+	# Bottom-right (mirrors player 1's bottom-left).
+	powerup_container_2.anchor_left = 1.0
+	powerup_container_2.anchor_right = 1.0
+	powerup_container_2.offset_left = -500.0
+	powerup_container_2.offset_right = -20.0
+	powerup_container_2.grow_horizontal = 0
+	$CanvasLayer.add_child(powerup_container_2)
+
+
+func remove_second_powerup_bar():
+	if powerup_container_2 != null:
+		powerup_container_2.queue_free()
+		powerup_container_2 = null
+
+
+# The powerup container for the given player: player 1 uses the authored one,
+# player 2 its clone. Falls back to player 1's container.
+func container_for(player):
+	if powerup_container_2 != null and player != get_parent().get_primary_player():
+		return powerup_container_2
+	return $CanvasLayer/PowerUpContainer
+
+
+func activate_powerup(player, powerup):
+	var single_powerup = container_for(player).get_node(powerup)
 
 	single_powerup.get_node("Label/ProgressBar").value = (
 		single_powerup.get_node("Label/ProgressBar").max_value
@@ -26,8 +61,8 @@ func activate_powerup(powerup):
 	single_powerup.visible = true
 
 
-func deactivate_powerup(powerup):
-	var single_powerup = $CanvasLayer/PowerUpContainer.get_node(powerup)
+func deactivate_powerup(player, powerup):
+	var single_powerup = container_for(player).get_node(powerup)
 
 	single_powerup.get_node("Label/ProgressBar").value = (
 		single_powerup.get_node("Label/ProgressBar").max_value
@@ -38,27 +73,33 @@ func deactivate_powerup(powerup):
 
 func show_powerup_bar():
 	$CanvasLayer/PowerUpContainer.visible = true
+	if powerup_container_2 != null:
+		powerup_container_2.visible = true
 
 
 func hide_powerup_bar():
 	$CanvasLayer/PowerUpContainer.visible = false
+	if powerup_container_2 != null:
+		powerup_container_2.visible = false
 
 
 func reset_powerup_bar():
 	powerup_index = 0
 
-	for single_powerup in $CanvasLayer/PowerUpContainer.get_children():
-		single_powerup.visible = false
-		single_powerup.get_node("Label/ProgressBar").max_value = constants.POWERUP_ACTIVE_DURATION
+	for container in _all_containers():
+		for single_powerup in container.get_children():
+			single_powerup.visible = false
+			single_powerup.get_node("Label/ProgressBar").max_value = constants.POWERUP_ACTIVE_DURATION
 
 
 func reset_powerup_bar_text():
-	for single_powerup in $CanvasLayer/PowerUpContainer.get_children():
-		single_powerup.get_node("Label").text = single_powerup.name
+	for container in _all_containers():
+		for single_powerup in container.get_children():
+			single_powerup.get_node("Label").text = single_powerup.name
 
 
-func reset_powerup_bar_durations():
-	var duration_percentage = get_parent().get_primary_player().upgrades["MORE POWER"][0] * 20
+func reset_powerup_bar_durations(player):
+	var duration_percentage = player.upgrades["MORE POWER"][0] * 20
 	var duration = int(
 		(
 			constants.POWERUP_ACTIVE_DURATION
@@ -66,26 +107,34 @@ func reset_powerup_bar_durations():
 		)
 	)
 
-	for single_powerup in $CanvasLayer/PowerUpContainer.get_children():
+	for single_powerup in container_for(player).get_children():
 		single_powerup.get_node("Label/ProgressBar").max_value = duration
 
 
-func set_powerup_level(powerup, level):
+func set_powerup_level(player, powerup, level):
 	var text = " " + str(level)
 
 	if level == 0:
 		text = ""
 
-	if level == get_parent().get_primary_player().max_powerup_levels[powerup]:
+	if level == player.max_powerup_levels[powerup]:
 		text = " MAX"
 
-	var single_powerup = $CanvasLayer/PowerUpContainer.get_node(powerup)
+	var single_powerup = container_for(player).get_node(powerup)
 	single_powerup.get_node("Label").text = powerup + text
 
 
-func set_all_powerup_levels():
+func set_all_powerup_levels(player):
 	for powerup in POWERUP_BAR_SEQUENCE:
-		set_powerup_level(powerup, get_parent().get_primary_player().current_powerup_levels[powerup])
+		set_powerup_level(player, powerup, player.current_powerup_levels[powerup])
+
+
+# Every powerup container currently present (player 1, and player 2 if spawned).
+func _all_containers():
+	var containers = [$CanvasLayer/PowerUpContainer]
+	if powerup_container_2 != null:
+		containers.append(powerup_container_2)
+	return containers
 
 
 func _on_upgrade_button_pressed(button_number):

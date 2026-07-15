@@ -60,7 +60,18 @@ func _follow_players(delta):
 	# Target zoom = fit the players' bounding box plus a margin, capped.
 	var target_zoom = _fit_zoom(players)
 
-	var pos_weight = clamp(constants.CAMERA_POSITION_LERP * delta, 0.0, 1.0)
+	# While players are swimming in at wave start they move faster than the lerp
+	# can follow, which would let them rise into the wave-start text. Track them
+	# rigidly (no lag) until they have settled into normal play.
+	var following_settled = false
+	for p in players:
+		if p.is_player_alive():
+			following_settled = true
+			break
+
+	var pos_weight = 1.0
+	if following_settled:
+		pos_weight = clamp(constants.CAMERA_POSITION_LERP * delta, 0.0, 1.0)
 	var zoom_weight = clamp(constants.CAMERA_ZOOM_LERP * delta, 0.0, 1.0)
 
 	global_position = global_position.lerp(midpoint, pos_weight)

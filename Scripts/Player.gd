@@ -167,7 +167,7 @@ func prepare_for_new_game():
 
 	hud.reset_powerup_bar()
 	hud.reset_powerup_bar_text()
-	hud.set_all_powerup_levels()
+	hud.set_all_powerup_levels(self)
 	hud.update_upgrade_summary()
 
 
@@ -443,9 +443,9 @@ func _physics_process(_delta):
 									recalculate_mini_shark_spacing()
 
 							powerup_label_animation(powerup_selected + "!")
-							hud.activate_powerup(powerup_selected)
+							hud.activate_powerup(self, powerup_selected)
 							hud.set_powerup_level(
-								powerup_selected, current_powerup_levels[powerup_selected]
+								self, powerup_selected, current_powerup_levels[powerup_selected]
 							)
 							$AudioStreamPowerUp.play()
 						"power-pellet":
@@ -871,8 +871,10 @@ func powerup_label_animation_decrease_count():
 # Play this shark's spray sound, but only if Main's throttle allows it (avoids
 # two sharks stacking near-simultaneous shots into a muddy doubled sound).
 func play_spray_sound():
-	if get_parent().request_spray_sound():
-		$AudioStreamPlayerSpray.play()
+	# Route through Main's single shared spray voice (avoids two per-shark
+	# players layering into a doubled sound when firing at slightly different
+	# times).
+	get_parent().play_spray_sound()
 
 
 func set_fire_rate_delay_timer():
@@ -1042,11 +1044,11 @@ func decrease_powerup_level(powerup):
 	current_powerup_levels[powerup] = current_powerup_levels[powerup] - 1
 	if current_powerup_levels[powerup] <= 0:
 		current_powerup_levels[powerup] = 0
-		hud.deactivate_powerup(powerup)
+		hud.deactivate_powerup(self, powerup)
 	else:
-		hud.activate_powerup(powerup)
+		hud.activate_powerup(self, powerup)
 
-	hud.set_powerup_level(powerup, current_powerup_levels[powerup])
+	hud.set_powerup_level(self, powerup, current_powerup_levels[powerup])
 
 
 func _on_hud_upgrade_button_pressed(button_number):
@@ -1085,7 +1087,7 @@ func _on_hud_upgrade_button_pressed(button_number):
 			)
 			$FishProgressBar.max_value = fish_needed
 		"MORE POWER":
-			hud.reset_powerup_bar_durations()
+			hud.reset_powerup_bar_durations(self)
 		"HEAL ME":
 			var original_energy = player_energy
 			player_energy = constants.PLAYER_START_GAME_ENERGY

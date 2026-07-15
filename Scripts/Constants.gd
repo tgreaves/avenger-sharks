@@ -72,10 +72,11 @@ const FOLLOW_STOP_DISTANCE = 250.0
 
 const PLAYER_FIRE_DELAY = 0.15
 const PLAYER_FIRE_DELAY_POWERUP_DECREASE = 0.01
-# Minimum gap between spray shot sounds (seconds). Stops two sharks firing at
-# almost the same instant from stacking into a muddy doubled sound. Well under
-# PLAYER_FIRE_DELAY, so single-player fire is unaffected.
-const SPRAY_SOUND_MIN_INTERVAL = 0.05
+# Minimum gap between (re)triggers of the shared spray voice. Two sharks firing
+# independently would otherwise restart the one voice up to twice as often,
+# chopping the clip into a stuttery "machine gun". ~0.1s keeps it close to a
+# single player's cadence while still allowing FAST SPRAY to feel rapid.
+const SPRAY_SOUND_MIN_INTERVAL = 0.1
 const PLAYER_FIRE_SPEED = 1600
 const PLAYER_FIRE_SIZE_BASE = 0.5
 const PLAYER_FIRE_SIZE_POWERUP_INCREASE = 0.25

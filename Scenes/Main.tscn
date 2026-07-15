@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://cj10txdbe3cd2" path="res://Scripts/Main.gd" id="1_yyejc"]
 [ext_resource type="Script" path="res://Scripts/CoopCamera.gd" id="99_coopcam"]
+[ext_resource type="AudioStream" uid="uid://ba0q1jycm55i3" path="res://Sound/laser5-47286.wav" id="98_spray"]
 [ext_resource type="PackedScene" uid="uid://dlyr1neald0e4" path="res://Scenes/Dedication.tscn" id="2_utmp5"]
 [ext_resource type="PackedScene" uid="uid://dde3f2uantk5b" path="res://Scenes/Intro.tscn" id="2_vh1q3"]
 [ext_resource type="PackedScene" uid="uid://bkmx1mvtb8dxr" path="res://Scenes/Enemy.tscn" id="3_br4mh"]
@@ -139,6 +140,10 @@ bus = &"Music"
 [node name="CountdownEffect" type="AudioStreamPlayer" parent="." unique_id=2082413384]
 stream = ExtResource("23_4lpjy")
 volume_db = 8.0
+bus = &"Effects"
+
+[node name="SpraySound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("98_spray")
 bus = &"Effects"
 
 [connection signal="player_enable_fish_frenzy" from="." to="Player" method="_on_main_player_enable_fish_frenzy"]

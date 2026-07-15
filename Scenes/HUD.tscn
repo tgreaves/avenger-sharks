@@ -106,14 +106,12 @@ text = "TIME"
 horizontal_alignment = 2
 
 [node name="PowerUpContainer" type="VBoxContainer" parent="CanvasLayer" unique_id=1635403270]
-anchors_preset = 3
-anchor_left = 1.0
+anchors_preset = 2
 anchor_top = 1.0
-anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -480.0
+offset_left = 20.0
 offset_top = -26.0
-grow_horizontal = 0
+offset_right = 500.0
 grow_vertical = 0
 
 [node name="SPEED UP" type="VBoxContainer" parent="CanvasLayer/PowerUpContainer" unique_id=1656961841]

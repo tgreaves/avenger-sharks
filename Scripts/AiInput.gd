@@ -26,6 +26,9 @@ const DANGER_DISTANCE := 300.0
 # branches take priority). Kept short so it only detours for genuinely-nearby
 # fish rather than crossing the arena.
 const FISH_SEEK_RANGE := 550.0
+# Grab dropped items / power-up chests within this range, same conditions as
+# fish (not while dodging/retreating).
+const ITEM_SEEK_RANGE := 550.0
 # Recompute the navigation path at most every this many physics frames (A* is
 # not free; the target rarely moves far between frames).
 const PATH_RECOMPUTE_FRAMES := 10
@@ -60,9 +63,11 @@ func update(owner, _delta) -> void:
 	if enemy != null:
 		enemy_distance = owner.global_position.distance_to(enemy.global_position)
 
-	# Combat (independent of movement): aim at and fire on the nearest enemy.
-	if enemy != null and enemy_distance <= ENGAGE_RANGE:
-		_aim = (enemy.global_position - owner.global_position).normalized()
+	# Combat (independent of movement): aim at and fire on the nearest enemy
+	# worth targeting, including ones still spawning, so we open fire at once.
+	var target = _nearest_target_enemy(owner)
+	if target != null and owner.global_position.distance_to(target.global_position) <= ENGAGE_RANGE:
+		_aim = (target.global_position - owner.global_position).normalized()
 		_firing = true
 
 	# Fish frenzy: use it as soon as it is available.
@@ -96,15 +101,11 @@ func update(owner, _delta) -> void:
 		_move = away_from_enemy
 		_path.clear()
 	else:
-		# 3. Not dodging or retreating — grab a nearby fish if there is one
-		# (even with enemies around, since we're at a safe distance here), else
-		# follow the human. Longer-range goals, so navigate obstacles via A*.
-		var target_pos = null
-		var fish = _nearest_fish(owner)
-
-		if fish != null and owner.global_position.distance_to(fish.global_position) <= FISH_SEEK_RANGE:
-			target_pos = fish.global_position
-		else:
+		# 3. Not dodging or retreating — grab the nearest nearby pickup (fish or
+		# item/chest), even with enemies around since we're at a safe distance
+		# here; else follow the human. Navigate obstacles via A*.
+		var target_pos = _nearest_pickup_pos(owner)
+		if target_pos == null:
 			var human = _nearest_human(owner)
 			if human != null:
 				if owner.global_position.distance_to(human.global_position) > FOLLOW_DISTANCE:
@@ -114,6 +115,39 @@ func update(owner, _delta) -> void:
 			_move = _direction_via_path(owner, target_pos)
 		else:
 			_path.clear()
+
+
+# Nearest in-range fish or item to grab, or null. Whichever is closest wins.
+func _nearest_pickup_pos(owner):
+	var best_pos = null
+	var best_distance = INF
+
+	var fish = _nearest_fish(owner)
+	if fish != null:
+		var df = owner.global_position.distance_to(fish.global_position)
+		if df <= FISH_SEEK_RANGE and df < best_distance:
+			best_pos = fish.global_position
+			best_distance = df
+
+	var item = _nearest_item(owner)
+	if item != null:
+		var di = owner.global_position.distance_to(item.global_position)
+		if di <= ITEM_SEEK_RANGE and di < best_distance:
+			best_pos = item.global_position
+			best_distance = di
+
+	return best_pos
+
+
+func _nearest_item(owner):
+	var nearest = null
+	var nearest_distance = INF
+	for it in owner.get_tree().get_nodes_in_group("itemGroup"):
+		var d = owner.global_position.distance_to(it.global_position)
+		if d < nearest_distance:
+			nearest = it
+			nearest_distance = d
+	return nearest
 
 
 # Direction toward `target_pos`, routed around obstacles using the arena's A*
@@ -156,6 +190,21 @@ func _nearest_enemy(owner):
 	var nearest_distance = INF
 	for e in owner.get_tree().get_nodes_in_group("enemyGroup"):
 		if not e.is_enemy_alive():
+			continue
+		var d = owner.global_position.distance_to(e.global_position)
+		if d < nearest_distance:
+			nearest = e
+			nearest_distance = d
+	return nearest
+
+
+# Nearest enemy worth shooting at (includes still-spawning enemies), so the
+# CPU opens fire immediately rather than waiting for enemies to start moving.
+func _nearest_target_enemy(owner):
+	var nearest = null
+	var nearest_distance = INF
+	for e in owner.get_tree().get_nodes_in_group("enemyGroup"):
+		if not e.is_enemy_targetable():
 			continue
 		var d = owner.global_position.distance_to(e.global_position)
 		if d < nearest_distance:

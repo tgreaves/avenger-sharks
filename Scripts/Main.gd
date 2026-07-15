@@ -171,17 +171,18 @@ func get_coop_camera():
 	return $CoopCamera
 
 
-var _last_spray_sound_ms = -1000000
+var _last_spray_sound_ms = -100000
 
 
-# Whether a shark may play its spray shot sound now. Throttled so two sharks
-# firing at nearly the same instant don't stack into a muddy doubled sound.
-func request_spray_sound():
+# Single shared spray voice, rate-capped. One monophonic AudioStreamPlayer means
+# no overlapping copies; the interval stops two sharks retriggering it so fast it
+# turns into a stuttery "machine gun".
+func play_spray_sound():
 	var now = Time.get_ticks_msec()
-	if now - _last_spray_sound_ms >= constants.SPRAY_SOUND_MIN_INTERVAL * 1000.0:
-		_last_spray_sound_ms = now
-		return true
-	return false
+	if now - _last_spray_sound_ms < constants.SPRAY_SOUND_MIN_INTERVAL * 1000.0:
+		return
+	_last_spray_sound_ms = now
+	$SpraySound.play()
 
 
 # The shark that should be credited for a kill/pickup. Human-controlled players
@@ -272,6 +273,8 @@ func sync_player_instances():
 			$Key._on_player_player_found_exit_stop_key_movement
 		)
 		add_child(player_two)
+		# Player 2 gets its own powerup bar (bottom-right).
+		$HUD.add_second_powerup_bar()
 	elif player_count == 1 and player_two != null:
 		despawn_player_two()
 
@@ -305,6 +308,7 @@ func despawn_player_two():
 	if player_two != null:
 		player_two.queue_free()
 		player_two = null
+	$HUD.remove_second_powerup_bar()
 
 
 func main_menu():
@@ -460,7 +464,10 @@ func prepare_for_wave():
 		player.prepare_for_new_wave()
 		player.visible = true
 		#player.position = Vector2(2650, 2500)
-		player.position = Vector2(2650, 2600) + (PLAYER_2_START_OFFSET * player_index)
+		# y=2521 is one tile above the bottom wall band (row 33): spawning both
+		# sharks clear of it keeps them at the same height (player 2's column has
+		# a wall at the spawn row that would otherwise bump it up ~1 tile).
+		player.position = Vector2(2650, 2521) + (PLAYER_2_START_OFFSET * player_index)
 		player.get_node("AnimatedSprite2D").animation = "default"
 		player.get_node("AnimatedSprite2D").play()
 		player_index += 1
