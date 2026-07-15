@@ -277,6 +277,10 @@ func sync_player_instances():
 		player_move_to_starting_position.connect(
 			player_two._on_main_player_move_to_starting_position
 		)
+		# Low-energy tension music: player 2's peril drives it too (the handlers
+		# recompute from all living sharks).
+		player_two.player_low_energy.connect(_on_player_player_low_energy)
+		player_two.player_no_longer_low_energy.connect(_on_player_player_no_longer_low_energy)
 		# Phase 5 slice 1: player 2 can die. Game over is gated on all players
 		# being dead (see _on_player_player_died).
 		player_two.player_died.connect(_on_player_player_died)
@@ -877,12 +881,17 @@ func spawn_enemy(spawn_to_use, spawn_pattern_to_use, half_spawn_boolean):
 				spawn_enemy_random_position(spawn_array[i])
 				i += 1
 		"CIRCLE_SURROUND_PLAYER":
+			# Surround a living shark (random, for fairness in co-op); at wave
+			# start both sharks are together so either choice encircles both.
+			var circle_target = get_random_living_player()
+			if circle_target == null:
+				circle_target = get_primary_player()
 			var i = 0
 			while i < number_to_spawn:
 				var angle_degrees = (360 / number_to_spawn) * (i + 1)
 				var angle_rad = deg_to_rad(angle_degrees)
 				var offset = Vector2(sin(angle_rad), cos(angle_rad)) * 600
-				var enemy_position = $Player.position + offset
+				var enemy_position = circle_target.position + offset
 
 				spawn_enemy_set_position(
 					spawn_array[i], enemy_position, "", Vector2(0, 0).normalized(), false
@@ -1345,6 +1354,15 @@ func get_living_players():
 	return living
 
 
+# A random living player, or null if none are alive. Used to spread artillery
+# strikes fairly across both sharks rather than always targeting player 1.
+func get_random_living_player():
+	var living = get_living_players()
+	if living.is_empty():
+		return null
+	return living[randi() % living.size()]
+
+
 # Is any player currently cheating death? (Wave-end waits for this to resolve.)
 func any_player_cheating_death():
 	for player in get_players():
@@ -1365,6 +1383,10 @@ func _on_player_player_died():
 			if player.is_player_down():
 				player.set_physics_process(false)
 				player.visible = false
+		# A downed shark leaves the living set without emitting a low-energy
+		# signal, so re-evaluate the tension music (a low survivor keeps it up; a
+		# healthy survivor relaxes it).
+		update_low_energy_music()
 
 
 # When one shark grabs the wave-end key: the key sticks to that shark, and the
@@ -1514,12 +1536,25 @@ func _on_main_menu_cheats_pressed():
 	cheat_mode = true
 
 
+# Tension music tracks whether ANY living shark is on low energy — so P2's peril
+# raises it, and it only relaxes once no living shark is low. Both signals just
+# recompute, so it stays correct regardless of which shark emitted.
 func _on_player_player_low_energy():
-	$AudioStreamPlayerMusic.pitch_scale = 1.2
+	update_low_energy_music()
 
 
 func _on_player_player_no_longer_low_energy():
-	$AudioStreamPlayerMusic.pitch_scale = 1.0
+	update_low_energy_music()
+
+
+func update_low_energy_music():
+	var any_low = false
+	for player in get_living_players():
+		if player.player_energy <= constants.PLAYER_LOW_ENERGY_BLINK:
+			any_low = true
+			break
+
+	$AudioStreamPlayerMusic.pitch_scale = 1.2 if any_low else 1.0
 
 
 func upgrade_screen():
@@ -1731,11 +1766,17 @@ func _on_steam_input_device_connected(input_handle):
 func _on_artillery_timer():
 	var mob = artillery_scene.instantiate()
 
+	# Each strike targets a random living shark (falls back to player 1 if none
+	# are currently alive, e.g. mid-transition).
+	var target = get_random_living_player()
+	if target == null:
+		target = get_primary_player()
+
 	var spawn_position
 
 	spawn_position = Vector2(
-		randf_range($Player.position.x - 200, $Player.position.x + 200),
-		randf_range($Player.position.y - 200, $Player.position.y + 200)
+		randf_range(target.position.x - 200, target.position.x + 200),
+		randf_range(target.position.y - 200, target.position.y + 200)
 	)
 
 	mob.get_node(".").set_position(spawn_position)

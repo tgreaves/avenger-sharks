@@ -374,7 +374,7 @@ func _physics_process(_delta):
 					break
 
 				if collision.get_collider().is_in_group("dinosaurGroup"):
-					collided_with.get_node(".").go_on_a_rampage()
+					collided_with.get_node(".").go_on_a_rampage(self)
 					break
 
 				if collision.get_collider().is_in_group("itemGroup"):
@@ -507,9 +507,9 @@ func _physics_process(_delta):
 						var target_direction = Vector2(1, 1).normalized()
 						target_direction = target_direction.rotated(deg_to_rad(360.0 / 32.0) * i)
 						var shark_spray = SharkSprayScene.instantiate()
+						shark_spray.owner_player = self
 						get_parent().add_child(shark_spray)
 						shark_spray.add_to_group("sharkSprayGroup")
-						shark_spray.owner_player = self
 						shark_spray.global_position = position
 						shark_spray.velocity = target_direction * constants.PLAYER_FIRE_SPEED
 
@@ -897,9 +897,9 @@ func set_grenade_rate_delay_timer():
 func mini_shark_fire(shark_fire_direction):
 	for mini_shark in get_tree().get_nodes_in_group("miniSharkGroup"):
 		var mini_shark_spray = SharkSprayScene.instantiate()
+		mini_shark_spray.owner_player = self
 		get_parent().add_child(mini_shark_spray)
 		mini_shark_spray.add_to_group("miniSharkSprayGroup")
-		mini_shark_spray.owner_player = self
 		mini_shark_spray.global_position = mini_shark.global_position
 		mini_shark_spray.velocity = shark_fire_direction * constants.PLAYER_FIRE_SPEED
 
@@ -1126,9 +1126,9 @@ func confirm_upgrade_choice():
 
 func spawn_shark_spray(target_direction):
 	var shark_spray = SharkSprayScene.instantiate()
+	shark_spray.owner_player = self
 	get_parent().add_child(shark_spray)
 	shark_spray.add_to_group("sharkSprayGroup")
-	shark_spray.owner_player = self
 	shark_spray.global_position = position
 	shark_spray.velocity = velocity + (target_direction * constants.PLAYER_FIRE_SPEED)
 
@@ -1168,8 +1168,19 @@ func remove_aiming_line():
 func end_shark_attack():
 	$AnimatedSprite2D.set_modulate(Color(1, 1, 1, 1))
 	$HungryParticles.set_emitting(false)
-	get_parent().get_node("SharkAttackMusic").stop()
-	get_parent().get_node("AudioStreamPlayerMusic").set_stream_paused(false)
+
+	# SharkAttackMusic is shared, so only stop it (and resume normal music) once
+	# NO shark is still power-pelleted — otherwise one shark's pellet ending would
+	# cut the music short for the other. Callers clear their own flag first.
+	var any_still_attacking = false
+	for player in get_parent().get_players():
+		if player.power_pellet_enabled:
+			any_still_attacking = true
+			break
+
+	if not any_still_attacking:
+		get_parent().get_node("SharkAttackMusic").stop()
+		get_parent().get_node("AudioStreamPlayerMusic").set_stream_paused(false)
 
 	for single_enemy in get_tree().get_nodes_in_group("enemyGroup"):
 		single_enemy.reset_state_timer()

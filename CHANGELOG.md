@@ -11,6 +11,7 @@
 		* Optional CPU-controlled second player.
 		* Two-player device setup screen: each player presses a button to claim their controller (or keyboard + mouse) before the game starts.
 		* Separate high scores for each mode: 1 player, 2 players, and 2 players (CPU).
+		* Co-op fairness pass: each shark's own BIG SPRAY and DOMINANT DINO upgrades now apply to that shark, artillery strikes and circling enemies target either player, and the low-energy / feeding-frenzy music reacts to both sharks.
 * Bug fixes:
 	* PACIFIST mode: fish counter failed to update at wave start due to a misspelt game mode check.
 	* GRENADE fire rate no longer carries over from a previous game; grenade delay is now reset at the start of each new game.

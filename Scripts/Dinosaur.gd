@@ -10,7 +10,7 @@ func _ready():
 	state = IDLE
 
 
-func go_on_a_rampage():
+func go_on_a_rampage(eating_player = null):
 	state = RAMPAGING
 	set_collision_layer_value(6, false)  # No longer be an item.
 	set_collision_layer_value(8, true)  # Be a DINOSAUR!
@@ -20,7 +20,10 @@ func go_on_a_rampage():
 	$AnimatedSprite2D.play("dinosaur-run")
 	$DinosaurAttackTimer.start(0.1)  # Insta attack first time.
 
-	var rampage_percentage = get_parent().get_primary_player().upgrades["DOMINANT DINO"][0] * 20
+	# Rampage length scales with the DOMINANT DINO upgrade of the shark that ate
+	# the dino (falls back to the primary player if not supplied).
+	var owner = eating_player if eating_player != null else get_parent().get_primary_player()
+	var rampage_percentage = owner.upgrades["DOMINANT DINO"][0] * 20
 	var survival_time = (
 		constants.DINOSAUR_SURVIVAL_TIME
 		+ ((rampage_percentage / 100.0) * constants.DINOSAUR_SURVIVAL_TIME)

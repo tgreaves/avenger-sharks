@@ -6,7 +6,10 @@ var owner_player = null
 
 func _ready():
 	$AnimatedSprite2D.play()
-	var player = get_parent().get_primary_player()
+	# Size from the shark that fired this spray (its own BIG SPRAY level), not a
+	# shared "primary" player. owner_player is set by the spawner before add_child,
+	# so it is available here; fall back to the primary player if unset.
+	var player = owner_player if owner_player != null else get_parent().get_primary_player()
 	if player.spray_size:
 		set_global_scale(
 			Vector2(

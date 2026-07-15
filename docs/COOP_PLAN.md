@@ -15,9 +15,9 @@ Status (all play-tested, single-player unchanged throughout):
 - **Phase 4 — DONE.** Per-player powerup bar (4a) and simultaneous per-player
   upgrade screen (4b): vertical column UI with a manual cursor (keys/controller
   + mouse), per-player offers/summary, CPU deliberation + confirm flash.
-- **Phase 6 — IN PROGRESS.** Device-setup / join screen DONE. Remaining:
-  two-gamepad hardware verification, colour presets, separate 1P/2P high scores,
-  single-player-assumption audit.
+- **Phase 6 — IN PROGRESS.** Device-setup / join screen, per-mode high scores,
+  and the single-player-assumption audit DONE. Only two-gamepad hardware
+  verification remains. (Player-selectable colours dropped from scope.)
 
 The full two-player feature is complete and play-tested. Only Phase 6 (menu/
 config polish + the two-gamepad hardware check) remains; it does not block play.
@@ -364,6 +364,37 @@ subset in any order.
   keyboard slot renders as "KEYBOARD + MOUSE"; columns are top-aligned with a
   fixed-height status box so headings don't shift when a device is claimed.
   Colour picking was dropped from scope (kept the fixed `PLAYER_1/2_TINT`).
+- **Separate high scores per mode (was item 4) — DONE.** Three boards, keyed by
+  mode in `Main.high_score_key()`: `high_score` (1P), `high_score_2p` (two
+  humans), `high_score_2p_cpu` (CPU partner). `high_score()` reads the current
+  mode's value (safe `0` default, so old save files need no migration);
+  `update_high_score()` writes the matching key. The HUD/menu HIGH SCORE shows
+  the current mode and refreshes live as the player-count toggle is cycled
+  (`update_player_count_label()`). Storage seeds all three keys.
+- **Single-player-assumption audit (was item 2) — DONE.** Swept the systems that
+  still assumed one shark and fixed six (all co-op-only; 1P behaviour unchanged
+  since the single player is always both "nearest/random living" and the whole
+  "any low" set):
+  - **Spray size** (`SharkSpray._ready`) read `get_primary_player().spray_size`,
+    so P2's BIG SPRAY never enlarged its own spray. Now reads
+    `owner_player.spray_size`; `owner_player` is set *before* `add_child` at all
+    four spawn sites (else `_ready` runs before it's assigned).
+  - **Dinosaur rampage** (`Dinosaur.go_on_a_rampage`) used P1's DOMINANT DINO
+    level; the eating shark is now passed through (`go_on_a_rampage(self)`).
+  - **Artillery** drops (`_on_artillery_timer`) always centred on P1; now target
+    a random living shark via new `get_random_living_player()` (the chase already
+    used `get_nearest_player`).
+  - **Low-energy tension music** was P1-only (P2's signals unconnected, shared
+    `pitch_scale`). Now recomputes from *any* living shark being low
+    (`update_low_energy_music()`), P2's signals are wired, and it's re-evaluated
+    on death (a downed shark leaves the living set without emitting).
+  - **Power-pellet music** (`end_shark_attack`, shared `SharkAttackMusic`) was
+    stopped by whichever shark's pellet ended first; now only stops once no shark
+    is still power-pelleted.
+  - **CIRCLE_SURROUND_PLAYER** spawn placement encircled P1; now encircles a
+    random living shark.
+  - Left as-is (correct): the wave-start camera snap to `$Player.position`
+    (both sharks spawn together and `CoopCamera` takes over immediately).
 
 **Remaining items:**
 
@@ -374,32 +405,11 @@ subset in any order.
    already supports claiming two pads. The input model itself was proven via the
    spike (`Spikes/`).
 
-2. **Player-selectable shark colours.** Let each player pick their shark colour
-   from presets, ideally on the (now-built) setup screen. Today the tints are
-   fixed constants (`PLAYER_1_TINT` / `PLAYER_2_TINT` in `Constants.gd`). They
-   apply via the sprite `self_modulate`, amplified above 1.0 to stay vivid —
-   presets should follow the same approach (or move to a shader recolour for
-   cleaner results, per the TODO graphics idea). Watch the interaction with the
-   power-pellet red / damage-flash modulate. (Deferred out of the setup-screen
-   work — the screen currently keeps the fixed tints.)
+Player-selectable shark colours were considered and **removed from scope** — the
+game keeps the fixed `PLAYER_1_TINT` / `PLAYER_2_TINT`.
 
-3. **Separate high scores for 1P vs 2P (incl. CPU).** Solo and co-op are
-   different challenges and should not share a leaderboard. Today there is a
-   single `"high_score"` stat key, read/written in `Main.gd`
-   (`update_high_score()`, `best_score()`, and the HUD "HIGH SCORE" display via
-   `Storage.stats`). Split it by mode — e.g. `high_score` / `high_score_2p`,
-   selected on `player_count`. Small, self-contained.
-
-4. **Single-player-assumption audit** (verification sweep). Check/fix systems
-   that may still assume one player: **artillery targeting** (`$Player.position`
-   → should target among players), **dinosaur rampage**, **Fish Frenzy**,
-   power-pellet music (global — probably fine). Some may already be correct;
-   this is a "check each" pass.
-
-**Suggested sequencing:** two-gamepad verification (item 1) once the second
-controller is available; then colours (item 2) folded onto the setup screen;
-then separate high scores (item 3) and the audit (item 4) as small independent
-commits.
+**Suggested sequencing:** only the two-gamepad hardware verification (item 1)
+remains, once the second controller is available.
 
 ## Phase 7 — CPU-controlled player 2 (also a testing aid) — DONE
 
