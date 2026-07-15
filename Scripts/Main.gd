@@ -201,15 +201,18 @@ func sync_player_instances():
 		player_two = PlayerScene.instantiate()
 		# Player 2 swims in to its own start marker so both sharks enter together.
 		player_two.start_marker_name = "PlayerStartLocation2"
-		# Display + wave-start swim-in signals are wired for player 2. Death, fish
+		# Display + wave-start swim-in signals are wired for player 2. Fish
 		# scoring, key/exit hunting and upgrades stay single-player (player 1
-		# only) until the Phase 5 wave-lifecycle work.
+		# only) until later Phase 5 slices.
 		player_update_energy.connect(player_two._on_main_player_update_energy)
 		player_update_fish.connect(player_two._on_main_player_update_fish)
 		player_enable_fish_frenzy.connect(player_two._on_main_player_enable_fish_frenzy)
 		player_move_to_starting_position.connect(
 			player_two._on_main_player_move_to_starting_position
 		)
+		# Phase 5 slice 1: player 2 can die. Game over is gated on all players
+		# being dead (see _on_player_player_died).
+		player_two.player_died.connect(_on_player_player_died)
 		add_child(player_two)
 	elif player_count == 1 and player_two != null:
 		despawn_player_two()
@@ -388,6 +391,8 @@ func prepare_for_wave():
 	for player in get_players():
 		player.set_process(true)
 		player.set_physics_process(true)
+		# Revive any shark downed in the previous wave (no-op for living sharks).
+		player.revive_for_new_wave()
 		player.prepare_for_new_wave()
 		player.visible = true
 		#player.position = Vector2(2650, 2500)
@@ -1115,8 +1120,26 @@ func update_fish_left_display():
 	$HUD.get_node("CanvasLayer").get_node("EnemiesLeft").text = "FISH\n" + str(fish_left_this_wave)
 
 
+# True when every player is down (used to gate co-op game over).
+func are_all_players_dead():
+	for player in get_players():
+		if player.is_player_alive():
+			return false
+	return true
+
+
 func _on_player_player_died():
-	game_over()
+	# In co-op a single death does not end the game — the downed shark sits out
+	# and respawns next wave. Game over only when all players are down.
+	if are_all_players_dead():
+		game_over()
+	else:
+		# Hide the downed shark for the rest of the wave; it respawns at wave
+		# start via revive_for_new_wave().
+		for player in get_players():
+			if not player.is_player_alive():
+				player.set_physics_process(false)
+				player.visible = false
 
 
 func _on_player_player_got_fish():

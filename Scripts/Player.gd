@@ -176,6 +176,20 @@ func prepare_for_new_wave():
 	set_grenade_rate_delay_timer()
 
 
+# Revive a shark that was downed in the previous wave (co-op). Restores it to a
+# clean ALIVE state at full energy. Safe to call on a living shark too.
+func revive_for_new_wave():
+	shark_status = ALIVE
+	player_energy = constants.PLAYER_START_GAME_ENERGY
+	$CollisionShape2D.set_deferred("disabled", false)
+	$AnimatedSprite2D.animation = "default"
+	$AnimatedSprite2D.speed_scale = 1
+	$AnimatedSprite2D.set_modulate(Color(1, 1, 1, 1))
+	$EnergyProgressBar.value = player_energy
+	$EnergyProgressBar.visible = true
+	velocity = Vector2(0, 0)
+
+
 func get_input():
 	if shark_status != ALIVE:
 		return

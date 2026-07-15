@@ -91,15 +91,15 @@ func _fit_zoom(players) -> float:
 
 
 func _living_players() -> Array:
-	var living := []
+	var visible_players := []
 	for p in main.get_players():
-		if p.visible and p.is_player_alive():
-			living.append(p)
-	# Fall back to all players if none report "alive" (e.g. between states), so
-	# the camera never freezes on nothing.
-	if living.is_empty():
+		if p.visible:
+			visible_players.append(p)
+	# Fall back to all players if none are visible (e.g. between states), so the
+	# camera never freezes on nothing.
+	if visible_players.is_empty():
 		return main.get_players()
-	return living
+	return visible_players
 
 
 # --- Screen shake (shared) ---
