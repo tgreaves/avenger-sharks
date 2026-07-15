@@ -341,24 +341,56 @@ Wave-end sequence:
   aggregates; add an "all players dead" helper for the game-over gate.
 - Score stays shared (already global in `Main`) — no per-player reconciliation.
 
-## Phase 6 — Menu, config, polish
+## Phase 6 — Menu, config, polish — TODO (the only remaining phase)
 
-- Main-menu player-count toggle (reuse the existing `game_mode` toggle pattern).
-  DONE (basic 1/2 selector).
-- "Press A to join" drop-in, or fixed 2P start — TBD.
-- **Player/device setup screen** for a 2P game (assign control method to P1/P2).
-  Currently the assignment is hard-coded (P1 = keyboard/mouse, P2 = gamepad 0);
-  this screen would let players choose, and is the natural place for the item
-  below.
-- **Player-selectable shark colours.** Let each player pick their shark colour
-  from a set of presets, ideally on the device-setup screen above. Today the
-  tints are fixed constants (`PLAYER_1_TINT` / `PLAYER_2_TINT`); this makes them
-  a per-player choice. Note the tints apply via `self_modulate` and are amplified
-  above 1.0 to stay vivid — presets should follow the same approach (or move to
-  a shader recolour for cleaner results, per the TODO graphics idea).
-- Audit single-player assumptions in: Fish Frenzy, power-pellet music (global —
-  fine), dinosaur rampage, artillery targeting (`$Player.position` — needs a
-  target choice among players).
+Everything here is refinement / configurability, not core mechanics (those are
+all done). Nothing blocks playing. The items are largely independent — do any
+subset in any order.
+
+**Done already:**
+- Main-menu player-count toggle (1 / 2 / 2-CPU 3-way cycle), reusing the
+  `game_mode` toggle pattern.
+
+**Remaining items:**
+
+1. **Device-setup / lobby screen** (the big one; needs a design decision first).
+   Today the 2P device assignment is **hard-coded**: P1 = keyboard/mouse,
+   P2 = gamepad 0 (see `Main.assign_player_devices()`). This screen lets players
+   choose who's on what. Open design question: how do players join —
+   **fixed start** vs **"press a button to join / claim a device"** drop-in.
+   This screen is the natural home for items 3 and 4 below.
+
+2. **Two-gamepad hardware verification** (quick; needs a second controller).
+   The two-gamepad pairing (P1 = pad 0, P2 = pad 1) has never been tested on
+   real hardware — it shares the validated `SPECIFIC` `PlayerInput` code path,
+   so it is expected to work but is unverified. Pairs with item 1 (assigning two
+   pads). The input model itself was proven via the spike (`Spikes/`).
+
+3. **Player-selectable shark colours.** Let each player pick their shark colour
+   from presets, ideally on the setup screen (item 1). Today the tints are fixed
+   constants (`PLAYER_1_TINT` / `PLAYER_2_TINT` in `Constants.gd`). They apply
+   via the sprite `self_modulate`, amplified above 1.0 to stay vivid — presets
+   should follow the same approach (or move to a shader recolour for cleaner
+   results, per the TODO graphics idea). Watch the interaction with the
+   power-pellet red / damage-flash modulate.
+
+4. **Separate high scores for 1P vs 2P (incl. CPU).** Solo and co-op are
+   different challenges and should not share a leaderboard. Today there is a
+   single `"high_score"` stat key, read/written in `Main.gd`
+   (`update_high_score()`, `best_score()`, and the HUD "HIGH SCORE" display via
+   `Storage.stats`). Split it by mode — e.g. `high_score` / `high_score_2p`,
+   selected on `player_count`. Small, self-contained.
+
+5. **Single-player-assumption audit** (verification sweep). Check/fix systems
+   that may still assume one player: **artillery targeting** (`$Player.position`
+   → should target among players), **dinosaur rampage**, **Fish Frenzy**,
+   power-pellet music (global — probably fine). Some may already be correct;
+   this is a "check each" pass.
+
+**Suggested sequencing:** two-gamepad verification (item 2) first once the
+second controller is available; then the device-setup screen (item 1) as the
+anchor, with colours (3) and two-pad assignment folded in; then separate high
+scores (4) and the audit (5) as small independent commits.
 
 ## Phase 7 — CPU-controlled player 2 (also a testing aid) — DONE
 
