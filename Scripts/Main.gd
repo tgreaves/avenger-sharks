@@ -85,6 +85,10 @@ func _ready():
 
 	$ArtilleryTimer.connect("timeout", _on_artillery_timer)
 
+	# Player 1 also notifies Main on key grab (so player 2 can follow it). This
+	# is in addition to the scene-wired Player 1 -> Key connection.
+	$Player.player_got_key.connect(_on_player_got_key)
+
 	if Engine.has_singleton("Steam") && (OS.has_feature("steam") or constants.DEV_STEAM_TESTING):
 		SteamClient.steam_setup()
 		SteamClient.SteamEngine.overlay_toggled.connect(_on_steam_overlay_toggled)
@@ -218,6 +222,12 @@ func get_nearest_player(from_position):
 # Player 2 (the scene-instanced $Player is always player 1). Held so we can
 # despawn it when returning to a single-player menu.
 var player_two = null
+# The shark currently carrying the wave-end key (null until one grabs it), so a
+# second shark can't also pick it up.
+var key_holder = null
+# Wave-end exit tracking: how many sharks must reach the exit, and how many have.
+var players_to_exit = 0
+var players_exited = 0
 
 
 # Ensure the number of live player nodes matches player_count. Player 1 is the
@@ -241,6 +251,13 @@ func sync_player_instances():
 		player_two.player_died.connect(_on_player_player_died)
 		# Phase 5 slice 2a: player 2's fish score for player 2.
 		player_two.player_got_fish.connect(_on_player_player_got_fish)
+		# Phase 5 slice 3a: player 2 joins the wave-end key hunt / exit.
+		player_hunt_key.connect(player_two._on_main_player_hunt_key)
+		player_two.player_got_key.connect(_on_player_got_key)
+		player_two.player_found_exit.connect(_on_player_player_found_exit)
+		player_two.player_found_exit_stop_key_movement.connect(
+			$Key._on_player_player_found_exit_stop_key_movement
+		)
 		add_child(player_two)
 	elif player_count == 1 and player_two != null:
 		despawn_player_two()
@@ -554,27 +571,34 @@ func start_wave():
 
 
 func wave_end():
-	
-	if $Player.is_player_cheating_death():
+
+	# Wait for any cheat-death payoff (on any shark) to finish first.
+	if any_player_cheating_death():
 		Logging.log_entry("Setting game_status to CHEATING_DEATH_AT_WAVE_END")
 		$HUD.get_node("CanvasLayer/Label").visible = false
 
 		game_status = CHEATING_DEATH_AT_WAVE_END
 		return
 
-	# Don't let wave end if the player beat it by dying!
-	if !$Player.is_player_alive():
+	# Don't let the wave end if every player beat it by dying.
+	if get_living_players().is_empty():
 		return
 
 	game_status = GETTING_KEY
+	key_holder = null  # No one holds the key yet this wave-end.
+	# Every living shark must reach the exit before the wave completes.
+	players_to_exit = get_living_players().size()
+	players_exited = 0
 
-	if $Player.power_pellet_enabled:
-		$Player.power_pellet_enabled = false
-		$Player.power_pellet_warning_running = false
-		$Player.end_shark_attack()
+	# End power-pellet / fish-frenzy states on every living shark.
+	for player in get_living_players():
+		if player.power_pellet_enabled:
+			player.power_pellet_enabled = false
+			player.power_pellet_warning_running = false
+			player.end_shark_attack()
 
-	if $Player.is_player_in_fish_frenzy():
-		$Player.stop_fish_frenzy()
+		if player.is_player_in_fish_frenzy():
+			player.stop_fish_frenzy()
 
 	for enemy in get_tree().get_nodes_in_group("enemyGroup"):
 		enemy.swim_escape()
@@ -975,8 +999,10 @@ func _process(_delta):
 			update_time_left_display()
 
 		if fish_left_this_wave == 0 && game_mode == "PACIFIST":
-			# Spawn key where player is.
-			$Key.global_position = $Player.global_position
+			# Spawn the key on a living player.
+			var living = get_living_players()
+			if living.size():
+				$Key.global_position = living[0].global_position
 			$Key.show()
 			$Key/CollisionShape2D.disabled = false
 			$Key/AnimatedSprite2D.play()
@@ -1259,6 +1285,23 @@ func are_all_players_dead():
 	return true
 
 
+# Living players (ALIVE or FISH_FRENZY) — used to drive co-op wave-end.
+func get_living_players():
+	var living = []
+	for player in get_players():
+		if player.is_player_alive():
+			living.append(player)
+	return living
+
+
+# Is any player currently cheating death? (Wave-end waits for this to resolve.)
+func any_player_cheating_death():
+	for player in get_players():
+		if player.is_player_cheating_death():
+			return true
+	return false
+
+
 func _on_player_player_died():
 	# In co-op a single death does not end the game — the downed shark sits out
 	# and respawns next wave. Game over only when all players are down.
@@ -1271,6 +1314,18 @@ func _on_player_player_died():
 			if not player.is_player_alive():
 				player.set_physics_process(false)
 				player.visible = false
+
+
+# When one shark grabs the wave-end key: the key sticks to that shark, and the
+# other living sharks follow it to the exit (only the holder opens the door).
+func _on_player_got_key(holder):
+	$Key.start_following(holder)
+	# Iterate all players (not get_living_players): a shark hunting the key is in
+	# HUNTING_KEY, which is_player_alive() does not count. follow_key_holder()
+	# itself guards that only a still-hunting shark switches to following.
+	for player in get_players():
+		if player != holder:
+			player.follow_key_holder(holder)
 
 
 func _on_player_player_got_fish(collecting_player):
@@ -1293,7 +1348,19 @@ func _on_player_player_got_fish(collecting_player):
 			collecting_player._on_main_player_enable_fish_frenzy()
 
 func _on_player_player_found_exit():
-	wave_end_cleanup()
+	players_exited += 1
+
+	# The key-holder exits first; only then do the following sharks head through
+	# the door, so nobody barges ahead of the shark carrying the key.
+	if players_exited < players_to_exit:
+		for player in get_players():
+			player.go_through_open_door()
+		return
+
+	# Fade the screen once the last shark is through, then end the wave.
+	var tween = get_tree().create_tween()
+	tween.tween_property(self, "modulate", Color(0, 0, 0, 0), 0.35)
+	tween.tween_callback(wave_end_cleanup)
 
 
 func _on_main_menu_start_game_pressed():
@@ -1568,13 +1635,15 @@ func _on_wave_time_left_timer_timeout():
 		update_time_left_display()
 
 		# Have a random enemy drop the key in fear.
-		# If there are no enemies left, drop it on the player instead.
+		# If there are no enemies left, drop it on a living player instead.
 		var enemies = get_tree().get_nodes_in_group("enemyGroup")
 		if enemies.size():
 			var random_enemy_idx = randi_range(0, enemies.size() - 1)
 			$Key.global_position = enemies[random_enemy_idx].global_position
 		else:
-			$Key.global_position = $Player.global_position
+			var living = get_living_players()
+			if living.size():
+				$Key.global_position = living[0].global_position
 		$Key.show()
 		$Key/CollisionShape2D.disabled = false
 		$Key/AnimatedSprite2D.play()

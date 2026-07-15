@@ -2,12 +2,19 @@
 
 # 1.4.0 (2026-xx-xx)
 
-* Platform:
-	* Godot upgrade to 4.7.stable.
-	* Steam: GodotSteam GDExtension upgraded to 4.20.
+* Gameplay:
+	* LOCAL TWO-PLAYER CO-OP! A second shark can join on a gamepad, or be computer-controlled.
+		* Shared zoom-to-fit camera that keeps both sharks in view.
+		* Each player has their own energy, FISH FRENZY, power-ups and score.
+		* A downed player sits out the rest of the wave and returns next wave; game over only when both are down.
+		* Optional CPU-controlled second player.
 * Bug fixes:
 	* PACIFIST mode: fish counter failed to update at wave start due to a misspelt game mode check.
 	* GRENADE fire rate no longer carries over from a previous game; grenade delay is now reset at the start of each new game.
+	* Fixed a crash at wave end if the survival timer expired with no enemies on screen.
+* Platform:
+	* Godot upgrade to 4.7.stable.
+	* Steam: GodotSteam GDExtension upgraded to 4.20.
 * Misc:
 	* [INTERNAL] Arena migrated from the deprecated TileMap node to TileMapLayer nodes.
 

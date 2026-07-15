@@ -2,7 +2,7 @@ extends CharacterBody2D
 
 signal player_died
 signal player_got_fish(collecting_player)
-signal player_got_key
+signal player_got_key(holder)
 signal player_found_exit_stop_key_movement
 signal player_found_exit
 signal player_low_energy
@@ -20,7 +20,8 @@ enum {
 	MOVING_TO_START_POSITION,
 	EXPLODING,
 	EXPLODED,
-	CHEATING_DEATH
+	CHEATING_DEATH,
+	FOLLOWING_KEY_HOLDER
 }
 
 const SharkSprayScene = preload("res://Scenes/SharkSpray.tscn")
@@ -42,6 +43,8 @@ var player_score = 0
 var player_score_multiplier = 1
 # Fish collected toward this shark's own FISH FRENZY (per-player bar/frenzy).
 var fish_collected = 0
+# True while this shark is carrying the wave-end key (it opens the exit door).
+var has_key = false
 
 var key_global_position
 var initial_player_position
@@ -188,6 +191,7 @@ func prepare_for_new_wave():
 # clean ALIVE state at full energy. Safe to call on a living shark too.
 func revive_for_new_wave():
 	shark_status = ALIVE
+	has_key = false
 	player_energy = constants.PLAYER_START_GAME_ENERGY
 	$CollisionShape2D.set_deferred("disabled", false)
 	$AnimatedSprite2D.animation = "default"
@@ -581,10 +585,14 @@ func _physics_process(_delta):
 			for i in get_slide_collision_count():
 				var collision = get_slide_collision(i)
 
-				if collision.get_collider().name == "Key":
+				# Only the first shark to reach the key grabs it. get_parent()
+				# tracks the current holder so a second shark can't also grab it.
+				if collision.get_collider().name == "Key" and get_parent().key_holder == null:
 					shark_status = HUNTING_EXIT
+					has_key = true
+					get_parent().key_holder = self
 					arena.get_node("ExitDoor").get_node("CollisionShape2D").disabled = false
-					player_got_key.emit()
+					player_got_key.emit(self)
 
 					var exit_door_global = (
 						arena.get_node("ExitDoor").global_position
@@ -608,6 +616,33 @@ func _physics_process(_delta):
 					velocity = target_direction * constants.PLAYER_SPEED_ESCAPING
 
 					$HuntingDoorTimer.start()
+		FOLLOWING_KEY_HOLDER:
+			# Trail the key-holder to the exit (it opens the door, not us).
+			if velocity.x > 0:
+				$AnimatedSprite2D.set_flip_h(true)
+			if velocity.x < 0:
+				$AnimatedSprite2D.set_flip_h(false)
+
+			if is_instance_valid(key_holder_to_follow):
+				# Once close to the holder, stop and stay put (avoids jittering
+				# on top of it when it pauses at the door).
+				if global_position.distance_to(key_holder_to_follow.global_position) <= constants.FOLLOW_STOP_DISTANCE:
+					velocity = Vector2(0, 0)
+				else:
+					astar_pathing_grid = arena.get_astar_route_from_positions(
+						global_position, key_holder_to_follow.global_position
+					)
+					astar_pathing_grid.pop_front()
+
+					if astar_pathing_grid.size():
+						var target_direction = (
+							(
+								arena.get_position_from_tilemap(astar_pathing_grid[0])
+								- global_position
+							)
+							. normalized()
+						)
+						velocity = target_direction * constants.PLAYER_SPEED_ESCAPING
 		HUNTING_EXIT:
 			# Have we reached the next node on the astar pathing grid?
 			var tilemap_coords = arena.get_tilemap_coords(global_position)
@@ -640,7 +675,8 @@ func _physics_process(_delta):
 			for i in get_slide_collision_count():
 				var collision = get_slide_collision(i)
 
-				if collision.get_collider().name == "ExitDoor":
+				# Only the key-holder can open the exit door.
+				if collision.get_collider().name == "ExitDoor" and has_key:
 					shark_status = FOUND_EXIT
 					velocity = Vector2i(0, 0)
 
@@ -666,9 +702,6 @@ func _physics_process(_delta):
 					. normalized()
 				)
 				velocity = target_direction * constants.PLAYER_SPEED_ESCAPING
-
-				var tween = get_tree().create_tween()
-				tween.tween_property(get_parent(), "modulate", Color(0, 0, 0, 0), 0.35)
 			for i in get_slide_collision_count():
 				var collision = get_slide_collision(i)
 
@@ -734,7 +767,31 @@ func player_hit():
 				player_low_energy.emit()
 
 
+var key_holder_to_follow
+
+
+# Called (via Main) when the OTHER shark grabbed the key: trail it to the exit.
+func follow_key_holder(holder):
+	# Only a shark still hunting the key should switch to following.
+	if shark_status != HUNTING_KEY:
+		return
+	key_holder_to_follow = holder
+	shark_status = FOLLOWING_KEY_HOLDER
+
+
+# The door is open; a following shark now heads through it to the exit too.
+func go_through_open_door():
+	if shark_status != FOLLOWING_KEY_HOLDER:
+		return
+	shark_status = GOING_THROUGH_DOOR
+	$DoorOpenTimer.start()
+
+
 func _on_main_player_hunt_key(passed_key_global_position):
+	# A downed shark (sitting out the wave) does not join the key hunt.
+	if not is_player_alive():
+		return
+
 	if shark_status == FISH_FRENZY:
 		stop_fish_frenzy()
 

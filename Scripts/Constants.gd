@@ -66,6 +66,9 @@ const PLAYER_LOW_ENERGY_BLINK = 30
 const PLAYER_SPEED = 800
 const PLAYER_SPEED_POWERUP_INCREASE = 25
 const PLAYER_SPEED_ESCAPING = 1200
+# How close the following shark gets to the key-holder before it stops (co-op
+# wave-end), so it doesn't jitter on top of the holder at the door.
+const FOLLOW_STOP_DISTANCE = 250.0
 
 const PLAYER_FIRE_DELAY = 0.15
 const PLAYER_FIRE_DELAY_POWERUP_DECREASE = 0.01
