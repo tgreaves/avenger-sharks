@@ -35,6 +35,12 @@ const MiniSharkScene = preload("res://Scenes/MiniShark.tscn")
 @export var max_powerup_levels = {}
 @export var upgrades = {}
 
+# Per-shark score and combo multiplier. In 1-player / 2-player-CPU only player 1
+# accrues (CPU and unattributed kills funnel to player 1); in 2-player-human
+# each shark keeps its own.
+var player_score = 0
+var player_score_multiplier = 1
+
 var key_global_position
 var initial_player_position
 var fish_frenzy_enabled = false
@@ -685,7 +691,7 @@ func player_hit():
 		$PlayerHitGracePeriodTimer.start()
 		$AudioStreamPlayerHit.play()
 
-		get_parent().reset_score_multiplier()
+		get_parent().reset_score_multiplier(self)
 
 		hud.flash_screen_red()
 

@@ -56,8 +56,8 @@ enum {
 
 var game_status_before_pause
 
-var score = 0
-var score_multiplier = 1
+# Score and combo multiplier are now per-shark (Player.player_score /
+# player_score_multiplier). See scoring_player_for() / best_score().
 var spawn_number = 0
 
 var spawned_items_this_wave = []
@@ -79,6 +79,10 @@ var accept_pause = true
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	randomize()
+
+	# Capture HIGH SCORE's original (centred) layout so we can restore it exactly
+	# on the menu after gameplay right-justifies it.
+	_capture_high_score_default()
 
 	$ArtilleryTimer.connect("timeout", _on_artillery_timer)
 
@@ -162,6 +166,29 @@ func get_players():
 # The shared co-op camera (also used in 1-player).
 func get_coop_camera():
 	return $CoopCamera
+
+
+# The shark that should be credited for a kill/pickup. Human-controlled players
+# score for themselves; the CPU and unattributed kills (e.g. dinosaur) funnel to
+# player 1, so 1-player and 2-player-CPU keep a single score.
+func scoring_player_for(attacker):
+	if attacker != null and not player_two_is_cpu and attacker in get_players():
+		return attacker
+	return get_primary_player()
+
+
+# Highest score across all sharks (matches single-player behaviour).
+func best_score():
+	var best = 0
+	for player in get_players():
+		best = max(best, player.player_score)
+	return best
+
+
+# Persist the high score if any shark has beaten it.
+func update_high_score():
+	if best_score() > Storage.stats.get_value("player", "high_score"):
+		Storage.stats.set_value("player", "high_score", best_score())
 
 
 # The canonical player for reading shared/player stats (upgrades, powerups, etc.).
@@ -251,8 +278,9 @@ func despawn_player_two():
 
 func main_menu():
 	game_status = MAIN_MENU
-	score = 0
-	score_multiplier = 1
+	for player in get_players():
+		player.player_score = 0
+		player.player_score_multiplier = 1
 	fish_collected = 0
 	fish_left_this_wave = 0
 	wave_number = constants.START_WAVE - 1
@@ -285,6 +313,8 @@ func main_menu():
 
 	$MainMenu.get_node("CanvasLayer").visible = true
 	$HUD/CanvasLayer/HighScore.visible = true
+	# Re-centre HIGH SCORE on the menu (gameplay right-justifies it).
+	center_high_score()
 	$MainMenu.set_process_input(true)
 	$MainMenu.do_ready()
 
@@ -315,6 +345,9 @@ func start_game():
 
 	# Create/destroy player 2 to match the selected player count.
 	sync_player_instances()
+
+	# Position the score HUD for the current mode.
+	apply_score_hud_layout()
 
 	for player in get_players():
 		if cheat_mode == true:
@@ -1037,15 +1070,15 @@ func on_enemy_update_score(
 		enemies_left_this_wave = enemies_left_this_wave - 1
 		enemies_on_screen = enemies_on_screen - 1
 
-	score = score + (score_to_add * score_multiplier)
-	var score_to_return = score_to_add * score_multiplier
+	var scorer = scoring_player_for(attacker)
+	var score_to_return = score_to_add * scorer.player_score_multiplier
+	scorer.player_score += score_to_return
 
 	# Don't increase multiplier for dinosaur kills
 	if death_source == "PLAYER-SHOT":
-		score_multiplier += 1
+		scorer.player_score_multiplier += 1
 
-	if score > Storage.stats.get_value("player", "high_score"):
-		Storage.stats.set_value("player", "high_score", score)
+	update_high_score()
 
 	Storage.increase_stat("player", "enemies_defeated", 1)
 
@@ -1075,18 +1108,103 @@ func on_enemy_update_score(
 
 
 func _on_enemy_update_score_display():
-	$HUD.get_node("CanvasLayer").get_node("Score").text = "SCORE\n" + str(score)
+	var player_one = get_primary_player()
+	var show_second = _two_human_players()
 
-	if score_multiplier > 1:
-		$HUD.get_node("CanvasLayer").get_node("Score").text += " x" + str(score_multiplier)
+	if show_second:
+		# In 2-player-human the labels are P1 / P2 to make ownership clear.
+		$HUD.get_node("CanvasLayer/Score").text = _score_text("P1", player_one)
+		$HUD.get_node("CanvasLayer/Score2").text = _score_text("P2", player_two)
+	else:
+		$HUD.get_node("CanvasLayer/Score").text = _score_text("SCORE", player_one)
 
-	$HUD.get_node("CanvasLayer").get_node("HighScore").text = (
+	$HUD.get_node("CanvasLayer/Score2").visible = show_second
+
+	$HUD.get_node("CanvasLayer/HighScore").text = (
 		"HIGH SCORE\n" + str(Storage.stats.get_value("player", "high_score"))
 	)
 
 
-func reset_score_multiplier():
-	score_multiplier = 1
+func _two_human_players():
+	return player_count == 2 and not player_two_is_cpu and player_two != null
+
+
+# Position the score HUD. TIME sits in the centre in every mode (consistent).
+#   1-player / CPU: SCORE left, TIME centre, HIGH SCORE right; P2 hidden.
+#   2-player-human: P1 left, TIME centre, P2 right; HIGH SCORE hidden.
+func apply_score_hud_layout():
+	var score = $HUD.get_node("CanvasLayer/Score")
+	var score2 = $HUD.get_node("CanvasLayer/Score2")
+	var enemies_left = $HUD.get_node("CanvasLayer/EnemiesLeft")
+	var high_score = $HUD.get_node("CanvasLayer/HighScore")
+
+	# TIME to the centre in all modes.
+	enemies_left.anchor_left = 0.5
+	enemies_left.anchor_right = 0.5
+	enemies_left.offset_left = -226.0
+	enemies_left.offset_right = 226.0
+	enemies_left.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+
+	# Right slot: P2 score in 2-player-human, otherwise HIGH SCORE.
+	if _two_human_players():
+		high_score.visible = false
+
+		score2.offset_top = score.offset_top
+		score2.offset_bottom = score.offset_bottom
+		score2.anchor_left = 1.0
+		score2.anchor_right = 1.0
+		score2.offset_left = -636.0
+		score2.offset_right = -20.0
+		score2.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	else:
+		high_score.visible = true
+		high_score.anchor_left = 1.0
+		high_score.anchor_right = 1.0
+		high_score.offset_left = -656.0
+		high_score.offset_right = -20.0
+		high_score.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+
+
+var _high_score_default := {}
+
+
+# Snapshot HIGH SCORE's authored layout so it can be restored verbatim.
+func _capture_high_score_default():
+	var hs = $HUD.get_node("CanvasLayer/HighScore")
+	_high_score_default = {
+		"anchor_left": hs.anchor_left,
+		"anchor_right": hs.anchor_right,
+		"offset_left": hs.offset_left,
+		"offset_right": hs.offset_right,
+		"grow_horizontal": hs.grow_horizontal,
+		"horizontal_alignment": hs.horizontal_alignment,
+	}
+
+
+# Restore HIGH SCORE to its authored (centred) layout — used on the menu, since
+# gameplay right-justifies it via apply_score_hud_layout.
+func center_high_score():
+	var hs = $HUD.get_node("CanvasLayer/HighScore")
+	hs.anchor_left = _high_score_default["anchor_left"]
+	hs.anchor_right = _high_score_default["anchor_right"]
+	hs.offset_left = _high_score_default["offset_left"]
+	hs.offset_right = _high_score_default["offset_right"]
+	hs.grow_horizontal = _high_score_default["grow_horizontal"]
+	hs.horizontal_alignment = _high_score_default["horizontal_alignment"]
+
+
+func _score_text(label, player):
+	var text = label + "\n" + str(player.player_score)
+	if player.player_score_multiplier > 1:
+		text += " x" + str(player.player_score_multiplier)
+	return text
+
+
+func reset_score_multiplier(player = null):
+	# Reset the given shark's combo (the one that got hit); defaults to player 1.
+	if player == null:
+		player = get_primary_player()
+	player.player_score_multiplier = 1
 	_on_enemy_update_score_display()
 
 
@@ -1144,9 +1262,10 @@ func _on_player_player_died():
 
 
 func _on_player_player_got_fish():
-	score = score + constants.GET_FISH_SCORE
-	if score > Storage.stats.get_value("player", "high_score"):
-		Storage.stats.set_value("player", "high_score", score)
+	# Fish still credit player 1 for now; per-player fish scoring lands with the
+	# per-player fish/frenzy slice (2a), when player 2's fish signal is wired.
+	get_primary_player().player_score += constants.GET_FISH_SCORE
+	update_high_score()
 
 	Storage.increase_stat("player", "fish_rescued", 1)
 

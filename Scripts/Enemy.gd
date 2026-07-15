@@ -490,7 +490,7 @@ func _physics_process(delta):
 			if collision.get_collider().is_in_group("players"):
 				var collided_with = collision.get_collider()
 				collided_with.player_hit()
-				death("PLAYER-BODY")
+				death("PLAYER-BODY", collided_with)
 			else:
 				# Hit a wall? Ensure AI mode is standard.
 				if ai_mode == "CHASE":
