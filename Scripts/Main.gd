@@ -235,6 +235,8 @@ var key_holder = null
 # Wave-end exit tracking: how many sharks must reach the exit, and how many have.
 var players_to_exit = 0
 var players_exited = 0
+# Delay after the last upgrade confirmation so the confirm flash can play out.
+var upgrade_advance_delay = 0.0
 
 
 # Ensure the number of live player nodes matches player_count. Player 1 is the
@@ -266,8 +268,9 @@ func sync_player_instances():
 			$Key._on_player_player_found_exit_stop_key_movement
 		)
 		add_child(player_two)
-		# Player 2 gets its own powerup bar (bottom-right).
+		# Player 2 gets its own powerup bar (bottom-right) and upgrade summary.
 		$HUD.add_second_powerup_bar()
+		$HUD.add_second_upgrade_summary()
 	elif player_count == 1 and player_two != null:
 		despawn_player_two()
 
@@ -302,6 +305,7 @@ func despawn_player_two():
 		player_two.queue_free()
 		player_two = null
 	$HUD.remove_second_powerup_bar()
+	$HUD.remove_second_upgrade_summary()
 
 
 func main_menu():
@@ -353,7 +357,7 @@ func main_menu():
 
 	$HUD/CanvasLayer.visible = true
 	$HUD/CanvasLayer/UpgradeChoiceContainer.visible = false
-	$HUD/CanvasLayer/UpgradeSummary.visible = false
+	$HUD.set_upgrade_summary_visible(false)
 	$HUD/CanvasLayer/BossHealthBar.visible = false
 	$HUD.get_node("CanvasLayer/Score").visible = false
 	$HUD.get_node("CanvasLayer/Label").visible = true
@@ -388,7 +392,7 @@ func start_game():
 		player.prepare_for_new_game()
 
 	#$HUD/CanvasLayer/UpgradeSummary.text = ""
-	$HUD/CanvasLayer/UpgradeSummary.visible = true
+	$HUD.set_upgrade_summary_visible(true)
 
 	if $MenuMusic.is_playing():
 		$MenuMusic.stop()
@@ -1006,7 +1010,7 @@ func _process(_delta):
 			upgrade_screen()
 
 	if game_status == UPGRADE_WAITING_FOR_CHOICE:
-		process_upgrade_choice()
+		process_upgrade_choice(_delta)
 
 	if game_status == PREPARE_FOR_WAVE:
 		if $WaveEndTimer.time_left == 0:
@@ -1289,8 +1293,11 @@ func update_fish_left_display():
 
 # True when every player is down (used to gate co-op game over).
 func are_all_players_dead():
+	# "Down" means actually dying/dead. A shark in a wave-end hunt/exit state is
+	# still in the game, so it must not count toward game-over (fixes a false
+	# game-over when one shark died just as the wave was ending).
 	for player in get_players():
-		if player.is_player_alive():
+		if not player.is_player_down():
 			return false
 	return true
 
@@ -1318,10 +1325,10 @@ func _on_player_player_died():
 	if are_all_players_dead():
 		game_over()
 	else:
-		# Hide the downed shark for the rest of the wave; it respawns at wave
+		# Hide the downed shark(s) for the rest of the wave; they respawn at wave
 		# start via revive_for_new_wave().
 		for player in get_players():
-			if not player.is_player_alive():
+			if player.is_player_down():
 				player.set_physics_process(false)
 				player.visible = false
 
@@ -1458,6 +1465,9 @@ func upgrade_screen():
 		player.choose_offered_upgrades()
 		player.upgrade_cursor = 1
 		player.upgrade_confirmed = false
+		player.upgrade_ai_started = false
+
+	upgrade_advance_delay = constants.UPGRADE_CONFIRM_FLASH_TIME
 
 	$HUD.show_upgrade_screen(get_players())
 
@@ -1467,16 +1477,13 @@ func upgrade_screen():
 # Per-frame upgrade navigation while UPGRADE_WAITING_FOR_CHOICE. Each player
 # drives its own column via its input (up/down, mouse hover for the mouse owner)
 # and confirms with fire / mouse click. Wave proceeds once all have confirmed.
-func process_upgrade_choice():
+func process_upgrade_choice(delta):
 	for player in get_players():
 		if player.upgrade_confirmed:
 			continue
 
-		# CPU auto-picks a random offered upgrade.
 		if player.input is AiInput:
-			player.upgrade_cursor = randi() % 3
-			player.confirm_upgrade_choice()
-			$HUD.set_upgrade_highlight(player, player.upgrade_cursor)
+			process_cpu_upgrade_choice(player, delta)
 			continue
 
 		var moved = false
@@ -1509,13 +1516,44 @@ func process_upgrade_choice():
 				confirm = true
 
 		if confirm:
-			player.confirm_upgrade_choice()
-			$HUD.set_upgrade_highlight(player, player.upgrade_cursor)
+			commit_upgrade(player)
 
-	# All players locked in? Advance.
+	# All players locked in? Wait out the confirm flash, then advance.
 	if all_players_confirmed_upgrade():
-		$HUD.hide_upgrade_screen()
-		game_status = PREPARE_FOR_WAVE
+		upgrade_advance_delay -= delta
+		if upgrade_advance_delay <= 0.0:
+			$HUD.hide_upgrade_screen()
+			game_status = PREPARE_FOR_WAVE
+
+
+# Apply a player's highlighted choice and play the confirmation flash.
+func commit_upgrade(player):
+	player.confirm_upgrade_choice()
+	$HUD.flash_upgrade_choice(player, player.upgrade_cursor)
+
+
+# CPU "pretends to decide": wiggles the cursor a few times, then commits.
+func process_cpu_upgrade_choice(player, delta):
+	if not player.upgrade_ai_started:
+		player.upgrade_ai_started = true
+		player.upgrade_ai_moves_left = randi_range(3, 6)
+		player.upgrade_ai_move_cooldown = constants.UPGRADE_CPU_MOVE_INTERVAL
+
+	player.upgrade_ai_move_cooldown -= delta
+	if player.upgrade_ai_move_cooldown > 0.0:
+		return
+	player.upgrade_ai_move_cooldown = constants.UPGRADE_CPU_MOVE_INTERVAL
+
+	if player.upgrade_ai_moves_left > 0:
+		# Wiggle to a different choice.
+		var next = player.upgrade_cursor
+		while next == player.upgrade_cursor:
+			next = randi() % 3
+		player.upgrade_cursor = next
+		player.upgrade_ai_moves_left -= 1
+		$HUD.set_upgrade_highlight(player, player.upgrade_cursor)
+	else:
+		commit_upgrade(player)
 
 
 func all_players_confirmed_upgrade():

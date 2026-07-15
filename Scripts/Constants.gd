@@ -84,6 +84,10 @@ const PLAYER_FIRE_SIZE_POWERUP_INCREASE = 0.25
 const PLAYER_GRENADE_DELAY = 0.6
 const PLAYER_GRENADE_DELAY_POWERUP_DECREASE = 0.1
 
+# Between-wave upgrade screen.
+const UPGRADE_CPU_MOVE_INTERVAL = 0.28   # Gap between CPU "deliberation" cursor moves.
+const UPGRADE_CONFIRM_FLASH_TIME = 0.5   # Hold on the confirm flash before advancing.
+
 # Powerups whose effect is a scalar stat recomputed from level:
 #   stat = base + (direction * step * level)
 # Powerups with non-scalar effects (SCATTER SPRAY, MINI SHARK) are handled

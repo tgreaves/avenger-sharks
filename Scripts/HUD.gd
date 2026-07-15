@@ -13,6 +13,8 @@ var powerup_container_2 = null
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	powerup_index = 0
+	# The upgrade header only shows with the upgrade screen.
+	$CanvasLayer/UpgradeHeader.visible = false
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -179,12 +181,14 @@ func show_upgrade_screen(players):
 	for player in players:
 		_fill_upgrade_column(player)
 
+	$CanvasLayer/UpgradeHeader.visible = true
 	$CanvasLayer/UpgradeChoiceContainer.visible = true
 	if upgrade_container_2 != null:
 		upgrade_container_2.visible = true
 
 
 func hide_upgrade_screen():
+	$CanvasLayer/UpgradeHeader.visible = false
 	$CanvasLayer/UpgradeChoiceContainer.visible = false
 	if upgrade_container_2 != null:
 		upgrade_container_2.visible = false
@@ -228,6 +232,16 @@ func set_upgrade_highlight(player, cursor):
 			choice.modulate = UPGRADE_HIGHLIGHT if i == cursor else UPGRADE_DIM
 
 
+# Flash the just-confirmed choice a few times as visual confirmation, then leave
+# it on the locked-in (confirmed) tint.
+func flash_upgrade_choice(player, cursor):
+	var choice = _upgrade_container(player).get_node("Choice" + str(cursor + 1))
+	var tween = create_tween()
+	for i in range(3):
+		tween.tween_property(choice, "modulate", Color(1, 1, 1, 1), 0.08)
+		tween.tween_property(choice, "modulate", UPGRADE_CONFIRMED, 0.08)
+
+
 # Which choice index (0..2) the mouse is currently over in this player's column,
 # or -1 if none. Only meaningful for the mouse-owning player.
 func upgrade_choice_at_mouse(player):
@@ -239,10 +253,48 @@ func upgrade_choice_at_mouse(player):
 	return -1
 
 
-func update_upgrade_summary():
+# Player 2's upgrade summary (a runtime clone of player 1's authored label,
+# anchored on the right), created with the second player.
+var upgrade_summary_2 = null
 
+
+func add_second_upgrade_summary():
+	if upgrade_summary_2 != null:
+		return
+	upgrade_summary_2 = $CanvasLayer/UpgradeSummary.duplicate()
+	upgrade_summary_2.name = "UpgradeSummary2"
+	# Right side (player 1's summary stays on the left).
+	upgrade_summary_2.anchor_left = 1.0
+	upgrade_summary_2.anchor_right = 1.0
+	upgrade_summary_2.offset_left = -658.0
+	upgrade_summary_2.offset_right = -6.0
+	upgrade_summary_2.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	$CanvasLayer.add_child(upgrade_summary_2)
+
+
+func remove_second_upgrade_summary():
+	if upgrade_summary_2 != null:
+		upgrade_summary_2.queue_free()
+		upgrade_summary_2 = null
+
+
+# Show/hide both players' upgrade summaries together.
+func set_upgrade_summary_visible(is_visible):
+	$CanvasLayer/UpgradeSummary.visible = is_visible
+	if upgrade_summary_2 != null:
+		upgrade_summary_2.visible = is_visible
+
+
+func _upgrade_summary_label(player):
+	if upgrade_summary_2 != null and player != get_parent().get_primary_player():
+		return upgrade_summary_2
+	return $CanvasLayer/UpgradeSummary
+
+
+# Render the given shark's owned upgrades into its own summary label.
+func update_upgrade_summary(player):
 	var sidebar_text = ""
-	var upgrades = get_parent().get_primary_player().upgrades
+	var upgrades = player.upgrades
 
 	for single_upgrade in upgrades:
 		if upgrades[single_upgrade][0] > 0:
@@ -255,7 +307,7 @@ func update_upgrade_summary():
 
 			sidebar_text += "\n"
 
-	$CanvasLayer/UpgradeSummary.text = sidebar_text
+	_upgrade_summary_label(player).text = sidebar_text
 
 
 func flash_screen_red():

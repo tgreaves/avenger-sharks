@@ -40,6 +40,10 @@ var offered_upgrades := []
 # Between-wave upgrade selection state (manual cursor, per player).
 var upgrade_cursor := 1  # Start on the middle choice.
 var upgrade_confirmed := false
+# CPU "deliberation": it wiggles the cursor a few times before committing.
+var upgrade_ai_moves_left := 0
+var upgrade_ai_move_cooldown := 0.0
+var upgrade_ai_started := false
 
 # Per-shark score and combo multiplier. In 1-player / 2-player-CPU only player 1
 # accrues (CPU and unattributed kills funnel to player 1); in 2-player-human
@@ -173,7 +177,7 @@ func prepare_for_new_game():
 	hud.reset_powerup_bar()
 	hud.reset_powerup_bar_text()
 	hud.set_all_powerup_levels(self)
-	hud.update_upgrade_summary()
+	hud.update_upgrade_summary(self)
 
 
 	despawn_mini_sharks()
@@ -523,7 +527,7 @@ func _physics_process(_delta):
 				# Can the player cheat death?
 				if upgrades["CHEAT DEATH"][0]:
 					upgrades["CHEAT DEATH"][0] = 0
-					hud.update_upgrade_summary()
+					hud.update_upgrade_summary(self)
 
 					player_energy = 0.75 * constants.PLAYER_START_GAME_ENERGY
 					$EnergyProgressBar.value = player_energy
@@ -1117,7 +1121,7 @@ func confirm_upgrade_choice():
 			):
 				player_no_longer_low_energy.emit()
 
-	hud.update_upgrade_summary()
+	hud.update_upgrade_summary(self)
 
 
 func spawn_shark_spray(target_direction):
@@ -1143,11 +1147,18 @@ func is_player_in_fish_frenzy():
 func is_player_cheating_death():
 	if shark_status == CHEATING_DEATH:
 		return true
-	
+
 	if shark_status == EXPLODING and upgrades["CHEAT DEATH"][0]:
 		return true
-	
+
 	return false
+
+
+# Truly out of the game (dying/dead). Every other state — including the wave-end
+# hunt/exit states — counts as still in play, so co-op game-over is only decided
+# when all sharks are actually down (not merely "not ALIVE").
+func is_player_down():
+	return shark_status == EXPLODING or shark_status == EXPLODED
 
 func remove_aiming_line():
 	if $AimingLine.get_point_count() > 1:
