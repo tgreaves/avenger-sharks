@@ -287,10 +287,22 @@ are NOT part of this phase. This phase is only the shared-HUD elements below.
   fine), dinosaur rampage, artillery targeting (`$Player.position` — needs a
   target choice among players).
 
-## Phase 7 — CPU-controlled player 2 (also a testing aid)
+## Phase 7 — CPU-controlled player 2 (also a testing aid) — DONE
 
-Lets 2-player mode be tested solo, stress-tests the co-op systems, and is a
-feature in its own right.
+All three slices complete and play-tested. Lets 2-player mode be tested solo,
+stress-tests the co-op systems, and is a feature in its own right.
+
+As-built notes:
+- `AiInput extends PlayerInput`; `PlayerInput.update(owner, delta)` hook ticked
+  from `Player._physics_process`. The device version leaves it empty.
+- Cautious behaviour ladder: surge-dodge (danger) → keep-distance (spacing band
+  with enter/exit **hysteresis** to stop boundary twitch) → opportunistic fish
+  (short radius, suppressed while any enemy is within engage range) → follow
+  human. Aim/fire at nearest living enemy layers on top; fish frenzy auto-fires.
+- Long-range moves (seek fish / follow) route through the arena A* grid (path
+  cached, recomputed every few frames); reactive dodge/retreat stay straight-line.
+- All tuning values are constants at the top of `Scripts/AiInput.gd`.
+- Still subject to the Phase 5 gaps: the CPU cannot yet score its fish or die.
 
 **Key enabler:** `Player.get_input()` reads everything through the
 `PlayerInput` abstraction, so an AI is just a `PlayerInput` subclass that
