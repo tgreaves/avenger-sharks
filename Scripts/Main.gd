@@ -60,18 +60,11 @@ var game_status_before_pause
 var spawn_number = 0
 
 var spawned_items_this_wave = []
-var upgrade_focus_memory_left_button
-var upgrade_focus_memory_middle_button
-var upgrade_focus_memory_right_button
 var intro
 var dedication
 var credits
 var statistics
 var first_game_played = false
-
-var upgrade_one_index
-var upgrade_two_index
-var upgrade_three_index
 
 var accept_pause = true
 
@@ -540,6 +533,8 @@ func wave_intro():
 	if spawn_text:
 		$HUD.get_node("CanvasLayer/Label").text += "\n\n" + spawn_text
 
+	# Restore opacity in case the label was left faded by the wave-end fade.
+	$HUD.get_node("CanvasLayer/Label").modulate = Color(1, 1, 1, 1)
 	$HUD.get_node("CanvasLayer/Label").visible = true
 	$WaveIntroTimer.start()
 
@@ -1010,6 +1005,9 @@ func _process(_delta):
 		if $WaveEndTimer.time_left == 0:
 			upgrade_screen()
 
+	if game_status == UPGRADE_WAITING_FOR_CHOICE:
+		process_upgrade_choice()
+
 	if game_status == PREPARE_FOR_WAVE:
 		if $WaveEndTimer.time_left == 0:
 			prepare_for_wave()
@@ -1087,16 +1085,8 @@ func handle_pause_input():
 			game_status_before_pause = game_status
 			game_status = GAME_PAUSED
 
-			if game_status_before_pause == UPGRADE_WAITING_FOR_CHOICE:
-				upgrade_focus_memory_left_button = (
-					$HUD/CanvasLayer/UpgradeChoiceContainer/Choice1/Button.has_focus()
-				)
-				upgrade_focus_memory_middle_button = (
-					$HUD/CanvasLayer/UpgradeChoiceContainer/Choice2/Button.has_focus()
-				)
-				upgrade_focus_memory_right_button = (
-					$HUD/CanvasLayer/UpgradeChoiceContainer/Choice3/Button.has_focus()
-				)
+			# (Upgrade-screen selection is manual per-player state that simply
+			# persists across pause — no Godot focus to stash/restore.)
 
 			$PauseMenu.get_node("CanvasLayer").visible = true
 			$PauseMenu.set_process_input(true)
@@ -1377,9 +1367,14 @@ func _on_player_player_found_exit():
 			player.go_through_open_door()
 		return
 
-	# Fade the screen once the last shark is through, then end the wave.
+	# Fade the screen once the last shark is through, then end the wave. The HUD
+	# is on its own CanvasLayer (not a child of Main), so the "WAVE COMPLETE!"
+	# banner won't ride this fade — fade it out explicitly, in step.
 	var tween = get_tree().create_tween()
+	tween.set_parallel()
 	tween.tween_property(self, "modulate", Color(0, 0, 0, 0), 0.35)
+	tween.tween_property($HUD/CanvasLayer/Label, "modulate", Color(1, 1, 1, 0), 0.35)
+	tween.set_parallel(false)
 	tween.tween_callback(wave_end_cleanup)
 
 
@@ -1395,18 +1390,8 @@ func _on_pause_menu_unpause_game_pressed():
 	game_status = game_status_before_pause
 	$PauseMenu.get_node("CanvasLayer").visible = false
 
-	if game_status == UPGRADE_WAITING_FOR_CHOICE:
-		if upgrade_focus_memory_left_button:
-			$HUD/CanvasLayer/UpgradeChoiceContainer/Choice1/Button.grab_focus()
-			upgrade_focus_memory_left_button = false
-
-		if upgrade_focus_memory_middle_button:
-			$HUD/CanvasLayer/UpgradeChoiceContainer/Choice2/Button.grab_focus()
-			upgrade_focus_memory_middle_button = false
-
-		if upgrade_focus_memory_right_button:
-			$HUD/CanvasLayer/UpgradeChoiceContainer/Choice3/Button.grab_focus()
-			upgrade_focus_memory_right_button = false
+	# (No upgrade-screen focus to restore — selection is manual per-player state
+	# that persisted across the pause.)
 
 	$PauseMenu.set_process_input(false)
 	accept_pause = false
@@ -1464,73 +1449,82 @@ func _on_player_player_no_longer_low_energy():
 
 
 func upgrade_screen():
-	# Select two upgrades to offer the player at random.
+	# The "WAVE COMPLETE!" banner has already faded out with the exit fade; hide
+	# it. Its opacity is restored in wave_intro() before the next message shows.
+	$HUD.get_node("CanvasLayer/Label").visible = false
 
-	upgrade_one_index = 0
-	upgrade_two_index = 0
-	upgrade_three_index = 0
+	# Each shark picks its own three offered upgrades and starts un-confirmed.
+	for player in get_players():
+		player.choose_offered_upgrades()
+		player.upgrade_cursor = 1
+		player.upgrade_confirmed = false
 
-	# Form an array of upgrades that are eligible for inclusion.
-	var eligible_upgrades: Array = []
-
-	for single_upgrade in $Player.upgrades:
-		var single_upgrade_detail = $Player.upgrades.get(single_upgrade)
-		if single_upgrade_detail[0] < single_upgrade_detail[1]:
-			# This can be included as we have not exceeded max level of the upgrade.
-			eligible_upgrades.append(single_upgrade)
-
-	while eligible_upgrades.size() < 3:
-		eligible_upgrades.append("HEAL ME")
-
-	# Now select the two upgrades to present to the player.
-	eligible_upgrades.shuffle()
-	upgrade_one_index = eligible_upgrades.pop_front()
-	upgrade_two_index = eligible_upgrades.pop_front()
-	upgrade_three_index = eligible_upgrades.pop_front()
-
-	if constants.DEV_FORCE_UPGRADE:
-		upgrade_one_index = constants.DEV_FORCE_UPGRADE
-
-	$HUD/CanvasLayer/UpgradeChoiceContainer/Choice1/TextureRect.texture = load(
-		$Player.upgrades[upgrade_one_index][2]
-	)
-	$HUD/CanvasLayer/UpgradeChoiceContainer/Choice2/TextureRect.texture = load(
-		$Player.upgrades[upgrade_two_index][2]
-	)
-	$HUD/CanvasLayer/UpgradeChoiceContainer/Choice3/TextureRect.texture = load(
-		$Player.upgrades[upgrade_three_index][2]
-	)
-
-	$HUD/CanvasLayer/UpgradeChoiceContainer/Choice1/Title.text = upgrade_one_index
-	$HUD/CanvasLayer/UpgradeChoiceContainer/Choice2/Title.text = upgrade_two_index
-	$HUD/CanvasLayer/UpgradeChoiceContainer/Choice3/Title.text = upgrade_three_index
-
-	$HUD/CanvasLayer/UpgradeChoiceContainer/Choice1/Description.text = (
-		$Player.upgrades[upgrade_one_index][3]
-	)
-	$HUD/CanvasLayer/UpgradeChoiceContainer/Choice2/Description.text = (
-		$Player.upgrades[upgrade_two_index][3]
-	)
-	$HUD/CanvasLayer/UpgradeChoiceContainer/Choice3/Description.text = (
-		$Player.upgrades[upgrade_three_index][3]
-	)
-
-	$HUD/CanvasLayer/UpgradeChoiceContainer/Choice2/Button.grab_focus()
-
-	$HUD/CanvasLayer/UpgradeChoiceContainer.modulate = Color(0, 0, 0, 0)
-	$HUD/CanvasLayer/UpgradeChoiceContainer.visible = true
-
-	var tween = get_tree().create_tween()
-	tween.tween_property(
-		$HUD/CanvasLayer/UpgradeChoiceContainer, "modulate", Color(1, 1, 1, 1), 0.5
-	)
+	$HUD.show_upgrade_screen(get_players())
 
 	game_status = UPGRADE_WAITING_FOR_CHOICE
 
 
-func _on_player_player_made_upgrade_choice():
-	$HUD/CanvasLayer/UpgradeChoiceContainer.visible = false
-	game_status = PREPARE_FOR_WAVE
+# Per-frame upgrade navigation while UPGRADE_WAITING_FOR_CHOICE. Each player
+# drives its own column via its input (up/down, mouse hover for the mouse owner)
+# and confirms with fire / mouse click. Wave proceeds once all have confirmed.
+func process_upgrade_choice():
+	for player in get_players():
+		if player.upgrade_confirmed:
+			continue
+
+		# CPU auto-picks a random offered upgrade.
+		if player.input is AiInput:
+			player.upgrade_cursor = randi() % 3
+			player.confirm_upgrade_choice()
+			$HUD.set_upgrade_highlight(player, player.upgrade_cursor)
+			continue
+
+		var moved = false
+
+		# Keyboard/controller: up/down move the cursor (edge-triggered).
+		if player.input.is_just_pressed("up"):
+			player.upgrade_cursor = max(0, player.upgrade_cursor - 1)
+			moved = true
+		elif player.input.is_just_pressed("down"):
+			player.upgrade_cursor = min(2, player.upgrade_cursor + 1)
+			moved = true
+
+		# Mouse (owner only): hovering a choice highlights it.
+		if player.input.uses_mouse():
+			var hovered = $HUD.upgrade_choice_at_mouse(player)
+			if hovered != -1 and hovered != player.upgrade_cursor:
+				player.upgrade_cursor = hovered
+				moved = true
+
+		if moved:
+			$HUD.set_upgrade_highlight(player, player.upgrade_cursor)
+
+		# Confirm: fire button, or a mouse click for the mouse owner.
+		var confirm = player.input.is_just_pressed("shark_fire")
+		if player.input.uses_mouse() and player.input.is_just_pressed("shark_fire_mouse"):
+			# A click only confirms if it is over one of this player's choices.
+			var clicked = $HUD.upgrade_choice_at_mouse(player)
+			if clicked != -1:
+				player.upgrade_cursor = clicked
+				confirm = true
+
+		if confirm:
+			player.confirm_upgrade_choice()
+			$HUD.set_upgrade_highlight(player, player.upgrade_cursor)
+
+	# All players locked in? Advance.
+	if all_players_confirmed_upgrade():
+		$HUD.hide_upgrade_screen()
+		game_status = PREPARE_FOR_WAVE
+
+
+func all_players_confirmed_upgrade():
+	for player in get_players():
+		if not player.upgrade_confirmed:
+			return false
+	return true
+
+
 
 
 func _on_main_menu_game_mode_pressed():

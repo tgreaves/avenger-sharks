@@ -1,6 +1,5 @@
 extends Control
 
-signal upgrade_button_pressed(button_number)
 
 const POWERUP_BAR_SEQUENCE = ["SPEED UP", "FAST SPRAY", "BIG SPRAY", "GRENADE", "MINI SHARK"]
 
@@ -137,8 +136,107 @@ func _all_containers():
 	return containers
 
 
-func _on_upgrade_button_pressed(button_number):
-	upgrade_button_pressed.emit(button_number)
+# --- Upgrade choice screen (manual, per-player) ---
+#
+# Player 1 uses the authored UpgradeChoiceContainer (a centred vertical column of
+# Choice1/2/3). Player 2 (2-player) gets a runtime clone positioned to the right,
+# with player 1's column shifted left. Highlight is a manual modulate on the
+# chosen Choice; there is no Godot focus or Button hover involved.
+
+const UPGRADE_HIGHLIGHT = Color(1, 1, 0.4, 1)   # Highlighted choice tint.
+const UPGRADE_DIM = Color(0.6, 0.6, 0.6, 1)     # Non-highlighted choices.
+const UPGRADE_CONFIRMED = Color(0.4, 1, 0.4, 1)  # Locked-in choice.
+
+var upgrade_container_2 = null
+
+
+func _upgrade_container(player):
+	if upgrade_container_2 != null and player != get_parent().get_primary_player():
+		return upgrade_container_2
+	return $CanvasLayer/UpgradeChoiceContainer
+
+
+# Show the upgrade screen for the given players, filling each column with that
+# player's offered upgrades. Adds/removes a second column to match player count.
+func show_upgrade_screen(players):
+	var one_column = players.size() < 2
+
+	if one_column:
+		_remove_upgrade_column_2()
+		# Centre player 1's column.
+		var c = $CanvasLayer/UpgradeChoiceContainer
+		c.offset_left = -320.0
+		c.offset_right = 320.0
+	else:
+		_add_upgrade_column_2()
+		# Player 1 left, player 2 right.
+		var c1 = $CanvasLayer/UpgradeChoiceContainer
+		c1.offset_left = -700.0
+		c1.offset_right = -60.0
+		upgrade_container_2.offset_left = 60.0
+		upgrade_container_2.offset_right = 700.0
+
+	for player in players:
+		_fill_upgrade_column(player)
+
+	$CanvasLayer/UpgradeChoiceContainer.visible = true
+	if upgrade_container_2 != null:
+		upgrade_container_2.visible = true
+
+
+func hide_upgrade_screen():
+	$CanvasLayer/UpgradeChoiceContainer.visible = false
+	if upgrade_container_2 != null:
+		upgrade_container_2.visible = false
+
+
+func _add_upgrade_column_2():
+	if upgrade_container_2 != null:
+		return
+	upgrade_container_2 = $CanvasLayer/UpgradeChoiceContainer.duplicate()
+	upgrade_container_2.name = "UpgradeChoiceContainer2"
+	$CanvasLayer.add_child(upgrade_container_2)
+
+
+func _remove_upgrade_column_2():
+	if upgrade_container_2 != null:
+		upgrade_container_2.queue_free()
+		upgrade_container_2 = null
+
+
+# Fill a player's column from its offered_upgrades and reset its highlight.
+func _fill_upgrade_column(player):
+	var container = _upgrade_container(player)
+	var i = 0
+	for code in player.offered_upgrades:
+		var choice = container.get_node("Choice" + str(i + 1))
+		choice.get_node("TextureRect").texture = load(player.upgrades[code][2])
+		choice.get_node("Title").text = code
+		choice.get_node("Description").text = player.upgrades[code][3]
+		i += 1
+	set_upgrade_highlight(player, player.upgrade_cursor)
+
+
+# Tint the choices so the highlighted one stands out (or all-confirmed green).
+func set_upgrade_highlight(player, cursor):
+	var container = _upgrade_container(player)
+	for i in range(3):
+		var choice = container.get_node("Choice" + str(i + 1))
+		if player.upgrade_confirmed:
+			choice.modulate = UPGRADE_CONFIRMED if i == cursor else UPGRADE_DIM
+		else:
+			choice.modulate = UPGRADE_HIGHLIGHT if i == cursor else UPGRADE_DIM
+
+
+# Which choice index (0..2) the mouse is currently over in this player's column,
+# or -1 if none. Only meaningful for the mouse-owning player.
+func upgrade_choice_at_mouse(player):
+	var container = _upgrade_container(player)
+	for i in range(3):
+		var choice = container.get_node("Choice" + str(i + 1))
+		if choice.get_global_rect().has_point(choice.get_global_mouse_position()):
+			return i
+	return -1
 
 
 func update_upgrade_summary():

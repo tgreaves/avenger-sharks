@@ -7,7 +7,6 @@ signal player_found_exit_stop_key_movement
 signal player_found_exit
 signal player_low_energy
 signal player_no_longer_low_energy
-signal player_made_upgrade_choice
 signal player_has_stopped_cheating_death
 
 enum {
@@ -35,6 +34,12 @@ const MiniSharkScene = preload("res://Scenes/MiniShark.tscn")
 @export var current_powerup_levels = {}
 @export var max_powerup_levels = {}
 @export var upgrades = {}
+# The three upgrade codes offered to this shark on the between-wave screen,
+# computed per player from its own eligible upgrades.
+var offered_upgrades := []
+# Between-wave upgrade selection state (manual cursor, per player).
+var upgrade_cursor := 1  # Start on the middle choice.
+var upgrade_confirmed := false
 
 # Per-shark score and combo multiplier. In 1-player / 2-player-CPU only player 1
 # accrues (CPU and unattributed kills funnel to player 1); in 2-player-human
@@ -1051,16 +1056,29 @@ func decrease_powerup_level(powerup):
 	hud.set_powerup_level(self, powerup, current_powerup_levels[powerup])
 
 
-func _on_hud_upgrade_button_pressed(button_number):
-	var selected_upgrade
+# Pick this shark's three upgrade choices from its own eligible upgrades
+# (those not yet at max level), padded with HEAL ME. Stored in offered_upgrades.
+func choose_offered_upgrades():
+	var eligible: Array = []
+	for single_upgrade in upgrades:
+		var detail = upgrades.get(single_upgrade)
+		if detail[0] < detail[1]:
+			eligible.append(single_upgrade)
 
-	match button_number:
-		1:
-			selected_upgrade = get_parent().upgrade_one_index
-		2:
-			selected_upgrade = get_parent().upgrade_two_index
-		3:
-			selected_upgrade = get_parent().upgrade_three_index
+	while eligible.size() < 3:
+		eligible.append("HEAL ME")
+
+	eligible.shuffle()
+	offered_upgrades = [eligible.pop_front(), eligible.pop_front(), eligible.pop_front()]
+
+	if constants.DEV_FORCE_UPGRADE:
+		offered_upgrades[0] = constants.DEV_FORCE_UPGRADE
+
+
+func confirm_upgrade_choice():
+	# Apply the upgrade this shark's cursor is on, and lock the choice in.
+	var selected_upgrade = offered_upgrades[upgrade_cursor]
+	upgrade_confirmed = true
 
 	$AudioStreamPlayerSelectedUpgrade.play()
 
@@ -1101,8 +1119,6 @@ func _on_hud_upgrade_button_pressed(button_number):
 
 	hud.update_upgrade_summary()
 
-	# Go to next wave.
-	player_made_upgrade_choice.emit()
 
 func spawn_shark_spray(target_direction):
 	var shark_spray = SharkSprayScene.instantiate()
