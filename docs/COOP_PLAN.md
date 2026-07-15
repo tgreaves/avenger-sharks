@@ -12,13 +12,14 @@ Status (all play-tested, single-player unchanged throughout):
   game over only when all down), per-player scoring + dual-score HUD,
   per-player fish/frenzy, and shared wave-end key hunt / escape.
 - **Phase 7 — DONE.** CPU-controlled player 2.
-- **Phase 4 — TODO.** Per-player powerup bar + upgrade screen (still P1-only;
-  energy/fish bars are already per-player). Does not block play.
+- **Phase 4 — DONE.** Per-player powerup bar (4a) and simultaneous per-player
+  upgrade screen (4b): vertical column UI with a manual cursor (keys/controller
+  + mouse), per-player offers/summary, CPU deliberation + confirm flash.
 - **Phase 6 — TODO.** Menu/config polish: two-gamepad device-setup screen,
   colour presets. Plus: verify the two-gamepad pairing on real hardware.
 
-The core two-player game is complete and playable. Remaining work (Phases 4 & 6)
-is HUD duplication and menu polish.
+The full two-player feature is complete and play-tested. Only Phase 6 (menu/
+config polish + the two-gamepad hardware check) remains; it does not block play.
 
 Resequenced after the 2b audit — see "Re-plan: entanglement finding".
 
@@ -253,7 +254,24 @@ Details retained here for reference.
 - Single-player uses the same rig (fixed zoom, follows one shark) — one camera
   path to maintain.
 
-## Phase 4 — HUD for two players
+## Phase 4 — HUD for two players — DONE
+
+As-built:
+- **4a (powerup bar):** per-player. Player 1's bar re-anchored bottom-left;
+  player 2 gets a runtime clone bottom-right. `HUD.gd` powerup methods take the
+  player and drive that shark's bar.
+- **4b (upgrade screen):** simultaneous per-player picking. Godot's single-focus
+  button system can't serve two independent cursors, so the screen was rebuilt
+  as a vertical column with a **manual** per-player cursor (up/down + mouse
+  hover; fire or click to confirm — one consistent highlight, no focus/hover
+  split). Each player gets its own column (P1 left / P2 right), its own offered
+  upgrades, and its own upgrade summary. CPU "deliberates" then auto-picks; a
+  confirm flash plays before the wave advances. The old focus-memory pause logic
+  was removed. Rows are fixed-height + top-aligned for cross-column alignment.
+- Decision resolved: **independent picks, simultaneous** (not shared, not
+  turn-based). Full detail in `docs/PHASE_4B_UPGRADE_PLAN.md`.
+
+Original design notes (retained for reference):
 
 Note (from the 2b audit): energy bar, fish-frenzy bar, and aiming line already
 live on the **Player** node, so they duplicate for free when P2 spawns — they

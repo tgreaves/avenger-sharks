@@ -5,7 +5,8 @@
 * Gameplay:
 	* LOCAL TWO-PLAYER CO-OP! A second shark can join on a gamepad, or be computer-controlled.
 		* Shared zoom-to-fit camera that keeps both sharks in view.
-		* Each player has their own energy, FISH FRENZY, power-ups and score.
+		* Each player has their own energy, FISH FRENZY, power-ups, score and upgrades.
+		* Both players choose their between-wave upgrade at the same time.
 		* A downed player sits out the rest of the wave and returns next wave; game over only when both are down.
 		* Optional CPU-controlled second player.
 * Bug fixes:
