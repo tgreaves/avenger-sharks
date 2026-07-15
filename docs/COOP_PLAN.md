@@ -1,10 +1,24 @@
 # Couch Co-op — Architecture & Implementation Plan
 
-Status: **Phase 1 complete**; **Phase 2a complete** (input routed through
-`PlayerInput`, player-count menu selector added — both play-tested, single-player
-unchanged). **Phase 2b next** (spawn P2 — now includes the shared camera, merged
-from Phase 3). Phase 4 (shared-HUD powerup/upgrade duplication) deferred and does
-not block a first playable co-op build.
+Status (all play-tested, single-player unchanged throughout):
+
+- **Phase 1 — DONE.** Decoupled the single-player reference.
+- **Phase 2a — DONE.** Input via `PlayerInput`; player-count menu selector.
+- **Phase 2b — DONE.** Second player spawns with synchronised swim-in,
+  device-scoped input, and a distinct tint. Includes the shared zoom-to-fit
+  camera (Phase 3, merged in).
+- **Phase 3 — DONE** (merged into 2b).
+- **Phase 5 — DONE.** Co-op death (downed shark sits out, respawns next wave,
+  game over only when all down), per-player scoring + dual-score HUD,
+  per-player fish/frenzy, and shared wave-end key hunt / escape.
+- **Phase 7 — DONE.** CPU-controlled player 2.
+- **Phase 4 — TODO.** Per-player powerup bar + upgrade screen (still P1-only;
+  energy/fish bars are already per-player). Does not block play.
+- **Phase 6 — TODO.** Menu/config polish: two-gamepad device-setup screen,
+  colour presets. Plus: verify the two-gamepad pairing on real hardware.
+
+The core two-player game is complete and playable. Remaining work (Phases 4 & 6)
+is HUD duplication and menu polish.
 
 Resequenced after the 2b audit — see "Re-plan: entanglement finding".
 
@@ -255,7 +269,27 @@ are NOT part of this phase. This phase is only the shared-HUD elements below.
   focus-management work — the pause/focus-memory logic in `Main.gd` assumes one
   picker.
 
-## Phase 5 — Wave lifecycle & co-op death
+## Phase 5 — Wave lifecycle & co-op death — DONE
+
+Built as three sub-slices (all play-tested):
+- **5.1** — co-op death: downed shark hidden for the wave, `revive_for_new_wave()`
+  at next wave start, `game_over()` gated on `are_all_players_dead()`. Also fixed
+  a camera zoom-out at wave-end (camera now frames *visible* players, so a lone
+  survivor keeps single-player zoom).
+- **5.2** — projectile ownership threaded through the kill path; per-shark
+  `player_score`/`player_score_multiplier`; dual-score HUD (P1 left, TIME centre,
+  P2 right / HIGH SCORE hidden in 2P-human; CPU + 1P keep one score).
+- **2a** — per-player `fish_collected`, own bar + own FISH FRENZY; fish score
+  credits the collector; collected fish fly to the collector's HUD label
+  (converted screen→world so they track at any camera zoom/pan).
+- **5.3** — shared wave-end: any-living-player gating (fixed a soft-lock when P1
+  died), both sharks hunt the key, single-holder carries it and opens the door,
+  the other **follows the holder** and both **escape together** (holder exits
+  first, then followers; the screen fade + cleanup are owned by Main and fire
+  once the last shark is through). 5.3a (safe) and 5.3b (escape-together) were
+  done in one pass.
+
+Original design notes (retained for reference):
 
 **Death model corrected (there is no "lives" mechanic in the game).** The game
 uses a **per-shark energy bar**; death = energy hits zero (sudden, once, unless
