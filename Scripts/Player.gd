@@ -221,7 +221,7 @@ func get_input():
 			grenade_fire(target_direction)
 
 			Storage.increase_stat("player", "shots_fired", 1)
-			$AudioStreamPlayerSpray.play()
+			play_spray_sound()
 			set_fire_rate_delay_timer()
 
 		# Controller (Twin stick)
@@ -235,7 +235,7 @@ func get_input():
 			grenade_fire(shoot_direction)
 
 			Storage.increase_stat("player", "shots_fired", 1)
-			$AudioStreamPlayerSpray.play()
+			play_spray_sound()
 			set_fire_rate_delay_timer()
 
 	# Aiming line support (Controller only)
@@ -510,7 +510,7 @@ func _physics_process(_delta):
 							shark_spray.modulate = Color(0, 1, 0)
 							fish_frenzy_colour = "BLUE"
 
-						$AudioStreamPlayerSpray.play()
+						play_spray_sound()
 						i += 1
 
 		EXPLODING:
@@ -866,6 +866,13 @@ func powerup_label_animation_decrease_count():
 
 	if powerup_labels_being_displayed < 0:
 		powerup_labels_being_displayed = 0
+
+
+# Play this shark's spray sound, but only if Main's throttle allows it (avoids
+# two sharks stacking near-simultaneous shots into a muddy doubled sound).
+func play_spray_sound():
+	if get_parent().request_spray_sound():
+		$AudioStreamPlayerSpray.play()
 
 
 func set_fire_rate_delay_timer():

@@ -171,6 +171,19 @@ func get_coop_camera():
 	return $CoopCamera
 
 
+var _last_spray_sound_ms = -1000000
+
+
+# Whether a shark may play its spray shot sound now. Throttled so two sharks
+# firing at nearly the same instant don't stack into a muddy doubled sound.
+func request_spray_sound():
+	var now = Time.get_ticks_msec()
+	if now - _last_spray_sound_ms >= constants.SPRAY_SOUND_MIN_INTERVAL * 1000.0:
+		_last_spray_sound_ms = now
+		return true
+	return false
+
+
 # The shark that should be credited for a kill/pickup. Human-controlled players
 # score for themselves; the CPU and unattributed kills (e.g. dinosaur) funnel to
 # player 1, so 1-player and 2-player-CPU keep a single score.
