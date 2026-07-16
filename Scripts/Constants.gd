@@ -7,17 +7,18 @@ const DEV_DELAY_ON_START = false
 const DEV_LOGGING = false
 const DEV_LOG_WAVE_DESIGN = false
 const DEV_ALLOW_CHEATS = false
-const DEV_SKIP_INTRO = false
+const DEV_SKIP_INTRO = true
 const DEV_START_GAME_IMMEDIATELY = false
 const DEV_STEAM_TESTING = false
 const DEV_SPAWN_ENEMY_COUNT = 0
 const DEV_SPAWN_ONE_ENEMY_TYPE = ""
 const DEV_FISH_FRENZY_AVAILABLE_IMMEDIATELY = false
-const DEV_CHEAT_DEATH_AVAILABLE_IMMEDIATELY = false # false
+const DEV_CHEAT_DEATH_AVAILABLE_IMMEDIATELY = false 
 const DEV_FORCE_UPGRADE = ""   	# ""
 const DEV_FORCE_POWERUP = ""	# ""
 const DEV_WAVE_LASTS_FOREVER = false
 const DEV_WIPE_ACHIEVEMENTS = false
+const DEV_FORCE_BOSS_WAVE = true   # Force every wave to be a boss wave for testing.
 
 # Hardware settings
 const WINDOW_TITLE = "Avenger Sharks " + GAME_VERSION
@@ -287,6 +288,27 @@ const ENEMY_KNOCKBACK_VELOCITY_CLAMP = Vector2(200, 200)
 
 # Boss waves
 const BOSS_WAVE_MULTIPLIER = 1000000
+# Base boss health (number of shots to defeat). Tuned in Phase 5.
+const BOSS_BASE_HEALTH = 60
+# Boss is tougher in 2-player since two sharks out-damage one.
+const BOSS_HEALTH_2P_MULTIPLIER = 1.75
+# Where the boss spawns — upper-middle arena, clear of the bottom entrance the
+# sharks swim in through.
+const BOSS_SPAWN_POSITION = Vector2(2650, 900)
+# Boss visual + collision scale (mirrors ENEMY_SETTINGS sprite_scale /
+# collision_scale). Applied in Boss.configure() so it stays data-driven.
+# The shared capsule (radius 59 / height 132) is tuned to fit the creature at a
+# sprite scale of 4 (that's how the enemies use it: sprite 4x, collision 1x). At
+# the boss's sprite scale of 7 the creature is drawn 7/4 = 1.75x larger, so the
+# collision scale matches at 1.75x to stay proportional.
+const BOSS_SPRITE_SCALE = Vector2(7, 7)
+const BOSS_COLLISION_SCALE = Vector2(1.75, 1.75)
+# The necromancer creature sits low in its frame, so (like the necromancer enemy,
+# which uses sprite_offset (0,-25)) the sprite is lifted to sit over the centred
+# capsule. Applied in Boss.configure() and scaled with the sprite.
+const BOSS_SPRITE_OFFSET = Vector2(0, -25)
+# Score awarded for defeating a boss (tuned in Phase 5).
+const BOSS_DEFEAT_SCORE_BONUS = 1000
 
 # Fish
 const FISH_TO_SPAWN_ARCADE = 20

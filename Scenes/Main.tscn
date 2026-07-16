@@ -1,8 +1,6 @@
 [gd_scene format=3 uid="uid://bxw6akrvsd84v"]
 
 [ext_resource type="Script" uid="uid://cj10txdbe3cd2" path="res://Scripts/Main.gd" id="1_yyejc"]
-[ext_resource type="Script" path="res://Scripts/CoopCamera.gd" id="99_coopcam"]
-[ext_resource type="AudioStream" uid="uid://ba0q1jycm55i3" path="res://Sound/laser5-47286.wav" id="98_spray"]
 [ext_resource type="PackedScene" uid="uid://dlyr1neald0e4" path="res://Scenes/Dedication.tscn" id="2_utmp5"]
 [ext_resource type="PackedScene" uid="uid://dde3f2uantk5b" path="res://Scenes/Intro.tscn" id="2_vh1q3"]
 [ext_resource type="PackedScene" uid="uid://bkmx1mvtb8dxr" path="res://Scenes/Enemy.tscn" id="3_br4mh"]
@@ -16,8 +14,8 @@
 [ext_resource type="Texture2D" uid="uid://b11pog2gr6q20" path="res://Images/UnderwaterFantasy/foregound-merged.png" id="10_p7nrg"]
 [ext_resource type="PackedScene" uid="uid://ds5km1djhril" path="res://Scenes/Arena.tscn" id="11_cdl54"]
 [ext_resource type="PackedScene" uid="uid://bcqacic7yj4ds" path="res://Scenes/HUD.tscn" id="12_ldcme"]
-[ext_resource type="PackedScene" uid="uid://dc60erflcrf6" path="res://Scenes/MainMenu.tscn" id="13_u3xax"]
 [ext_resource type="PackedScene" uid="uid://b2setupscrn01" path="res://Scenes/SetupScreen.tscn" id="13_setupscrn"]
+[ext_resource type="PackedScene" uid="uid://dc60erflcrf6" path="res://Scenes/MainMenu.tscn" id="13_u3xax"]
 [ext_resource type="PackedScene" uid="uid://dfksl6get6jnk" path="res://Scenes/PauseMenu.tscn" id="14_fssl1"]
 [ext_resource type="PackedScene" uid="uid://5yp4e43ckdrj" path="res://Scenes/Player.tscn" id="15_3wn6m"]
 [ext_resource type="PackedScene" uid="uid://ci0jxmpdr3ue5" path="res://Scenes/Options.tscn" id="15_ai8du"]
@@ -27,6 +25,8 @@
 [ext_resource type="AudioStream" uid="uid://bg0hxy3wpmvun" path="res://Sound/shark-hunt-16191.mp3" id="20_ixctd"]
 [ext_resource type="AudioStream" uid="uid://bvgi2r1adyvav" path="res://Sound/countdown-sound-effect-8-bit-151797.mp3" id="23_4lpjy"]
 [ext_resource type="AudioStream" uid="uid://csu46ibf7e8md" path="res://Sound/romantic-melody-of-the-80s-129224.mp3" id="23_pr0en"]
+[ext_resource type="AudioStream" uid="uid://ba0q1jycm55i3" path="res://Sound/laser5-47286.wav" id="98_spray"]
+[ext_resource type="Script" uid="uid://d2bbg6tojt1uv" path="res://Scripts/CoopCamera.gd" id="99_coopcam"]
 
 [node name="Main" type="Node2D" unique_id=1933226704]
 script = ExtResource("1_yyejc")
@@ -67,7 +67,7 @@ offset_top = 93.0
 offset_right = -1018.0
 offset_bottom = 93.0
 
-[node name="SetupScreen" parent="." instance=ExtResource("13_setupscrn")]
+[node name="SetupScreen" parent="." unique_id=1623583294 instance=ExtResource("13_setupscrn")]
 
 [node name="PauseMenu" parent="." unique_id=1467719564 instance=ExtResource("14_fssl1")]
 process_mode = 3
@@ -88,7 +88,7 @@ visible = false
 [node name="Player" parent="." unique_id=2037117605 instance=ExtResource("15_3wn6m")]
 position = Vector2(2650, 714)
 
-[node name="CoopCamera" type="Camera2D" parent="."]
+[node name="CoopCamera" type="Camera2D" parent="." unique_id=1611932978]
 limit_left = 0
 limit_top = 0
 limit_right = 5300
@@ -145,7 +145,7 @@ stream = ExtResource("23_4lpjy")
 volume_db = 8.0
 bus = &"Effects"
 
-[node name="SpraySound" type="AudioStreamPlayer" parent="."]
+[node name="SpraySound" type="AudioStreamPlayer" parent="." unique_id=1963546844]
 stream = ExtResource("98_spray")
 bus = &"Effects"
 
@@ -158,13 +158,13 @@ bus = &"Effects"
 [connection signal="credits_pressed" from="MainMenu" to="." method="_on_main_menu_credits_pressed"]
 [connection signal="exit_game_pressed" from="MainMenu" to="." method="_on_main_menu_exit_game_pressed"]
 [connection signal="game_mode_pressed" from="MainMenu" to="." method="_on_main_menu_game_mode_pressed"]
-[connection signal="player_count_pressed" from="MainMenu" to="." method="_on_main_menu_player_count_pressed"]
 [connection signal="how_to_play_pressed" from="MainMenu" to="." method="_on_main_menu_how_to_play_pressed"]
 [connection signal="options_pressed" from="MainMenu" to="." method="_on_main_menu_options_pressed"]
+[connection signal="player_count_pressed" from="MainMenu" to="." method="_on_main_menu_player_count_pressed"]
 [connection signal="start_game_pressed" from="MainMenu" to="." method="_on_main_menu_start_game_pressed"]
 [connection signal="statistics_pressed" from="MainMenu" to="." method="_on_main_menu_statistics_pressed"]
-[connection signal="setup_confirmed" from="SetupScreen" to="." method="_on_setup_screen_setup_confirmed"]
 [connection signal="setup_cancelled" from="SetupScreen" to="." method="_on_setup_screen_setup_cancelled"]
+[connection signal="setup_confirmed" from="SetupScreen" to="." method="_on_setup_screen_setup_confirmed"]
 [connection signal="abandon_game_pressed" from="PauseMenu" to="." method="_on_pause_menu_abandon_game_pressed"]
 [connection signal="unpause_game_pressed" from="PauseMenu" to="." method="_on_pause_menu_unpause_game_pressed"]
 [connection signal="credits_return_button_pressed" from="Credits" to="." method="_on_credits_credits_return_button_pressed"]

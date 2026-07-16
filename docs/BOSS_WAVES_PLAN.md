@@ -2,18 +2,25 @@
 
 Status:
 
-- **Phase 0 — Existing scaffolding.** A disabled skeleton is already in the code
-  (see "What exists today"). No boss can currently be fought.
-- **Phase 1 — TODO.** The boss entity: a single large enemy with a health pool
-  the sharks deplete.
-- **Phase 2 — TODO.** Win/lose condition + wave lifecycle integration.
-- **Phase 3 — TODO.** Boss attacks / behaviour.
-- **Phase 4 — TODO.** Procedural adds (TheDirector decides if/when the fight is
-  complicated by normal enemies).
-- **Phase 5 — TODO.** Trigger cadence, HUD polish, audio, co-op framing.
+- **Phase 0 — Existing scaffolding.** A disabled skeleton was already in the
+  code (see "What exists today").
+- **Phase 1 — DONE.** The boss entity + a complete, winnable boss wave. Making
+  Phase 1 testable pulled most of **Phase 2** forward with it (win condition,
+  reward, no-timer race, "BOSS" display, key-drop handoff) — see the Phase 1
+  "As-built" notes.
+- **Phase 2 — MOSTLY DONE** (folded into Phase 1). Remaining tail only: co-op
+  death behaviour during a boss fight is untested (should already work via the
+  existing rule); confirm during Phase 3+ co-op testing.
+- **Phase 3 — TODO (next).** Boss attacks / behaviour — this is what makes the
+  boss dangerous. Currently it only drifts.
+- **Phase 4 — TODO.** Procedural adds (TheDirector rolls intensity none/light/
+  heavy; capped periodic trickle).
+- **Phase 5 — TODO.** Trigger cadence (replace the placeholder multiplier), HUD
+  polish, audio, co-op camera framing, and balance tuning.
 
-Each phase is independently testable. Phase 1 gets *something to shoot*; Phase 2
-makes it a real, completable wave; Phases 3–5 add depth and variety.
+Each phase is independently testable. Phase 1 got *something to shoot* and a
+full spawn → deplete → win loop; Phase 3 makes it a real fight; Phases 4–5 add
+variety and polish.
 
 ## Goal
 
@@ -87,48 +94,60 @@ wave can't end, (3) no damage plumbing to the health bar, (4) trigger disabled,
 
 ---
 
-## Phase 1 — The boss entity
+## Phase 1 — The boss entity — DONE
 
-Get *something to shoot* that has health and dies.
+Delivered *something to shoot* AND a complete winnable boss wave (most of the
+original Phase 2 came along for the ride, because a boss you can't defeat isn't
+testable).
 
-- New `Boss` scene + script (or a buffed existing enemy per open decision 1),
-  added to a `bossGroup` (and likely `enemyGroup` so existing shark-spray
-  collision / scoring works with minimal change).
-- `boss_health` drives an internal HP; taking a `death("PLAYER-SHOT", owner)`
-  hit reduces HP instead of dying outright, and updates `BossHealthBar`.
-- Spawn it at boss-wave start (replace the `boss_health_reveal()`-only branch in
-  `Main.gd` with: reveal bar **and** spawn the boss, e.g. arena centre / away
-  from the player entrance).
-- No attacks yet — it can just sit or drift. Verify: bar reveals, shots lower
-  it, both sharks' shots count (co-op), bar empties.
+### As-built
 
-### Damage plumbing
+- **`Scripts/Boss.gd` + `Scenes/Boss.tscn`** — a single large boss, a buffed
+  reskin of the necromancer sprite (run + death animations reused from the same
+  sheet). Added to `enemyGroup` so the existing shark-spray / grenade collision
+  and cleanup treat it like any other enemy body. Exposes `death(source,
+  attacker)` (same signature as `Enemy.death`) so both projectile paths damage
+  it with zero changes to those scripts.
+- **Health pool:** `configure(health)` sets HP; each `death()` hit decrements by
+  1, flashes the sprite, and emits `boss_damaged`. At 0 it emits `boss_defeated`,
+  plays the death anim/sound, and frees via a StateTimer.
+- **Scale is data-driven** (mirrors `ENEMY_SETTINGS`): `BOSS_SPRITE_SCALE` (7×),
+  `BOSS_COLLISION_SCALE` (1.75× — the shared capsule fits the creature at sprite
+  4× / collision 1×, so 7/4 = 1.75× keeps it proportional), and
+  `BOSS_SPRITE_OFFSET` (lifts the low-in-frame art over the centred capsule, like
+  the necromancer's `sprite_offset`). All applied in `Boss.configure()`.
+- **Spawn:** `Main.spawn_boss()` instances the boss at `BOSS_SPAWN_POSITION`
+  (upper-middle, clear of the swim-in lane), scales health ×1.75 in 2-player,
+  and connects its signals. Called from `start_wave()`'s boss branch.
+- **Damage → HUD:** `_on_boss_damaged` → `HUD.update_boss_health`. Reveal
+  (`boss_health_reveal`) reads the spawned boss's actual (scaled) max health.
+- **Drift:** gentle random drift + wall bounce so it isn't a static target. Real
+  movement/attacks are Phase 3.
 
-- Reuse the co-op projectile ownership: `SharkSpray`/grenade already carry
-  `owner_player`; the boss's hit handler credits score via
-  `scoring_player_for(attacker)` on defeat.
-- Update `BossHealthBar.value` on each hit (Main or HUD helper —
-  `HUD.update_boss_health(current)`).
+### Win condition + lifecycle (Phase 2 items folded in here)
 
-## Phase 2 — Win condition & wave lifecycle
+- **Win = deplete health.** `_on_boss_defeated` awards `BOSS_DEFEAT_SCORE_BONUS`
+  to the killing shark (`scoring_player_for`), full-heals all living sharks
+  (+ `update_low_energy_music`), hides the health bar, drops the key at the
+  boss's death position, and routes into the existing `wave_end()` — so the
+  normal hunt-key → exit → upgrade flow runs.
+- **No survival timer:** the boss branch skips `WaveTimeLeftTimer` and
+  `EnemySpawnTimer`. TIME slot shows **"BOSS"** (`update_time_left_display`).
+- **Intro banner:** `wave_intro` shows "WAVE N / ALERT! BOSS DETECTED!" with no
+  "SURVIVE X SECONDS".
+- **Director:** `design_boss_wave` sets safe defaults for the keys `start_wave`
+  reads (obstacle_number, total_enemies=0, total_spawns=0, reinforcements=0), so
+  it no longer faults on the missing normal-wave design. `DEV_FORCE_BOSS_WAVE`
+  forces every wave to a boss wave for testing.
+- **Cleanup:** boss leaves `enemyGroup` on death (so the wave-end `swim_escape`
+  sweep skips it); `return_to_main_screen` nulls the ref and hides the bar.
 
-Make a boss wave a real, completable wave.
+### Phase 2 tail still open
 
-- When boss HP hits 0: trigger the wave-end path. Simplest is to route into the
-  existing `wave_end()` — drop the key on the boss's death position, then the
-  normal hunt-key → exit → upgrade flow runs (co-op: both sharks escape).
-- The boss-wave branch must **not** start `WaveTimeLeftTimer` — there is no
-  survival timer (pure damage race).
-- **Reward on defeat:** award a large score bonus (via `scoring_player_for()`
-  attribution / split as appropriate) and restore shark health (amount TBD —
-  see open items) before the next wave.
-- HUD: hide `BossHealthBar` on wave end / game over / return to menu (audit the
-  existing visibility toggles).
-- **Co-op death:** reuse the existing rule unchanged — a downed shark waits out
-  the whole boss fight and revives at the next normal wave start;
-  `are_all_players_dead()` still gates game over.
-- Time display: a boss wave has no countdown, so hide TIME or show "BOSS" in its
-  place. Audit `update_time_left_display()`.
+- **Co-op death during a boss fight** is untested. It *should* work unchanged
+  (downed shark waits out the fight, `are_all_players_dead()` gates game over,
+  revive at next normal wave start), but hasn't been exercised — confirm during
+  Phase 3+ co-op testing.
 
 ## Phase 3 — Boss attacks / behaviour
 

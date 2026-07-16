@@ -376,25 +376,25 @@ subset in any order.
   since the single player is always both "nearest/random living" and the whole
   "any low" set):
   - **Spray size** (`SharkSpray._ready`) read `get_primary_player().spray_size`,
-    so P2's BIG SPRAY never enlarged its own spray. Now reads
-    `owner_player.spray_size`; `owner_player` is set *before* `add_child` at all
-    four spawn sites (else `_ready` runs before it's assigned).
+	so P2's BIG SPRAY never enlarged its own spray. Now reads
+	`owner_player.spray_size`; `owner_player` is set *before* `add_child` at all
+	four spawn sites (else `_ready` runs before it's assigned).
   - **Dinosaur rampage** (`Dinosaur.go_on_a_rampage`) used P1's DOMINANT DINO
-    level; the eating shark is now passed through (`go_on_a_rampage(self)`).
+	level; the eating shark is now passed through (`go_on_a_rampage(self)`).
   - **Artillery** drops (`_on_artillery_timer`) always centred on P1; now target
-    a random living shark via new `get_random_living_player()` (the chase already
-    used `get_nearest_player`).
+	a random living shark via new `get_random_living_player()` (the chase already
+	used `get_nearest_player`).
   - **Low-energy tension music** was P1-only (P2's signals unconnected, shared
     `pitch_scale`). Now recomputes from *any* living shark being low
-    (`update_low_energy_music()`), P2's signals are wired, and it's re-evaluated
+	(`update_low_energy_music()`), P2's signals are wired, and it's re-evaluated
     on death (a downed shark leaves the living set without emitting).
   - **Power-pellet music** (`end_shark_attack`, shared `SharkAttackMusic`) was
-    stopped by whichever shark's pellet ended first; now only stops once no shark
-    is still power-pelleted.
+	stopped by whichever shark's pellet ended first; now only stops once no shark
+	is still power-pelleted.
   - **CIRCLE_SURROUND_PLAYER** spawn placement encircled P1; now encircles a
-    random living shark.
+	random living shark.
   - Left as-is (correct): the wave-start camera snap to `$Player.position`
-    (both sharks spawn together and `CoopCamera` takes over immediately).
+	(both sharks spawn together and `CoopCamera` takes over immediately).
 
 **Remaining items:**
 

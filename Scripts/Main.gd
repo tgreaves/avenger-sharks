@@ -1,6 +1,7 @@
 extends Node
 
 const PlayerScene = preload("res://Scenes/Player.tscn")
+const BossScene = preload("res://Scenes/Boss.tscn")
 
 # Offset of player 2's start position relative to player 1.
 const PLAYER_2_START_OFFSET = Vector2(300, 0)
@@ -247,6 +248,8 @@ func get_nearest_player(from_position):
 # Player 2 (the scene-instanced $Player is always player 1). Held so we can
 # despawn it when returning to a single-player menu.
 var player_two = null
+# The active boss instance during a boss wave (null otherwise).
+var boss = null
 # Device id assigned to each human player slot ([P1, P2]) for 2-player SPECIFIC
 # input. Defaults to the historical hard-coded pairing (P1 keyboard/mouse,
 # P2 gamepad 0); the setup screen overwrites these before a 2P-human game.
@@ -551,7 +554,11 @@ func wave_intro():
 
 	var wave_text
 
-	if wave_number == 1:
+	if TheDirector.wave_design.get("boss_wave", false):
+		# Boss waves are a damage race, not a survival timer — no "SURVIVE X
+		# SECONDS" text (the spawn_text "ALERT! BOSS DETECTED!" is appended below).
+		wave_text = "[center]WAVE " + str(wave_number)
+	elif wave_number == 1:
 		match game_mode:
 			"ARCADE":
 				wave_text = (
@@ -599,16 +606,22 @@ func start_wave():
 
 	dropped_items_on_screen = 0
 
-	$WaveTimeLeftTimer.start(TheDirector.wave_design.get("wave_time"))
+	var is_boss_wave = TheDirector.wave_design.get("boss_wave", false)
+
+	# A boss wave is a damage race: no survival timer and no reinforcement spawns.
+	if not is_boss_wave:
+		$WaveTimeLeftTimer.start(TheDirector.wave_design.get("wave_time"))
+		$EnemySpawnTimer.start(TheDirector.wave_design.get("reinforcements_timer", 0))
+
 	$ItemSpawnTimer.start(
 		randf_range(constants.ITEM_SPAWN_MINIMUM_SECONDS, constants.ITEM_SPAWN_MAXIMUM_SECONDS)
 	)
-	$EnemySpawnTimer.start(TheDirector.wave_design.get("reinforcements_timer", 0))
 
 	spawn_number = 0
 	enemies_left_this_wave = TheDirector.wave_design.get("total_enemies")
 
-	if TheDirector.wave_design.get("boss_wave", false):
+	if is_boss_wave:
+		spawn_boss()
 		$HUD.boss_health_reveal()
 	else:
 		spawn_enemy("start_spawn", "spawn_pattern", false)
@@ -760,6 +773,11 @@ func return_to_main_screen():
 
 	for enemy in get_tree().get_nodes_in_group("enemyGroup"):
 		enemy.queue_free()
+
+	# The boss lives in enemyGroup and was freed above; drop our reference and
+	# hide its health bar.
+	boss = null
+	$HUD/CanvasLayer/BossHealthBar.visible = false
 
 	for enemy_attack in get_tree().get_nodes_in_group("enemyAttack"):
 		enemy_attack.queue_free()
@@ -1042,6 +1060,57 @@ func spawn_fish():
 	add_child(mob, true)
 
 
+# Spawn the single boss for a boss wave. Health scales with player count so the
+# fight stays meaningful in co-op. Added to enemyGroup so existing shark-spray /
+# grenade collision and clean-up treat it like any other enemy body.
+func spawn_boss():
+	boss = BossScene.instantiate()
+
+	var health = constants.BOSS_BASE_HEALTH
+	if player_count == 2:
+		health = int(round(health * constants.BOSS_HEALTH_2P_MULTIPLIER))
+
+	boss.configure(health)
+	boss.position = constants.BOSS_SPAWN_POSITION
+	boss.add_to_group("enemyGroup")
+	boss.boss_damaged.connect(_on_boss_damaged)
+	boss.boss_defeated.connect(_on_boss_defeated)
+	add_child(boss)
+
+
+func _on_boss_damaged(current_health, max_health):
+	$HUD.update_boss_health(current_health, max_health)
+
+
+# Boss defeated: award the reward and route into the normal wave-end flow.
+func _on_boss_defeated(defeat_position, attacker):
+	boss = null
+
+	# Reward: large score bonus to the shark that landed the kill, plus a full
+	# health restore for all living sharks going into the next wave.
+	var scorer = scoring_player_for(attacker)
+	scorer.player_score += constants.BOSS_DEFEAT_SCORE_BONUS
+	update_high_score()
+	_on_enemy_update_score_display()
+
+	for player in get_living_players():
+		player.player_energy = constants.PLAYER_START_GAME_ENERGY
+		player.get_node("EnergyProgressBar").value = player.player_energy
+		player._on_main_player_update_energy()
+	update_low_energy_music()
+
+	$HUD/CanvasLayer/BossHealthBar.visible = false
+
+	# Drop the key where the boss fell so the normal hunt-key -> exit flow runs.
+	$Key.global_position = defeat_position
+	$Key.show()
+	$Key/CollisionShape2D.disabled = false
+	$Key/AnimatedSprite2D.play()
+
+	Logging.log_entry("Boss defeated; invoking wave_end()")
+	wave_end()
+
+
 func _process(_delta):
 	if SteamClient.steam_running:
 		SteamClient.SteamEngine.run_callbacks()
@@ -1304,6 +1373,11 @@ func reset_score_multiplier(player = null):
 
 
 func update_time_left_display():
+	# A boss wave has no countdown — show "BOSS" in the TIME slot instead.
+	if TheDirector.wave_design.get("boss_wave", false):
+		$HUD.get_node("CanvasLayer").get_node("EnemiesLeft").text = "BOSS"
+		return
+
 	var time_left
 
 	match game_status:

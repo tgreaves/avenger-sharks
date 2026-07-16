@@ -14,7 +14,7 @@ func design_wave(wave_number):
 	spawn_ratios.clear()
 	running_chance = 0.0
 
-	if wave_number % constants.BOSS_WAVE_MULTIPLIER == 0:
+	if constants.DEV_FORCE_BOSS_WAVE or wave_number % constants.BOSS_WAVE_MULTIPLIER == 0:
 		Logging.log_entry("Boss wave qualifier.")
 		design_boss_wave(wave_number)
 		return
@@ -217,5 +217,17 @@ func get_spawn_pattern(enemy_spawn_placement_configuration, previous_spawn_patte
 
 func design_boss_wave(_wave_number):
 	wave_design["boss_wave"] = true
-	wave_design["boss_health"] = 1000
+	# Base health; Main scales it for player count when it spawns the boss.
+	wave_design["boss_health"] = constants.BOSS_BASE_HEALTH
 	wave_design["spawn_text"] = "ALERT! BOSS DETECTED!"
+
+	# A boss wave still needs an obstacle count and fish (arena decoration /
+	# frenzy fuel), but no survival timer, no reinforcement spawns, and no
+	# regular enemy roster — the boss is the wave. Set safe defaults for the keys
+	# start_wave() reads so it doesn't fault on the missing normal-wave design.
+	wave_design["obstacle_number"] = randi_range(
+		constants.ARENA_OBSTACLE_MINIMUM, constants.ARENA_OBSTACLE_MAXIMUM
+	)
+	wave_design["total_enemies"] = 0
+	wave_design["total_spawns"] = 0
+	wave_design["reinforcements_timer"] = 0

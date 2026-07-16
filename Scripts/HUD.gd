@@ -319,12 +319,19 @@ func flash_screen_red():
 
 
 func boss_health_reveal():
-	$CanvasLayer/BossHealthBar.max_value = TheDirector.wave_design.get("boss_health")
+	# Reveal animates the bar filling up to the spawned boss's actual
+	# (player-count-scaled) health.
+	var full = get_parent().boss.boss_max_health
+	$CanvasLayer/BossHealthBar.max_value = full
 	$CanvasLayer/BossHealthBar.value = 0
 
 	var tween = get_tree().create_tween()
-	tween.tween_property(
-		$CanvasLayer/BossHealthBar, "value", TheDirector.wave_design.get("boss_health"), 2.0
-	)
+	tween.tween_property($CanvasLayer/BossHealthBar, "value", full, 2.0)
 
 	$CanvasLayer/BossHealthBar.visible = true
+
+
+# Update the boss health bar as the boss takes damage.
+func update_boss_health(current_health, max_health):
+	$CanvasLayer/BossHealthBar.max_value = max_health
+	$CanvasLayer/BossHealthBar.value = current_health

@@ -271,7 +271,7 @@ theme_override_styles/fill = SubResource("StyleBoxFlat_bf8k5")
 value = 50.0
 show_percentage = false
 
-[node name="UpgradeHeader" type="Label" parent="CanvasLayer"]
+[node name="UpgradeHeader" type="Label" parent="CanvasLayer" unique_id=1753497859]
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
@@ -300,9 +300,9 @@ grow_vertical = 2
 theme_override_constants/separation = 20
 
 [node name="Choice1" type="VBoxContainer" parent="CanvasLayer/UpgradeChoiceContainer" unique_id=487788323]
+custom_minimum_size = Vector2(0, 300)
 layout_mode = 2
 size_flags_horizontal = 3
-custom_minimum_size = Vector2(0, 300)
 alignment = 0
 
 [node name="TextureRect" type="TextureRect" parent="CanvasLayer/UpgradeChoiceContainer/Choice1" unique_id=1408447458]
@@ -330,9 +330,9 @@ vertical_alignment = 1
 autowrap_mode = 2
 
 [node name="Choice2" type="VBoxContainer" parent="CanvasLayer/UpgradeChoiceContainer" unique_id=407331852]
+custom_minimum_size = Vector2(0, 300)
 layout_mode = 2
 size_flags_horizontal = 3
-custom_minimum_size = Vector2(0, 300)
 alignment = 0
 
 [node name="TextureRect" type="TextureRect" parent="CanvasLayer/UpgradeChoiceContainer/Choice2" unique_id=1628195625]
@@ -360,9 +360,9 @@ vertical_alignment = 1
 autowrap_mode = 2
 
 [node name="Choice3" type="VBoxContainer" parent="CanvasLayer/UpgradeChoiceContainer" unique_id=174544335]
+custom_minimum_size = Vector2(0, 300)
 layout_mode = 2
 size_flags_horizontal = 3
-custom_minimum_size = Vector2(0, 300)
 alignment = 0
 
 [node name="TextureRect" type="TextureRect" parent="CanvasLayer/UpgradeChoiceContainer/Choice3" unique_id=77373141]

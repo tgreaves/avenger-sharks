@@ -1,0 +1,173 @@
+[gd_scene format=3 uid="uid://b0ssw4vescn01"]
+
+[ext_resource type="Script" path="res://Scripts/Boss.gd" id="1_boss"]
+[ext_resource type="Texture2D" uid="uid://71x34ukulwpb" path="res://Sprites/Necromancer_creativekind-Sheet.png" id="2_sheet"]
+[ext_resource type="AudioStream" uid="uid://vioqdrtdy1x3" path="res://Sound/086398_game-die-81356.mp3" id="3_die"]
+
+[sub_resource type="AtlasTexture" id="run0"]
+atlas = ExtResource("2_sheet")
+region = Rect2(0, 128, 160, 128)
+
+[sub_resource type="AtlasTexture" id="run1"]
+atlas = ExtResource("2_sheet")
+region = Rect2(160, 128, 160, 128)
+
+[sub_resource type="AtlasTexture" id="run2"]
+atlas = ExtResource("2_sheet")
+region = Rect2(320, 128, 160, 128)
+
+[sub_resource type="AtlasTexture" id="run3"]
+atlas = ExtResource("2_sheet")
+region = Rect2(480, 128, 160, 128)
+
+[sub_resource type="AtlasTexture" id="run4"]
+atlas = ExtResource("2_sheet")
+region = Rect2(640, 128, 160, 128)
+
+[sub_resource type="AtlasTexture" id="run5"]
+atlas = ExtResource("2_sheet")
+region = Rect2(800, 128, 160, 128)
+
+[sub_resource type="AtlasTexture" id="run6"]
+atlas = ExtResource("2_sheet")
+region = Rect2(960, 128, 160, 128)
+
+[sub_resource type="AtlasTexture" id="run7"]
+atlas = ExtResource("2_sheet")
+region = Rect2(1120, 128, 160, 128)
+
+[sub_resource type="AtlasTexture" id="death0"]
+atlas = ExtResource("2_sheet")
+region = Rect2(0, 768, 160, 128)
+
+[sub_resource type="AtlasTexture" id="death1"]
+atlas = ExtResource("2_sheet")
+region = Rect2(160, 768, 160, 128)
+
+[sub_resource type="AtlasTexture" id="death2"]
+atlas = ExtResource("2_sheet")
+region = Rect2(320, 768, 160, 128)
+
+[sub_resource type="AtlasTexture" id="death3"]
+atlas = ExtResource("2_sheet")
+region = Rect2(480, 768, 160, 128)
+
+[sub_resource type="AtlasTexture" id="death4"]
+atlas = ExtResource("2_sheet")
+region = Rect2(640, 768, 160, 128)
+
+[sub_resource type="AtlasTexture" id="death5"]
+atlas = ExtResource("2_sheet")
+region = Rect2(800, 768, 160, 128)
+
+[sub_resource type="AtlasTexture" id="death6"]
+atlas = ExtResource("2_sheet")
+region = Rect2(960, 768, 160, 128)
+
+[sub_resource type="AtlasTexture" id="death7"]
+atlas = ExtResource("2_sheet")
+region = Rect2(1120, 768, 160, 128)
+
+[sub_resource type="AtlasTexture" id="death8"]
+atlas = ExtResource("2_sheet")
+region = Rect2(1280, 768, 160, 128)
+
+[sub_resource type="AtlasTexture" id="death9"]
+atlas = ExtResource("2_sheet")
+region = Rect2(1440, 768, 160, 128)
+
+[sub_resource type="SpriteFrames" id="frames"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("death0")
+}, {
+"duration": 1.0,
+"texture": SubResource("death1")
+}, {
+"duration": 1.0,
+"texture": SubResource("death2")
+}, {
+"duration": 1.0,
+"texture": SubResource("death3")
+}, {
+"duration": 1.0,
+"texture": SubResource("death4")
+}, {
+"duration": 1.0,
+"texture": SubResource("death5")
+}, {
+"duration": 1.0,
+"texture": SubResource("death6")
+}, {
+"duration": 1.0,
+"texture": SubResource("death7")
+}, {
+"duration": 1.0,
+"texture": SubResource("death8")
+}, {
+"duration": 1.0,
+"texture": SubResource("death9")
+}],
+"loop": false,
+"name": &"boss-death",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("run0")
+}, {
+"duration": 1.0,
+"texture": SubResource("run1")
+}, {
+"duration": 1.0,
+"texture": SubResource("run2")
+}, {
+"duration": 1.0,
+"texture": SubResource("run3")
+}, {
+"duration": 1.0,
+"texture": SubResource("run4")
+}, {
+"duration": 1.0,
+"texture": SubResource("run5")
+}, {
+"duration": 1.0,
+"texture": SubResource("run6")
+}, {
+"duration": 1.0,
+"texture": SubResource("run7")
+}],
+"loop": true,
+"name": &"boss-run",
+"speed": 6.0
+}]
+
+[sub_resource type="CapsuleShape2D" id="shape"]
+radius = 59.0
+height = 132.0
+
+[node name="Boss" type="CharacterBody2D"]
+collision_layer = 4
+collision_mask = 16
+script = ExtResource("1_boss")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("frames")
+animation = &"boss-run"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("shape")
+
+[node name="StateTimer" type="Timer" parent="."]
+one_shot = true
+
+[node name="FlashHitTimer" type="Timer" parent="."]
+wait_time = 0.05
+one_shot = true
+
+[node name="DriftTimer" type="Timer" parent="."]
+one_shot = true
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("3_die")
