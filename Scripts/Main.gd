@@ -1100,6 +1100,11 @@ func _on_boss_defeated(defeat_position, attacker):
 	update_low_energy_music()
 
 	$HUD/CanvasLayer/BossHealthBar.visible = false
+	# Hide the "BOSS" time-slot label for the rest of the wave (key hunt + upgrade
+	# screen). It's re-shown at the next wave start. The boss_wave flag stays true
+	# until the next wave is designed, so update_time_left_display() would keep
+	# re-showing "BOSS" otherwise.
+	$HUD.get_node("CanvasLayer/EnemiesLeft").visible = false
 
 	# Drop the key where the boss fell so the normal hunt-key -> exit flow runs.
 	$Key.global_position = defeat_position
@@ -1672,8 +1677,11 @@ func process_upgrade_choice(delta):
 			player.upgrade_cursor = min(2, player.upgrade_cursor + 1)
 			moved = true
 
-		# Mouse (owner only): hovering a choice highlights it.
-		if player.input.uses_mouse():
+		# Mouse (owner only): hovering a choice highlights it — but only while the
+		# cursor is actually visible. When the player switches to a controller the
+		# cursor is hidden; its stale position must not keep grabbing the highlight
+		# and fighting the up/down keys.
+		if player.input.uses_mouse() and _mouse_cursor_visible():
 			var hovered = $HUD.upgrade_choice_at_mouse(player)
 			if hovered != -1 and hovered != player.upgrade_cursor:
 				player.upgrade_cursor = hovered
@@ -1684,7 +1692,7 @@ func process_upgrade_choice(delta):
 
 		# Confirm: fire button, or a mouse click for the mouse owner.
 		var confirm = player.input.is_just_pressed("shark_fire")
-		if player.input.uses_mouse() and player.input.is_just_pressed("shark_fire_mouse"):
+		if player.input.uses_mouse() and _mouse_cursor_visible() and player.input.is_just_pressed("shark_fire_mouse"):
 			# A click only confirms if it is over one of this player's choices.
 			var clicked = $HUD.upgrade_choice_at_mouse(player)
 			if clicked != -1:
@@ -1700,6 +1708,13 @@ func process_upgrade_choice(delta):
 		if upgrade_advance_delay <= 0.0:
 			$HUD.hide_upgrade_screen()
 			game_status = PREPARE_FOR_WAVE
+
+
+# Whether the mouse cursor is currently visible. It's hidden the moment a
+# controller input is seen (see _input), so this distinguishes "player is using
+# the mouse" from "mouse is idle under a controller-driven session".
+func _mouse_cursor_visible() -> bool:
+	return DisplayServer.mouse_get_mode() == DisplayServer.MOUSE_MODE_VISIBLE
 
 
 # Apply a player's highlighted choice and play the confirmation flash.

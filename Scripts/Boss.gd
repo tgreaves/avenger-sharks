@@ -11,6 +11,8 @@ extends CharacterBody2D
 
 enum { ALIVE, DYING }
 
+const EnemyAttackScene = preload("res://Scenes/EnemyAttack.tscn")
+
 signal boss_damaged(current_health, max_health)
 signal boss_defeated(defeat_position, attacker)
 
@@ -29,6 +31,13 @@ func _ready():
 	_pick_new_drift()
 	$DriftTimer.connect("timeout", _on_drift_timer_timeout)
 	$DriftTimer.start(randf_range(1.5, 3.0))
+
+	# Attack cadences: a rotating spiral on one timer, aimed volleys at the
+	# nearest shark on another. Both fire only while ALIVE.
+	$SpiralTimer.connect("timeout", _on_spiral_timer_timeout)
+	$SpiralTimer.start(constants.BOSS_SPIRAL_INTERVAL)
+	$AimedTimer.connect("timeout", _on_aimed_timer_timeout)
+	$AimedTimer.start(constants.BOSS_AIMED_INTERVAL)
 
 
 # Called by Main right after instancing to set the health pool for this wave.
@@ -66,8 +75,15 @@ func _physics_process(delta):
 
 	var collision = move_and_collide(velocity * delta)
 	if collision:
-		# Bounce off walls; keep drifting.
-		_drift_direction = _drift_direction.bounce(collision.get_normal())
+		var collider = collision.get_collider()
+		if collider.is_in_group("players"):
+			# Ramming a shark hurts it (player_hit has its own grace period, so
+			# staying in contact won't drain energy every frame). Keep drifting
+			# through rather than bouncing off the player.
+			collider.player_hit()
+		else:
+			# Bounce off walls; keep drifting.
+			_drift_direction = _drift_direction.bounce(collision.get_normal())
 
 
 func _on_drift_timer_timeout():
@@ -77,6 +93,41 @@ func _on_drift_timer_timeout():
 
 func _pick_new_drift():
 	_drift_direction = Vector2(randf_range(-1, 1), randf_range(-1, 1)).normalized()
+
+
+# Spawn one EnemyAttack projectile travelling in a direction (standard enemy
+# attack damage / collision — it calls player_hit() on contact itself).
+func _fire_projectile(direction):
+	var attack = EnemyAttackScene.instantiate()
+	get_parent().add_child(attack)
+	attack.add_to_group("enemyAttack")
+	attack.global_position = global_position
+	attack.velocity = direction.normalized() * constants.BOSS_ATTACK_PROJECTILE_SPEED
+
+
+func _on_spiral_timer_timeout():
+	if state == ALIVE:
+		var count = constants.BOSS_SPIRAL_PROJECTILE_COUNT
+		for i in range(count):
+			var direction = Vector2(1, 0).rotated(deg_to_rad(360.0 / count) * i)
+			_fire_projectile(direction)
+	$SpiralTimer.start(constants.BOSS_SPIRAL_INTERVAL)
+
+
+func _on_aimed_timer_timeout():
+	if state == ALIVE:
+		var target = get_parent().get_nearest_player(global_position)
+		if target != null:
+			var aim = (target.global_position - global_position).normalized()
+			var count = constants.BOSS_AIMED_PROJECTILE_COUNT
+			var spread = constants.BOSS_AIMED_SPREAD_DEGREES
+			# Fan the volley symmetrically around the aim direction.
+			for i in range(count):
+				var offset = 0.0
+				if count > 1:
+					offset = -spread / 2.0 + (spread / (count - 1)) * i
+				_fire_projectile(aim.rotated(deg_to_rad(offset)))
+	$AimedTimer.start(constants.BOSS_AIMED_INTERVAL)
 
 
 # Same signature as Enemy.death() so shark spray / grenade can hit us uniformly.
@@ -98,6 +149,8 @@ func death(death_source, attacker = null):
 func _die(attacker):
 	state = DYING
 	velocity = Vector2.ZERO
+	$SpiralTimer.stop()
+	$AimedTimer.stop()
 	# Leave enemyGroup so the wave-end sweep (which calls swim_escape on every
 	# member) doesn't touch the boss; it frees itself via StateTimer below.
 	remove_from_group("enemyGroup")

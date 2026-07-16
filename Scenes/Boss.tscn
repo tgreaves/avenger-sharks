@@ -149,7 +149,7 @@ height = 132.0
 
 [node name="Boss" type="CharacterBody2D"]
 collision_layer = 4
-collision_mask = 16
+collision_mask = 17
 script = ExtResource("1_boss")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
@@ -167,6 +167,12 @@ wait_time = 0.05
 one_shot = true
 
 [node name="DriftTimer" type="Timer" parent="."]
+one_shot = true
+
+[node name="SpiralTimer" type="Timer" parent="."]
+one_shot = true
+
+[node name="AimedTimer" type="Timer" parent="."]
 one_shot = true
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]

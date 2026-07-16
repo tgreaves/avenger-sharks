@@ -309,6 +309,15 @@ const BOSS_COLLISION_SCALE = Vector2(1.75, 1.75)
 const BOSS_SPRITE_OFFSET = Vector2(0, -25)
 # Score awarded for defeating a boss (tuned in Phase 5).
 const BOSS_DEFEAT_SCORE_BONUS = 1000
+# Boss attacks (Phase 3). The boss roams and threatens via projectiles: a
+# rotating spiral on a cadence, with aimed volleys at the nearest shark between
+# spirals. Reuses the standard EnemyAttack projectile (standard damage).
+const BOSS_SPIRAL_INTERVAL = 3.0         # Seconds between spiral bursts.
+const BOSS_SPIRAL_PROJECTILE_COUNT = 20  # Shots per spiral ring.
+const BOSS_AIMED_INTERVAL = 1.2          # Seconds between aimed volleys.
+const BOSS_AIMED_PROJECTILE_COUNT = 3    # Shots per aimed volley (small spread).
+const BOSS_AIMED_SPREAD_DEGREES = 12.0   # Spread of an aimed volley.
+const BOSS_ATTACK_PROJECTILE_SPEED = 700 # Boss projectile speed.
 
 # Fish
 const FISH_TO_SPAWN_ARCADE = 20

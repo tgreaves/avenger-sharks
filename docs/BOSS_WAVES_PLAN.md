@@ -11,8 +11,11 @@ Status:
 - **Phase 2 — MOSTLY DONE** (folded into Phase 1). Remaining tail only: co-op
   death behaviour during a boss fight is untested (should already work via the
   existing rule); confirm during Phase 3+ co-op testing.
-- **Phase 3 — TODO (next).** Boss attacks / behaviour — this is what makes the
-  boss dangerous. Currently it only drifts.
+- **Phase 3 — DONE (first pass).** Boss attacks / behaviour: roams + spiral +
+  aimed volleys + contact damage. Health-threshold phases deferred.
+- **Phase 3.5 — TODO.** Random boss identity (sprite) and varied behaviour
+  (movement/attack profile) per boss wave, Director-driven — the "keep it
+  interesting" requirement.
 - **Phase 4 — TODO.** Procedural adds (TheDirector rolls intensity none/light/
   heavy; capped periodic trickle).
 - **Phase 5 — TODO.** Trigger cadence (replace the placeholder multiplier), HUD
@@ -149,18 +152,49 @@ testable).
   revive at next normal wave start), but hasn't been exercised — confirm during
   Phase 3+ co-op testing.
 
-## Phase 3 — Boss attacks / behaviour
+## Phase 3 — Boss attacks / behaviour — DONE (first pass)
 
-Give the boss a reason to be dangerous.
+Gave the boss a reason to be dangerous.
 
-- One or more attack patterns (reuse existing enemy attack scenes where
-  possible: spiral like the necromancer/dinosaur, artillery-style, charges).
-- Movement: chase nearest shark (`get_nearest_player`) or a pattern.
-- Phases (optional): behaviour shifts as `boss_health` crosses thresholds
-  (e.g. faster / new attack under 50%).
-- Co-op: attacks should target among players (use `get_nearest_player` /
-  `get_random_living_player`, consistent with the single-player-assumption audit
-  already done for artillery/dino).
+### As-built
+
+- **Movement:** roams (random drift + wall bounce); danger comes from
+  projectiles rather than chasing. (Chosen over a chase.)
+- **Attacks** (reuse `EnemyAttackScene`, standard damage):
+  - **Spiral** — a full ring of `BOSS_SPIRAL_PROJECTILE_COUNT` (20) shots every
+    `BOSS_SPIRAL_INTERVAL` (3s), on its own `SpiralTimer`.
+  - **Aimed volley** — a `BOSS_AIMED_PROJECTILE_COUNT` (3) shot fan across
+    `BOSS_AIMED_SPREAD_DEGREES` at the nearest shark every `BOSS_AIMED_INTERVAL`
+    (1.2s), on its own `AimedTimer`.
+- **Contact damage:** ramming a shark calls `player_hit()` (which has its own
+  grace period, so sustained contact doesn't drain every frame); still bounces
+  off walls. Boss collision mask gained the player layer (bit 1) for this.
+- **Co-op:** aimed volleys target `get_nearest_player`. Timers stop on death.
+- All cadence/count/speed values are tunable constants.
+
+### Deferred to a later phase (see "Random boss identity & varied behaviour")
+
+- Health-threshold phase changes (faster / denser under 50% HP).
+- Per-wave variety in sprite and attack/movement style.
+
+## Phase 3.5 — Random boss identity & varied behaviour — TODO
+
+**Requirement (added during Phase 3 testing):** keep boss waves interesting by
+randomising, per boss wave, **both** the boss's appearance and how it
+behaves — so it isn't always the same necromancer doing the same spiral.
+
+- **Sprite/identity:** pick a random enemy type (from the `ENEMY_SETTINGS`
+  roster / their sprite sheets) as the boss's look, instead of the hard-coded
+  necromancer reskin. Reuse each type's existing run/death animations.
+- **Behaviour set:** pick a random movement + attack profile — e.g. roam +
+  spiral (current), chase + aimed, stationary bullet-hell, artillery-style
+  rain, charges. Ideally the choice is weighted / themed to the chosen sprite.
+- **Director-driven:** the roll belongs in `TheDirector.design_boss_wave()`
+  (which already authors the wave), storing the chosen identity + behaviour in
+  `wave_design` for `Boss.configure()` to apply. This sits naturally alongside
+  the Phase 4 adds-intensity roll — both are the Director "keeping it
+  interesting".
+- Consider health-threshold phase changes here too (open item from Phase 3).
 
 ## Phase 4 — Procedural adds
 
