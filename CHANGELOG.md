@@ -3,6 +3,12 @@
 # 1.4.0 (2026-xx-xx)
 
 * Gameplay:
+	* BOSS WAVES! Every fifth wave (from wave 5) is a showdown with a giant boss.
+		* The fight takes place in a sealed, single-screen room: swim in from the bottom, the door closes behind you, and it's you versus the boss.
+		* The boss is a random giant enemy with its own fun title (e.g. MR. RATTLEBONES, THE QUEEN BEE) and a themed attack style.
+		* Varied bullet-hell attacks: rotating spirals, curving spirals, shotgun blasts and walls-with-a-gap to dodge through.
+		* Some boss fights also send in waves of smaller 'add' enemies to keep you busy.
+		* Defeat the boss for a big score bonus and a full heal; later bosses are tougher.
 	* LOCAL TWO-PLAYER CO-OP! A second shark can join on a gamepad, or be computer-controlled.
 		* Shared zoom-to-fit camera that keeps both sharks in view.
 		* Each player has their own energy, FISH FRENZY, power-ups, score and upgrades.

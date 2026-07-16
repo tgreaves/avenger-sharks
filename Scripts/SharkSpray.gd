@@ -37,6 +37,11 @@ func _physics_process(_delta):
 			self.queue_free()
 			break
 
-		collision.get_collider().get_node(".").death("PLAYER-SHOT", owner_player)
+		# Only damage things that can take damage (enemies / boss). Other bodies on
+		# the shared collision layer — ExitLocation, start markers, boss-room exit
+		# door — just stop the spray.
+		var collider = collision.get_collider()
+		if collider.has_method("death"):
+			collider.death("PLAYER-SHOT", owner_player)
 		$CollisionShape2D.disabled = true
 		self.queue_free()

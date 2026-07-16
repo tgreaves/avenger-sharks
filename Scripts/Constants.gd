@@ -18,7 +18,7 @@ const DEV_FORCE_UPGRADE = ""   	# ""
 const DEV_FORCE_POWERUP = ""	# ""
 const DEV_WAVE_LASTS_FOREVER = false
 const DEV_WIPE_ACHIEVEMENTS = false
-const DEV_FORCE_BOSS_WAVE = false   # Force every wave to be a boss wave for testing.
+const DEV_FORCE_BOSS_WAVE = true   # Force every wave to be a boss wave for testing.
 
 # Hardware settings
 const WINDOW_TITLE = "Avenger Sharks " + GAME_VERSION
@@ -287,14 +287,31 @@ const ENEMY_KNOCKBACK_TIMER = 0.3
 const ENEMY_KNOCKBACK_VELOCITY_CLAMP = Vector2(200, 200)
 
 # Boss waves
-const BOSS_WAVE_MULTIPLIER = 1000000
-# Base boss health (number of shots to defeat). Tuned in Phase 5.
-const BOSS_BASE_HEALTH = 60
+# Cadence: a boss wave occurs every BOSS_WAVE_INTERVAL waves, no earlier than
+# BOSS_WAVE_FIRST. (Legacy BOSS_WAVE_MULTIPLIER retired.)
+const BOSS_WAVE_INTERVAL = 5
+const BOSS_WAVE_FIRST = 5
+# Base boss health (number of shots to defeat), plus growth per boss encounter
+# so later bosses are tougher. Effective base = BOSS_BASE_HEALTH +
+# (boss_number - 1) * BOSS_HEALTH_WAVE_GROWTH, where boss_number counts boss
+# waves seen (1st boss, 2nd boss, ...).
+const BOSS_BASE_HEALTH = 5  # was: 60
+const BOSS_HEALTH_WAVE_GROWTH = 25
 # Boss is tougher in 2-player since two sharks out-damage one.
 const BOSS_HEALTH_2P_MULTIPLIER = 1.75
-# Where the boss spawns — upper-middle arena, clear of the bottom entrance the
-# sharks swim in through.
-const BOSS_SPAWN_POSITION = Vector2(2650, 900)
+# Boss fights happen in a confined room sized to ONE SCREENFUL at the standard
+# gameplay zoom. The camera LOCKS STATIC on BOSS_ARENA_CENTER (does not follow
+# the player) — the whole room fits on screen, so no scrolling reveals the outer
+# arena. The on-screen world area is the project viewport (2560x1440), NOT the
+# window size; the room is that size less a wall tile each side so the walls sit
+# just inside the screen edges. BOSS_ARENA_CENTER is both the camera lock point
+# and the room centre; it sits low enough that the bottom-entry swim-in is
+# on-screen.
+const BOSS_ARENA_CENTER = Vector2(2650, 1810)
+const BOSS_ARENA_SIZE = Vector2(2380, 1280)
+# The boss patrols across the top of the box; players rest in the lower third.
+# Actual patrol X bounds are derived from the box in Boss.gd.
+const BOSS_SPAWN_POSITION = Vector2(2650, 1560)
 # Boss visual + collision scale (mirrors ENEMY_SETTINGS sprite_scale /
 # collision_scale). Applied in Boss.configure() so it stays data-driven.
 # The shared capsule (radius 59 / height 132) is tuned to fit the creature at a
@@ -309,52 +326,133 @@ const BOSS_COLLISION_SCALE = Vector2(1.75, 1.75)
 const BOSS_SPRITE_OFFSET = Vector2(0, -25)
 # Score awarded for defeating a boss (tuned in Phase 5).
 const BOSS_DEFEAT_SCORE_BONUS = 1000
-# Boss attacks (Phase 3). The boss roams and threatens via projectiles: a
-# rotating spiral on a cadence, with aimed volleys at the nearest shark between
-# spirals. Reuses the standard EnemyAttack projectile (standard damage).
-const BOSS_SPIRAL_INTERVAL = 3.0         # Seconds between spiral bursts.
-const BOSS_SPIRAL_PROJECTILE_COUNT = 20  # Shots per spiral ring.
-const BOSS_AIMED_INTERVAL = 1.2          # Seconds between aimed volleys.
-const BOSS_AIMED_PROJECTILE_COUNT = 3    # Shots per aimed volley (small spread).
-const BOSS_AIMED_SPREAD_DEGREES = 12.0   # Spread of an aimed volley.
-const BOSS_ATTACK_PROJECTILE_SPEED = 700 # Boss projectile speed.
-
-# Movement speeds per behaviour profile.
-const BOSS_ROAM_SPEED = 120.0            # Aimless drift (ROAM_SPIRAL).
-const BOSS_CHASE_SPEED = 260.0           # Pursuit of nearest shark (CHASE_AIMED).
-# The "stationary" bullet-hell profile still hovers slowly: the enemy sprites
-# only have a run animation (no idle), so a truly motionless boss looks like it
-# is running on the spot / into a wall. A slow drift keeps it looking alive.
-const BOSS_HOVER_SPEED = 45.0
-
-# Stationary bullet-hell fires a denser, faster spiral (it doesn't move).
-const BOSS_BULLETHELL_SPIRAL_INTERVAL = 1.6
-const BOSS_BULLETHELL_PROJECTILE_COUNT = 28
-
-# Artillery-rain profile: seconds between POLLUTION-STRIKE drops.
-const BOSS_ARTILLERY_INTERVAL_MIN = 1.2
-const BOSS_ARTILLERY_INTERVAL_MAX = 2.2
 
 # Boss behaviour profiles (Phase 3.5). The Director picks one, themed to the
-# chosen sprite (see BOSS_TYPE_BEHAVIOUR).
+# chosen sprite. Each profile is a movement style paired with a weighted attack
+# pool (below).
 const BOSS_BEHAVIOUR_ROAM_SPIRAL = "ROAM_SPIRAL"
 const BOSS_BEHAVIOUR_CHASE_AIMED = "CHASE_AIMED"
 const BOSS_BEHAVIOUR_BULLETHELL = "STATIONARY_BULLETHELL"
 const BOSS_BEHAVIOUR_ARTILLERY = "ARTILLERY_RAIN"
 
+# Boss attacks. The boss fires on a single cadence timer, each time picking an
+# attack from its behaviour's weighted pool (see BOSS_ATTACK_POOLS), so a fight
+# mixes several shot types. All reuse the standard EnemyAttack projectile.
+const BOSS_ATTACK_PROJECTILE_SPEED = 700
+
+# Attack cadence (seconds between attacks). Later bosses fire faster: the
+# interval shrinks by BOSS_ATTACK_INTERVAL_STEP per boss encounter, floored at
+# BOSS_ATTACK_INTERVAL_MIN.
+const BOSS_ATTACK_INTERVAL_BASE = 2.4
+const BOSS_ATTACK_INTERVAL_STEP = 0.2
+const BOSS_ATTACK_INTERVAL_MIN = 1.2
+
+# Attack type identifiers.
+const BOSS_ATTACK_ROTATING_SPIRAL = "ROTATING_SPIRAL"
+const BOSS_ATTACK_TWIN_SPIRAL = "TWIN_SPIRAL"
+const BOSS_ATTACK_SHOTGUN = "SHOTGUN"
+const BOSS_ATTACK_WALL = "WALL"
+const BOSS_ATTACK_CURVING_SPIRAL = "CURVING_SPIRAL"
+
+# Attack shape parameters.
+const BOSS_SPIRAL_PROJECTILE_COUNT = 20   # Shots per spiral ring.
+const BOSS_SPIRAL_ROTATION_STEP = 18.0    # Degrees the gap sweeps each spiral burst.
+const BOSS_TWIN_SPIRAL_COUNT = 14         # Shots per arm of a twin (counter-rotating) spiral.
+const BOSS_SHOTGUN_PROJECTILE_COUNT = 9   # Shots in an aimed shotgun fan.
+const BOSS_SHOTGUN_SPREAD_DEGREES = 70.0  # Total spread of the shotgun fan.
+const BOSS_WALL_PROJECTILE_COUNT = 16     # Shots across a wall.
+const BOSS_WALL_GAP_WIDTH = 3             # How many shots are omitted to form the gap.
+# Curving spiral: shots are emitted from a rotating arm AND each shot curves in
+# flight (its velocity rotates), tracing spiral arms across the arena.
+const BOSS_CURVING_SPIRAL_ARMS = 4        # Number of arms.
+const BOSS_CURVING_SPIRAL_SHOTS = 10      # Shots fired per arm over the emit.
+const BOSS_CURVING_SPIRAL_CURVE_RATE = 150.0  # Degrees/sec each shot curves initially.
+# Curve decays to 0 so shots spiral OUTWARD then straighten to the arena edge,
+# rather than looping back (a constant curve rate traces a circle).
+const BOSS_CURVING_SPIRAL_CURVE_DECAY = 120.0  # Degrees/sec^2 the curve rate decays.
+const BOSS_CURVING_SPIRAL_EMIT_GAP = 0.06 # Seconds between shots along an arm.
+
+# Weighted attack pools per behaviour profile. Each entry is attack -> weight;
+# the boss rolls one per cadence tick. Themed so each profile plays differently.
+const BOSS_ATTACK_POOLS = {
+	BOSS_BEHAVIOUR_ROAM_SPIRAL: {
+		BOSS_ATTACK_ROTATING_SPIRAL: 35,
+		BOSS_ATTACK_CURVING_SPIRAL: 25,
+		BOSS_ATTACK_SHOTGUN: 25,
+		BOSS_ATTACK_WALL: 15
+	},
+	BOSS_BEHAVIOUR_CHASE_AIMED: {
+		BOSS_ATTACK_SHOTGUN: 50, BOSS_ATTACK_ROTATING_SPIRAL: 20, BOSS_ATTACK_TWIN_SPIRAL: 15,
+		BOSS_ATTACK_CURVING_SPIRAL: 15
+	},
+	BOSS_BEHAVIOUR_BULLETHELL: {
+		BOSS_ATTACK_TWIN_SPIRAL: 35,
+		BOSS_ATTACK_CURVING_SPIRAL: 30,
+		BOSS_ATTACK_ROTATING_SPIRAL: 20,
+		BOSS_ATTACK_WALL: 15
+	},
+	BOSS_BEHAVIOUR_ARTILLERY: {
+		BOSS_ATTACK_ROTATING_SPIRAL: 30, BOSS_ATTACK_SHOTGUN: 30, BOSS_ATTACK_WALL: 20,
+		BOSS_ATTACK_CURVING_SPIRAL: 20
+	}
+}
+
+# The boss is rooted to the top of the (confined) box and patrols left/right
+# only. The challenge comes from attack intensity + adds, not from chasing. It
+# reverses at the box edges and re-rolls direction periodically. Patrol X bounds
+# are derived from BOSS_ARENA_CENTER/SIZE (inset from the walls) in Boss.gd.
+const BOSS_PATROL_SPEED = 380.0
+const BOSS_PATROL_EDGE_INSET = 250.0   # Keep the (large) boss clear of the side walls.
+
+# Artillery-rain profile ALSO drops POLLUTION strikes (on top of its attack
+# pool): seconds between drops.
+const BOSS_ARTILLERY_INTERVAL_MIN = 1.2
+const BOSS_ARTILLERY_INTERVAL_MAX = 2.2
+
 # The boss can be any enemy sprite (Phase 3.5). Each type has a native frame
 # size, so per-type base scale keeps them all reading as a big boss (the small
 # 32px-tall knight/wizard/rogue/skeleton need more; the necromancer least). The
 # behaviour is themed to the type.
+# Each type has a list of fun titles; one is picked at random per boss wave and
+# shown over the health bar (with more personality than "GIANT SKELETON").
 const BOSS_TYPE_SETTINGS = {
-	"knight": {"scale": Vector2(12, 12), "behaviour": BOSS_BEHAVIOUR_CHASE_AIMED},
-	"wizard": {"scale": Vector2(12, 12), "behaviour": BOSS_BEHAVIOUR_ROAM_SPIRAL},
-	"rogue": {"scale": Vector2(12, 12), "behaviour": BOSS_BEHAVIOUR_CHASE_AIMED},
-	"necromancer": {"scale": Vector2(7, 7), "behaviour": BOSS_BEHAVIOUR_ARTILLERY},
+	"knight": {
+		"scale": Vector2(12, 12),
+		"behaviour": BOSS_BEHAVIOUR_CHASE_AIMED,
+		"titles": ["SIR SMITE-A-LOT", "THE TIN TITAN", "LORD CLANKALOT"]
+	},
+	"wizard": {
+		"scale": Vector2(12, 12),
+		"behaviour": BOSS_BEHAVIOUR_ROAM_SPIRAL,
+		"titles": ["THE FIZZLORD", "GANDALF'S EVIL COUSIN", "MERLIN THE MENACE"]
+	},
+	"rogue": {
+		"scale": Vector2(12, 12),
+		"behaviour": BOSS_BEHAVIOUR_CHASE_AIMED,
+		"titles": ["THE BACKSTABBER", "SNEAKY McSTABFACE", "SHADOW LURKER"]
+	},
+	"necromancer": {
+		"scale": Vector2(7, 7),
+		"behaviour": BOSS_BEHAVIOUR_ARTILLERY,
+		"titles": ["THE BONE BARON", "DR. DOOMRAISER", "THE GRAVE GAFFER"]
+	},
 	# The bee boss is a giant queen: bigger, and its adds are themed as a bee swarm.
-	"bee": {"scale": Vector2(16, 16), "behaviour": BOSS_BEHAVIOUR_CHASE_AIMED, "adds_type": "bee"},
-	"skeleton": {"scale": Vector2(12, 12), "behaviour": BOSS_BEHAVIOUR_BULLETHELL},
-	"snake": {"scale": Vector2(14, 14), "behaviour": BOSS_BEHAVIOUR_BULLETHELL}
+	"bee": {
+		"scale": Vector2(16, 16),
+		"behaviour": BOSS_BEHAVIOUR_CHASE_AIMED,
+		"adds_type": "bee",
+		"titles": ["THE QUEEN BEE", "HER ROYAL STINGINESS", "BUZZ MAXIMUS"]
+	},
+	"skeleton": {
+		"scale": Vector2(12, 12),
+		"behaviour": BOSS_BEHAVIOUR_BULLETHELL,
+		"titles": ["MR. RATTLEBONES", "THE BONEZONE", "CALCIUM OVERLORD"]
+	},
+	"snake": {
+		"scale": Vector2(14, 14),
+		"behaviour": BOSS_BEHAVIOUR_BULLETHELL,
+		"titles": ["THE BOINGMEISTER", "SIR SLITHERS", "NOODLE OF DOOM"]
+	}
 }
 
 # Procedural adds (Phase 4). The Director rolls an intensity per boss wave,

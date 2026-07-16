@@ -11,22 +11,42 @@ Status:
 - **Phase 2 — MOSTLY DONE** (folded into Phase 1). Remaining tail only: co-op
   death behaviour during a boss fight is untested (should already work via the
   existing rule); confirm during Phase 3+ co-op testing.
-- **Phase 3 — DONE (first pass).** Boss attacks / behaviour: roams + spiral +
-  aimed volleys + contact damage. Health-threshold phases deferred.
-- **Phase 3.5 — DONE.** Random boss identity (any of the 7 enemy sprites) and a
-  behaviour profile themed to that sprite. Four profiles: roam+spiral,
-  chase+aimed, stationary bullet-hell, artillery-rain. Director picks type +
-  behaviour in `design_boss_wave()`.
+- **Phase 3 — DONE.** Boss attacks / behaviour, reworked into a **confined
+  bullet-hell fight** (see "Combat model" below). The boss is rooted at the top
+  of a walled, one-screen room and threatens via a varied, weighted attack pool;
+  contact damage applies. Health-threshold phases still deferred.
+- **Phase 3.5 — DONE.** Random boss identity (any of the 7 enemy sprites), themed
+  behaviour, plus a spawn-in (invulnerable while materialising). Director picks
+  type + behaviour in `design_boss_wave()`.
 - **Phase 4 — DONE.** Procedural adds: Director rolls a weighted intensity
-  (none 55 / light 30 / heavy 15); when enabled, capped batches of random
-  enemies trickle in on the (otherwise-unused) EnemySpawnTimer during the fight.
+  (none 55 / light 30 / heavy 15); when enabled, capped batches trickle in on the
+  EnemySpawnTimer during the fight (bee boss themes its adds as a bee swarm).
   Adds don't gate completion — only boss HP does.
-- **Phase 5 — TODO.** Trigger cadence (replace the placeholder multiplier), HUD
-  polish, audio, co-op camera framing, and balance tuning.
+- **Phase 5 — DONE.** Trigger cadence (every 5th wave from wave 5), boss titles,
+  health growth per encounter, and extensive combat/arena rework (below).
 
-Each phase is independently testable. Phase 1 got *something to shoot* and a
-full spawn → deplete → win loop; Phase 3 makes it a real fight; Phases 4–5 add
-variety and polish.
+**Combat model (as-built, reworked this session):**
+- The boss fight happens in a **confined one-screen room** walled off with the
+  arena's own perimeter tiles (`Arena.build_boss_walls`), so the player can't
+  kite into empty scrollable space. The **camera locks static** on the room
+  centre at the standard zoom. Sharks **swim in from the bottom** through a
+  2-tile door that **closes behind them**; on defeat the room's **top door
+  opens** (only when the key-holder reaches it, like a normal wave) and the exit
+  is relocated there so the wave ends promptly.
+- The boss is **rooted to the top** and patrols left/right; danger comes from
+  **attack intensity + adds**, not chasing. Attacks are a weighted pool per
+  profile: rotating spiral, twin counter-spiral, shotgun fan, wall-with-gap, and
+  a **curving spiral** (projectiles that actually arc outward via decaying
+  curve). Cadence speeds up on later bosses.
+- **Spawn-in:** the boss materialises invulnerable (like normal enemies) and
+  only becomes vulnerable + starts attacking when the wave goes live, so it
+  can't be pre-damaged.
+- **No obstacles** and **no star/power-pellet** spawn on boss waves.
+- Only one artillery strike is active at a time.
+
+Each phase was independently testable. The confined-arena combat model went
+through heavy playtest iteration (camera lock, room sizing to the 2560×1440
+viewport, wall tiles, door mechanics, exit relocation).
 
 ## Goal
 
@@ -220,20 +240,30 @@ Keeps boss waves interesting by randomising both appearance and behaviour.
   wave-end sweep (they're in `enemyGroup`).
 - The timer stops naturally on boss defeat (wave leaves `GAME_RUNNING`).
 
-## Phase 5 — Trigger, polish, tuning
+## Phase 5 — Trigger, polish, tuning — DONE
 
-- **Cadence:** replace `BOSS_WAVE_MULTIPLIER = 1000000` with a real rule
-  (`BOSS_WAVE_INTERVAL`, every Nth wave, first no earlier than wave X). Add a DEV
-  constant to force a boss wave for testing.
-- **Boss health scaling:** base `boss_health`, growth with wave number, and the
-  2-player multiplier (≈×1.75 starting point). Tune by feel.
-- **HUD:** boss name/title over the bar, reveal flourish, defeat animation.
-- **Audio:** boss music (swap `AudioStreamPlayerMusic` like power-pellet does
-  with `SharkAttackMusic`), defeat sting.
-- **Camera:** verify the shared co-op camera frames boss + both sharks sensibly
-  (the boss may be large; check zoom cap).
-- **Reward tuning:** score-bonus amount and health-restore amount (full vs.
-  partial) on defeat.
+- **Cadence — DONE.** `BOSS_WAVE_INTERVAL`/`BOSS_WAVE_FIRST` (every 5th wave from
+  wave 5) via `TheDirector.is_boss_wave()`; `DEV_FORCE_BOSS_WAVE` forces one.
+- **Boss health scaling — DONE.** `BOSS_BASE_HEALTH` + `BOSS_HEALTH_WAVE_GROWTH`
+  per boss encounter, ×`BOSS_HEALTH_2P_MULTIPLIER` (1.75) in 2-player.
+- **HUD titles — DONE.** Random fun title per type shown over the health bar
+  (`BOSS_TYPE_SETTINGS[...].titles`), hidden on defeat/cleanup.
+- **Reward — DONE (Phase 1).** Score bonus + full heal on defeat.
+- **Confined-arena combat rework — DONE.** See "Combat model" in the status
+  header — this was the bulk of the session's work.
+
+### Still deferred / future
+
+- **Audio:** no dedicated boss music yet (deliberately deferred; hook is to swap
+  `AudioStreamPlayerMusic` like power-pellet does with `SharkAttackMusic`).
+- **Health-threshold phases:** boss behaviour shifting as HP drops (e.g. faster
+  under 50%) — noted since Phase 3, not built.
+- **Co-op play-test:** the confined room, spawn-in, and wave-end have been
+  tested in 1-player. Two-player boss fights (camera lock with two sharks, both
+  swimming into the room, co-op death during the fight) are **untested** — the
+  main open item before calling boss waves fully done.
+- **Balance:** health values, attack cadence/density, and adds intensity are
+  first-pass; tune after more play.
 
 ## Co-op considerations (cross-cutting)
 
@@ -244,5 +274,8 @@ The two-player feature is complete; boss waves must respect it:
   (never hard-coded `$Player`), consistent with the single-player-assumption
   audit already done.
 - **Death rule** unchanged: downed shark sits out, game over only when all down.
-- **Camera / shake** already shared via `CoopCamera`.
-- **Boss health scaling** likely higher in 2-player (open decision, Phase 5).
+- **Camera / shake** already shared via `CoopCamera`. NOTE: boss waves lock the
+  camera static on the room — untested with two sharks (a shark could in theory
+  move off the locked view; the room is one screenful so it should be fine).
+- **Boss health scaling** higher in 2-player via `BOSS_HEALTH_2P_MULTIPLIER`
+  (1.75). DONE.

@@ -14,7 +14,7 @@ func design_wave(wave_number):
 	spawn_ratios.clear()
 	running_chance = 0.0
 
-	if constants.DEV_FORCE_BOSS_WAVE or wave_number % constants.BOSS_WAVE_MULTIPLIER == 0:
+	if constants.DEV_FORCE_BOSS_WAVE or is_boss_wave(wave_number):
 		Logging.log_entry("Boss wave qualifier.")
 		design_boss_wave(wave_number)
 		return
@@ -215,10 +215,32 @@ func get_spawn_pattern(enemy_spawn_placement_configuration, previous_spawn_patte
 	return spawn_pattern
 
 
-func design_boss_wave(_wave_number):
+# Is this wave number a boss wave? Every BOSS_WAVE_INTERVAL waves, no earlier
+# than BOSS_WAVE_FIRST.
+func is_boss_wave(wave_number):
+	if wave_number < constants.BOSS_WAVE_FIRST:
+		return false
+	return (wave_number - constants.BOSS_WAVE_FIRST) % constants.BOSS_WAVE_INTERVAL == 0
+
+
+# Which boss encounter this is (1 = first boss, 2 = second, ...). Drives health
+# growth so later bosses are tougher. DEV-forced boss waves count as the 1st.
+func boss_number(wave_number):
+	if not is_boss_wave(wave_number):
+		return 1
+	@warning_ignore("integer_division")
+	return (wave_number - constants.BOSS_WAVE_FIRST) / constants.BOSS_WAVE_INTERVAL + 1
+
+
+func design_boss_wave(wave_number):
 	wave_design["boss_wave"] = true
-	# Base health; Main scales it for player count when it spawns the boss.
-	wave_design["boss_health"] = constants.BOSS_BASE_HEALTH
+
+	# Base health grows with each boss encounter (later bosses tougher). Main
+	# scales this further for player count when it spawns the boss.
+	var encounter = boss_number(wave_number)
+	wave_design["boss_health"] = (
+		constants.BOSS_BASE_HEALTH + (encounter - 1) * constants.BOSS_HEALTH_WAVE_GROWTH
+	)
 	wave_design["spawn_text"] = "ALERT! BOSS DETECTED!"
 
 	# Keep it interesting: pick a random sprite type; its behaviour profile is
@@ -228,16 +250,18 @@ func design_boss_wave(_wave_number):
 	wave_design["boss_type"] = chosen_type
 	wave_design["boss_behaviour"] = constants.BOSS_TYPE_SETTINGS[chosen_type]["behaviour"]
 
+	# Random fun title for this boss (shown over the health bar).
+	var titles = constants.BOSS_TYPE_SETTINGS[chosen_type]["titles"]
+	wave_design["boss_title"] = titles[randi() % titles.size()]
+
 	# Procedural adds: roll a weighted intensity (none / light / heavy).
 	wave_design["adds_intensity"] = _roll_adds_intensity()
 
-	# A boss wave still needs an obstacle count and fish (arena decoration /
-	# frenzy fuel), but no survival timer, no reinforcement spawns, and no
-	# regular enemy roster — the boss is the wave. Set safe defaults for the keys
-	# start_wave() reads so it doesn't fault on the missing normal-wave design.
-	wave_design["obstacle_number"] = randi_range(
-		constants.ARENA_OBSTACLE_MINIMUM, constants.ARENA_OBSTACLE_MAXIMUM
-	)
+	# No obstacles on boss waves — keep the arena clear so dodging the boss's
+	# attacks and the adds isn't complicated by scenery (and pathing stays clean).
+	# No survival timer, no reinforcement spawns, no regular enemy roster — the
+	# boss is the wave. Safe defaults for the keys start_wave() reads.
+	wave_design["obstacle_number"] = 0
 	wave_design["total_enemies"] = 0
 	wave_design["total_spawns"] = 0
 	wave_design["reinforcements_timer"] = 0

@@ -57,4 +57,8 @@ func _physics_process(_delta):
 				if collision.get_collider().name.contains("Artillery"):
 					break
 
-				collision.get_collider().get_node(".").death("PLAYER-SHOT", owner_player)
+				# Only damage things that can take damage; ignore other bodies on
+				# the shared layer (ExitLocation, markers, boss-room exit door).
+				var collider = collision.get_collider()
+				if collider.has_method("death"):
+					collider.death("PLAYER-SHOT", owner_player)

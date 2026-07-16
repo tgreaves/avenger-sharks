@@ -612,16 +612,12 @@ func _physics_process(_delta):
 						. get_astar_route_from_positions(global_position, exit_door_global)
 					)
 
-					# Start heading towards the first one.
-					var target_direction = (
-						(
-							arena.get_position_from_tilemap(
-								astar_pathing_grid[0]
-							)
-							- global_position
-						)
-						. normalized()
-					)
+					# Head towards the first path node; if the route is empty (e.g.
+					# already adjacent to the door), aim straight at the door.
+					var next_target = exit_door_global
+					if astar_pathing_grid.size():
+						next_target = arena.get_position_from_tilemap(astar_pathing_grid[0])
+					var target_direction = (next_target - global_position).normalized()
 					velocity = target_direction * constants.PLAYER_SPEED_ESCAPING
 
 					$HuntingDoorTimer.start()
@@ -656,7 +652,7 @@ func _physics_process(_delta):
 			# Have we reached the next node on the astar pathing grid?
 			var tilemap_coords = arena.get_tilemap_coords(global_position)
 
-			if tilemap_coords == astar_pathing_grid[0]:
+			if astar_pathing_grid.size() and tilemap_coords == astar_pathing_grid[0]:
 				astar_pathing_grid.pop_front()
 
 				if astar_pathing_grid.size():
@@ -678,8 +674,11 @@ func _physics_process(_delta):
 				$AnimatedSprite2D.set_flip_h(false)
 
 			if $HuntingDoorTimer.time_left == 0:
-				position.x = 2632
-				position.y = 286
+				# Anti-stuck failsafe: teleport to the exit door. (On boss waves the
+				# exit door is relocated to the room's top door, so use its position
+				# rather than the hard-coded arena-top spot.)
+				var exit_door = arena.get_node("ExitDoor")
+				position = exit_door.global_position
 
 			for i in get_slide_collision_count():
 				var collision = get_slide_collision(i)

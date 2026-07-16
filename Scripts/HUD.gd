@@ -344,6 +344,16 @@ func boss_health_reveal():
 
 	$CanvasLayer/BossHealthBar.visible = true
 
+	# Fun title over the bar (e.g. "MR. RATTLEBONES").
+	var title = TheDirector.wave_design.get("boss_title", "BOSS")
+	$CanvasLayer/BossTitle.text = title
+	$CanvasLayer/BossTitle.visible = true
+
+
+# Hide the boss title (on defeat / cleanup, alongside the health bar).
+func hide_boss_title():
+	$CanvasLayer/BossTitle.visible = false
+
 
 # Update the boss health bar as the boss takes damage.
 func update_boss_health(current_health, max_health):

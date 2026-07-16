@@ -169,10 +169,7 @@ one_shot = true
 [node name="DriftTimer" type="Timer" parent="."]
 one_shot = true
 
-[node name="SpiralTimer" type="Timer" parent="."]
-one_shot = true
-
-[node name="AimedTimer" type="Timer" parent="."]
+[node name="AttackTimer" type="Timer" parent="."]
 one_shot = true
 
 [node name="ArtilleryTimer" type="Timer" parent="."]

@@ -258,6 +258,9 @@ func get_nearest_player(from_position):
 var player_two = null
 # The active boss instance during a boss wave (null otherwise).
 var boss = null
+# The walled interior of the confined boss box (world-space Rect2), set when a
+# boss wave builds its arena; used for camera lock and boss patrol bounds.
+var boss_arena_interior = Rect2()
 # Device id assigned to each human player slot ([P1, P2]) for 2-player SPECIFIC
 # input. Defaults to the historical hard-coded pairing (P1 keyboard/mouse,
 # P2 gamepad 0); the setup screen overwrites these before a 2P-human game.
@@ -410,6 +413,7 @@ func main_menu():
 	$HUD/CanvasLayer/UpgradeChoiceContainer.visible = false
 	$HUD.set_upgrade_summary_visible(false)
 	$HUD/CanvasLayer/BossHealthBar.visible = false
+	$HUD.hide_boss_title()
 	$HUD.get_node("CanvasLayer/Score").visible = false
 	$HUD.get_node("CanvasLayer/Label").visible = true
 	$HUD.get_node("CanvasLayer/Label").text = ""
@@ -494,6 +498,12 @@ func prepare_for_wave():
 	for i in range(1, TheDirector.wave_design.get("obstacle_number", 0)):
 		$Arena.add_obstacle()
 
+	# Boss waves are fought in a confined one-screen box (walls + static camera).
+	# Build the box now (obstacle_number is 0 on boss waves, so no scenery) and
+	# position the swim-in markers in its lower third so players fight upward at
+	# the boss. Normal waves keep the default marker positions.
+	setup_boss_arena_if_needed()
+
 	# Fish spawning
 	if game_mode == "ARCADE":
 		fish_left_this_wave = constants.FISH_TO_SPAWN_ARCADE
@@ -502,6 +512,8 @@ func prepare_for_wave():
 			constants.FISH_TO_SPAWN_PACIFIST_BASE
 			+ ((wave_number - 1) * constants.FISH_TO_SPAWN_PACIFIST_WAVE_MULTIPLIER)
 		)
+
+	var is_boss_wave = TheDirector.wave_design.get("boss_wave", false)
 
 	var player_index = 0
 	for player in get_players():
@@ -513,8 +525,8 @@ func prepare_for_wave():
 		player.visible = true
 		#player.position = Vector2(2650, 2500)
 		# y=2521 is one tile above the bottom wall band (row 33): spawning both
-		# sharks clear of it keeps them at the same height (player 2's column has
-		# a wall at the spawn row that would otherwise bump it up ~1 tile).
+		# sharks clear of it keeps them at the same height (player 2's column
+		# has a wall at the spawn row that would otherwise bump it up ~1 tile).
 		player.position = Vector2(2650, 2521) + (PLAYER_2_START_OFFSET * player_index)
 		player.get_node("AnimatedSprite2D").animation = "default"
 		player.get_node("AnimatedSprite2D").play()
@@ -523,6 +535,10 @@ func prepare_for_wave():
 	# Take over camera control for gameplay.
 	get_coop_camera().activate()
 	get_coop_camera().global_position = $Player.position
+	if is_boss_wave:
+		# Boss fight: lock the camera static on the room centre (it does not follow
+		# the player — the whole room fits on screen).
+		get_coop_camera().lock_static(constants.BOSS_ARENA_CENTER)
 
 	var tween = get_tree().create_tween()
 	tween.tween_property(self, "modulate", Color(1, 1, 1, 1), 0.5)
@@ -540,6 +556,8 @@ func prepare_for_wave():
 		)
 		tween_camera.tween_callback(func(): coop_camera.manual_control = false)
 
+	# Sharks swim in from the bottom entrance (boss waves too — up through the
+	# gap in the room's bottom wall).
 	player_move_to_starting_position.emit()
 
 	_on_enemy_update_score_display()
@@ -627,8 +645,10 @@ func start_wave():
 		$WaveTimeLeftTimer.start(TheDirector.wave_design.get("wave_time"))
 		$EnemySpawnTimer.start(TheDirector.wave_design.get("reinforcements_timer", 0))
 	else:
-		# The boss was spawned during the swim-in (spawn_wave_entities) with its
-		# attacks held; now the wave is live, let it fight.
+		# The boss was spawned during the intro with its attacks held; now the
+		# wave is live, let it fight. Players have swum into the room, so seal the
+		# bottom-wall gap behind them. (Camera locked in prepare_for_wave.)
+		$Arena.close_boss_gap()
 		if boss != null:
 			boss.begin_fighting()
 		_start_boss_adds()
@@ -801,9 +821,12 @@ func return_to_main_screen():
 		enemy.queue_free()
 
 	# The boss lives in enemyGroup and was freed above; drop our reference and
-	# hide its health bar.
+	# hide its health bar + title.
 	boss = null
 	$HUD/CanvasLayer/BossHealthBar.visible = false
+	$HUD.hide_boss_title()
+	# In case the game ended mid-boss-fight, tear down the box walls.
+	$Arena.clear_boss_walls()
 
 	for enemy_attack in get_tree().get_nodes_in_group("enemyAttack"):
 		enemy_attack.queue_free()
@@ -856,6 +879,13 @@ func spawn_item():
 		items = constants.ARCADE_SPAWNING_ITEMS
 	else:
 		items = constants.PACIFIST_SPAWNING_ITEMS
+
+	# The star (power-pellet) turns the tables on enemies, which trivialises a
+	# boss fight — exclude it during boss waves.
+	if TheDirector.wave_design.get("boss_wave", false):
+		items = items.filter(func(item): return item != "power-pellet")
+		if items.is_empty():
+			return
 
 	var spawned_item = items[randi() % items.size()]
 
@@ -1094,13 +1124,59 @@ func spawn_fish():
 	add_child(mob, true)
 
 
+# Default (non-boss) swim-in marker Y and exit node positions, captured once so
+# boss waves can relocate them and normal waves can restore them.
+var _default_marker_y = null
+var _default_exit_door_pos = null
+var _default_exit_location_pos = null
+
+
+# On a boss wave, wall off the confined room, move the swim-in markers into its
+# lower area (sharks swim up through the bottom-wall door and stop inside), and
+# relocate the exit to the room's TOP door so escaping through it ends the wave
+# immediately (no long path up to the arena's real exit). On a normal wave,
+# restore everything. Called from prepare_for_wave after the arena floor reset.
+func setup_boss_arena_if_needed():
+	var p1 = $Arena.get_node("PlayerStartLocation")
+	var p2 = $Arena.get_node("PlayerStartLocation2")
+	var exit_door = $Arena.get_node("ExitDoor")
+	var exit_location = $Arena.get_node("ExitLocation")
+	if _default_marker_y == null:
+		_default_marker_y = p1.global_position.y
+		_default_exit_door_pos = exit_door.global_position
+		_default_exit_location_pos = exit_location.global_position
+
+	if TheDirector.wave_design.get("boss_wave", false):
+		var box = Rect2(
+			constants.BOSS_ARENA_CENTER - constants.BOSS_ARENA_SIZE / 2.0,
+			constants.BOSS_ARENA_SIZE
+		)
+		boss_arena_interior = $Arena.build_boss_walls(box)
+		# Sharks stop in the lower area of the room (fighting upward at the boss).
+		var rest_y = boss_arena_interior.position.y + boss_arena_interior.size.y * 0.82
+		p1.global_position.y = rest_y
+		p2.global_position.y = rest_y
+		# Exit is the room's top door; ExitLocation sits just above it.
+		var door_pos = $Arena.boss_top_door_position()
+		exit_door.global_position = door_pos
+		exit_location.global_position = door_pos + Vector2(0, -120)
+	else:
+		boss_arena_interior = Rect2()
+		p1.global_position.y = _default_marker_y
+		p2.global_position.y = _default_marker_y
+		exit_door.global_position = _default_exit_door_pos
+		exit_location.global_position = _default_exit_location_pos
+
+
 # Spawn the single boss for a boss wave. Health scales with player count so the
 # fight stays meaningful in co-op. Added to enemyGroup so existing shark-spray /
 # grenade collision and clean-up treat it like any other enemy body.
 func spawn_boss():
 	boss = BossScene.instantiate()
 
-	var health = constants.BOSS_BASE_HEALTH
+	# Base health comes from the Director (grows per boss encounter); scale up for
+	# player count so the fight stays meaningful in co-op.
+	var health = TheDirector.wave_design.get("boss_health", constants.BOSS_BASE_HEALTH)
 	if player_count == 2:
 		health = int(round(health * constants.BOSS_HEALTH_2P_MULTIPLIER))
 
@@ -1108,8 +1184,14 @@ func spawn_boss():
 	var boss_behaviour = TheDirector.wave_design.get(
 		"boss_behaviour", constants.BOSS_BEHAVIOUR_ROAM_SPIRAL
 	)
+	var encounter = TheDirector.boss_number(wave_number)
 
-	boss.position = constants.BOSS_SPAWN_POSITION
+	# Position near the top of the confined box and set its patrol bounds from
+	# the walled interior (inset so the large sprite stays clear of the walls).
+	var top_y = boss_arena_interior.position.y + constants.BOSS_PATROL_EDGE_INSET
+	boss.position = Vector2(constants.BOSS_ARENA_CENTER.x, top_y)
+	boss.patrol_min_x = boss_arena_interior.position.x + constants.BOSS_PATROL_EDGE_INSET
+	boss.patrol_max_x = boss_arena_interior.end.x - constants.BOSS_PATROL_EDGE_INSET
 	boss.add_to_group("enemyGroup")
 	boss.boss_damaged.connect(_on_boss_damaged)
 	boss.boss_defeated.connect(_on_boss_defeated)
@@ -1117,7 +1199,7 @@ func spawn_boss():
 	# Configure after add_child so the sprite/collision nodes are ready. The boss
 	# spawns during the swim-in with attacks held (begin_fighting is called from
 	# start_wave when the wave goes live). Adds also start there.
-	boss.configure(health, boss_type, boss_behaviour)
+	boss.configure(health, boss_type, boss_behaviour, encounter)
 
 
 # Procedural adds for a boss wave. Reads the rolled intensity and, if enabled,
@@ -1184,11 +1266,16 @@ func _on_boss_defeated(defeat_position, attacker):
 	update_low_energy_music()
 
 	$HUD/CanvasLayer/BossHealthBar.visible = false
+	$HUD.hide_boss_title()
 	# Hide the "BOSS" time-slot label for the rest of the wave (key hunt + upgrade
 	# screen). It's re-shown at the next wave start. The boss_wave flag stays true
 	# until the next wave is designed, so update_time_left_display() would keep
 	# re-showing "BOSS" otherwise.
 	$HUD.get_node("CanvasLayer/EnemiesLeft").visible = false
+
+	# The room stays intact. Its top door opens only when the key-holder reaches
+	# it (handled in the normal exit flow, via arena.open_top_door), just like a
+	# regular wave — not pre-opened here.
 
 	# Drop the key where the boss fell so the normal hunt-key -> exit flow runs.
 	$Key.global_position = defeat_position
@@ -1964,6 +2051,11 @@ func _on_artillery_timer():
 # so the boss's artillery-rain profile can trigger strikes without touching
 # Main's own ArtilleryTimer.
 func spawn_artillery_strike():
+	# Only one strike active at a time (the boss's rapid rain would otherwise
+	# stack several at once). The timers keep ticking and will try again.
+	if get_tree().get_nodes_in_group("artilleryGroup").size() > 0:
+		return
+
 	var mob = artillery_scene.instantiate()
 
 	# Each strike targets a random living shark (falls back to player 1 if none

@@ -35,6 +35,19 @@ func deactivate():
 	enabled = false
 
 
+# Lock the camera static, framing a fixed point at default zoom (used for the
+# confined boss-arena fight). Suspends the follow/zoom logic.
+func lock_static(center: Vector2):
+	manual_control = true
+	global_position = center
+	zoom = Vector2(constants.CAMERA_DEFAULT_ZOOM, constants.CAMERA_DEFAULT_ZOOM)
+
+
+# Resume normal player-following.
+func unlock():
+	manual_control = false
+
+
 func _process(delta):
 	if not enabled:
 		return
