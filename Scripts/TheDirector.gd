@@ -221,6 +221,16 @@ func design_boss_wave(_wave_number):
 	wave_design["boss_health"] = constants.BOSS_BASE_HEALTH
 	wave_design["spawn_text"] = "ALERT! BOSS DETECTED!"
 
+	# Keep it interesting: pick a random sprite type; its behaviour profile is
+	# themed to that type (see BOSS_TYPE_SETTINGS).
+	var types = constants.BOSS_TYPE_SETTINGS.keys()
+	var chosen_type = types[randi() % types.size()]
+	wave_design["boss_type"] = chosen_type
+	wave_design["boss_behaviour"] = constants.BOSS_TYPE_SETTINGS[chosen_type]["behaviour"]
+
+	# Procedural adds: roll a weighted intensity (none / light / heavy).
+	wave_design["adds_intensity"] = _roll_adds_intensity()
+
 	# A boss wave still needs an obstacle count and fish (arena decoration /
 	# frenzy fuel), but no survival timer, no reinforcement spawns, and no
 	# regular enemy roster — the boss is the wave. Set safe defaults for the keys
@@ -231,3 +241,23 @@ func design_boss_wave(_wave_number):
 	wave_design["total_enemies"] = 0
 	wave_design["total_spawns"] = 0
 	wave_design["reinforcements_timer"] = 0
+
+	Logging.log_entry(
+		"Boss wave: type=" + chosen_type
+		+ " behaviour=" + wave_design["boss_behaviour"]
+		+ " adds=" + wave_design["adds_intensity"]
+	)
+
+
+# Weighted pick of adds intensity for a boss wave.
+func _roll_adds_intensity():
+	var total = 0
+	for weight in constants.BOSS_ADDS_INTENSITY_WEIGHTS.values():
+		total += weight
+	var roll = randi_range(1, total)
+	var running = 0
+	for intensity in constants.BOSS_ADDS_INTENSITY_WEIGHTS:
+		running += constants.BOSS_ADDS_INTENSITY_WEIGHTS[intensity]
+		if roll <= running:
+			return intensity
+	return "none"

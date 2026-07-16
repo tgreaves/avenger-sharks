@@ -361,7 +361,7 @@ disabled = true
 
 [node name="PlayerStartLocation" type="CharacterBody2D" parent="." unique_id=274125038]
 z_index = 2
-position = Vector2(511.2, 151.6)
+position = Vector2(511.2, 295)
 collision_layer = 16
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="PlayerStartLocation" unique_id=460100440]
@@ -371,7 +371,7 @@ disabled = true
 
 [node name="PlayerStartLocation2" type="CharacterBody2D" parent="."]
 z_index = 2
-position = Vector2(569.25, 151.6)
+position = Vector2(569.25, 295)
 collision_layer = 16
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="PlayerStartLocation2"]

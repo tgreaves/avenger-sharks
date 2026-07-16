@@ -119,6 +119,16 @@ func is_pressed(action: String) -> bool:
 	return _pressed.get(action, false)
 
 
+# Clear any pending edge-triggered "just pressed" flags. Needed because some
+# actions (e.g. shark_fire) aren't read every frame during gameplay, so their
+# SPECIFIC-mode flag can go stale and fire spuriously the next time it IS read
+# (e.g. auto-confirming the upgrade screen). Call when entering a screen that
+# reads a normally-unread action.
+func clear_just_pressed() -> void:
+	for a in TRACKED_ACTIONS:
+		_just_pressed[a] = false
+
+
 # Edge-triggered. In SPECIFIC mode the flag is consumed on read, so this must be
 # called at most once per frame per action (matching Input.is_action_just_pressed
 # usage).

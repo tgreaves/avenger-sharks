@@ -1,6 +1,6 @@
 extends Node
 
-const GAME_VERSION = "1.4.0-wip"
+const GAME_VERSION = "1.4.0-alpha"
 
 # Developer settings.
 const DEV_DELAY_ON_START = false
@@ -18,7 +18,7 @@ const DEV_FORCE_UPGRADE = ""   	# ""
 const DEV_FORCE_POWERUP = ""	# ""
 const DEV_WAVE_LASTS_FOREVER = false
 const DEV_WIPE_ACHIEVEMENTS = false
-const DEV_FORCE_BOSS_WAVE = true   # Force every wave to be a boss wave for testing.
+const DEV_FORCE_BOSS_WAVE = false   # Force every wave to be a boss wave for testing.
 
 # Hardware settings
 const WINDOW_TITLE = "Avenger Sharks " + GAME_VERSION
@@ -46,7 +46,7 @@ const PLAYER_2_TINT = Color(1.7, 0.85, 0.2, 1)
 const PLAY_WAVE_END_MUSIC = false
 
 const START_WAVE = 1
-const WAVE_SURVIVAL_TIME_BASE = 30
+const WAVE_SURVIVAL_TIME_BASE = 5 # 30
 const WAVE_SURVIVAL_TIME_INCREASE = 5
 const WAVE_SURVIVAL_TIME_MAXIMUM = 60
 
@@ -318,6 +318,53 @@ const BOSS_AIMED_INTERVAL = 1.2          # Seconds between aimed volleys.
 const BOSS_AIMED_PROJECTILE_COUNT = 3    # Shots per aimed volley (small spread).
 const BOSS_AIMED_SPREAD_DEGREES = 12.0   # Spread of an aimed volley.
 const BOSS_ATTACK_PROJECTILE_SPEED = 700 # Boss projectile speed.
+
+# Movement speeds per behaviour profile.
+const BOSS_ROAM_SPEED = 120.0            # Aimless drift (ROAM_SPIRAL).
+const BOSS_CHASE_SPEED = 260.0           # Pursuit of nearest shark (CHASE_AIMED).
+# The "stationary" bullet-hell profile still hovers slowly: the enemy sprites
+# only have a run animation (no idle), so a truly motionless boss looks like it
+# is running on the spot / into a wall. A slow drift keeps it looking alive.
+const BOSS_HOVER_SPEED = 45.0
+
+# Stationary bullet-hell fires a denser, faster spiral (it doesn't move).
+const BOSS_BULLETHELL_SPIRAL_INTERVAL = 1.6
+const BOSS_BULLETHELL_PROJECTILE_COUNT = 28
+
+# Artillery-rain profile: seconds between POLLUTION-STRIKE drops.
+const BOSS_ARTILLERY_INTERVAL_MIN = 1.2
+const BOSS_ARTILLERY_INTERVAL_MAX = 2.2
+
+# Boss behaviour profiles (Phase 3.5). The Director picks one, themed to the
+# chosen sprite (see BOSS_TYPE_BEHAVIOUR).
+const BOSS_BEHAVIOUR_ROAM_SPIRAL = "ROAM_SPIRAL"
+const BOSS_BEHAVIOUR_CHASE_AIMED = "CHASE_AIMED"
+const BOSS_BEHAVIOUR_BULLETHELL = "STATIONARY_BULLETHELL"
+const BOSS_BEHAVIOUR_ARTILLERY = "ARTILLERY_RAIN"
+
+# The boss can be any enemy sprite (Phase 3.5). Each type has a native frame
+# size, so per-type base scale keeps them all reading as a big boss (the small
+# 32px-tall knight/wizard/rogue/skeleton need more; the necromancer least). The
+# behaviour is themed to the type.
+const BOSS_TYPE_SETTINGS = {
+	"knight": {"scale": Vector2(12, 12), "behaviour": BOSS_BEHAVIOUR_CHASE_AIMED},
+	"wizard": {"scale": Vector2(12, 12), "behaviour": BOSS_BEHAVIOUR_ROAM_SPIRAL},
+	"rogue": {"scale": Vector2(12, 12), "behaviour": BOSS_BEHAVIOUR_CHASE_AIMED},
+	"necromancer": {"scale": Vector2(7, 7), "behaviour": BOSS_BEHAVIOUR_ARTILLERY},
+	# The bee boss is a giant queen: bigger, and its adds are themed as a bee swarm.
+	"bee": {"scale": Vector2(16, 16), "behaviour": BOSS_BEHAVIOUR_CHASE_AIMED, "adds_type": "bee"},
+	"skeleton": {"scale": Vector2(12, 12), "behaviour": BOSS_BEHAVIOUR_BULLETHELL},
+	"snake": {"scale": Vector2(14, 14), "behaviour": BOSS_BEHAVIOUR_BULLETHELL}
+}
+
+# Procedural adds (Phase 4). The Director rolls an intensity per boss wave,
+# weighted toward none/light. When enabled, adds trickle in capped batches on a
+# timer alongside the boss and do NOT gate wave completion (only boss HP does).
+const BOSS_ADDS_INTENSITY_WEIGHTS = {"none": 55, "light": 30, "heavy": 15}
+const BOSS_ADDS_SETTINGS = {
+	"light": {"cap": 4, "batch": 2, "interval": 6.0},
+	"heavy": {"cap": 8, "batch": 3, "interval": 4.0}
+}
 
 # Fish
 const FISH_TO_SPAWN_ARCADE = 20

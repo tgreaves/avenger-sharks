@@ -13,11 +13,14 @@ Status:
   existing rule); confirm during Phase 3+ co-op testing.
 - **Phase 3 — DONE (first pass).** Boss attacks / behaviour: roams + spiral +
   aimed volleys + contact damage. Health-threshold phases deferred.
-- **Phase 3.5 — TODO.** Random boss identity (sprite) and varied behaviour
-  (movement/attack profile) per boss wave, Director-driven — the "keep it
-  interesting" requirement.
-- **Phase 4 — TODO.** Procedural adds (TheDirector rolls intensity none/light/
-  heavy; capped periodic trickle).
+- **Phase 3.5 — DONE.** Random boss identity (any of the 7 enemy sprites) and a
+  behaviour profile themed to that sprite. Four profiles: roam+spiral,
+  chase+aimed, stationary bullet-hell, artillery-rain. Director picks type +
+  behaviour in `design_boss_wave()`.
+- **Phase 4 — DONE.** Procedural adds: Director rolls a weighted intensity
+  (none 55 / light 30 / heavy 15); when enabled, capped batches of random
+  enemies trickle in on the (otherwise-unused) EnemySpawnTimer during the fight.
+  Adds don't gate completion — only boss HP does.
 - **Phase 5 — TODO.** Trigger cadence (replace the placeholder multiplier), HUD
   polish, audio, co-op camera framing, and balance tuning.
 
@@ -177,40 +180,45 @@ Gave the boss a reason to be dangerous.
 - Health-threshold phase changes (faster / denser under 50% HP).
 - Per-wave variety in sprite and attack/movement style.
 
-## Phase 3.5 — Random boss identity & varied behaviour — TODO
+## Phase 3.5 — Random boss identity & varied behaviour — DONE
 
-**Requirement (added during Phase 3 testing):** keep boss waves interesting by
-randomising, per boss wave, **both** the boss's appearance and how it
-behaves — so it isn't always the same necromancer doing the same spiral.
+Keeps boss waves interesting by randomising both appearance and behaviour.
 
-- **Sprite/identity:** pick a random enemy type (from the `ENEMY_SETTINGS`
-  roster / their sprite sheets) as the boss's look, instead of the hard-coded
-  necromancer reskin. Reuse each type's existing run/death animations.
-- **Behaviour set:** pick a random movement + attack profile — e.g. roam +
-  spiral (current), chase + aimed, stationary bullet-hell, artillery-style
-  rain, charges. Ideally the choice is weighted / themed to the chosen sprite.
-- **Director-driven:** the roll belongs in `TheDirector.design_boss_wave()`
-  (which already authors the wave), storing the chosen identity + behaviour in
-  `wave_design` for `Boss.configure()` to apply. This sits naturally alongside
-  the Phase 4 adds-intensity roll — both are the Director "keeping it
-  interesting".
-- Consider health-threshold phase changes here too (open item from Phase 3).
+### As-built
 
-## Phase 4 — Procedural adds
+- **Sprite/identity:** `design_boss_wave()` picks a random type from
+  `BOSS_TYPE_SETTINGS` (all 7 enemy types). `Boss.configure()` borrows the
+  shared enemy `SpriteFrames` (all types' run/death anims) from a throwaway
+  `Enemy` instance and plays `<type>-run` / `<type>-death`.
+- **Per-type scale:** enemy frames have different native sizes, so each type has
+  its own `scale` in `BOSS_TYPE_SETTINGS` (small 32px knight/wizard/rogue/skeleton
+  ~12×, bee ~10×, necromancer ~7×, snake ~14×). Collision scales proportionally
+  from the necromancer-tuned capsule (`type_scale * 1.75/7`).
+- **Behaviour themed to sprite** (`BOSS_TYPE_SETTINGS[type].behaviour`). Four
+  profiles in `Boss.gd`:
+  - `ROAM_SPIRAL` — drifts, fires spiral + aimed volleys (wizard).
+  - `CHASE_AIMED` — pursues nearest shark, aimed volleys (knight/rogue/bee).
+  - `STATIONARY_BULLETHELL` — holds position, denser/faster spiral
+    (skeleton/snake).
+  - `ARTILLERY_RAIN` — roams, aimed volleys + POLLUTION-STRIKE drops on a timer
+    (necromancer), reusing `Main.spawn_artillery_strike()`.
+- **Deferred:** health-threshold phase changes (open item from Phase 3), and
+  per-type collision-capsule tuning (currently one capsule scaled proportionally).
 
-TheDirector decides, per boss wave, how much to complicate the fight.
+## Phase 4 — Procedural adds — DONE
 
-- In `design_boss_wave()`: roll an **intensity** — `none` / `light` / `heavy`,
-  weighted toward none/light — rather than a simple on/off. Store it in
-  `wave_design` (e.g. `adds_intensity`). If not `none`, author the add
-  composition (eligible types, batch size, on-screen cap, cadence) using the
-  existing spawn-ratio machinery from `design_wave()`.
-- `Main.gd` boss-wave branch: if adds are enabled, run a **periodic trickle** —
-  small batches on the reinforcements timer, capped at a low on-screen count —
-  alongside the boss, reusing `spawn_enemy`. Adds do **not** gate wave
-  completion; only boss HP does.
-- The intensity roll is the "keep it interesting" lever: many boss waves have no
-  adds, some a light trickle, a few a heavier mix.
+### As-built
+
+- `design_boss_wave()` rolls a weighted `adds_intensity`
+  (`BOSS_ADDS_INTENSITY_WEIGHTS`: none 55 / light 30 / heavy 15).
+- If not `none`, `Main._start_boss_adds()` reads `BOSS_ADDS_SETTINGS`
+  (cap / batch / interval per intensity) and starts the otherwise-unused
+  `EnemySpawnTimer`. On boss waves that timer routes to
+  `spawn_boss_adds_batch()`, which spawns up to `batch` random enemies via
+  `spawn_enemy_random_position` while under the on-screen `cap`, then reschedules.
+- Adds don't gate completion — only boss HP does. They swim out with the normal
+  wave-end sweep (they're in `enemyGroup`).
+- The timer stops naturally on boss defeat (wave leaves `GAME_RUNNING`).
 
 ## Phase 5 — Trigger, polish, tuning
 

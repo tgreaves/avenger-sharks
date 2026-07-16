@@ -227,6 +227,14 @@ func get_primary_player():
 
 # The player nearest to a world position — used by enemy/item targeting. With a
 # single player this always returns that player.
+# The world position a player swims to at wave start (its start marker). Used to
+# aim the opening CIRCLE_SURROUND_PLAYER spawn at where the shark WILL be, since
+# enemies now spawn while the sharks are still swimming in.
+func player_start_destination(player):
+	var marker = $Arena.get_node(player.start_marker_name)
+	return marker.global_position
+
+
 func get_nearest_player(from_position):
 	var players = get_players()
 
@@ -589,6 +597,12 @@ func wave_intro():
 	$HUD.get_node("CanvasLayer/Label").visible = true
 	$WaveIntroTimer.start()
 
+	# Spawn the enemies / boss NOW, while the players are still swimming into
+	# position, so the action (and especially the boss) visibly materialises
+	# rather than popping in after a delay. The wave only goes "live" (timers +
+	# boss attacks) when start_wave() fires at the end of the intro.
+	spawn_wave_entities()
+
 
 func start_wave():
 	game_status = GAME_RUNNING
@@ -612,10 +626,32 @@ func start_wave():
 	if not is_boss_wave:
 		$WaveTimeLeftTimer.start(TheDirector.wave_design.get("wave_time"))
 		$EnemySpawnTimer.start(TheDirector.wave_design.get("reinforcements_timer", 0))
+	else:
+		# The boss was spawned during the swim-in (spawn_wave_entities) with its
+		# attacks held; now the wave is live, let it fight.
+		if boss != null:
+			boss.begin_fighting()
+		_start_boss_adds()
 
 	$ItemSpawnTimer.start(
 		randf_range(constants.ITEM_SPAWN_MINIMUM_SECONDS, constants.ITEM_SPAWN_MAXIMUM_SECONDS)
 	)
+
+	if game_mode == "PACIFIST":
+		update_fish_left_display()
+
+	# Artillery
+	if TheDirector.wave_design.get("artillery", false):
+		$ArtilleryTimer.start(
+			randf_range(constants.ARTILLERY_MINIMUM_TIME, constants.ARTILLERY_MAXIMUM_TIME)
+		)
+
+
+# Spawn the wave's entities (enemies / boss / fish). Called during the swim-in
+# (from wave_intro) so they materialise while players move into position. The
+# wave only goes live in start_wave().
+func spawn_wave_entities():
+	var is_boss_wave = TheDirector.wave_design.get("boss_wave", false)
 
 	spawn_number = 0
 	enemies_left_this_wave = TheDirector.wave_design.get("total_enemies")
@@ -626,20 +662,10 @@ func start_wave():
 	else:
 		spawn_enemy("start_spawn", "spawn_pattern", false)
 
-	i = 0
-
+	var i = 0
 	while i < fish_left_this_wave:
 		spawn_fish()
 		i = i + 1
-
-	if game_mode == "PACIFIST":
-		update_fish_left_display()
-
-	# Artillery
-	if TheDirector.wave_design.get("artillery", false):
-		$ArtilleryTimer.start(
-			randf_range(constants.ARTILLERY_MINIMUM_TIME, constants.ARTILLERY_MAXIMUM_TIME)
-		)
 
 
 func wave_end():
@@ -904,12 +930,20 @@ func spawn_enemy(spawn_to_use, spawn_pattern_to_use, half_spawn_boolean):
 			var circle_target = get_random_living_player()
 			if circle_target == null:
 				circle_target = get_primary_player()
+
+			# The opening spawn happens while the sharks are still swimming into
+			# position, so circle their DESTINATION (the swim-in marker) rather
+			# than their current, moving position near the entrance.
+			var circle_centre = circle_target.position
+			if spawn_to_use == "start_spawn":
+				circle_centre = player_start_destination(circle_target)
+
 			var i = 0
 			while i < number_to_spawn:
 				var angle_degrees = (360 / number_to_spawn) * (i + 1)
 				var angle_rad = deg_to_rad(angle_degrees)
 				var offset = Vector2(sin(angle_rad), cos(angle_rad)) * 600
-				var enemy_position = circle_target.position + offset
+				var enemy_position = circle_centre + offset
 
 				spawn_enemy_set_position(
 					spawn_array[i], enemy_position, "", Vector2(0, 0).normalized(), false
@@ -1070,12 +1104,62 @@ func spawn_boss():
 	if player_count == 2:
 		health = int(round(health * constants.BOSS_HEALTH_2P_MULTIPLIER))
 
-	boss.configure(health)
+	var boss_type = TheDirector.wave_design.get("boss_type", "necromancer")
+	var boss_behaviour = TheDirector.wave_design.get(
+		"boss_behaviour", constants.BOSS_BEHAVIOUR_ROAM_SPIRAL
+	)
+
 	boss.position = constants.BOSS_SPAWN_POSITION
 	boss.add_to_group("enemyGroup")
 	boss.boss_damaged.connect(_on_boss_damaged)
 	boss.boss_defeated.connect(_on_boss_defeated)
 	add_child(boss)
+	# Configure after add_child so the sprite/collision nodes are ready. The boss
+	# spawns during the swim-in with attacks held (begin_fighting is called from
+	# start_wave when the wave goes live). Adds also start there.
+	boss.configure(health, boss_type, boss_behaviour)
+
+
+# Procedural adds for a boss wave. Reads the rolled intensity and, if enabled,
+# starts a trickle on the EnemySpawnTimer (unused on boss waves otherwise).
+var boss_adds_settings = null
+
+
+func _start_boss_adds():
+	boss_adds_settings = null
+	var intensity = TheDirector.wave_design.get("adds_intensity", "none")
+	if intensity == "none":
+		return
+	boss_adds_settings = constants.BOSS_ADDS_SETTINGS.get(intensity)
+	if boss_adds_settings != null:
+		$EnemySpawnTimer.start(boss_adds_settings["interval"])
+
+
+# One trickle batch of adds, capped at the on-screen limit for the intensity.
+func spawn_boss_adds_batch():
+	if boss_adds_settings == null:
+		return
+	var cap = boss_adds_settings["cap"]
+	var batch = boss_adds_settings["batch"]
+	var eligible = constants.ENEMY_SETTINGS.keys()
+
+	# If the boss type themes its adds (e.g. the bee queen -> a bee swarm), use
+	# that type for every add; otherwise adds are random.
+	var boss_type = TheDirector.wave_design.get("boss_type", "")
+	var themed_add = constants.BOSS_TYPE_SETTINGS.get(boss_type, {}).get("adds_type", "")
+
+	for i in range(batch):
+		if enemies_on_screen >= cap:
+			break
+		var type = themed_add if themed_add != "" else eligible[randi() % eligible.size()]
+		spawn_enemy_random_position(type)
+	$EnemySpawnTimer.start(boss_adds_settings["interval"])
+
+
+# A boss "artillery rain" strike — reuse the normal artillery spawner (the boss
+# reschedules its own strikes, so don't touch Main's ArtilleryTimer here).
+func spawn_boss_artillery():
+	spawn_artillery_strike()
 
 
 func _on_boss_damaged(current_health, max_health):
@@ -1154,7 +1238,10 @@ func _process(_delta):
 			spawn_item()
 
 		if $EnemySpawnTimer.time_left == 0:
-			if spawn_number < TheDirector.wave_design.get("total_spawns", 0):
+			if TheDirector.wave_design.get("boss_wave", false):
+				# Boss wave: the timer trickles procedural adds (if any).
+				spawn_boss_adds_batch()
+			elif spawn_number < TheDirector.wave_design.get("total_spawns", 0):
 				spawn_number += 1
 
 				var spawn_label = "spawn_" + str(spawn_number)
@@ -1314,6 +1401,9 @@ func apply_score_hud_layout():
 	enemies_left.offset_right = 226.0
 	enemies_left.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
+	# P1's upgrade summary sits just below the SCORE label (scene offset_top).
+	var p1_summary_top = $HUD.get_node("CanvasLayer/UpgradeSummary").offset_top
+
 	# Right slot: P2 score in 2-player-human, otherwise HIGH SCORE.
 	if _two_human_players():
 		high_score.visible = false
@@ -1325,6 +1415,9 @@ func apply_score_hud_layout():
 		score2.offset_left = -636.0
 		score2.offset_right = -20.0
 		score2.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+
+		# P2's summary sits below the P2 score.
+		$HUD.set_second_upgrade_summary_top(280.0)
 	else:
 		high_score.visible = true
 		high_score.anchor_left = 1.0
@@ -1332,6 +1425,10 @@ func apply_score_hud_layout():
 		high_score.offset_left = -656.0
 		high_score.offset_right = -20.0
 		high_score.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+
+		# 2-player-CPU: HIGH SCORE occupies the right slot, so P2's summary aligns
+		# with P1's (below the score line).
+		$HUD.set_second_upgrade_summary_top(p1_summary_top)
 
 
 var _high_score_default := {}
@@ -1647,6 +1744,10 @@ func upgrade_screen():
 		player.upgrade_cursor = 1
 		player.upgrade_confirmed = false
 		player.upgrade_ai_started = false
+		# Drop any stale "just pressed" fire flag left over from gameplay (some
+		# actions like shark_fire aren't read every frame, so their edge flag can
+		# linger and instantly confirm the upgrade otherwise).
+		player.input.clear_just_pressed()
 
 	upgrade_advance_delay = constants.UPGRADE_CONFIRM_FLASH_TIME
 
@@ -1853,6 +1954,16 @@ func _on_steam_input_device_connected(input_handle):
 
 
 func _on_artillery_timer():
+	spawn_artillery_strike()
+	$ArtilleryTimer.start(
+		randf_range(constants.ARTILLERY_MINIMUM_TIME, constants.ARTILLERY_MAXIMUM_TIME)
+	)
+
+
+# Spawn a single POLLUTION STRIKE on a random living shark. Split from the timer
+# so the boss's artillery-rain profile can trigger strikes without touching
+# Main's own ArtilleryTimer.
+func spawn_artillery_strike():
 	var mob = artillery_scene.instantiate()
 
 	# Each strike targets a random living shark (falls back to player 1 if none
@@ -1861,9 +1972,7 @@ func _on_artillery_timer():
 	if target == null:
 		target = get_primary_player()
 
-	var spawn_position
-
-	spawn_position = Vector2(
+	var spawn_position = Vector2(
 		randf_range(target.position.x - 200, target.position.x + 200),
 		randf_range(target.position.y - 200, target.position.y + 200)
 	)
@@ -1871,10 +1980,6 @@ func _on_artillery_timer():
 	mob.get_node(".").set_position(spawn_position)
 	mob.add_to_group("artilleryGroup")
 	add_child(mob, true)
-
-	$ArtilleryTimer.start(
-		randf_range(constants.ARTILLERY_MINIMUM_TIME, constants.ARTILLERY_MAXIMUM_TIME)
-	)
 
 
 func _on_accept_pause_timer_timeout():

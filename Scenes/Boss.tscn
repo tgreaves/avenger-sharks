@@ -175,5 +175,8 @@ one_shot = true
 [node name="AimedTimer" type="Timer" parent="."]
 one_shot = true
 
+[node name="ArtilleryTimer" type="Timer" parent="."]
+one_shot = true
+
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("3_die")
