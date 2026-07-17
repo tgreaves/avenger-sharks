@@ -79,6 +79,11 @@ func configure(health_in, type_in, behaviour_in, boss_number_in := 1):
 	# the necromancer-tuned capsule as the reference proportion.
 	var type_scale = constants.BOSS_TYPE_SETTINGS[boss_type]["scale"]
 	$AnimatedSprite2D.scale = type_scale
+	# Some sprites sit off-centre in their frame; reuse the enemy's own tuned
+	# sprite_offset (in texture px, auto-scaled by the node) so the creature lines
+	# up with the centred collision capsule — same as the normal enemy does.
+	var enemy_settings = constants.ENEMY_SETTINGS[boss_type]
+	$AnimatedSprite2D.offset = enemy_settings.get("sprite_offset", Vector2.ZERO)
 	# The shared capsule fits the necromancer at collision 1.75 / sprite 7; scale
 	# the collision to the same ratio for this type's sprite scale.
 	var collision_scale = type_scale * (1.75 / 7.0)
@@ -91,8 +96,10 @@ func configure(health_in, type_in, behaviour_in, boss_number_in := 1):
 	_patrol_direction = 1 if randi() % 2 == 0 else -1
 
 	# Materialise in (invulnerable) like a normal enemy: start transparent and
-	# fade to opaque over the spawn-in; begin_fighting() ends the spawn state.
+	# fade to opaque over the spawn-in, with spawn particles swirling around it;
+	# begin_fighting() ends the spawn state.
 	set_modulate(Color(1, 1, 1, 0))
+	$SpawnParticles.emitting = true
 
 
 # The wave has gone live (players are in position) — start the attack timers for
@@ -100,9 +107,10 @@ func configure(health_in, type_in, behaviour_in, boss_number_in := 1):
 # the players see the boss materialise before it opens fire.
 func begin_fighting():
 	_fighting = true
-	# Spawn-in over: now vulnerable and fully opaque.
+	# Spawn-in over: now vulnerable and fully opaque; stop the spawn particles.
 	state = ALIVE
 	set_modulate(Color(1, 1, 1, 1))
+	$SpawnParticles.emitting = false
 	# Single cadence timer drives the weighted attack pool for every profile.
 	$AttackTimer.start(attack_interval)
 	# The artillery profile additionally rains POLLUTION strikes.

@@ -343,16 +343,14 @@ func boss_health_reveal():
 	tween.tween_property($CanvasLayer/BossHealthBar, "value", full, 2.0)
 
 	$CanvasLayer/BossHealthBar.visible = true
-
-	# Fun title over the bar (e.g. "MR. RATTLEBONES").
-	var title = TheDirector.wave_design.get("boss_title", "BOSS")
-	$CanvasLayer/BossTitle.text = title
-	$CanvasLayer/BossTitle.visible = true
+	# The boss name is shown in the top-centre slot (see update_time_left_display),
+	# so no separate title label over the bar.
 
 
-# Hide the boss title (on defeat / cleanup, alongside the health bar).
+# Retained for callers; the boss name now lives in the top-centre TIME slot and
+# is cleared when that slot resets, so there's nothing to hide here.
 func hide_boss_title():
-	$CanvasLayer/BossTitle.visible = false
+	pass
 
 
 # Update the boss health bar as the boss takes damage.

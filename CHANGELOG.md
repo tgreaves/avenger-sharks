@@ -5,7 +5,7 @@
 * Gameplay:
 	* BOSS WAVES! Every fifth wave (from wave 5) is a showdown with a giant boss.
 		* The fight takes place in a sealed, single-screen room: swim in from the bottom, the door closes behind you, and it's you versus the boss.
-		* The boss is a random giant enemy with its own fun title (e.g. MR. RATTLEBONES, THE QUEEN BEE) and a themed attack style.
+		* The boss is a random giant enemy with its own fun title (e.g. MR. RATTLEBONES, THE QUEEN BEE) and a themed attack style. It materialises with a spawn-in effect, and its name is shown across the top of the screen.
 		* Varied bullet-hell attacks: rotating spirals, curving spirals, shotgun blasts and walls-with-a-gap to dodge through.
 		* Some boss fights also send in waves of smaller 'add' enemies to keep you busy.
 		* Defeat the boss for a big score bonus and a full heal; later bosses are tougher.

@@ -1562,10 +1562,26 @@ func reset_score_multiplier(player = null):
 
 
 func update_time_left_display():
-	# A boss wave has no countdown — show "BOSS" in the TIME slot instead.
+	var enemies_left = $HUD.get_node("CanvasLayer").get_node("EnemiesLeft")
+
+	# A boss wave has no countdown — show the boss's name in the TIME slot (this
+	# replaces the old separate "BOSS" label + name-over-bar pair). Same font size
+	# as SCORE etc.; the slot is widened (see apply_score_hud_layout) to fit the
+	# name, with wrap as a fallback for the longest titles.
 	if TheDirector.wave_design.get("boss_wave", false):
-		$HUD.get_node("CanvasLayer").get_node("EnemiesLeft").text = "BOSS"
+		enemies_left.add_theme_font_size_override("font_size", 64)
+		enemies_left.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		# Widen the centred slot so the full-size boss name fits on one line.
+		enemies_left.offset_left = -640.0
+		enemies_left.offset_right = 640.0
+		enemies_left.text = TheDirector.wave_design.get("boss_title", "BOSS")
 		return
+
+	# Normal countdown: standard TIME font / no wrap / standard width.
+	enemies_left.add_theme_font_size_override("font_size", 64)
+	enemies_left.autowrap_mode = TextServer.AUTOWRAP_OFF
+	enemies_left.offset_left = -226.0
+	enemies_left.offset_right = 226.0
 
 	var time_left
 
