@@ -46,13 +46,19 @@ Status:
   - **Wall-stuck fix.** Large bosses (snake 14×, bee 16×) reached a side wall
     before their centre crossed the patrol turn-point and pinned there; now also
     reverse on wall contact.
-  - **Per-type collision override.** `BOSS_TYPE_SETTINGS` entries may set
-    `collision_scale` / `collision_offset` (else the necromancer-proportional
-    default). Used to fix the **bee** hitbox (its small-in-frame body left the
-    shared capsule ~3× oversized and low): tightened + raised to match the body
-    (offset is world px, so ×16 the texture-space distance at the bee's scale).
-    Addresses the long-standing "per-type collision-capsule tuning" deferral for
-    the bee; other types still on the proportional default.
+  - **Unified per-type collision.** `collision_offset` now lives in
+    `ENEMY_SETTINGS` in **sprite-relative texture px** (same space as
+    `sprite_offset`), scaled by the sprite scale in both `Enemy.gd` and
+    `Boss.gd` — so ONE value fits the normal enemy and the (larger) boss. Boss
+    still gets its own `collision_scale` via `BOSS_TYPE_SETTINGS` where the body
+    fills the frame differently. Used to fix the **bee** (small high body → raised,
+    tighter capsule) and the **necromancer** (low/right body → shifted on, and a
+    taller boss capsule to span head-to-legs). Retires the long-standing "per-type
+    collision-capsule tuning" deferral for these two; other types stay on the
+    proportional default. Normal-enemy hitboxes for bee/necromancer improve too.
+  - **Boss name display.** The top-of-screen TIME slot shows a plain `"BOSS"`
+    (long titles didn't fit the narrow slot); the fun name is announced big during
+    the swim-in intro instead (`spawn_text` = `"<NAME> IS HERE!"`).
   - **Dev aid.** `DEV_FORCE_BOSS_WAVE_TYPE` pins the boss to one type for testing
     (empty = random). MUST be reset to `""` (and `DEV_FORCE_BOSS_WAVE` to `false`)
     for real play.
@@ -285,8 +291,9 @@ Keeps boss waves interesting by randomising both appearance and behaviour.
   wave 5) via `TheDirector.is_boss_wave()`; `DEV_FORCE_BOSS_WAVE` forces one.
 - **Boss health scaling — DONE.** `BOSS_BASE_HEALTH` + `BOSS_HEALTH_WAVE_GROWTH`
   per boss encounter, ×`BOSS_HEALTH_2P_MULTIPLIER` (1.75) in 2-player.
-- **HUD titles — DONE.** Random fun title per type shown over the health bar
-  (`BOSS_TYPE_SETTINGS[...].titles`), hidden on defeat/cleanup.
+- **HUD titles — DONE.** Random fun title per type (`BOSS_TYPE_SETTINGS[...].titles`).
+  Announced during the swim-in ("<NAME> IS HERE!"); the top TIME slot shows "BOSS"
+  (see the post-Phase 5 tuning note — long titles didn't fit the narrow slot).
 - **Reward — DONE (Phase 1).** Score bonus + full heal on defeat.
 - **Confined-arena combat rework — DONE.** See "Combat model" in the status
   header — this was the bulk of the session's work.
