@@ -34,7 +34,12 @@ func _physics_process(delta):
 			self.queue_free()
 			break
 
-		collision.get_collider().get_node(".").player_hit()
+		# Only damage things that can be hurt (players). Other bodies on the shared
+		# collision layer — ExitLocation, start markers, boss-room walls/doors —
+		# just stop the projectile.
+		var collider = collision.get_collider()
+		if collider.has_method("player_hit"):
+			collider.player_hit()
 
 		$CollisionShape2D.disabled = true
 		self.queue_free()

@@ -330,7 +330,8 @@ func swim_escape():
 
 
 # Same signature as Enemy.death() so shark spray / grenade can hit us uniformly.
-func death(death_source, attacker = null):
+# death_source is unused (the boss takes 1 damage from any source), hence the _.
+func death(_death_source, attacker = null):
 	# Invulnerable while spawning in (and once dying), like normal enemies.
 	if state != ALIVE:
 		return

@@ -22,8 +22,8 @@ func go_on_a_rampage(eating_player = null):
 
 	# Rampage length scales with the DOMINANT DINO upgrade of the shark that ate
 	# the dino (falls back to the primary player if not supplied).
-	var owner = eating_player if eating_player != null else get_parent().get_primary_player()
-	var rampage_percentage = owner.upgrades["DOMINANT DINO"][0] * 20
+	var rampage_owner = eating_player if eating_player != null else get_parent().get_primary_player()
+	var rampage_percentage = rampage_owner.upgrades["DOMINANT DINO"][0] * 20
 	var survival_time = (
 		constants.DINOSAUR_SURVIVAL_TIME
 		+ ((rampage_percentage / 100.0) * constants.DINOSAUR_SURVIVAL_TIME)

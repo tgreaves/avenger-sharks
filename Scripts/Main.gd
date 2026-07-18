@@ -624,7 +624,6 @@ func wave_intro():
 
 func start_wave():
 	game_status = GAME_RUNNING
-	var i = 0
 
 	if $SharkAttackMusic.is_playing():
 		$SharkAttackMusic.stop()
@@ -1479,7 +1478,7 @@ func apply_score_hud_layout():
 	var score = $HUD.get_node("CanvasLayer/Score")
 	var score2 = $HUD.get_node("CanvasLayer/Score2")
 	var enemies_left = $HUD.get_node("CanvasLayer/EnemiesLeft")
-	var high_score = $HUD.get_node("CanvasLayer/HighScore")
+	var high_score_label = $HUD.get_node("CanvasLayer/HighScore")
 
 	# TIME to the centre in all modes.
 	enemies_left.anchor_left = 0.5
@@ -1493,7 +1492,7 @@ func apply_score_hud_layout():
 
 	# Right slot: P2 score in 2-player-human, otherwise HIGH SCORE.
 	if _two_human_players():
-		high_score.visible = false
+		high_score_label.visible = false
 
 		score2.offset_top = score.offset_top
 		score2.offset_bottom = score.offset_bottom
@@ -1506,12 +1505,12 @@ func apply_score_hud_layout():
 		# P2's summary sits below the P2 score.
 		$HUD.set_second_upgrade_summary_top(280.0)
 	else:
-		high_score.visible = true
-		high_score.anchor_left = 1.0
-		high_score.anchor_right = 1.0
-		high_score.offset_left = -656.0
-		high_score.offset_right = -20.0
-		high_score.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		high_score_label.visible = true
+		high_score_label.anchor_left = 1.0
+		high_score_label.anchor_right = 1.0
+		high_score_label.offset_left = -656.0
+		high_score_label.offset_right = -20.0
+		high_score_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 
 		# 2-player-CPU: HIGH SCORE occupies the right slot, so P2's summary aligns
 		# with P1's (below the score line).

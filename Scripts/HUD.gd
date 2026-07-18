@@ -285,18 +285,18 @@ func remove_second_upgrade_summary():
 # Vertically position player 2's upgrade summary. In 2-player-human the right
 # slot holds the P2 score, so the summary sits below it; in 2-player-CPU the slot
 # holds HIGH SCORE (shorter), so it aligns with player 1's summary.
-func set_second_upgrade_summary_top(offset_top):
+func set_second_upgrade_summary_top(top):
 	if upgrade_summary_2 == null:
 		return
 	var height = upgrade_summary_2.offset_bottom - upgrade_summary_2.offset_top
-	upgrade_summary_2.offset_top = offset_top
-	upgrade_summary_2.offset_bottom = offset_top + height
+	upgrade_summary_2.offset_top = top
+	upgrade_summary_2.offset_bottom = top + height
 
 
-func set_upgrade_summary_visible(is_visible):
-	$CanvasLayer/UpgradeSummary.visible = is_visible
+func set_upgrade_summary_visible(summary_visible):
+	$CanvasLayer/UpgradeSummary.visible = summary_visible
 	if upgrade_summary_2 != null:
-		upgrade_summary_2.visible = is_visible
+		upgrade_summary_2.visible = summary_visible
 
 
 func _upgrade_summary_label(player):

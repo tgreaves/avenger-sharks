@@ -595,12 +595,12 @@ func grouped_enemy_death():
 
 	if child_of_enemy:
 		# A body segment died: renumber the surviving segments in order.
-		var i = 0
+		var segment_number = 0
 		for single_enemy in get_tree().get_nodes_in_group(group_name):
 			if single_enemy.name == name or single_enemy.state == DYING:
 				continue
-			i += 1
-			single_enemy.set_child_number(i)
+			segment_number += 1
+			single_enemy.set_child_number(segment_number)
 
 		return false
 

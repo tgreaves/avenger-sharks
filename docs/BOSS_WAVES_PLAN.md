@@ -265,6 +265,16 @@ Keeps boss waves interesting by randomising both appearance and behaviour.
 - **Balance:** health values, attack cadence/density, and adds intensity are
   first-pass; tune after more play.
 
+### Notes / gotchas found in testing
+
+- Relocating the exit/markers into the boss room put extra `CharacterBody2D`s on
+  the shared collision layer. All player projectiles (`SharkSpray`, `Grenade`,
+  `EnemyAttack`) now guard their damage call with `has_method(...)` so a shot
+  hitting a non-damageable body (exit marker, start marker, room wall/door) stops
+  harmlessly instead of crashing.
+- The necromancer boss capsule floated above the sprite until the boss reused
+  each enemy type's tuned `sprite_offset` from `ENEMY_SETTINGS`.
+
 ## Co-op considerations (cross-cutting)
 
 The two-player feature is complete; boss waves must respect it:

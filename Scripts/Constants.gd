@@ -295,7 +295,7 @@ const BOSS_WAVE_FIRST = 5
 # so later bosses are tougher. Effective base = BOSS_BASE_HEALTH +
 # (boss_number - 1) * BOSS_HEALTH_WAVE_GROWTH, where boss_number counts boss
 # waves seen (1st boss, 2nd boss, ...).
-const BOSS_BASE_HEALTH = 5  # was: 60
+const BOSS_BASE_HEALTH = 60
 const BOSS_HEALTH_WAVE_GROWTH = 25
 # Boss is tougher in 2-player since two sharks out-damage one.
 const BOSS_HEALTH_2P_MULTIPLIER = 1.75

@@ -24,11 +24,13 @@
 	* GRENADE fire rate no longer carries over from a previous game; grenade delay is now reset at the start of each new game.
 	* Fixed a crash at wave end if the survival timer expired with no enemies on screen.
 	* OPTIONS: fixed the oversized ENABLE HAPTICS button (a stray line break made its row taller than the others).
+	* Fixed a crash when a boss projectile struck the boss room's exit marker.
 * Platform:
 	* Godot upgrade to 4.7.stable.
 	* Steam: GodotSteam GDExtension upgraded to 4.20.
 * Misc:
 	* [INTERNAL] Arena migrated from the deprecated TileMap node to TileMapLayer nodes.
+	* [INTERNAL] Cleared GDScript analyzer warnings (unused/shadowing locals and parameters).
 
 # 1.3.0 (2024-10-15)
 
