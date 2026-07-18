@@ -70,6 +70,7 @@ func spawn_specific(enemy_type_in):
 	var sprite_offset = enemy_settings.get("sprite_offset", null)
 	var sprite_scale = enemy_settings.get("sprite_scale", null)
 	var collision_scale = enemy_settings.get("collision_scale", null)
+	var collision_offset = enemy_settings.get("collision_offset", null)
 	var collision_mask_enable = enemy_settings.get("collision_mask_enable", null)
 
 	death_sprite_offset = enemy_settings.get("death_sprite_offset", null)
@@ -82,6 +83,12 @@ func spawn_specific(enemy_type_in):
 
 	if collision_scale:
 		$CollisionShape2D.scale = collision_scale
+
+	# collision_offset is sprite-relative texture px (same space as sprite_offset),
+	# scaled by the sprite scale so ONE per-type value fits both the normal enemy
+	# and the (larger) boss. Centres the shared capsule on the body.
+	if collision_offset:
+		$CollisionShape2D.position = collision_offset * $AnimatedSprite2D.scale
 
 	if collision_mask_enable:
 		set_collision_mask_value(collision_mask_enable, true)

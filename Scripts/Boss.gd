@@ -100,13 +100,19 @@ func configure(health_in, type_in, behaviour_in, boss_number_in := 1):
 	# up with the centred collision capsule — same as the normal enemy does.
 	var enemy_settings = constants.ENEMY_SETTINGS[boss_type]
 	$AnimatedSprite2D.offset = enemy_settings.get("sprite_offset", Vector2.ZERO)
-	# Collision: the shared capsule is necromancer-shaped, so by default it scales
-	# proportionally (fits at collision 1.75 / sprite 7). Sprites whose body-to-frame
-	# proportions differ from the necromancer (e.g. the bee's small body in a large
-	# frame) override collision_scale / collision_offset in BOSS_TYPE_SETTINGS.
+	# Collision scale: the shared capsule is necromancer-shaped, so by default it
+	# scales proportionally (fits at collision 1.75 / sprite 7). Sprites whose body
+	# fills its frame differently (e.g. the bee's small body) override collision_scale
+	# in BOSS_TYPE_SETTINGS.
 	var collision_scale = type_settings.get("collision_scale", type_scale * (1.75 / 7.0))
 	$CollisionShape2D.scale = collision_scale
-	$CollisionShape2D.position = type_settings.get("collision_offset", Vector2(2, -1) * collision_scale)
+	# Collision offset: shared with the normal enemy via ENEMY_SETTINGS, in
+	# sprite-relative texture px (same space as sprite_offset), scaled by the sprite
+	# scale so one value fits both. Types without it keep the legacy centred default.
+	if enemy_settings.has("collision_offset"):
+		$CollisionShape2D.position = enemy_settings["collision_offset"] * type_scale
+	else:
+		$CollisionShape2D.position = Vector2(2, -1) * collision_scale
 
 	# The boss holds the top of the arena; the behaviour drives the attack pool,
 	# and BOSS_MOVEMENT_STYLE decides whether it paces or stays rooted. Pick a

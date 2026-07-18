@@ -241,7 +241,6 @@ func design_boss_wave(wave_number):
 	wave_design["boss_health"] = (
 		constants.BOSS_BASE_HEALTH + (encounter - 1) * constants.BOSS_HEALTH_WAVE_GROWTH
 	)
-	wave_design["spawn_text"] = "ALERT! BOSS DETECTED!"
 
 	# Keep it interesting: pick a random sprite type; its behaviour profile is
 	# themed to that type (see BOSS_TYPE_SETTINGS). DEV_FORCE_BOSS_WAVE_TYPE pins it
@@ -253,9 +252,12 @@ func design_boss_wave(wave_number):
 	wave_design["boss_type"] = chosen_type
 	wave_design["boss_behaviour"] = constants.BOSS_TYPE_SETTINGS[chosen_type]["behaviour"]
 
-	# Random fun title for this boss (shown over the health bar).
+	# Random fun title for this boss. Shown big during the swim-in intro
+	# ("<NAME> IS HERE!"); the top-of-screen TIME slot just shows "BOSS" since long
+	# names don't fit there.
 	var titles = constants.BOSS_TYPE_SETTINGS[chosen_type]["titles"]
 	wave_design["boss_title"] = titles[randi() % titles.size()]
+	wave_design["spawn_text"] = wave_design["boss_title"] + " IS HERE!"
 
 	# Procedural adds: roll a weighted intensity (none / light / heavy).
 	wave_design["adds_intensity"] = _roll_adds_intensity()

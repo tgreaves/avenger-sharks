@@ -582,7 +582,7 @@ func wave_intro():
 
 	if TheDirector.wave_design.get("boss_wave", false):
 		# Boss waves are a damage race, not a survival timer — no "SURVIVE X
-		# SECONDS" text (the spawn_text "ALERT! BOSS DETECTED!" is appended below).
+		# SECONDS" text (the spawn_text "<BOSS NAME> IS HERE!" is appended below).
 		wave_text = "[center]WAVE " + str(wave_number)
 	elif wave_number == 1:
 		match game_mode:
@@ -1563,17 +1563,15 @@ func reset_score_multiplier(player = null):
 func update_time_left_display():
 	var enemies_left = $HUD.get_node("CanvasLayer").get_node("EnemiesLeft")
 
-	# A boss wave has no countdown — show the boss's name in the TIME slot (this
-	# replaces the old separate "BOSS" label + name-over-bar pair). Same font size
-	# as SCORE etc.; the slot is widened (see apply_score_hud_layout) to fit the
-	# name, with wrap as a fallback for the longest titles.
+	# A boss wave has no countdown — the TIME slot just shows "BOSS". (The boss's
+	# fun name is shown big during the swim-in intro instead; long names don't fit
+	# this narrow top slot.) Standard TIME formatting / width.
 	if TheDirector.wave_design.get("boss_wave", false):
 		enemies_left.add_theme_font_size_override("font_size", 64)
-		enemies_left.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		# Widen the centred slot so the full-size boss name fits on one line.
-		enemies_left.offset_left = -640.0
-		enemies_left.offset_right = 640.0
-		enemies_left.text = TheDirector.wave_design.get("boss_title", "BOSS")
+		enemies_left.autowrap_mode = TextServer.AUTOWRAP_OFF
+		enemies_left.offset_left = -226.0
+		enemies_left.offset_right = 226.0
+		enemies_left.text = "BOSS"
 		return
 
 	# Normal countdown: standard TIME font / no wrap / standard width.

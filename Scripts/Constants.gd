@@ -21,7 +21,7 @@ const DEV_WIPE_ACHIEVEMENTS = false
 const DEV_FORCE_BOSS_WAVE = true   # Force every wave to be a boss wave for testing.
 # Force every boss to a specific type (a BOSS_TYPE_SETTINGS key, e.g. "bee") for
 # testing that type's sprite / hitbox / behaviour. Empty string = random as normal.
-const DEV_FORCE_BOSS_WAVE_TYPE = "necromancer"
+const DEV_FORCE_BOSS_WAVE_TYPE = ""
 
 # Hardware settings
 const WINDOW_TITLE = "Avenger Sharks " + GAME_VERSION
@@ -226,6 +226,10 @@ const ENEMY_SETTINGS = {
 		"can_be_knocked_back": true,
 		"sprite_offset": Vector2(0, -25),
 		"collision_scale": Vector2(1.5, 1.5),
+		# Body sits low+right in the frame (even after sprite_offset lifts it);
+		# nudge the capsule onto it, centred over the full figure incl. legs. Texture
+		# px, scaled by sprite scale (shared with the boss). Tune with shapes visible.
+		"collision_offset": Vector2(3, 9),
 		"collision_mask_enable": 7
 	},
 	"bee":
@@ -236,6 +240,10 @@ const ENEMY_SETTINGS = {
 		"health": 1,
 		"AI": "CHASE",
 		"score": 10,
+		# Body sits high in the frame; lift the capsule onto it. Texture px, scaled
+		# by sprite scale (shared with the boss — at the boss's 16x this is the ~-112
+		# world-px that centred it).
+		"collision_offset": Vector2(0, -7),
 	},
 	"skeleton":
 	{
@@ -472,21 +480,20 @@ const BOSS_TYPE_SETTINGS = {
 	"necromancer": {
 		"scale": Vector2(7, 7),
 		"behaviour": BOSS_BEHAVIOUR_ARTILLERY,
+		# Tall upright figure with trailing legs: override the proportional default
+		# (1.75) with a taller-than-wide capsule so it spans head to legs.
+		"collision_scale": Vector2(1.9, 2.3),
 		"titles": ["THE BONE BARON", "DR. DOOMRAISER", "THE GRAVE GAFFER"]
 	},
 	# The bee boss is a giant queen: bigger, and its adds are themed as a bee swarm.
 	# The bee's body is small within its frame, so the necromancer-proportional
-	# capsule oversizes it ~3x — override with a tighter, slightly-raised capsule
-	# that matches the visible body (tune by feel with visible collision shapes on).
+	# capsule oversizes it ~3x — override the scale to match the visible body. (The
+	# vertical centring is handled by the shared ENEMY_SETTINGS.bee collision_offset.)
 	"bee": {
 		"scale": Vector2(16, 16),
 		"behaviour": BOSS_BEHAVIOUR_CHASE_AIMED,
 		"adds_type": "bee",
 		"collision_scale": Vector2(1.7, 1.7),
-		# The bee body sits ~7 texture-px above its frame centre; at 16x sprite scale
-		# that's ~112 world-px, so lift the capsule to match (offset is world px, NOT
-		# scaled by the sprite).
-		"collision_offset": Vector2(0, -110),
 		"titles": ["THE QUEEN BEE", "HER ROYAL STINGINESS", "BUZZ MAXIMUS"]
 	},
 	"skeleton": {

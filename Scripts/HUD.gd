@@ -343,12 +343,12 @@ func boss_health_reveal():
 	tween.tween_property($CanvasLayer/BossHealthBar, "value", full, 2.0)
 
 	$CanvasLayer/BossHealthBar.visible = true
-	# The boss name is shown in the top-centre slot (see update_time_left_display),
-	# so no separate title label over the bar.
+	# The top-centre TIME slot shows a static "BOSS"; the boss's fun name is shown
+	# big during the swim-in intro instead, so no separate title label over the bar.
 
 
-# Retained for callers; the boss name now lives in the top-centre TIME slot and
-# is cleared when that slot resets, so there's nothing to hide here.
+# Retained for callers; the TIME slot shows a static "BOSS" that is cleared when
+# that slot resets, so there's nothing to hide here.
 func hide_boss_title():
 	pass
 
