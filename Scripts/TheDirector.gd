@@ -244,9 +244,12 @@ func design_boss_wave(wave_number):
 	wave_design["spawn_text"] = "ALERT! BOSS DETECTED!"
 
 	# Keep it interesting: pick a random sprite type; its behaviour profile is
-	# themed to that type (see BOSS_TYPE_SETTINGS).
+	# themed to that type (see BOSS_TYPE_SETTINGS). DEV_FORCE_BOSS_WAVE_TYPE pins it
+	# to one type for testing.
 	var types = constants.BOSS_TYPE_SETTINGS.keys()
 	var chosen_type = types[randi() % types.size()]
+	if constants.DEV_FORCE_BOSS_WAVE_TYPE != "" and constants.BOSS_TYPE_SETTINGS.has(constants.DEV_FORCE_BOSS_WAVE_TYPE):
+		chosen_type = constants.DEV_FORCE_BOSS_WAVE_TYPE
 	wave_design["boss_type"] = chosen_type
 	wave_design["boss_behaviour"] = constants.BOSS_TYPE_SETTINGS[chosen_type]["behaviour"]
 

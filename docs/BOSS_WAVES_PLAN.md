@@ -24,6 +24,43 @@ Status:
   Adds don't gate completion — only boss HP does.
 - **Phase 5 — DONE.** Trigger cadence (every 5th wave from wave 5), boss titles,
   health growth per encounter, and extensive combat/arena rework (below).
+- **Difficulty & feel tuning (post-Phase 5).** A pass to make boss fights read as
+  less easy and less "indecisive":
+  - **Enrage phase (health-threshold).** Bosses **enrage at 25% HP** (tunable
+    `BOSS_ENRAGE_HEALTH_FRACTION`), tightening attack cadence
+    (×`BOSS_ENRAGE_CADENCE_MULTIPLIER` = 0.6) for the rest of the fight. Visual
+    tell: the boss reddens (`BOSS_ENRAGE_TINT`, persisted between hit flashes via
+    `_base_tint`) plus a one-shot scale flex. Base cadence also quickened
+    (`BOSS_ATTACK_INTERVAL_BASE` 2.4→1.8, `..._MIN` 1.2→0.9).
+  - **Charge attack** (new — CHASE_AIMED profiles: knight/rogue/bee). Halts +
+    vibrates as a tell, then lunges at the nearest shark's position captured at
+    lunge start (dodgeable by moving), passing THROUGH sharks (player layer masked
+    out; contact damage applied manually) and stopping only at a wall. A sub-state
+    machine (`CHARGE_TELEGRAPH`/`CHARGING`/`RECOVERING`) that suspends patrol +
+    cadence, then returns to the telegraph anchor. All tunable via `BOSS_CHARGE_*`.
+  - **Pacing rework.** Movement now sweeps the full arena width edge-to-edge,
+    reversing ONLY at the bounds (removed the old `DriftTimer` random mid-travel
+    flips that made it dither). New `BOSS_MOVEMENT_STYLE` toggle: `"pace"`
+    (default) vs `"rooted"`. **OPEN DECISION** — pace vs rooted not yet settled;
+    shipping with the toggle at `"pace"`.
+  - **Wall-stuck fix.** Large bosses (snake 14×, bee 16×) reached a side wall
+    before their centre crossed the patrol turn-point and pinned there; now also
+    reverse on wall contact.
+  - **Per-type collision override.** `BOSS_TYPE_SETTINGS` entries may set
+    `collision_scale` / `collision_offset` (else the necromancer-proportional
+    default). Used to fix the **bee** hitbox (its small-in-frame body left the
+    shared capsule ~3× oversized and low): tightened + raised to match the body
+    (offset is world px, so ×16 the texture-space distance at the bee's scale).
+    Addresses the long-standing "per-type collision-capsule tuning" deferral for
+    the bee; other types still on the proportional default.
+  - **Dev aid.** `DEV_FORCE_BOSS_WAVE_TYPE` pins the boss to one type for testing
+    (empty = random). MUST be reset to `""` (and `DEV_FORCE_BOSS_WAVE` to `false`)
+    for real play.
+  - **Still open:** snake boss renders as a single sprite (a snake is a node
+    chain; the boss borrows one sprite) — decision pending (exclude from pool /
+    accept / build a segmented snake boss). Further "easy" levers if needed: a
+    second enrage threshold, concurrent attacks, denying the bottom-edge safe
+    zone, damping the Fish Frenzy burst.
 
 **Combat model (as-built, reworked this session):**
 - The boss fight happens in a **confined one-screen room** walled off with the
@@ -197,7 +234,8 @@ Gave the boss a reason to be dangerous.
 
 ### Deferred to a later phase (see "Random boss identity & varied behaviour")
 
-- Health-threshold phase changes (faster / denser under 50% HP).
+- Health-threshold phase changes (faster / denser under 50% HP). **DONE** in the
+  post-Phase 5 difficulty tuning — enrage at 25% HP tightens cadence.
 - Per-wave variety in sprite and attack/movement style.
 
 ## Phase 3.5 — Random boss identity & varied behaviour — DONE
@@ -222,8 +260,9 @@ Keeps boss waves interesting by randomising both appearance and behaviour.
     (skeleton/snake).
   - `ARTILLERY_RAIN` — roams, aimed volleys + POLLUTION-STRIKE drops on a timer
     (necromancer), reusing `Main.spawn_artillery_strike()`.
-- **Deferred:** health-threshold phase changes (open item from Phase 3), and
-  per-type collision-capsule tuning (currently one capsule scaled proportionally).
+- **Deferred:** health-threshold phase changes (open item from Phase 3) — now
+  **DONE** (enrage at 25% HP, see the post-Phase 5 tuning note); per-type
+  collision-capsule tuning remains (currently one capsule scaled proportionally).
 
 ## Phase 4 — Procedural adds — DONE
 
@@ -256,8 +295,11 @@ Keeps boss waves interesting by randomising both appearance and behaviour.
 
 - **Audio:** no dedicated boss music yet (deliberately deferred; hook is to swap
   `AudioStreamPlayerMusic` like power-pellet does with `SharkAttackMusic`).
-- **Health-threshold phases:** boss behaviour shifting as HP drops (e.g. faster
-  under 50%) — noted since Phase 3, not built.
+- **Health-threshold phases — DONE** (post-Phase 5 tuning). Bosses enrage at 25%
+  HP, tightening attack cadence for the rest of the fight; base cadence also
+  quickened. Follow-up levers if still too easy: a second enrage threshold, a
+  concurrent second attack per tick, denying the bottom-edge safe zone, and
+  damping the Fish Frenzy burst (all noted, not built).
 - **Co-op play-test:** the confined room, spawn-in, and wave-end have been
   tested in 1-player. Two-player boss fights (camera lock with two sharks, both
   swimming into the room, co-op death during the fight) are **untested** — the

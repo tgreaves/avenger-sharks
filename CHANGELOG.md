@@ -7,6 +7,8 @@
 		* The fight takes place in a sealed, single-screen room: swim in from the bottom, the door closes behind you, and it's you versus the boss.
 		* The boss is a random giant enemy with its own fun title (e.g. MR. RATTLEBONES, THE QUEEN BEE) and a themed attack style. It materialises with a spawn-in effect, and its name is shown across the top of the screen.
 		* Varied bullet-hell attacks: rotating spirals, curving spirals, shotgun blasts and walls-with-a-gap to dodge through.
+		* CHARGE attack: some bosses rear back with a vibrating tell, then lunge across the whole room at where you were standing — move to dodge it. The lunge barrels straight through you (contact still hurts) and only stops when it slams a wall.
+		* Bosses now ENRAGE at 25% health — turning red with an angry flex and firing noticeably faster for the rest of the fight. The whole fight also opens at a brisker pace.
 		* Some boss fights also send in waves of smaller 'add' enemies to keep you busy.
 		* Defeat the boss for a big score bonus and a full heal; later bosses are tougher.
 	* LOCAL TWO-PLAYER CO-OP! A second shark can join on a gamepad, or be computer-controlled.
@@ -25,6 +27,8 @@
 	* Fixed a crash at wave end if the survival timer expired with no enemies on screen.
 	* OPTIONS: fixed the oversized ENABLE HAPTICS button (a stray line break made its row taller than the others).
 	* Fixed a crash when a boss projectile struck the boss room's exit marker.
+	* Boss waves: the larger bosses (bee, snake) could get stuck against a side wall while pacing instead of turning around. They now reverse on wall contact.
+	* Boss waves: tightened the bee boss's collision so shots register on its body rather than the empty water around it.
 * Platform:
 	* Godot upgrade to 4.7.stable.
 	* Steam: GodotSteam GDExtension upgraded to 4.20.

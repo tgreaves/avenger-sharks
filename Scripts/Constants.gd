@@ -19,6 +19,9 @@ const DEV_FORCE_POWERUP = ""	# ""
 const DEV_WAVE_LASTS_FOREVER = false
 const DEV_WIPE_ACHIEVEMENTS = false
 const DEV_FORCE_BOSS_WAVE = true   # Force every wave to be a boss wave for testing.
+# Force every boss to a specific type (a BOSS_TYPE_SETTINGS key, e.g. "bee") for
+# testing that type's sprite / hitbox / behaviour. Empty string = random as normal.
+const DEV_FORCE_BOSS_WAVE_TYPE = "necromancer"
 
 # Hardware settings
 const WINDOW_TITLE = "Avenger Sharks " + GAME_VERSION
@@ -343,9 +346,19 @@ const BOSS_ATTACK_PROJECTILE_SPEED = 700
 # Attack cadence (seconds between attacks). Later bosses fire faster: the
 # interval shrinks by BOSS_ATTACK_INTERVAL_STEP per boss encounter, floored at
 # BOSS_ATTACK_INTERVAL_MIN.
-const BOSS_ATTACK_INTERVAL_BASE = 2.4
+const BOSS_ATTACK_INTERVAL_BASE = 1.8
 const BOSS_ATTACK_INTERVAL_STEP = 0.2
-const BOSS_ATTACK_INTERVAL_MIN = 1.2
+const BOSS_ATTACK_INTERVAL_MIN = 0.9
+
+# Enrage phase: once boss_health drops to BOSS_ENRAGE_HEALTH_FRACTION of max, the
+# boss's attack cadence tightens by BOSS_ENRAGE_CADENCE_MULTIPLIER for the rest of
+# the fight (floored at BOSS_ATTACK_INTERVAL_MIN * the multiplier). This makes the
+# final stretch of every fight ramp up instead of playing the same from full to
+# zero. The boss also reddens (BOSS_ENRAGE_TINT, a modulate that persists between
+# hit flashes) and gives a quick scale flex so the phase change is readable.
+const BOSS_ENRAGE_HEALTH_FRACTION = 0.25
+const BOSS_ENRAGE_CADENCE_MULTIPLIER = 0.6
+const BOSS_ENRAGE_TINT = Color(1.0, 0.35, 0.35, 1.0)
 
 # Attack type identifiers.
 const BOSS_ATTACK_ROTATING_SPIRAL = "ROTATING_SPIRAL"
@@ -353,6 +366,7 @@ const BOSS_ATTACK_TWIN_SPIRAL = "TWIN_SPIRAL"
 const BOSS_ATTACK_SHOTGUN = "SHOTGUN"
 const BOSS_ATTACK_WALL = "WALL"
 const BOSS_ATTACK_CURVING_SPIRAL = "CURVING_SPIRAL"
+const BOSS_ATTACK_CHARGE = "CHARGE"
 
 # Attack shape parameters.
 const BOSS_SPIRAL_PROJECTILE_COUNT = 20   # Shots per spiral ring.
@@ -372,6 +386,22 @@ const BOSS_CURVING_SPIRAL_CURVE_RATE = 150.0  # Degrees/sec each shot curves ini
 const BOSS_CURVING_SPIRAL_CURVE_DECAY = 120.0  # Degrees/sec^2 the curve rate decays.
 const BOSS_CURVING_SPIRAL_EMIT_GAP = 0.06 # Seconds between shots along an arm.
 
+# Charge attack (CHASE_AIMED profiles). The boss halts and vibrates in place as a
+# tell, then lunges VERY fast in a straight line toward the nearest shark's
+# position captured at the moment the lunge begins — so moving during the lunge
+# dodges it. The lunge ends on contact (wall or shark) or after a max distance,
+# then the boss slides back to where it started (its patrol band) and resumes.
+const BOSS_CHARGE_TELEGRAPH_TIME = 0.6     # Seconds of vibrating tell before the lunge.
+const BOSS_CHARGE_VIBRATE_AMPLITUDE = 12.0 # Sprite jitter (px) during the tell.
+const BOSS_CHARGE_SPEED = 2800.0           # Lunge speed (patrol is BOSS_PATROL_SPEED = 380).
+# The lunge runs until it hits a wall (the boss room is fully enclosed on all four
+# sides — the closed doors are solid — so a lunge always meets a wall).
+# Safety cap on the slide-back (a blocked path snaps home rather than stalling the
+# fight). Kept above the longest in-room return (~1.3s at RETURN_SPEED) so a normal
+# return finishes by arriving, not by the cap.
+const BOSS_CHARGE_RECOVER_TIME = 2.0
+const BOSS_CHARGE_RETURN_SPEED = 1400.0    # Speed sliding back to the anchor after a lunge.
+
 # Weighted attack pools per behaviour profile. Each entry is attack -> weight;
 # the boss rolls one per cadence tick. Themed so each profile plays differently.
 const BOSS_ATTACK_POOLS = {
@@ -382,8 +412,8 @@ const BOSS_ATTACK_POOLS = {
 		BOSS_ATTACK_WALL: 15
 	},
 	BOSS_BEHAVIOUR_CHASE_AIMED: {
-		BOSS_ATTACK_SHOTGUN: 50, BOSS_ATTACK_ROTATING_SPIRAL: 20, BOSS_ATTACK_TWIN_SPIRAL: 15,
-		BOSS_ATTACK_CURVING_SPIRAL: 15
+		BOSS_ATTACK_SHOTGUN: 40, BOSS_ATTACK_CHARGE: 25, BOSS_ATTACK_ROTATING_SPIRAL: 15,
+		BOSS_ATTACK_TWIN_SPIRAL: 10, BOSS_ATTACK_CURVING_SPIRAL: 10
 	},
 	BOSS_BEHAVIOUR_BULLETHELL: {
 		BOSS_ATTACK_TWIN_SPIRAL: 35,
@@ -397,10 +427,18 @@ const BOSS_ATTACK_POOLS = {
 	}
 }
 
-# The boss is rooted to the top of the (confined) box and patrols left/right
-# only. The challenge comes from attack intensity + adds, not from chasing. It
-# reverses at the box edges and re-rolls direction periodically. Patrol X bounds
-# are derived from BOSS_ARENA_CENTER/SIZE (inset from the walls) in Boss.gd.
+# The boss holds the top of the (confined) box; the challenge comes from attack
+# intensity + adds, not from chasing. Movement style is a tunable while we settle
+# the feel:
+#   "pace"   — sweep the full arena width edge to edge at BOSS_PATROL_SPEED,
+#              reversing ONLY at the patrol bounds (predictable, deliberate; the
+#              projectile patterns provide the threat).
+#   "rooted" — hold station at the arena centre and rely purely on attacks.
+# Patrol X bounds are derived from BOSS_ARENA_CENTER/SIZE (inset from the walls)
+# in Boss.gd.
+const BOSS_MOVEMENT_PACE = "pace"
+const BOSS_MOVEMENT_ROOTED = "rooted"
+const BOSS_MOVEMENT_STYLE = BOSS_MOVEMENT_PACE
 const BOSS_PATROL_SPEED = 380.0
 const BOSS_PATROL_EDGE_INSET = 250.0   # Keep the (large) boss clear of the side walls.
 
@@ -437,10 +475,18 @@ const BOSS_TYPE_SETTINGS = {
 		"titles": ["THE BONE BARON", "DR. DOOMRAISER", "THE GRAVE GAFFER"]
 	},
 	# The bee boss is a giant queen: bigger, and its adds are themed as a bee swarm.
+	# The bee's body is small within its frame, so the necromancer-proportional
+	# capsule oversizes it ~3x — override with a tighter, slightly-raised capsule
+	# that matches the visible body (tune by feel with visible collision shapes on).
 	"bee": {
 		"scale": Vector2(16, 16),
 		"behaviour": BOSS_BEHAVIOUR_CHASE_AIMED,
 		"adds_type": "bee",
+		"collision_scale": Vector2(1.7, 1.7),
+		# The bee body sits ~7 texture-px above its frame centre; at 16x sprite scale
+		# that's ~112 world-px, so lift the capsule to match (offset is world px, NOT
+		# scaled by the sprite).
+		"collision_offset": Vector2(0, -110),
 		"titles": ["THE QUEEN BEE", "HER ROYAL STINGINESS", "BUZZ MAXIMUS"]
 	},
 	"skeleton": {
