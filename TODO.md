@@ -109,17 +109,6 @@ references are approximate and may drift as the code changes.
 
 ## Performance (highest impact — this is a bullet-hell with per-enemy A*)
 
-- [ ] **Enemy A* re-pathing cadence.** Every chasing enemy recomputes a full
-  `AStarGrid2D` path to the player every ~0.1s (`Constants.gd`
-  `ENEMY_CHASE_REORIENT_MIN/MAX`, used in `Enemy.gd` CHASE). With enemy counts
-  scaling as `wave * 25`, this is likely the single biggest CPU cost at high
-  waves. Options:
-  - Stagger recompute times per-enemy (they are all synced to 0.1 today)
-  - Raise the interval to 0.2–0.3s
-  - Cache the player's tilemap cell and only re-path when it changes
-  - Cap the number of enemies allowed to re-path per frame (pathfinding budget)
-  - Consider a shared **flow-field** toward the single player target — scales
-	far better than N independent A* searches
 - [ ] **`get_tree().get_nodes_in_group(...)` in hot paths.** Allocates a new
   array every call. Hotspots: `Player.gd` grenade targeting (scans all enemies
   every fire), mini-shark iteration; `Enemy.gd` FISH mode (scans all fish every

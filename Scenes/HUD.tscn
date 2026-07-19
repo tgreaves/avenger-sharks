@@ -303,7 +303,6 @@ theme_override_constants/separation = 20
 custom_minimum_size = Vector2(0, 300)
 layout_mode = 2
 size_flags_horizontal = 3
-alignment = 0
 
 [node name="TextureRect" type="TextureRect" parent="CanvasLayer/UpgradeChoiceContainer/Choice1" unique_id=1408447458]
 custom_minimum_size = Vector2(64, 64)
@@ -333,7 +332,6 @@ autowrap_mode = 2
 custom_minimum_size = Vector2(0, 300)
 layout_mode = 2
 size_flags_horizontal = 3
-alignment = 0
 
 [node name="TextureRect" type="TextureRect" parent="CanvasLayer/UpgradeChoiceContainer/Choice2" unique_id=1628195625]
 custom_minimum_size = Vector2(64, 64)
@@ -363,7 +361,6 @@ autowrap_mode = 2
 custom_minimum_size = Vector2(0, 300)
 layout_mode = 2
 size_flags_horizontal = 3
-alignment = 0
 
 [node name="TextureRect" type="TextureRect" parent="CanvasLayer/UpgradeChoiceContainer/Choice3" unique_id=77373141]
 custom_minimum_size = Vector2(64, 64)

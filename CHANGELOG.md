@@ -9,8 +9,9 @@
 		* Varied bullet-hell attacks: rotating spirals, curving spirals, shotgun blasts and walls-with-a-gap to dodge through.
 		* CHARGE attack: some bosses rear back with a vibrating tell, then lunge across the whole room at where you were standing — move to dodge it. The lunge barrels straight through you (contact still hurts) and only stops when it slams a wall.
 		* Bosses now ENRAGE at 25% health — turning red with an angry flex and firing noticeably faster for the rest of the fight. The whole fight also opens at a brisker pace.
-		* Some boss fights also send in waves of smaller 'add' enemies to keep you busy.
+		* Some boss fights also send in 'add' enemies to keep you busy. These now erupt from the boss and are flung out toward the sharks, and always match the boss's own kind — a giant bee sends a bee swarm, a skeleton lord sends skeletons.
 		* Defeat the boss for a big score bonus and a full heal; later bosses are tougher.
+		* Because beating a boss fully heals both sharks, the HEAL ME upgrade is no longer offered on the upgrade screen right after a boss wave (it would be wasted).
 	* LOCAL TWO-PLAYER CO-OP! A second shark can join on a gamepad, or be computer-controlled.
 		* Shared zoom-to-fit camera that keeps both sharks in view.
 		* Each player has their own energy, FISH FRENZY, power-ups, score and upgrades.
@@ -29,6 +30,7 @@
 	* Fixed a crash when a boss projectile struck the boss room's exit marker.
 	* Boss waves: the larger bosses (bee, snake) could get stuck against a side wall while pacing instead of turning around. They now reverse on wall contact.
 	* Boss waves: aligned the boss collision shapes (bee and necromancer) to their bodies so shots register on the creature rather than the empty water around it.
+		* A shark caught mid-SWIM SURGE (dash) when a wave ended could get stuck in the dash and fail to hunt the key; the dash is now cleared cleanly at wave end.
 * Platform:
 	* Godot upgrade to 4.7.stable.
 	* Steam: GodotSteam GDExtension upgraded to 4.20.

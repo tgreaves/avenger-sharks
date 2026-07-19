@@ -42,7 +42,17 @@ Status:
     reversing ONLY at the bounds (removed the old `DriftTimer` random mid-travel
     flips that made it dither). New `BOSS_MOVEMENT_STYLE` toggle: `"pace"`
     (default) vs `"rooted"`. **OPEN DECISION** — pace vs rooted not yet settled;
-    shipping with the toggle at `"pace"`.
+    shipping with the toggle at `"pace"`. Rooted is now a viable option: a rooted
+    boss **compensates** for not chasing — its attack cadence tightens
+    (`BOSS_ROOTED_CADENCE_MULTIPLIER`) and its wave is guaranteed at least
+    `BOSS_ROOTED_MIN_ADDS_INTENSITY` of adds (both applied only while rooted).
+  - **Charge wind-up lengthened.** `BOSS_CHARGE_TELEGRAPH_TIME` 0.6 → 0.8s so the
+    lunge is a touch more readable/dodgeable.
+  - **Health bump.** `BOSS_BASE_HEALTH` 60 → 72 (fights were ending a little fast).
+  - **Upgrade screen after a boss.** HEAL ME is excluded from the offered upgrades
+    on the screen straight after a boss wave (boss defeat already full-heals both
+    sharks, so it would be wasted). Falls back to HEAL ME only if fewer than three
+    other upgrades remain unmaxed. See `Player.choose_offered_upgrades()`.
   - **Wall-stuck fix.** Large bosses (snake 14×, bee 16×) reached a side wall
     before their centre crossed the patrol turn-point and pinned there; now also
     reverse on wall contact.
@@ -279,11 +289,31 @@ Keeps boss waves interesting by randomising both appearance and behaviour.
 - If not `none`, `Main._start_boss_adds()` reads `BOSS_ADDS_SETTINGS`
   (cap / batch / interval per intensity) and starts the otherwise-unused
   `EnemySpawnTimer`. On boss waves that timer routes to
-  `spawn_boss_adds_batch()`, which spawns up to `batch` random enemies via
-  `spawn_enemy_random_position` while under the on-screen `cap`, then reschedules.
+  `spawn_boss_adds_batch()`, which spawns up to `batch` enemies while under the
+  on-screen `cap`, then reschedules.
 - Adds don't gate completion — only boss HP does. They swim out with the normal
   wave-end sweep (they're in `enemyGroup`).
 - The timer stops naturally on boss defeat (wave leaves `GAME_RUNNING`).
+
+### Adds rework (post-Phase 5) — fired out, same type as the boss
+
+- **Ejected from the boss.** Adds no longer appear at random arena positions
+  (which, on a boss wave, could even land *outside* the sealed room). Each add
+  now spawns from inside the boss (`spawn_boss_add_fired`) and is flung outward,
+  the batch **fanned** across `BOSS_ADDS_FAN_SPREAD_DEGREES` centred on the aim
+  at the nearest shark. It reuses the existing `SPAWN_OUTWARDS` AI mode: fly
+  outward for `BOSS_ADDS_LAUNCH_TIME` (its own per-instance timer so the
+  mini-skeleton default is untouched), then switch to `CHASE`. Adds are **live
+  immediately** (`instant_spawn`) — shootable and dangerous during the launch.
+- **Same kind as the boss.** Adds always match the boss's own type (bee queen →
+  bees, skeleton lord → skeletons, …), pulled from `wave_design.boss_type`. This
+  retired the per-type `adds_type` override (bee/skeleton) — now redundant.
+- **Rooted compensation.** A rooted boss (see the movement note below) guarantees
+  at least `BOSS_ROOTED_MIN_ADDS_INTENSITY` of adds even if the Director rolled
+  fewer, so a stationary boss still pressures the sharks.
+- **Snake caveat.** The snake is a grouped/segmented enemy, so a snake boss's
+  adds spawn full snake chains and only the head segment obeys the launch. If it
+  reads badly in play, map snake adds to a simpler type.
 
 ## Phase 5 — Trigger, polish, tuning — DONE
 

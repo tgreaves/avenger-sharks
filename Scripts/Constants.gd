@@ -306,7 +306,7 @@ const BOSS_WAVE_FIRST = 5
 # so later bosses are tougher. Effective base = BOSS_BASE_HEALTH +
 # (boss_number - 1) * BOSS_HEALTH_WAVE_GROWTH, where boss_number counts boss
 # waves seen (1st boss, 2nd boss, ...).
-const BOSS_BASE_HEALTH = 60
+const BOSS_BASE_HEALTH = 72
 const BOSS_HEALTH_WAVE_GROWTH = 25
 # Boss is tougher in 2-player since two sharks out-damage one.
 const BOSS_HEALTH_2P_MULTIPLIER = 1.75
@@ -399,7 +399,7 @@ const BOSS_CURVING_SPIRAL_EMIT_GAP = 0.06 # Seconds between shots along an arm.
 # position captured at the moment the lunge begins — so moving during the lunge
 # dodges it. The lunge ends on contact (wall or shark) or after a max distance,
 # then the boss slides back to where it started (its patrol band) and resumes.
-const BOSS_CHARGE_TELEGRAPH_TIME = 0.6     # Seconds of vibrating tell before the lunge.
+const BOSS_CHARGE_TELEGRAPH_TIME = 0.8     # Seconds of vibrating tell before the lunge.
 const BOSS_CHARGE_VIBRATE_AMPLITUDE = 12.0 # Sprite jitter (px) during the tell.
 const BOSS_CHARGE_SPEED = 2800.0           # Lunge speed (patrol is BOSS_PATROL_SPEED = 380).
 # The lunge runs until it hits a wall (the boss room is fully enclosed on all four
@@ -450,6 +450,14 @@ const BOSS_MOVEMENT_STYLE = BOSS_MOVEMENT_PACE
 const BOSS_PATROL_SPEED = 380.0
 const BOSS_PATROL_EDGE_INSET = 250.0   # Keep the (large) boss clear of the side walls.
 
+# Rooted-boss compensation. A rooted boss doesn't pressure the sharks by moving,
+# so it makes up for it: its attack cadence is tightened (interval ×, floored at
+# BOSS_ATTACK_INTERVAL_MIN × the same multiplier) and its wave is guaranteed at
+# least BOSS_ROOTED_MIN_ADDS_INTENSITY of adds even if the Director rolled fewer.
+# Both apply only while BOSS_MOVEMENT_STYLE == BOSS_MOVEMENT_ROOTED.
+const BOSS_ROOTED_CADENCE_MULTIPLIER = 0.7
+const BOSS_ROOTED_MIN_ADDS_INTENSITY = "light"   # A BOSS_ADDS_SETTINGS key.
+
 # Artillery-rain profile ALSO drops POLLUTION strikes (on top of its attack
 # pool): seconds between drops.
 const BOSS_ARTILLERY_INTERVAL_MIN = 1.2
@@ -485,14 +493,13 @@ const BOSS_TYPE_SETTINGS = {
 		"collision_scale": Vector2(1.9, 2.3),
 		"titles": ["THE BONE BARON", "DR. DOOMRAISER", "THE GRAVE GAFFER"]
 	},
-	# The bee boss is a giant queen: bigger, and its adds are themed as a bee swarm.
-	# The bee's body is small within its frame, so the necromancer-proportional
-	# capsule oversizes it ~3x — override the scale to match the visible body. (The
-	# vertical centring is handled by the shared ENEMY_SETTINGS.bee collision_offset.)
+	# The bee boss is a giant queen. The bee's body is small within its frame, so
+	# the necromancer-proportional capsule oversizes it ~3x — override the scale to
+	# match the visible body. (The vertical centring is handled by the shared
+	# ENEMY_SETTINGS.bee collision_offset.)
 	"bee": {
 		"scale": Vector2(16, 16),
 		"behaviour": BOSS_BEHAVIOUR_CHASE_AIMED,
-		"adds_type": "bee",
 		"collision_scale": Vector2(1.7, 1.7),
 		"titles": ["THE QUEEN BEE", "HER ROYAL STINGINESS", "BUZZ MAXIMUS"]
 	},
@@ -516,6 +523,15 @@ const BOSS_ADDS_SETTINGS = {
 	"light": {"cap": 4, "batch": 2, "interval": 6.0},
 	"heavy": {"cap": 8, "batch": 3, "interval": 4.0}
 }
+
+# Boss adds are ejected from inside the boss and fanned toward the nearest shark,
+# then fly outward for a short launch before their AI switches to CHASE. They are
+# live enemies the whole time (vulnerable and dangerous while launching), so the
+# launch is just their entrance. BOSS_ADDS_LAUNCH_TIME is the outward-flight
+# duration (per-add, so it doesn't disturb the mini-skeleton SpawnOutwardsTimer);
+# BOSS_ADDS_FAN_SPREAD_DEGREES is the total arc a batch is fanned across.
+const BOSS_ADDS_LAUNCH_TIME = 0.75
+const BOSS_ADDS_FAN_SPREAD_DEGREES = 70.0
 
 # Fish
 const FISH_TO_SPAWN_ARCADE = 20

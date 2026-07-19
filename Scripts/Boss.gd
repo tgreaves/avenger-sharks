@@ -80,6 +80,13 @@ func configure(health_in, type_in, behaviour_in, boss_number_in := 1):
 		- (boss_number - 1) * constants.BOSS_ATTACK_INTERVAL_STEP
 	)
 
+	# A rooted boss doesn't chase, so it compensates by firing more often.
+	if constants.BOSS_MOVEMENT_STYLE == constants.BOSS_MOVEMENT_ROOTED:
+		attack_interval = max(
+			constants.BOSS_ATTACK_INTERVAL_MIN * constants.BOSS_ROOTED_CADENCE_MULTIPLIER,
+			attack_interval * constants.BOSS_ROOTED_CADENCE_MULTIPLIER
+		)
+
 	# Borrow the shared enemy SpriteFrames (all types' run/death anims) from a
 	# throwaway Enemy instance so the boss can wear any enemy's sprite.
 	var enemy = EnemyScene.instantiate()

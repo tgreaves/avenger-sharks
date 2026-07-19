@@ -1062,12 +1062,22 @@ func decrease_powerup_level(powerup):
 # Pick this shark's three upgrade choices from its own eligible upgrades
 # (those not yet at max level), padded with HEAL ME. Stored in offered_upgrades.
 func choose_offered_upgrades():
+	# Defeating a boss auto-heals every shark, so HEAL ME is pointless on the
+	# upgrade screen straight after a boss wave — leave it out of the pool. (This
+	# runs before prepare_for_wave regenerates wave_design, so boss_wave still
+	# reflects the wave just completed.)
+	var just_beat_boss = TheDirector.wave_design.get("boss_wave", false)
+
 	var eligible: Array = []
 	for single_upgrade in upgrades:
+		if just_beat_boss and single_upgrade == "HEAL ME":
+			continue
 		var detail = upgrades.get(single_upgrade)
 		if detail[0] < detail[1]:
 			eligible.append(single_upgrade)
 
+	# Pad to three. HEAL ME is the filler, but after a boss fall back to it only if
+	# there genuinely aren't three other upgrades left (i.e. the rest are maxed).
 	while eligible.size() < 3:
 		eligible.append("HEAL ME")
 
@@ -1204,3 +1214,17 @@ func _on_swim_surge_reuse_timer_timeout():
 	swim_surge_available = true
 	$AnimatedSprite2DSurgeReady.set_visible(true)
 	$AnimatedSprite2DSurgeReady.play()
+
+
+# Cancel an in-progress SWIM SURGE (dash) so the shark returns to normal, input-
+# driven movement. Needed when the wave ends mid-dash: otherwise swim_surge_activate
+# stays true, which suppresses normal velocity in get_input() and leaves the shark
+# stuck / unable to hunt the key. Safe to call when not surging.
+func cancel_swim_surge():
+	if not swim_surge_activate:
+		return
+	# Stop the running timer so its timeout doesn't fire the cleanup a second time.
+	$SwimSurgeRunningTimer.stop()
+	_on_swim_surge_running_timer_timeout()
+	# Drop any residual dash velocity so it doesn't carry into the key hunt.
+	velocity = Vector2.ZERO

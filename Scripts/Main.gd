@@ -707,7 +707,9 @@ func wave_end():
 	players_to_exit = get_living_players().size()
 	players_exited = 0
 
-	# End power-pellet / fish-frenzy states on every living shark.
+	# End power-pellet / fish-frenzy / swim-surge states on every living shark, so
+	# none of them linger into the key hunt (a shark caught mid-dash would otherwise
+	# stay stuck in the surge state and fail to hunt the key).
 	for player in get_living_players():
 		if player.power_pellet_enabled:
 			player.power_pellet_enabled = false
@@ -716,6 +718,8 @@ func wave_end():
 
 		if player.is_player_in_fish_frenzy():
 			player.stop_fish_frenzy()
+
+		player.cancel_swim_surge()
 
 	for enemy in get_tree().get_nodes_in_group("enemyGroup"):
 		enemy.swim_escape()
@@ -1209,6 +1213,10 @@ var boss_adds_settings = null
 func _start_boss_adds():
 	boss_adds_settings = null
 	var intensity = TheDirector.wave_design.get("adds_intensity", "none")
+	# A rooted boss doesn't pressure the sharks by moving, so guarantee a baseline
+	# of adds to compensate (never weaker than what the Director already rolled).
+	if constants.BOSS_MOVEMENT_STYLE == constants.BOSS_MOVEMENT_ROOTED:
+		intensity = _stronger_adds_intensity(intensity, constants.BOSS_ROOTED_MIN_ADDS_INTENSITY)
 	if intensity == "none":
 		return
 	boss_adds_settings = constants.BOSS_ADDS_SETTINGS.get(intensity)
@@ -1216,25 +1224,62 @@ func _start_boss_adds():
 		$EnemySpawnTimer.start(boss_adds_settings["interval"])
 
 
+# The higher of two adds-intensity keys (none < light < heavy).
+func _stronger_adds_intensity(a, b):
+	var order = {"none": 0, "light": 1, "heavy": 2}
+	return a if order.get(a, 0) >= order.get(b, 0) else b
+
+
 # One trickle batch of adds, capped at the on-screen limit for the intensity.
+# The batch is ejected from inside the boss and fanned toward the nearest shark.
 func spawn_boss_adds_batch():
 	if boss_adds_settings == null:
 		return
+	if boss == null or not is_instance_valid(boss):
+		return
 	var cap = boss_adds_settings["cap"]
 	var batch = boss_adds_settings["batch"]
-	var eligible = constants.ENEMY_SETTINGS.keys()
 
-	# If the boss type themes its adds (e.g. the bee queen -> a bee swarm), use
-	# that type for every add; otherwise adds are random.
-	var boss_type = TheDirector.wave_design.get("boss_type", "")
-	var themed_add = constants.BOSS_TYPE_SETTINGS.get(boss_type, {}).get("adds_type", "")
+	# Adds always match the boss's own type (a bee queen sends bees, a skeleton
+	# lord sends skeletons, ...). Falls back to necromancer if somehow unset.
+	var add_type = TheDirector.wave_design.get("boss_type", "necromancer")
 
-	for i in range(batch):
-		if enemies_on_screen >= cap:
-			break
-		var type = themed_add if themed_add != "" else eligible[randi() % eligible.size()]
-		spawn_enemy_random_position(type)
+	# Fan the batch across an arc centred on the aim at the nearest shark (falls
+	# back to straight down if there's somehow no living shark).
+	var aim = Vector2.DOWN
+	var target = get_nearest_player(boss.global_position)
+	if target != null:
+		aim = (target.global_position - boss.global_position).normalized()
+	var spread = constants.BOSS_ADDS_FAN_SPREAD_DEGREES
+
+	var to_spawn = min(batch, cap - enemies_on_screen)
+	for i in range(to_spawn):
+		var offset = 0.0
+		if to_spawn > 1:
+			offset = -spread / 2.0 + (spread / (to_spawn - 1)) * i
+		spawn_boss_add_fired(add_type, aim.rotated(deg_to_rad(offset)))
 	$EnemySpawnTimer.start(boss_adds_settings["interval"])
+
+
+# Spawn one boss add from inside the boss, launched outward in `direction`. It is
+# a live enemy immediately (can be shot and can hurt the sharks while it flies
+# out), using the SPAWN_OUTWARDS AI mode: it travels outward for
+# BOSS_ADDS_LAUNCH_TIME, then switches to CHASE. The per-instance launch duration
+# is set on its own timer so it doesn't disturb the mini-skeleton default.
+func spawn_boss_add_fired(enemy_type, direction):
+	var mob = enemy_scene.instantiate()
+	mob.set_position(boss.global_position)
+	mob.set_ai_mode("SPAWN_OUTWARDS")
+	mob.set_initial_direction(direction)
+	# Live immediately (skip the spawn-in invulnerability) so it reads as ejected.
+	mob.set_instant_spawn(true)
+	# Give this add its own launch duration (spawn_specific starts the timer using
+	# its wait_time when the AI mode is SPAWN_OUTWARDS).
+	mob.get_node("SpawnOutwardsTimer").wait_time = constants.BOSS_ADDS_LAUNCH_TIME
+	mob.add_to_group("enemyGroup")
+	add_child(mob, true)
+	mob.spawn_specific(enemy_type)
+	enemies_on_screen += 1
 
 
 # A boss "artillery rain" strike — reuse the normal artillery spawner (the boss
