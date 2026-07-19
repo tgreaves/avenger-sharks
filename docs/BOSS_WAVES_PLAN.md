@@ -354,6 +354,54 @@ Keeps boss waves interesting by randomising both appearance and behaviour.
 - The necromancer boss capsule floated above the sprite until the boss reused
   each enemy type's tuned `sprite_offset` from `ENEMY_SETTINGS`.
 
+## Attack-type backlog (ideas)
+
+Candidate additions to the weighted attack pools to keep fights varied. Grouped
+by implementation cost. Each "cheap" one is a new `BOSS_ATTACK_*` const, a
+`_attack_*()` in `Boss.gd`, and a weight in `BOSS_ATTACK_POOLS`.
+
+**Cheap — reuse `_fire_projectile` + the pool pattern**
+
+- **Expanding rings / pulse.** Fire several full rings in quick succession, each
+  ring's gap rotated a notch from the last, so the shark must keep sliding as the
+  rings expand. (A timed burst of `_attack_rotating_spiral`.)
+- **Falling curtain.** The boss sits up top, so rain vertical columns of shots
+  with a moving gap that walks left↔right (the `WALL` attack turned vertical and
+  repeated). Reads very differently from the aimed patterns.
+- **Aimed burst-fire.** 3–4 quick `SHOTGUN` fans in a row, each re-aimed at the
+  shark's current position — punishes standing still without being a wall.
+- **Shockwave on charge impact.** When a `CHARGE` lunge slams a wall
+  (`_begin_charge_recover`), emit a ring burst from the impact point, so the
+  dodge-the-lunge moment also means "don't be by the wall it hits". Nearly free;
+  ties two systems together (CHASE_AIMED profiles).
+
+**Medium — small `EnemyAttack` extension (builds on `curve_rate`)**
+
+- **Homing seekers — DONE.** `BOSS_ATTACK_HOMING`, in every profile's pool at a
+  low weight. A short fan of colourful missiles (`Scenes/HomingSeeker.tscn`,
+  `Scripts/HomingSeeker.gd`, using `Sprites/spaceMissiles_003.png`) that curve
+  toward the nearest shark at a **capped turn rate** (`BOSS_SEEKER_TURN_RATE`, so
+  juking dodges them), then **time out into a small ring burst**
+  (`BOSS_SEEKER_LIFESPAN` → `_mini_explode`). Distinct missile sprite (rotated to
+  face travel) so they read differently from the round fireball. Unlike other boss
+  shots they are **shootable** — the seeker rides the enemy collision layer and
+  exposes `death()`, so a shark's spray destroys it. **Any** death triggers the
+  mini-explosion (timeout, ramming a shark, a wall, or being shot — guarded by
+  `_exploded` so it fires once), so it's best shot from a distance. The wave-end
+  sweep `queue_free`s it directly, bypassing the burst. Feel values are `BOSS_SEEKER_*`.
+- **Bouncing shots.** Projectiles that ricochet off the sealed room's walls a
+  few times before expiring — fills space unpredictably. Needs wall-reflection
+  in `EnemyAttack`.
+
+**Involved — new entity, higher impact**
+
+- **Sweeping laser beam.** Telegraph a line, then fire a solid beam that sweeps
+  the room. This is essentially the turret/laser already sketched in `TODO.md` —
+  build once, reuse for a boss attack and a future turret enemy.
+- **Mines / depth charges.** Drop stationary orbs that arm after a delay then pop
+  into a small ring. The rogue's `EnemyTrap` is most of the tech already; thematic
+  for the necromancer/skeleton.
+
 ## Co-op considerations (cross-cutting)
 
 The two-player feature is complete; boss waves must respect it:

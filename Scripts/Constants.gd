@@ -49,7 +49,7 @@ const PLAYER_2_TINT = Color(1.7, 0.85, 0.2, 1)
 const PLAY_WAVE_END_MUSIC = false
 
 const START_WAVE = 1
-const WAVE_SURVIVAL_TIME_BASE = 5 # 30
+const WAVE_SURVIVAL_TIME_BASE = 30
 const WAVE_SURVIVAL_TIME_INCREASE = 5
 const WAVE_SURVIVAL_TIME_MAXIMUM = 60
 
@@ -380,6 +380,7 @@ const BOSS_ATTACK_SHOTGUN = "SHOTGUN"
 const BOSS_ATTACK_WALL = "WALL"
 const BOSS_ATTACK_CURVING_SPIRAL = "CURVING_SPIRAL"
 const BOSS_ATTACK_CHARGE = "CHARGE"
+const BOSS_ATTACK_HOMING = "HOMING"
 
 # Attack shape parameters.
 const BOSS_SPIRAL_PROJECTILE_COUNT = 20   # Shots per spiral ring.
@@ -415,6 +416,19 @@ const BOSS_CHARGE_SPEED = 2800.0           # Lunge speed (patrol is BOSS_PATROL_
 const BOSS_CHARGE_RECOVER_TIME = 2.0
 const BOSS_CHARGE_RETURN_SPEED = 1400.0    # Speed sliding back to the anchor after a lunge.
 
+# Homing seekers (BOSS_ATTACK_HOMING, all profiles at a low weight). A short fan of
+# colourful missiles (Scenes/HomingSeeker.tscn) that curve toward the nearest shark
+# at a capped turn rate — dodgeable by juking — then time out into a small ring
+# burst. Unlike other boss shots they are SHOOTABLE (a shark's spray destroys one).
+const BOSS_SEEKER_COUNT = 1                # Missiles per volley.
+const BOSS_SEEKER_SPREAD_DEGREES = 50.0    # Launch fan toward the shark (only matters if COUNT > 1).
+const BOSS_SEEKER_SPEED = 480.0            # Travel speed (slower than fireballs so it reads/dodges).
+const BOSS_SEEKER_TURN_RATE = 120.0        # Max degrees/sec it can re-aim (lower = easier to juke).
+const BOSS_SEEKER_LIFESPAN = 5.0           # Seconds before it times out and mini-explodes.
+const BOSS_SEEKER_EXPLODE_COUNT = 6        # Shots in the timeout ring burst.
+const BOSS_SEEKER_EXPLODE_SPEED = 500.0    # Speed of the burst shots.
+const BOSS_SEEKER_EXPLOSION_SCALE = 1.5    # Scale of the reused explosion animation (64px frames).
+
 # Weighted attack pools per behaviour profile. Each entry is attack -> weight;
 # the boss rolls one per cadence tick. Themed so each profile plays differently.
 const BOSS_ATTACK_POOLS = {
@@ -422,21 +436,23 @@ const BOSS_ATTACK_POOLS = {
 		BOSS_ATTACK_ROTATING_SPIRAL: 35,
 		BOSS_ATTACK_CURVING_SPIRAL: 25,
 		BOSS_ATTACK_SHOTGUN: 25,
-		BOSS_ATTACK_WALL: 15
+		BOSS_ATTACK_WALL: 15,
+		BOSS_ATTACK_HOMING: 15
 	},
 	BOSS_BEHAVIOUR_CHASE_AIMED: {
 		BOSS_ATTACK_SHOTGUN: 40, BOSS_ATTACK_CHARGE: 25, BOSS_ATTACK_ROTATING_SPIRAL: 15,
-		BOSS_ATTACK_TWIN_SPIRAL: 10, BOSS_ATTACK_CURVING_SPIRAL: 10
+		BOSS_ATTACK_TWIN_SPIRAL: 10, BOSS_ATTACK_CURVING_SPIRAL: 10, BOSS_ATTACK_HOMING: 15
 	},
 	BOSS_BEHAVIOUR_BULLETHELL: {
 		BOSS_ATTACK_TWIN_SPIRAL: 35,
 		BOSS_ATTACK_CURVING_SPIRAL: 30,
 		BOSS_ATTACK_ROTATING_SPIRAL: 20,
-		BOSS_ATTACK_WALL: 15
+		BOSS_ATTACK_WALL: 15,
+		BOSS_ATTACK_HOMING: 15
 	},
 	BOSS_BEHAVIOUR_ARTILLERY: {
 		BOSS_ATTACK_ROTATING_SPIRAL: 30, BOSS_ATTACK_SHOTGUN: 30, BOSS_ATTACK_WALL: 20,
-		BOSS_ATTACK_CURVING_SPIRAL: 20
+		BOSS_ATTACK_CURVING_SPIRAL: 20, BOSS_ATTACK_HOMING: 15
 	}
 }
 

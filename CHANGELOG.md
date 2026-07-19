@@ -8,6 +8,7 @@
 		* The boss is a random giant enemy with its own fun title (e.g. MR. RATTLEBONES, THE QUEEN BEE) and a themed attack style. It materialises with a spawn-in effect, and its name is announced as it swims in ("<NAME> IS HERE!").
 		* Varied bullet-hell attacks: rotating spirals, curving spirals, shotgun blasts and walls-with-a-gap to dodge through.
 		* CHARGE attack: some bosses rear back with a vibrating tell, then lunge across the whole room at where you were standing — move to dodge it. The lunge barrels straight through you (contact still hurts) and only stops when it slams a wall.
+		* HOMING SEEKERS: bosses can launch colourful homing missiles that curve after you and burst in a small explosion when they die — juke to shake them, or shoot them down (from a safe distance, as they still go off).
 		* Bosses now ENRAGE at 25% health — turning red with an angry flex and firing noticeably faster for the rest of the fight. The whole fight also opens at a brisker pace.
 		* Some boss fights also send in 'add' enemies to keep you busy. These now erupt from the boss and are flung out toward the sharks, and always match the boss's own kind — a giant bee sends a bee swarm, a skeleton lord sends skeletons.
 		* Defeat the boss for a big score bonus and a full heal; later bosses are tougher.

@@ -15,6 +15,7 @@ enum { CHARGE_NONE, CHARGE_TELEGRAPH, CHARGE_CHARGING, CHARGE_RECOVERING }
 
 const EnemyAttackScene = preload("res://Scenes/EnemyAttack.tscn")
 const EnemyScene = preload("res://Scenes/Enemy.tscn")
+const HomingSeekerScene = preload("res://Scenes/HomingSeeker.tscn")
 
 signal boss_damaged(current_health, max_health)
 signal boss_defeated(defeat_position, attacker)
@@ -242,6 +243,8 @@ func _on_attack_timer_timeout():
 				_attack_wall()
 			constants.BOSS_ATTACK_CURVING_SPIRAL:
 				_attack_curving_spiral()
+			constants.BOSS_ATTACK_HOMING:
+				_attack_homing_seekers()
 	$AttackTimer.start(attack_interval)
 
 
@@ -364,6 +367,27 @@ func _attack_twin_spiral():
 		var base = (360.0 / count) * i
 		_fire_projectile(Vector2(1, 0).rotated(deg_to_rad(_spiral_angle + base)))
 		_fire_projectile(Vector2(1, 0).rotated(deg_to_rad(-_spiral_angle - base)))
+
+
+# A short fan of homing missiles toward the nearest shark. Each then curves after
+# its target at a capped turn rate and times out into a mini ring burst; they are
+# shootable (see HomingSeeker.gd).
+func _attack_homing_seekers():
+	var target = get_parent().get_nearest_player(global_position)
+	var aim = Vector2.DOWN
+	if target != null:
+		aim = (target.global_position - global_position).normalized()
+	var count = constants.BOSS_SEEKER_COUNT
+	var spread = constants.BOSS_SEEKER_SPREAD_DEGREES
+	for i in range(count):
+		var offset = 0.0
+		if count > 1:
+			offset = -spread / 2.0 + (spread / (count - 1)) * i
+		var seeker = HomingSeekerScene.instantiate()
+		get_parent().add_child(seeker)
+		seeker.add_to_group("enemyAttack")
+		seeker.global_position = global_position
+		seeker.velocity = aim.rotated(deg_to_rad(offset)) * constants.BOSS_SEEKER_SPEED
 
 
 # A wide, dense fan aimed at the nearest shark.
