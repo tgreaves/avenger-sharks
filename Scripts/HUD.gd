@@ -263,14 +263,13 @@ func add_second_upgrade_summary():
 		return
 	upgrade_summary_2 = $CanvasLayer/UpgradeSummary.duplicate()
 	upgrade_summary_2.name = "UpgradeSummary2"
-	# Right side (player 1's summary stays on the left). Pushed below the P2
-	# score label (which occupies the right slot in 2-player-human).
+	# Right side (player 1's summary stays on the left). Keep P1's top/bottom from
+	# the duplicate so the two summaries share the same height; only the horizontal
+	# placement changes here (vertical top is set by set_second_upgrade_summary_top).
 	upgrade_summary_2.anchor_left = 1.0
 	upgrade_summary_2.anchor_right = 1.0
 	upgrade_summary_2.offset_left = -658.0
 	upgrade_summary_2.offset_right = -6.0
-	upgrade_summary_2.offset_top = 280.0
-	upgrade_summary_2.offset_bottom = 720.0
 	upgrade_summary_2.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	$CanvasLayer.add_child(upgrade_summary_2)
 

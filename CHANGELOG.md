@@ -33,6 +33,9 @@
 	* Boss waves: aligned the boss collision shapes (bee and necromancer) to their bodies so shots register on the creature rather than the empty water around it.
 		* A shark caught mid-SWIM SURGE (dash) when a wave ended could get stuck in the dash and fail to hunt the key; the dash is now cleared cleanly at wave end.
 		* Fixed controls becoming unresponsive for a whole wave if an enemy that spawned during the swim-in blocked or deflected a shark from reaching its start position (most easily hit on special waves like FEEL THE BUZZ that spawn enemies around the sharks).
+		* Two-player boss waves: the second shark could get stuck on the swim-in and never enter the boss room; both sharks now start inside the room.
+		* Two-player waves: the two sharks now spawn symmetrically about the centre (previously player 1 sat on the centre and player 2 was offset to the right) — most noticeable in the boss room, where the camera is locked.
+		* Two-player HUD: player 2's upgrade list is now aligned with player 1's (same top and height) instead of sitting lower with a gap below the score.
 * Platform:
 	* Godot upgrade to 4.7.stable.
 	* Steam: GodotSteam GDExtension upgraded to 4.20.

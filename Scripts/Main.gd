@@ -524,10 +524,22 @@ func prepare_for_wave():
 		player.prepare_for_new_wave()
 		player.visible = true
 		#player.position = Vector2(2650, 2500)
-		# y=2521 is one tile above the bottom wall band (row 33): spawning both
-		# sharks clear of it keeps them at the same height (player 2's column
-		# has a wall at the spawn row that would otherwise bump it up ~1 tile).
-		player.position = Vector2(2650, 2521) + (PLAYER_2_START_OFFSET * player_index)
+		if is_boss_wave:
+			# Start both sharks INSIDE the boss room (just below their rest markers)
+			# so neither has to path through the narrow 2-tile bottom-door gap. Player
+			# 2's lane is offset clear of that gap and would otherwise jam against the
+			# room's bottom wall and never get in. Mirrors how normal waves start the
+			# sharks already inside the arena; they just swim up a little to arrive.
+			var inside_y = boss_arena_interior.position.y + boss_arena_interior.size.y * 0.9
+			var boss_base_x = swim_in_base_x(constants.BOSS_ARENA_CENTER.x)
+			player.position = Vector2(boss_base_x, inside_y) + (PLAYER_2_START_OFFSET * player_index)
+		else:
+			# y=2521 is one tile above the bottom wall band (row 33): spawning both
+			# sharks clear of it keeps them at the same height (player 2's column
+			# has a wall at the spawn row that would otherwise bump it up ~1 tile).
+			# X centres the pair on P1's default spot (matches the markers set in
+			# setup_boss_arena_if_needed), so 2-player spawns are symmetric.
+			player.position = Vector2(swim_in_base_x(_default_marker_x_p1), 2521) + (PLAYER_2_START_OFFSET * player_index)
 		player.get_node("AnimatedSprite2D").animation = "default"
 		player.get_node("AnimatedSprite2D").play()
 		player_index += 1
@@ -1133,9 +1145,11 @@ func spawn_fish():
 	add_child(mob, true)
 
 
-# Default (non-boss) swim-in marker Y and exit node positions, captured once so
-# boss waves can relocate them and normal waves can restore them.
+# Default (non-boss) swim-in marker positions and exit node positions, captured
+# once so boss waves can relocate them and normal waves can restore them.
 var _default_marker_y = null
+var _default_marker_x_p1 = null
+var _default_marker_x_p2 = null
 var _default_exit_door_pos = null
 var _default_exit_location_pos = null
 
@@ -1152,6 +1166,8 @@ func setup_boss_arena_if_needed():
 	var exit_location = $Arena.get_node("ExitLocation")
 	if _default_marker_y == null:
 		_default_marker_y = p1.global_position.y
+		_default_marker_x_p1 = p1.global_position.x
+		_default_marker_x_p2 = p2.global_position.x
 		_default_exit_door_pos = exit_door.global_position
 		_default_exit_location_pos = exit_location.global_position
 
@@ -1165,6 +1181,12 @@ func setup_boss_arena_if_needed():
 		var rest_y = boss_arena_interior.position.y + boss_arena_interior.size.y * 0.82
 		p1.global_position.y = rest_y
 		p2.global_position.y = rest_y
+		# Centre the shark pair on the room's centre line (the camera is locked on the
+		# room, so an off-centre pair reads as lopsided): P1 just left of centre, P2
+		# just right, straddling the door. base_x also keeps a lone shark dead centre.
+		var base_x = swim_in_base_x(constants.BOSS_ARENA_CENTER.x)
+		p1.global_position.x = base_x
+		p2.global_position.x = base_x + PLAYER_2_START_OFFSET.x
 		# Exit is the room's top door; ExitLocation sits just above it.
 		var door_pos = $Arena.boss_top_door_position()
 		exit_door.global_position = door_pos
@@ -1173,8 +1195,22 @@ func setup_boss_arena_if_needed():
 		boss_arena_interior = Rect2()
 		p1.global_position.y = _default_marker_y
 		p2.global_position.y = _default_marker_y
+		# Centre the pair the same way as boss waves — around P1's default spot — so
+		# 2-player spawns are symmetric here too. A lone shark stays on its spot.
+		var base_x = swim_in_base_x(_default_marker_x_p1)
+		p1.global_position.x = base_x
+		p2.global_position.x = base_x + PLAYER_2_START_OFFSET.x
 		exit_door.global_position = _default_exit_door_pos
 		exit_location.global_position = _default_exit_location_pos
+
+
+# Leftmost swim-in X for a 2-player wave: the shark pair is centred on `centre_x`,
+# so P1 sits half the P2 offset left of centre and P2 half-offset right (a single
+# shark lands on `centre_x`). Shared by the marker placement and the spawn point so
+# they line up and the sharks swim straight up. Boss waves centre on the room; normal
+# waves centre on P1's default marker spot.
+func swim_in_base_x(centre_x: float) -> float:
+	return centre_x - PLAYER_2_START_OFFSET.x * (player_count - 1) / 2.0
 
 
 # Spawn the single boss for a boss wave. Health scales with player count so the
@@ -1553,8 +1589,9 @@ func apply_score_hud_layout():
 		score2.offset_right = -20.0
 		score2.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 
-		# P2's summary sits below the P2 score.
-		$HUD.set_second_upgrade_summary_top(280.0)
+		# P2's summary sits below the P2 score, at the same height as P1's (the P2
+		# score shares P1's offset_top), so the two upgrade lists line up.
+		$HUD.set_second_upgrade_summary_top(p1_summary_top)
 	else:
 		high_score_label.visible = true
 		high_score_label.anchor_left = 1.0
