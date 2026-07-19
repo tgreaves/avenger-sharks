@@ -625,6 +625,12 @@ func wave_intro():
 func start_wave():
 	game_status = GAME_RUNNING
 
+	# Safety net: if a shark is still swimming to its start marker as the wave goes
+	# live (e.g. an enemy that spawned during the swim-in blocked or deflected it),
+	# force it to arrive so its controls aren't left dead for the whole wave.
+	for player in get_players():
+		player.ensure_arrived_at_start()
+
 	if $SharkAttackMusic.is_playing():
 		$SharkAttackMusic.stop()
 

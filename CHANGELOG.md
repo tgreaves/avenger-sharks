@@ -31,6 +31,7 @@
 	* Boss waves: the larger bosses (bee, snake) could get stuck against a side wall while pacing instead of turning around. They now reverse on wall contact.
 	* Boss waves: aligned the boss collision shapes (bee and necromancer) to their bodies so shots register on the creature rather than the empty water around it.
 		* A shark caught mid-SWIM SURGE (dash) when a wave ended could get stuck in the dash and fail to hunt the key; the dash is now cleared cleanly at wave end.
+		* Fixed controls becoming unresponsive for a whole wave if an enemy that spawned during the swim-in blocked or deflected a shark from reaching its start position (most easily hit on special waves like FEEL THE BUZZ that spawn enemies around the sharks).
 * Platform:
 	* Godot upgrade to 4.7.stable.
 	* Steam: GodotSteam GDExtension upgraded to 4.20.

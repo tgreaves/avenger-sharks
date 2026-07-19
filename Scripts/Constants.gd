@@ -18,7 +18,7 @@ const DEV_FORCE_UPGRADE = ""   	# ""
 const DEV_FORCE_POWERUP = ""	# ""
 const DEV_WAVE_LASTS_FOREVER = false
 const DEV_WIPE_ACHIEVEMENTS = false
-const DEV_FORCE_BOSS_WAVE = true   # Force every wave to be a boss wave for testing.
+const DEV_FORCE_BOSS_WAVE = false   # Force every wave to be a boss wave for testing.
 # Force every boss to a specific type (a BOSS_TYPE_SETTINGS key, e.g. "bee") for
 # testing that type's sprite / hitbox / behaviour. Empty string = random as normal.
 const DEV_FORCE_BOSS_WAVE_TYPE = ""
@@ -73,6 +73,11 @@ const PLAYER_SPEED_ESCAPING = 1200
 # How close the following shark gets to the key-holder before it stops (co-op
 # wave-end), so it doesn't jitter on top of the holder at the door.
 const FOLLOW_STOP_DISTANCE = 250.0
+# How close to its start marker a shark must get during the swim-in to count as
+# arrived (in addition to physically touching the marker). Guards against being
+# nudged into orbiting the marker without a clean contact when enemies spawn in
+# the way during the swim-in.
+const PLAYER_START_ARRIVE_DISTANCE = 60.0
 
 const PLAYER_FIRE_DELAY = 0.15
 const PLAYER_FIRE_DELAY_POWERUP_DECREASE = 0.01

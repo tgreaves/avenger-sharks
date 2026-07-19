@@ -719,12 +719,26 @@ func _physics_process(_delta):
 			if $DoorCloseTimer.time_left == 0:
 				# Close bottom door.
 				arena.close_bottom_door()
-			for i in get_slide_collision_count():
-				var collision = get_slide_collision(i)
 
-				if collision.get_collider().name == start_marker_name:
-					shark_status = ALIVE
-					arena.get_node(start_marker_name).get_node("CollisionShape2D").disabled = true
+			# Re-aim at the marker every frame. The swim-in velocity was set once
+			# when it began, so a knock from an enemy that spawned during the swim-in
+			# would otherwise deflect us off course for good and we'd never reach the
+			# marker — leaving controls dead for the whole wave.
+			var marker = arena.get_node(start_marker_name)
+			var to_marker = marker.global_position - global_position
+			velocity = to_marker.normalized() * constants.PLAYER_SPEED
+
+			# Arrive within a small radius of the marker, or on a physical touch of
+			# it. The radius covers being jostled into orbiting the marker (or an
+			# enemy sitting on it) without a clean collision.
+			if to_marker.length() <= constants.PLAYER_START_ARRIVE_DISTANCE:
+				_arrive_at_start_position()
+			else:
+				for i in get_slide_collision_count():
+					var collision = get_slide_collision(i)
+
+					if collision.get_collider().name == start_marker_name:
+						_arrive_at_start_position()
 
 
 func player_hit():
@@ -835,12 +849,31 @@ func _on_main_player_move_to_starting_position():
 	var marker = arena.get_node(start_marker_name)
 	marker.get_node("CollisionShape2D").disabled = false
 
-	# Swim toward this player's own start marker (which triggers ALIVE on
-	# collision). Each player has its own marker so both swim in together.
+	# Swim toward this player's own start marker (which triggers ALIVE on arrival).
+	# Each player has its own marker so both swim in together. The heading is
+	# re-aimed every frame in the MOVING_TO_START_POSITION state so a mid-swim knock
+	# can't deflect us off the marker permanently.
 	var target_direction = (marker.global_position - global_position).normalized()
 	velocity = target_direction * constants.PLAYER_SPEED
 
 	$DoorCloseTimer.start()
+
+
+# The swim-in is complete: hand control to the player and stop the marker from
+# interfering. Reached by proximity/contact during the swim-in, or forced by
+# ensure_arrived_at_start() as a safety net when the wave goes live.
+func _arrive_at_start_position():
+	shark_status = ALIVE
+	velocity = Vector2.ZERO
+	arena.get_node(start_marker_name).get_node("CollisionShape2D").disabled = true
+
+
+# Safety net (called from Main.start_wave): if this shark is somehow still swimming
+# to its marker when the wave goes live, force the arrival so its controls are
+# never left dead. Safe to call once the shark is already ALIVE (no-op).
+func ensure_arrived_at_start():
+	if shark_status == MOVING_TO_START_POSITION:
+		_arrive_at_start_position()
 
 
 func powerup_label_animation(powerup_name):
